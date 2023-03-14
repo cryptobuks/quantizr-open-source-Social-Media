@@ -1826,16 +1826,30 @@ Will come back later and study this more. todo-3 */
     width: 100%;
 }
 
-.threadFeedItem {
+.threadFeedItemBase {
     margin-top: 8px;
     padding-top: 10px;
+    border-radius: $border-radius;
+}
+
+.threadFeedItem {
+    @extend .threadFeedItemBase;
     border: 1px solid $nodeBorderBottomColor;
 }
 
 .threadFeedItemTarget {
-    margin-top: 8px;
-    padding-top: 10px;
+    @extend .threadFeedItemBase;
     border: 4px solid $nodeBorderBottomColor;
+}
+
+.threadFeedItemHighlight {
+   @extend .threadFeedItemBase;
+    border: 1px solid olivedrab;
+}
+
+.threadFeedItemHighlightTarget {
+    @extend .threadFeedItemBase;
+    border: 4px solid olivedrab;
 }
 
 .threadFeedSubItem {
@@ -1851,18 +1865,6 @@ Will come back later and study this more. todo-3 */
 
     border-left: 1px solid $nodeBorderBottomColor;
     margin-left: 4rem;
-}
-
-.threadFeedItemHighlight {
-    margin-top: 5px;
-    padding-top: 10px;
-    border: 1px solid olivedrab;
-}
-
-.threadFeedItemHighlightTarget {
-    margin-top: 5px;
-    padding-top: 10px;
-    border: 4px solid olivedrab;
 }
 
 .userFeedItem {
