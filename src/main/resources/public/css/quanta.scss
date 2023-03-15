@@ -1704,7 +1704,7 @@ Will come back later and study this more. todo-3 */
 
 .propsListItemCheckBox {
     vertical-align: middle;
-    margin-left: $smallGap;
+    margin-left: $microGap;
 }
 
 .property-table {
@@ -2023,6 +2023,11 @@ Will come back later and study this more. todo-3 */
     margin: $tinyGap;
 }
 
+.propRangesInList {
+    display: inline-block;
+    margin: $tinyGap;
+}
+
 .friendListImgDiv {
     width: 70px;
     max-width: 70px;
@@ -2143,7 +2148,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .dlgIcon {
-    margin-right: 12px;
+    margin-right: 8px;
     vertical-align: "middle";
 }
 

@@ -784,7 +784,6 @@ export class EditNodeDlg extends DialogBase {
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             const textarea = new TextArea(label + " (read-only)", {
-                placeholder: "Enter property value...",
                 readOnly: "readOnly",
                 disabled: "disabled"
             }, propState);
@@ -830,7 +829,6 @@ export class EditNodeDlg extends DialogBase {
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
                     valEditor = new TextField({
-                        placeholder: "Enter property value...",
                         inputClass: S.props.getInputClassForType(propEntry.name),
                         val: propState
                     });

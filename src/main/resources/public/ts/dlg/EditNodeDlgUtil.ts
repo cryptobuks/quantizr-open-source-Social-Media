@@ -9,7 +9,7 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
-import { EditPropertyDlg } from "./EditPropertyDlg";
+import { EditPropertyDlg, LS as EditPropertyDlgState } from "./EditPropertyDlg";
 import { EmojiPickerDlg, LS as EmojiPickerDlgState } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
@@ -143,15 +143,34 @@ export class EditNodeDlgUtil {
 
         if (propDlg.nameState.getValue()) {
             ast.editNode.properties = ast.editNode.properties || [];
-            const newProp: J.PropertyInfo = {
+            const prop: J.PropertyInfo = {
                 name: propDlg.nameState.getValue(),
                 value: ""
             }
-            ast.editNode.properties.push(newProp);
+            ast.editNode.properties.push(prop);
+
+            // this forces a rerender, even though it looks like we're doing nothing to state.
+            // todo-0: should mergeState come AFTER initPropsState ?
+            dlg.mergeState<EditNodeDlgState>(state);
+            this.initPropState(dlg, ast.editNode, prop);
+        }
+        else {
+            propDlg.getState<EditPropertyDlgState>().selections.forEach(sop => {
+                ast.editNode.properties = ast.editNode.properties || [];
+
+                // if this 'sop' is ALREADY a property we have, ignore it. Don't dupliate it.
+                if (ast.editNode.properties.find(prop => prop.name === sop.label)) return;
+
+                const prop: J.PropertyInfo = {
+                    name: sop.label,
+                    value: ""
+                }
+                ast.editNode.properties.push(prop);
+                this.initPropState(dlg, ast.editNode, prop);
+            });
 
             // this forces a rerender, even though it looks like we're doing nothing to state.
             dlg.mergeState<EditNodeDlgState>(state);
-            this.initPropState(dlg, ast.editNode, newProp);
         }
         // we don't need to return an actual promise here
         return null;

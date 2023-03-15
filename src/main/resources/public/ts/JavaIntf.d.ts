@@ -113,6 +113,11 @@ export interface SchemaOrgClass {
 
 export interface SchemaOrgProp {
     label: string;
+    ranges: SchemaOrgRange[];
+}
+
+export interface SchemaOrgRange {
+    id: string;
 }
 
 export interface UserProfile {

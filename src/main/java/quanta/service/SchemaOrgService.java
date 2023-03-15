@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
+import quanta.model.client.SchemaOrgRange;
 import quanta.response.GetSchemaOrgTypesResponse;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
@@ -33,7 +34,7 @@ public class SchemaOrgService extends ServiceBase {
 	 * always afford to do a brute force thru all properties whenever we need to find the properties in
 	 * a given class.
 	 */
-	public static final HashMap<String, SchemaOrgClass> classMap = new HashMap<>();
+	public HashMap<String, SchemaOrgClass> classMap = new HashMap<>();
 	public static final ArrayList<SchemaOrgClass> classList = new ArrayList<>();
 
 	@EventListener
@@ -53,8 +54,10 @@ public class SchemaOrgService extends ServiceBase {
 					log.debug("schema.org data failed to load.");
 					schema = new HashMap<>();
 				} else {
-					// log.debug("SCHEMA.ORG: " + XString.prettyPrint(schema));
 					parseSchema();
+
+					// allow classMap to be garbage collected now.
+					classMap = null;
 				}
 			} finally {
 				StreamUtil.close(in);
@@ -80,23 +83,7 @@ public class SchemaOrgService extends ServiceBase {
 				if (type instanceof String) {
 					switch ((String) type) {
 						case "rdfs:Class":
-							Object id = mitem.get("@id");
-							if (id instanceof String) {
-								String sid = (String) id;
-								// log.debug("TypeID: " + sid);
-								SchemaOrgClass soc = new SchemaOrgClass();
-								Object label = mitem.get("rdfs:label");
-								String slabel = getStringValue(label);
-
-								if (slabel == null) {
-									throw new RuntimeException("label not available: " + XString.prettyPrint(mitem));
-								}
-
-								soc.setLabel(slabel);
-								soc.setId(sid);
-								classMap.put(sid, soc);
-								classList.add(soc);
-							}
+							setupClass(mitem);
 							break;
 						default:
 							break;
@@ -117,7 +104,6 @@ public class SchemaOrgService extends ServiceBase {
 					String stype = (String) type;
 					switch (stype) {
 						case "rdf:Property":
-							// log.debug("Property: " + stype);
 							setupProperty(mitem);
 						default:
 							break;
@@ -139,6 +125,26 @@ public class SchemaOrgService extends ServiceBase {
 		}
 	}
 
+	private void setupClass(HashMap mitem) {
+		Object id = mitem.get("@id");
+		if (id instanceof String) {
+			String sid = (String) id;
+			// log.debug("TypeID: " + sid);
+			SchemaOrgClass soc = new SchemaOrgClass();
+			Object label = mitem.get("rdfs:label");
+			String slabel = getStringValue(label);
+
+			if (slabel == null) {
+				throw new RuntimeException("label not available: " + XString.prettyPrint(mitem));
+			}
+
+			soc.setLabel(slabel);
+			soc.setId(sid);
+			classMap.put(sid, soc);
+			classList.add(soc);
+		}
+	}
+
 	private String getStringValue(Object label) {
 		String slabel = null;
 		// handle if string
@@ -156,53 +162,94 @@ public class SchemaOrgService extends ServiceBase {
 		return slabel;
 	}
 
-	private void setupProperty(HashMap item) {
-		Object domains = item.get("schema:domainIncludes");
+	private void setupProperty(HashMap prop) {
+		SchemaOrgProp sop = new SchemaOrgProp();
+		setupDomainIncludes(sop, prop);
+		setupRangeIncludes(sop, prop);
+
+		// and these now have no value either, so remove from memory
+		prop.remove("@type");
+		prop.remove("schema:source");
+	}
+
+	private void setupDomainIncludes(SchemaOrgProp sop, HashMap prop) {
+		Object domains = prop.get("schema:domainIncludes");
 		// handle if object
 		if (domains instanceof HashMap) {
-			setupDomainObj(item, domains);
+			setupDomainObj(sop, prop, domains);
 		}
 		// handle of list
 		else if (domains instanceof List) {
 			List ldomains = (List) domains;
 			for (Object domain : ldomains) {
 				if (domain instanceof HashMap) {
-					setupDomainObj(item, domain);
+					setupDomainObj(sop, prop, domain);
 				}
 			}
 		}
 		// else warning
 		else {
-			log.debug("unable to get domainIncludes from " + XString.prettyPrint(item));
+			log.debug("unable to get domainIncludes from " + XString.prettyPrint(prop));
 		}
 
 		// Now that classes are updated we don't need domains to even residen in memory, so blow it away.
-		item.remove("schema:domainIncludes");
-
-		// and these now have no value either, so remove from memory
-		item.remove("@type");
-		item.remove("schema:source");
+		prop.remove("schema:domainIncludes");
 	}
 
-	private void setupDomainObj(HashMap item, Object domain) {
+	private void setupRangeIncludes(SchemaOrgProp sop, HashMap prop) {
+		Object ranges = prop.get("schema:rangeIncludes");
+
+		// handle if object
+		if (ranges instanceof HashMap) {
+			setupRangeObj(sop, prop, ranges);
+		}
+		// handle of list
+		else if (ranges instanceof List) {
+			List lranges = (List) ranges;
+			for (Object range : lranges) {
+				if (range instanceof HashMap) {
+					setupRangeObj(sop, prop, range);
+				}
+			}
+		}
+		// else warning
+		else {
+			log.debug("unable to get domainIncludes from " + XString.prettyPrint(prop));
+		}
+
+		// Now that classes are updated we don't need domains to even residen in memory, so blow it away.
+		prop.remove("schema:domainIncludes");
+	}
+
+	private void setupDomainObj(SchemaOrgProp sop, HashMap prop, Object domain) {
 		HashMap mdomain = (HashMap) domain;
 		Object domainId = mdomain.get("@id");
+
 		if (domainId instanceof String) {
 			String sdomainId = (String) domainId;
 			// log.debug(" DOMAIN: " + domainId);
 			SchemaOrgClass soc = classMap.get(sdomainId);
 			if (soc != null) {
-				SchemaOrgProp prop = new SchemaOrgProp();
-				Object propLabel = item.get("rdfs:label");
+				Object propLabel = prop.get("rdfs:label");
 				String slabel = getStringValue(propLabel);
 
 				if (slabel != null) {
-					prop.setLabel(slabel);
-					soc.getProps().add(prop);
+					sop.setLabel(slabel);
+					soc.getProps().add(sop);
 				} else {
-					throw new RuntimeException("Unable to parse 'rdfs:label' from " + XString.prettyPrint(item));
+					throw new RuntimeException("Unable to parse 'rdfs:label' from " + XString.prettyPrint(prop));
 				}
 			}
+		}
+	}
+
+	private void setupRangeObj(SchemaOrgProp sop, HashMap prop, Object range) {
+		HashMap mrange = (HashMap) range;
+		Object rangeId = mrange.get("@id");
+
+		if (rangeId instanceof String) {
+			String srangeId = (String) rangeId;
+			sop.getRanges().add(new SchemaOrgRange(srangeId.replace("schema:", "")));
 		}
 	}
 

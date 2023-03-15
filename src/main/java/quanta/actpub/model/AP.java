@@ -29,14 +29,6 @@ public class AP {
     /**
      * Looks in all elements of list, to find all elements that are Objects, and returns the value of
      * the first one containing the prop val as a property of it
-     * 
-     * example: Some servers have this for 'context' (i.e. an array), so we need to support and be able
-     * to get @language this way...
-     * 
-     * <pre>
-     * [ "https://www.w3.org/ns/activitystreams",
-     * "https://shitposter.club/schemas/litepub-0.1.jsonld", { "@language" : "und" } ]
-     * </pre>
      */
     public static Object apParseList(List list, String prop) {
         if (list == null)
