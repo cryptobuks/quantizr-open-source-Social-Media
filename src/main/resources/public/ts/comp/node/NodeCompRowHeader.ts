@@ -268,7 +268,7 @@ export class NodeCompRowHeader extends Div {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
-                    className: iconClass + (type.schemaOrg ? "microMarginRight" : " marginRight"),
+                    className: iconClass + (type.schemaOrg ? " microMarginRight" : " marginRight"),
                     title: "Node Type: " + type.getName()
                 }));
 

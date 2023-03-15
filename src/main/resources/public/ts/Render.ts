@@ -150,10 +150,13 @@ export class Render {
         // https://github.com/markedjs/marked/issues/882
         this.markedRenderer.link = (href: string, title: string, text: string) => {
             // console.log(`marked.link [${href}][${title}][${text}]`);
-            if (href.indexOf("mailto:") === 0) {
-                // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that.
-                return `<span class="userNameInContent">${text}</span>`;
-            }
+
+            // This will format the "clay@server.com" part of "@clay@server.com", and leave the prefix "@" character
+            // on the front unformatted so let's not do this.
+            // if (href.indexOf("mailto:") === 0) {
+            //     // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that.
+            //     return `<span class="userNameInContent">${text}</span>`;
+            // }
 
             if (title) {
                 return `<a href="${href}" title="${title}" target="_blank">${text}</a>`;

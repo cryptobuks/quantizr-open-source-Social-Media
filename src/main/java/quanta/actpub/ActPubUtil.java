@@ -451,7 +451,7 @@ public class ActPubUtil extends ServiceBase {
 
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            log.debug("POST: " + body + "\nTO: " + url + " RESULT: " + response.getStatusCode() + " response="
+            log.trace("POST: " + body + "\nTO: " + url + " RESULT: " + response.getStatusCode() + " response="
                     + response.getBody());
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
