@@ -25,5 +25,5 @@ export interface CompIntf {
     getCompClass(): string;
     create(): ReactNode;
     tag(type: any, props?: object, childrenArg?: any[]): ReactNode;
-    sortChildren(): void;
+    ordinalSortChildren(): void;
 }

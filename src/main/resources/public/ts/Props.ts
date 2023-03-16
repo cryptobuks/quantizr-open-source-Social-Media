@@ -9,6 +9,7 @@ export class Props {
     that it would never make sense to display an edit field for editing their value in the editor */
     controlBasedPropertyList: Set<string> = new Set<string>();
 
+    // todo-0: is ordering properties still relevant?
     orderProps = (propOrder: string[], _props: J.PropertyInfo[]): J.PropertyInfo[] => {
         const propsNew: J.PropertyInfo[] = S.util.arrayClone(_props);
         let targetIdx: number = 0;

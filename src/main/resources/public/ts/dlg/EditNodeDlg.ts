@@ -549,7 +549,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        _.propsParent.sortChildren();
+        _.propsParent.ordinalSortChildren();
         return ret;
     }
 
@@ -772,7 +772,6 @@ export class EditNodeDlg extends DialogBase {
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems: any[] = [];
-        debugger;
         const label = propConfig?.label || (type ? type.getEditLabelForProp(propEntry.name) : propEntry.name);
         const propType = type.getType(propEntry.name);
 
@@ -831,16 +830,20 @@ export class EditNodeDlg extends DialogBase {
                     }, propState, "textarea-min-4 displayCell marginRight");
                 }
                 else {
-                    /* todo-2: eventually we will have data types, but for now we use a hack
-                    to detect to treat a string as a date based on its property name. */
-
-                    // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
                     valEditor = new TextField({
                         outterClass: "marginRight",
                         inputClass: S.props.getInputClassForType(propEntry.name),
                         val: propState
                     });
                 }
+            }
+            // NUMBER TYPE
+            else if (propType === "Number") {
+                valEditor = new TextField({
+                    outterClass: "marginRight",
+                    inputClass: S.props.getInputClassForType(propEntry.name),
+                    val: propState
+                });
             }
             else {
                 console.error("Unsupported type: " + type.getType(propEntry.name));

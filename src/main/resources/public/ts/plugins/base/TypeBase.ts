@@ -70,7 +70,7 @@ export class TypeBase implements TypeIntf {
         return this.typeName;
     }
 
-    // schema.org compatable types: Text, Date, Number? (todo-0: not sure about number name yet)
+    // schema.org compatable types: Text, Date, Number
     getType(prop: string): string {
         return this.getSchemaOrgPropType(prop) || "Text";
     }
@@ -86,9 +86,8 @@ export class TypeBase implements TypeIntf {
         for (const p of this.schemaOrg.props) {
             if (p.label === prop) {
                 for (const r of p.ranges) {
-
-                    // todo-0: add numeric type here?
                     switch (r.id) {
+                        case "Number": return r.id;
                         case "Text": return r.id;
                         case "Date": return r.id;
                         default: break;

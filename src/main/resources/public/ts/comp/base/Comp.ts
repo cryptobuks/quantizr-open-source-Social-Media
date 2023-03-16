@@ -523,7 +523,7 @@ export abstract class Comp implements CompIntf {
 
     // There are a few very special places where we need to sort components
     // that may have been added in an order we don't want this this is how we do it.
-    sortChildren = () => {
+    ordinalSortChildren = () => {
         if (!this.children) return;
         this.children.sort((a, b) => a.ordinal - b.ordinal);
     }

@@ -106,8 +106,10 @@ export class EditNodeDlgUtil {
 
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
+        const type = S.plugin.getType(editNode.type);
         editNode.properties?.forEach(prop => {
             const propState = dlg.propStates.get(prop.name);
+
             if (propState) {
                 // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
                 if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
@@ -119,7 +121,13 @@ export class EditNodeDlgUtil {
                     }
                 }
                 else {
-                    prop.value = propState.getValue();
+                    const dataType = type.getType(prop.name);
+                    if (dataType === "Number") {
+                        prop.value = parseFloat(propState.getValue());
+                    }
+                    else {
+                        prop.value = propState.getValue();
+                    }
                 }
             }
         });
