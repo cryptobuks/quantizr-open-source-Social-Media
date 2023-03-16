@@ -362,7 +362,7 @@ export class EditNodeDlg extends DialogBase {
                     }),
                     state.selectedProps.size > 0 ? new Icon({
                         className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
-                        onClick: () => this.utl.deletePropertiesButtonClick(this),
+                        onClick: () => this.utl.deletePropsGesture(this),
                         title: "Delete property"
                     }) : null
                 ]);

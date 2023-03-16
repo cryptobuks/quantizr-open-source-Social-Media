@@ -20,6 +20,8 @@ export class PropTable extends Comp {
             this.node.properties.forEach(prop => {
                 const propConfig: any = type.getPropConfig(prop.name);
                 const label = propConfig?.label || (type ? type.getEditLabelForProp(prop.name) : prop.name);
+                const propType = type.getType(prop.name);
+                const displayVal = S.util.formatProperty(prop.value, propType);
 
                 if (S.props.isGuiControlBasedProp(prop)) return;
                 const ptr = new PropTableRow({
@@ -29,7 +31,7 @@ export class PropTable extends Comp {
                         title: "Property: " + prop.name,
                         className: "prop-table-name-col"
                     }),
-                    new PropTableCell(prop.value, {
+                    new PropTableCell(displayVal, {
                         className: "prop-table-val-col"
                     })
                 ]);

@@ -246,7 +246,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    deletePropertiesButtonClick = async (dlg: EditNodeDlg) => {
+    deletePropsGesture = async (dlg: EditNodeDlg) => {
         const confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
         await confirmDlg.open();
@@ -257,7 +257,13 @@ export class EditNodeDlgUtil {
 
     deleteSelectedProperties = (dlg: EditNodeDlg) => {
         const keys: string[] = [];
-        dlg.getState<EditNodeDlgState>().selectedProps.forEach(prop => keys.push(prop));
+        const delProps = dlg.getState<EditNodeDlgState>().selectedProps;
+
+        // special case: If user is deleting a date also delete the duration, because these go together.
+        if (delProps.has("date")) {
+            delProps.add("duration");
+        }
+        delProps.forEach(prop => keys.push(prop));
         this.deleteProperties(dlg, keys);
     }
 

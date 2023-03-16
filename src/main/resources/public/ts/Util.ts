@@ -529,6 +529,22 @@ export class Util {
         });
     }
 
+    formatProperty(val: any, type: string): string {
+        switch (type) {
+            case "Text":
+                return val;
+            case "Date":
+                if (typeof val === "string") {
+                    return S.util.formatDateTime(new Date(parseInt(val)));
+                }
+                return S.util.formatDateTime(new Date(val));
+            case "Number":
+                return "" + val;
+            default:
+                return val;
+        }
+    }
+
     formatDateTime = (date: Date): string => {
         let hours = date.getHours();
         const minutes = date.getMinutes();

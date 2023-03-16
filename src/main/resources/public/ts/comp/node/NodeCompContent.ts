@@ -8,6 +8,7 @@ import { Anchor } from "../core/Anchor";
 import { Clearfix } from "../core/Clearfix";
 import { Heading } from "../core/Heading";
 import { Img } from "../core/Img";
+import { PropDisplayLayout } from "../PropDisplayLayout";
 import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 
@@ -51,7 +52,12 @@ export class NodeCompContent extends Div {
         children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
 
         if (ast.userPrefs.showProps && this.node.properties?.length > 0) {
-            children.push(new PropTable(this.node));
+            if (type.schemaOrg) {
+                children.push(new PropDisplayLayout(this.node));
+            }
+            else {
+                children.push(new PropTable(this.node));
+            }
             children.push(new Clearfix());
         }
 
