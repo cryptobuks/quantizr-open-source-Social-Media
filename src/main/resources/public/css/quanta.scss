@@ -607,15 +607,16 @@ strong {
 
 .form-group-border {
     border: 1px solid $gray-600;
-
 }
 
 .edit-props-table {
     margin-top: $smallGap;
     margin-bottom: $smallGap;
-    padding: $smallGap;
+    padding-left: $smallGap;
+    padding-top: $smallGap;
     width: 100%;
     background-color: #17202A;
+    border: 1px solid $gray-600;
 }
 
 .fixedFont {
@@ -2452,4 +2453,14 @@ audio::-webkit-media-controls-play-button {
     border: 1px solid $nodeBorderBottomColor;
     text-align: center;
     margin-right: $bigGap;
+}
+
+.flexPropsEditPanel {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: $smallGap;
+}
+
+.contentEditor {
+    width: 100%;
 }

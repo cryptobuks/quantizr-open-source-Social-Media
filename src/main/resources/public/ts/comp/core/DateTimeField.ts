@@ -14,7 +14,7 @@ export class DateTimeField extends Span {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
-                className: "input-group"
+                className: "input-group marginRight"
             }
         };
 

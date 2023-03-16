@@ -70,6 +70,36 @@ export class TypeBase implements TypeIntf {
         return this.typeName;
     }
 
+    // schema.org compatable types: Text, Date, Number? (todo-0: not sure about number name yet)
+    getType(prop: string): string {
+        return this.getSchemaOrgPropType(prop) || "Text";
+    }
+
+    // for doing simplest possible layouts we allow types to set the width percent used by each property
+    // and then we just let a "display: flex" style take care of rendering them left to right top to bottom
+    getPropConfig = (prop: string): any => {
+        return getAs()?.config?.props?.[this.typeName]?.[prop];
+    }
+
+    getSchemaOrgPropType(prop: string): string {
+        if (!this.schemaOrg) return null;
+        for (const p of this.schemaOrg.props) {
+            if (p.label === prop) {
+                for (const r of p.ranges) {
+
+                    // todo-0: add numeric type here?
+                    switch (r.id) {
+                        case "Text": return r.id;
+                        case "Date": return r.id;
+                        default: break;
+                    }
+                }
+                return null;
+            }
+        }
+        return null;
+    }
+
     /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing
 
     note: adding NodeProps.CONTENT ('cont') to this (not a genuine property like the rest, is allowed, and it

@@ -54,26 +54,26 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.sectionTitle("View Options"),
                 new HorizontalLayout([
                     new Div(null, { className: "accountSettingsCol" }, [
-                        new Checkbox("Show Sensitive Content", { className: "bigMarginLeft" }, {
+                        new Checkbox("Sensitive Content", { className: "bigMarginLeft" }, {
                             setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
                             getValue: (): boolean => ast.userPrefs.nsfw
                         }),
 
-                        new Checkbox("Show Parent", { className: "bigMarginLeft" }, {
+                        new Checkbox("Parent Node", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => {
                                 await S.util.saveUserPrefs(s => s.userPrefs.showParents = checked);
                             },
                             getValue: (): boolean => ast.userPrefs.showParents
                         }),
 
-                        new Checkbox("Show Comments", { className: "bigMarginLeft" }, {
+                        new Checkbox("Comments", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.edit.setShowReplies(checked),
                             getValue: (): boolean => ast.userPrefs.showReplies
                         })
                     ]),
 
                     new Div(null, { className: "accountSettingsCol" }, [
-                        new Checkbox("Show Properties", { className: "bigMarginLeft" }, {
+                        new Checkbox("Properties", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
                         }),

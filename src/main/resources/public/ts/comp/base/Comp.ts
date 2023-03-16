@@ -45,6 +45,7 @@ export abstract class Comp implements CompIntf {
     // we have the 'target' here to make our purifier keep those rendered
     // see also: #onclick-security-note
     static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
+    public ordinal: number;
 
     constructor(attribs?: any, private stateMgr?: State, public scope?: string) {
         if (this.debug) {
@@ -518,6 +519,13 @@ export abstract class Comp implements CompIntf {
             }
             elm.scrollTop = pos;
         }
+    }
+
+    // There are a few very special places where we need to sort components
+    // that may have been added in an order we don't want this this is how we do it.
+    sortChildren = () => {
+        if (!this.children) return;
+        this.children.sort((a, b) => a.ordinal - b.ordinal);
     }
 }
 

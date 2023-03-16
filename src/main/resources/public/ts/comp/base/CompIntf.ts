@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 export interface CompIntf {
     attribs: any;
     debug: boolean;
+    ordinal: number;
 
     getId(prefix?: string): string;
     onMount(func: Function): void;
@@ -24,4 +25,5 @@ export interface CompIntf {
     getCompClass(): string;
     create(): ReactNode;
     tag(type: any, props?: object, childrenArg?: any[]): ReactNode;
+    sortChildren(): void;
 }

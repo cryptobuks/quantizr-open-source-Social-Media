@@ -38,6 +38,10 @@ export interface TypeIntf {
     // todo-1: now that we have EditorOptions, many of the fixed values can be subsumed into it to simplify
     // this interface
     getEditorOptions(): EditorOptions;
+    getType(prop: string): string;
+
+    // add typesafety here (todo-0)
+    getPropConfig(prop: string): any;
 }
 
 export enum NodeActionType {

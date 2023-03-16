@@ -37,4 +37,19 @@ menu:
       link: ":home"
     - name: "User Guide"
       link: ":user-guide"
+
+props:
+  Person:
+    givenName:
+      label: "First Name"
+      width: 40
+      ord: 1
+    familyName:
+      label: "Last Name"
+      width: 60
+      ord: 2
+    birthDate:
+      label: "Birthday"
+      width: 80
+      ord: 3
       

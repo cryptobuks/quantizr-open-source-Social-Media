@@ -304,12 +304,16 @@ export class EditNodeDlg extends DialogBase {
         let propsTable: Comp = null;
         let mainPropsTable: Comp = null;
 
-        const propsParent = new Div(null, {
-            className: "edit-props-table form-group-border marginBottom"
-        });
-
-        // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
+        const flexPropsEditPanel = !customProps;
+        let propsParent: Div = null;
+        console.log("customProps: " + customProps);
+        // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel.
+        // todo-0: does this make sense in the new schemaOrg system ? having this if condition and two different ways?
         if (!customProps) {
+            propsParent = new Div(null, {
+                className: "edit-props-table marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+            });
+
             propsTable = propsParent;
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
             mainPropsTable = new Div(null, {
@@ -317,6 +321,9 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
+            propsParent = new Div(null, {
+                className: "edit-props-table marginBottom " + (flexPropsEditPanel ? "flexPropsEditPanel" : "")
+            });
             mainPropsTable = propsParent;
         }
 
@@ -336,8 +343,30 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        if (this.buildPropsEditing({ propsParent, state, type, customProps })) {
+        let propsHeaderBar: Div = null;
+        if (this.buildPropsEditPanel({ propsParent, state, type, customProps, flexPropsEditPanel })) {
             propsVisible = true;
+
+            if (type.getAllowPropertyAdd()) {
+                const state = this.getState<LS>();
+                propsHeaderBar = new Div(null, { className: "float-end" }, [
+                    new Icon({
+                        className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
+                        onClick: async () => {
+                            dispatch("setPropsPanelExpanded", s => {
+                                s.propsPanelExpanded = true;
+                            });
+                            await this.utl.addProperty(this);
+                        },
+                        title: "Add property"
+                    }),
+                    state.selectedProps.size > 0 ? new Icon({
+                        className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
+                        onClick: () => this.utl.deletePropertiesButtonClick(this),
+                        title: "Delete property"
+                    }) : null
+                ]);
+            }
         }
 
         if (!propsVisible) {
@@ -377,6 +406,8 @@ export class EditNodeDlg extends DialogBase {
         let propsCollapsePanel: CollapsiblePanel = null;
         if (propsTable) {
             propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
+                new Clearfix(),
+                propsHeaderBar,
                 propsTable
             ], false,
                 (expanded: boolean) => {
@@ -487,9 +518,9 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* returns true if props table is not empty. This method has an "options object" arguments
-    pattern I'm trying out */
-    buildPropsEditing = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[] }): boolean => {
-        let numPropsShowing: number = 0;
+    pattern I'm trying out.
+    todo-1: This pattern of argument passing by name, not position is better for larg argument lists. */
+    buildPropsEditPanel = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
         let ret = false;
         const ast = getAs();
         if (ast.editNode.properties) {
@@ -510,8 +541,7 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
                         const allowSelection = !_.customProps || _.type?.hasSelectableProp(prop.name);
-                        const tableRow = this.makePropEditor(_.type, prop, durationProp, allowSelection, _.type ? _.type.getEditorRowsForProp(prop.name) : 1);
-                        numPropsShowing++;
+                        const tableRow = this.makePropEditField(_.type, prop, durationProp, allowSelection, _.type ? _.type.getEditorRowsForProp(prop.name) : 1, _.flexPropsEditPanel);
                         _.propsParent.addChild(tableRow);
                         ret = true;
                     }
@@ -519,31 +549,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        const allowPropAdd: boolean = _.type ? _.type.getAllowPropertyAdd() : true;
-        if (allowPropAdd) {
-            if (numPropsShowing > 0) {
-                const state = this.getState<LS>();
-                const propsButtonBar: ButtonBar = new ButtonBar([
-                    new IconButton("fa-plus-circle", null, {
-                        onClick: async () => {
-                            dispatch("setPropsPanelExpanded", s => {
-                                s.propsPanelExpanded = true;
-                            });
-                            await this.utl.addProperty(this);
-                        },
-                        title: "Add property"
-                    }),
-                    state.selectedProps.size > 0 ? new IconButton("fa-trash", null, {
-                        onClick: () => this.utl.deletePropertiesButtonClick(this),
-                        title: "Delete property"
-                    }) : null
-                ], null, "float-end");
-
-                // adds the button bar to the top of the list of children.
-                _.propsParent.insertFirstChild(propsButtonBar);
-                ret = true;
-            }
-        }
+        _.propsParent.sortChildren();
         return ret;
     }
 
@@ -752,14 +758,30 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+    /* Creates the editing field for a single property 'propEntry' */
+    makePropEditField = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo,
+        allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div => {
         const ast = getAs();
-        const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
+        // Warning: Don't put any margins on this row because the widths to allow widths that sum to
+        // precisely 100% to work correctly. Adding a margin would make it wrap prematurely.
+        const rowAttribs: any = { className: "marginBottom" };
+        const propConfig: any = type.getPropConfig(propEntry.name);
+        const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
+        const tableRow = new Div(null, rowAttribs);
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        const editItems = [];
-        const label = type ? type.getEditLabelForProp(propEntry.name) : propEntry.name;
+        const editItems: any[] = [];
+        debugger;
+        const label = propConfig?.label || (type ? type.getEditLabelForProp(propEntry.name) : propEntry.name);
+        const propType = type.getType(propEntry.name);
+
+        if (flexPropsEditPanel) {
+            const w: number = propConfig?.width || 100;
+            const widthStr = "" + w + "%";
+            rowAttribs.style = { width: widthStr, maxWidth: widthStr };
+        }
+
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: Validator = this.propStates.get(propEntry.name);
@@ -768,77 +790,89 @@ export class EditNodeDlg extends DialogBase {
             this.propStates.set(propEntry.name, propState);
         }
 
-        let durationState: Validator = null;
-        if (durationPropEntry) {
-            durationState = this.propStates.get(durationPropEntry.name);
-            if (!durationState) {
-                durationState = new Validator(durationPropEntry.value);
-                this.propStates.set(durationPropEntry.name, durationState);
-            }
-        }
-
         // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
         // which is not a valid time to be updating states
 
-        // todo-2: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
+        // todo-0: actually this is wrong to just do a Textarea always when it's readonly. It might be a non-multiline item here
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             const textarea = new TextArea(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
-            }, propState);
+            }, propState, "marginRight");
 
             editItems.push(textarea);
         }
         else {
-            if (allowCheckbox) {
-                const checkbox = new Checkbox(label, null, {
-                    setValue: (checked: boolean) => {
-                        const state = this.getState<LS>();
-                        if (checked) {
-                            state.selectedProps.add(propEntry.name);
-                        }
-                        else {
-                            state.selectedProps.delete(propEntry.name);
-                        }
-                        this.mergeState<LS>({ selectedProps: state.selectedProps });
-                    },
-                    getValue: (): boolean => this.getState<LS>().selectedProps.has(propEntry.name)
-                });
-                editItems.push(checkbox);
-            }
-            else {
-                editItems.push(new Label(label, { className: "marginTop" }));
-            }
-
+            this.addPropCheckboxOrLabel(allowCheckbox, label, propEntry, editItems);
             let valEditor: CompIntf = null;
             const multiLine = rows > 1;
 
-            if (multiLine) {
-                valEditor = new TextArea(null, {
-                    rows: "" + rows,
-                    id: "prop_" + ast.editNode.id
-                }, propState, "textarea-min-4 displayCell");
+            // We have the one special case that a property named 'date' is assumed to be a "Date" type always
+            // DATE TYPE
+            if (propType === "Date" || propEntry.name === J.NodeProp.DATE) {
+                let durationState: Validator = null;
+                if (durationPropEntry) {
+                    durationState = this.propStates.get(durationPropEntry.name);
+                    if (!durationState) {
+                        durationState = new Validator(durationPropEntry.value);
+                        this.propStates.set(durationPropEntry.name, durationState);
+                    }
+                }
+                valEditor = new DateTimeField(propState, durationState);
             }
-            else {
-                /* todo-2: eventually we will have data types, but for now we use a hack
-                to detect to treat a string as a date based on its property name. */
-                if (propEntry.name === J.NodeProp.DATE) {
-                    valEditor = new DateTimeField(propState, durationState);
+            // TEXT/TEXTAREA TYPE
+            else if (propType === "Text") {
+                if (multiLine) {
+                    // todo-0: I think displayCell class is wrong here, based on current refactoring.
+                    valEditor = new TextArea(null, {
+                        rows: "" + rows,
+                        id: "prop_" + ast.editNode.id
+                    }, propState, "textarea-min-4 displayCell marginRight");
                 }
                 else {
+                    /* todo-2: eventually we will have data types, but for now we use a hack
+                    to detect to treat a string as a date based on its property name. */
+
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
                     valEditor = new TextField({
+                        outterClass: "marginRight",
                         inputClass: S.props.getInputClassForType(propEntry.name),
                         val: propState
                     });
                 }
             }
+            else {
+                console.error("Unsupported type: " + type.getType(propEntry.name));
+            }
 
             editItems.push(valEditor as any as Comp);
         }
         tableRow.setChildren(editItems);
+        tableRow.ordinal = ordinal;
         return tableRow;
+    }
+
+    private addPropCheckboxOrLabel(allowCheckbox: boolean, label: string, propEntry: J.PropertyInfo, editItems: any[]) {
+        if (allowCheckbox) {
+            const checkbox = new Checkbox(label, null, {
+                setValue: (checked: boolean) => {
+                    const state = this.getState<LS>();
+                    if (checked) {
+                        state.selectedProps.add(propEntry.name);
+                    }
+                    else {
+                        state.selectedProps.delete(propEntry.name);
+                    }
+                    this.mergeState<LS>({ selectedProps: state.selectedProps });
+                },
+                getValue: (): boolean => this.getState<LS>().selectedProps.has(propEntry.name)
+            });
+            editItems.push(checkbox);
+        }
+        else {
+            editItems.push(new Label(label, { className: "marginTop" }));
+        }
     }
 
     async initContent(): Promise<void> {
@@ -897,7 +931,7 @@ export class EditNodeDlg extends DialogBase {
         this.contentEditor = new TextArea(null, {
             id: C.ID_PREFIX_EDIT + ast.editNode.id,
             rows
-        }, this.contentEditorState, "font-inherit displayCell", true, this.contentScrollPos);
+        }, this.contentEditorState, "font-inherit", true, this.contentScrollPos);
         if (this.decryptFailed) {
             this.contentEditor.setEnabled(false);
         }
@@ -944,7 +978,7 @@ export class EditNodeDlg extends DialogBase {
         ], "float-end microMarginBottom bigMarginRight"));
         editItems.push(this.contentEditor as any as Comp);
 
-        return new Div(null, null, editItems);
+        return new Div(null, { className: "contentEditor" }, editItems);
     }
 
     // NOTE: Be careful renaming this method. It's referenced in an "as any" way in one place.
