@@ -28,7 +28,7 @@ export class PropDisplayLayout extends Div {
                 const attrs: any = { className: "fieldDisplayCell", title: "Property: " + prop.name };
                 attrs.style = { width: widthStr, maxWidth: widthStr };
                 const propType = type.getType(prop.name);
-                const displayVal = S.util.formatProperty(prop.value, propType);
+                const displayVal = S.util.formatProperty(prop.value, propType) || "?";
 
                 const tableRow = new Div(null, attrs, [
                     new Div(label, { className: "fieldDisplayLabel" }),

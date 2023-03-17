@@ -306,8 +306,7 @@ public class NodeEditService extends ServiceBase {
 		update.saveIfDirty(ms, parentNode);
 
 		// We save this right away, before calling convertToNodeInfo in case that method does any Db related
-		// stuff
-		// where it's expecting the node to exist.
+		// stuff where it's expecting the node to exist.
 		update.save(ms, newNode);
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //

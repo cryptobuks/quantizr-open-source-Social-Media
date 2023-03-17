@@ -459,7 +459,7 @@ export class Util {
         return names ? names.length : 0;
     }
 
-    /* Iterates by callling callback with property key/value pairs for each property in the object
+    /* Iterates by calling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
     forEachProp = (obj: Object, callback: I.PropertyIterator) => {
         if (!obj) return;
