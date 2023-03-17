@@ -1,6 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
-import { EditorOptions } from "../Interfaces";
+import { ConfigProp, EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { TabIntf } from "./TabIntf";
 
@@ -40,8 +40,7 @@ export interface TypeIntf {
     getEditorOptions(): EditorOptions;
     getType(prop: string): string;
 
-    // add typesafety here (todo-0)
-    getPropConfig(prop: string): any;
+    getPropConfig(prop: string): ConfigProp;
 }
 
 export enum NodeActionType {

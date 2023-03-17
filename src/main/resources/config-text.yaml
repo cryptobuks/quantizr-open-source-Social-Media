@@ -38,6 +38,7 @@ menu:
     - name: "User Guide"
       link: ":user-guide"
 
+# NOTE: These entries have an interface in the typescript called 'ConfigProp' in 'interfaces.ts'
 props:
   Person:
     givenName:
@@ -50,6 +51,6 @@ props:
       ord: 2
     birthDate:
       label: "Birthday"
-      width: 80
+      width: 100
       ord: 3
       

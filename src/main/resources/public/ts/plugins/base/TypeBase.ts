@@ -5,11 +5,12 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
-import { EditorOptions } from "../../Interfaces";
+import { ConfigProp, EditorOptions } from "../../Interfaces";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import * as I from "../../Interfaces";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
@@ -36,7 +37,7 @@ export class TypeBase implements TypeIntf {
 
     getEditLabelForProp(propName: string): string {
         if (propName === J.NodeProp.DATE) {
-            return "Date";
+            return I.DomainType.Date;
         }
         else if (propName === J.NodeProp.DURATION) {
             return "Duration (HH:MM)";
@@ -72,12 +73,12 @@ export class TypeBase implements TypeIntf {
 
     // schema.org compatable types: Text, Date, Number
     getType(prop: string): string {
-        return this.getSchemaOrgPropType(prop) || "Text";
+        return this.getSchemaOrgPropType(prop) || I.DomainType.Text;
     }
 
     // for doing simplest possible layouts we allow types to set the width percent used by each property
     // and then we just let a "display: flex" style take care of rendering them left to right top to bottom
-    getPropConfig = (prop: string): any => {
+    getPropConfig = (prop: string): ConfigProp => {
         return getAs()?.config?.props?.[this.typeName]?.[prop];
     }
 
@@ -87,9 +88,11 @@ export class TypeBase implements TypeIntf {
             if (p.label === prop) {
                 for (const r of p.ranges) {
                     switch (r.id) {
-                        case "Number": return r.id;
-                        case "Text": return r.id;
-                        case "Date": return r.id;
+                        case I.DomainType.Number:
+                        case I.DomainType.Text:
+                        case I.DomainType.Date:
+                            return r.id;
+
                         default: break;
                     }
                 }

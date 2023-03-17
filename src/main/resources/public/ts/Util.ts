@@ -531,14 +531,14 @@ export class Util {
 
     formatProperty(val: any, type: string): string {
         switch (type) {
-            case "Text":
+            case I.DomainType.Text:
                 return val;
-            case "Date":
+            case I.DomainType.Date:
                 if (typeof val === "string") {
                     return S.util.formatDateTime(new Date(parseInt(val)));
                 }
                 return S.util.formatDateTime(new Date(val));
-            case "Number":
+            case I.DomainType.Number:
                 return "" + val;
             default:
                 return val;

@@ -2467,9 +2467,8 @@ audio::-webkit-media-controls-play-button {
 .fieldDisplayPanel {
     margin-left: 16px;
     margin-bottom: $smallGap;
-    // border: 1px solid $nodeBorderBottomColor;
-    // background-color: #17202A;
-    // border-radius: $border-radius;
+    border-top: 1px dotted $nodeBorderBottomColor;
+    border-right: 1px dotted $nodeBorderBottomColor;
 }
 
 .fieldDisplayLabel {

@@ -18,7 +18,7 @@ export class PropDisplayLayout extends Div {
             this.node.properties.forEach(prop => {
                 if (S.props.isGuiControlBasedProp(prop)) return;
 
-                const propConfig: any = type.getPropConfig(prop.name);
+                const propConfig = type.getPropConfig(prop.name);
                 const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
                 const label = propConfig?.label || (type ? type.getEditLabelForProp(prop.name) : prop.name);
                 const w: number = propConfig?.width || 100;

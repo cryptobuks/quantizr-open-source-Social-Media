@@ -307,8 +307,6 @@ export class EditNodeDlg extends DialogBase {
         const flexPropsEditPanel = !customProps;
         let propsParent: Div = null;
         console.log("customProps: " + customProps);
-        // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel.
-        // todo-0: does this make sense in the new schemaOrg system ? having this if condition and two different ways?
         if (!customProps) {
             propsParent = new Div(null, {
                 className: "edit-props-table marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
@@ -766,7 +764,7 @@ export class EditNodeDlg extends DialogBase {
         // Warning: Don't put any margins on this row because the widths to allow widths that sum to
         // precisely 100% to work correctly. Adding a margin would make it wrap prematurely.
         const rowAttribs: any = { className: "marginBottom" };
-        const propConfig: any = type.getPropConfig(propEntry.name);
+        const propConfig = type.getPropConfig(propEntry.name);
         const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
         const tableRow = new Div(null, rowAttribs);
         const allowEditAllProps: boolean = getAs().isAdminUser;
@@ -789,68 +787,57 @@ export class EditNodeDlg extends DialogBase {
             this.propStates.set(propEntry.name, propState);
         }
 
-        // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
-        // which is not a valid time to be updating states
+        this.addPropCheckboxOrLabel(allowCheckbox, label, propEntry, editItems);
+        let valEditor: CompIntf = null;
+        const multiLine = rows > 1;
 
-        // todo-0: actually this is wrong to just do a Textarea always when it's readonly. It might be a non-multiline item here
-        // and be better with a Textfield based editor
-        if (!allowEditAllProps && isReadOnly) {
-            const textarea = new TextArea(label + " (read-only)", {
-                readOnly: "readOnly",
-                disabled: "disabled"
-            }, propState, "marginRight");
-
-            editItems.push(textarea);
+        // We have the one special case that a property named 'date' is assumed to be a "Date" type always
+        // DATE TYPE
+        if (propType === I.DomainType.Date || propEntry.name === J.NodeProp.DATE) {
+            let durationState: Validator = null;
+            if (durationPropEntry) {
+                durationState = this.propStates.get(durationPropEntry.name);
+                if (!durationState) {
+                    durationState = new Validator(durationPropEntry.value);
+                    this.propStates.set(durationPropEntry.name, durationState);
+                }
+            }
+            valEditor = new DateTimeField(propState, durationState);
         }
-        else {
-            this.addPropCheckboxOrLabel(allowCheckbox, label, propEntry, editItems);
-            let valEditor: CompIntf = null;
-            const multiLine = rows > 1;
-
-            // We have the one special case that a property named 'date' is assumed to be a "Date" type always
-            // DATE TYPE
-            if (propType === "Date" || propEntry.name === J.NodeProp.DATE) {
-                let durationState: Validator = null;
-                if (durationPropEntry) {
-                    durationState = this.propStates.get(durationPropEntry.name);
-                    if (!durationState) {
-                        durationState = new Validator(durationPropEntry.value);
-                        this.propStates.set(durationPropEntry.name, durationState);
-                    }
-                }
-                valEditor = new DateTimeField(propState, durationState);
+        // TEXT/TEXTAREA TYPE
+        else if (propType === I.DomainType.Text) {
+            if (multiLine) {
+                valEditor = new TextArea(null, {
+                    rows: "" + rows,
+                    id: "prop_" + ast.editNode.id
+                }, propState, "textarea-min-4 marginRight");
             }
-            // TEXT/TEXTAREA TYPE
-            else if (propType === "Text") {
-                if (multiLine) {
-                    // todo-0: I think displayCell class is wrong here, based on current refactoring.
-                    valEditor = new TextArea(null, {
-                        rows: "" + rows,
-                        id: "prop_" + ast.editNode.id
-                    }, propState, "textarea-min-4 displayCell marginRight");
-                }
-                else {
-                    valEditor = new TextField({
-                        outterClass: "marginRight",
-                        inputClass: S.props.getInputClassForType(propEntry.name),
-                        val: propState
-                    });
-                }
-            }
-            // NUMBER TYPE
-            else if (propType === "Number") {
+            else {
                 valEditor = new TextField({
                     outterClass: "marginRight",
                     inputClass: S.props.getInputClassForType(propEntry.name),
                     val: propState
                 });
             }
-            else {
-                console.error("Unsupported type: " + type.getType(propEntry.name));
-            }
-
-            editItems.push(valEditor as any as Comp);
         }
+        // NUMBER TYPE
+        else if (propType === I.DomainType.Number) {
+            valEditor = new TextField({
+                outterClass: "marginRight",
+                inputClass: S.props.getInputClassForType(propEntry.name),
+                val: propState
+            });
+        }
+        else {
+            console.error("Unsupported type: " + type.getType(propEntry.name));
+        }
+
+        if (valEditor && !allowEditAllProps && isReadOnly) {
+            valEditor.attribs.readOnly = "readOnly";
+            valEditor.attribs.disabled = "disabled";
+        }
+
+        editItems.push(valEditor as any as Comp);
         tableRow.setChildren(editItems);
         tableRow.ordinal = ordinal;
         return tableRow;

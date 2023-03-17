@@ -7,6 +7,20 @@ export enum FullScreenType {
     NONE, IMAGE, GRAPH, CALENDAR
 }
 
+export class DomainType {
+    // eslint-disable-next-line no-unused-vars
+    public static Text: string = "Text";
+    public static Date: string = "Date";
+    public static Number: string = "Number";
+}
+
+// For prop types defined in config-text.yaml
+export interface ConfigProp {
+    label: string;
+    width: number;
+    ord: number;
+}
+
 export interface EditorOptions {
     tags?: boolean;
     nodeName?: boolean;
