@@ -150,18 +150,14 @@ export class TypeBase implements TypeIntf {
 
     /* Types can override this to ensure that during node editing there is a hook to prefill and create any properties that are
     required to exist on that type of node in case they aren't existing yet
-
-    todo-0: heavily debug this, i think it's working but for the wrong reason.
     */
     ensureDefaultProperties(node: J.NodeInfo) {
-        console.log("ensureDefaultProperties on type: " + node.type);
         // look for this as a configured property
         const typeObj = getAs()?.config?.props?.[node.type];
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {
             S.util.forEachProp(typeObj, (k: string, v: any): boolean => {
-                console.log("   propDef: " + k);
                 const propFound = node.properties.find(p => p.name === k);
                 if (!propFound) {
                     node.properties.push({ name: k, value: "" });

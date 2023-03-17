@@ -464,19 +464,10 @@ export class Util {
     forEachProp = (obj: Object, callback: I.PropertyIterator) => {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
-        // try {
-            // if (names?.forEach) {
-                names?.forEach(prop => {
-                    /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
-                    if (callback(prop, obj[prop]) === false) return;
-                });
-            // }
-        // }
-        // todo-0: remove this
-        // catch (e) {
-        //     console.error("type of names is " + (typeof names) + " and javscript thinks it doesn't have a forEach method");
-        //     console.error("OBJ: " + S.util.prettyPrint(names));
-        // }
+        names?.forEach(prop => {
+            /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
+            if (callback(prop, obj[prop]) === false) return;
+        });
     }
 
     /* iterates over an object creating a string containing it's keys */

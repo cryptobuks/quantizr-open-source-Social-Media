@@ -319,7 +319,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             propsParent = new Div(null, {
-                className: "edit-props-table marginBottom x2" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+                className: "edit-props-table marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
             mainPropsTable = propsParent;
         }
@@ -799,7 +799,7 @@ export class EditNodeDlg extends DialogBase {
         allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div => {
         const ast = getAs();
 
-        // Warning: Don't put any margins on this row because the widths to allow widths that sum to
+        // Warning: Don't put any left/right margins on this row because the widths to allow widths that sum to
         // precisely 100% to work correctly. Adding a margin would make it wrap prematurely.
         const rowAttribs: any = { className: "marginBottom" };
         const propConfig = type.getPropConfig(propEntry.name);
@@ -816,8 +816,6 @@ export class EditNodeDlg extends DialogBase {
             const widthStr = "" + w + "%";
             rowAttribs.style = { width: widthStr, maxWidth: widthStr };
         }
-
-        // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: Validator = this.propStates.get(propEntry.name);
         if (!propState) {
@@ -955,7 +953,6 @@ export class EditNodeDlg extends DialogBase {
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
         const allowFocus = !this.contentEditor;
-        // console.log("making field editor for val[" + value + "]");
 
         this.contentEditor = new TextArea(null, {
             id: C.ID_PREFIX_EDIT + ast.editNode.id,
