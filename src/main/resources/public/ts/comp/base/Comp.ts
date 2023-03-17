@@ -412,8 +412,9 @@ export abstract class Comp implements CompIntf {
             return ret;
         }
         catch (e) {
+            // todo-0: need to make sure ALL EXCEPTIONS are printint the 'e.stack' value.
             console.error("Failed to render child (in render method) " + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
-                "\nELEMENTS Stack: " + this.getAncestry());
+                "\nELEMENTS Stack: " + this.getAncestry()+"\nJS Stack: "+e.stack);
             return null;
         }
     }

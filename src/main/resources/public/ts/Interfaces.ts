@@ -29,7 +29,6 @@ export interface EditorOptions {
     encrypt?: boolean;
     sign?: boolean;
     inlineChildren?: boolean;
-    contentEditorRows?: string;
 }
 
 export interface FullScreenConfig {

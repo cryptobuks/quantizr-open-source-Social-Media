@@ -609,14 +609,15 @@ strong {
     border: 1px solid $gray-600;
 }
 
-.edit-props-table {
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
-    padding-left: $smallGap;
-    padding-top: $smallGap;
-    width: 100%;
+.edit-props-container {
     background-color: #17202A;
     border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+}
+
+.edit-props-table {
+    padding-left: $smallGap;
+    width: 100%;
 }
 
 .fixedFont {
@@ -2456,7 +2457,6 @@ audio::-webkit-media-controls-play-button {
 .flexPropsEditPanel {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: $smallGap;
 }
 
 .flexPropsDisplayPanel {

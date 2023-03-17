@@ -39,13 +39,13 @@ module.exports = {
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             // #sourceMap
-            // {
-            //     test: /\.js$/,
-            //     enforce: "pre",
-            //     use: [{
-            //         loader: "source-map-loader"
-            //     }]
-            // },
+            {
+                test: /\.js$/,
+                enforce: "pre",
+                use: [{
+                    loader: "source-map-loader"
+                }]
+            },
 
             {
                 // handles both scss or css files.

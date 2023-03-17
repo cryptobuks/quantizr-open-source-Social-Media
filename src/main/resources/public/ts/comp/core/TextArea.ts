@@ -17,7 +17,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     textareaAttribs: any = {};
 
     constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "",
-        public calcRows: boolean = false, private scrollPos: ScrollPos = null) {
+        public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
@@ -130,7 +130,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         //     textarea.style.height = calcHeight(textarea.value) + "px";
         // });
 
-        children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.scrollPos));
+        children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.minRows, this.scrollPos));
         this.setChildren(children);
     }
 }

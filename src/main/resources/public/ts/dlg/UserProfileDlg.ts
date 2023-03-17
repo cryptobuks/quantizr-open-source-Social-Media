@@ -165,7 +165,7 @@ export class UserProfileDlg extends DialogBase {
                     ? new Html(S.util.markdown(state.userProfile.userBio) || "", { className: "bioPanel" })
                     : new TextArea("About Me", {
                         rows: 5
-                    }, this.bioState, null, false, this.textScrollPos),
+                    }, this.bioState, null, false, 3, this.textScrollPos),
 
                 web3Div,
 

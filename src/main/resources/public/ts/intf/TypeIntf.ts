@@ -11,7 +11,8 @@ export interface TypeIntf {
     getName(): string;
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;
     getIconClass(): string;
-    allowAction(action : NodeActionType, node: J.NodeInfo): boolean;
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean;
+    allowDeleteProperty(prop: string): boolean;
     getAllowRowHeader(): boolean;
     getAutoExpandProps(): boolean;
     allowPropertyEdit(typeName: string): boolean;

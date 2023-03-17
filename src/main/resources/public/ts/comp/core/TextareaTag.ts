@@ -8,10 +8,9 @@ interface LS { // Local State
 
 export class TextareaTag extends Comp {
     static CHAR_THRESHOLD = 40;
-    static MIN_ROWS = 3;
     static MAX_ROWS = 15;
 
-    constructor(attribs: Object = {}, private valState: Validator, private calcRows: boolean = false, private scrollPos: ScrollPos = null) {
+    constructor(attribs: Object = {}, private valState: Validator, private calcRows: boolean = false, private minRows: number, private scrollPos: ScrollPos = null) {
         super(attribs, valState.v);
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
@@ -24,7 +23,7 @@ export class TextareaTag extends Comp {
     }
 
     calcRowsFunc(val: string): number {
-        let rows = TextareaTag.MIN_ROWS;
+        let rows = this.minRows;
         if (val) {
             const arr = this.splitLines(val);
             if (arr) {
@@ -45,8 +44,8 @@ export class TextareaTag extends Comp {
             }
         }
 
-        if (rows < TextareaTag.MIN_ROWS) {
-            rows = TextareaTag.MIN_ROWS;
+        if (rows < this.minRows) {
+            rows = this.minRows;
         }
         else if (rows > TextareaTag.MAX_ROWS) {
             rows = TextareaTag.MAX_ROWS;

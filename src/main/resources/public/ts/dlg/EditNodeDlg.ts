@@ -292,13 +292,13 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        const flowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
+        const advFlowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
 
         if (ast.editNode.hasChildren) {
-            flowPanel.addChild(this.createLayoutSelection());
+            advFlowPanel.addChild(this.createLayoutSelection());
         }
 
-        flowPanel.addChildren(this.makeCheckboxesRow(editorOpts));
+        advFlowPanel.addChildren(this.makeCheckboxesRow(editorOpts));
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -306,10 +306,9 @@ export class EditNodeDlg extends DialogBase {
 
         const flexPropsEditPanel = !customProps;
         let propsParent: Div = null;
-        console.log("customProps: " + customProps);
         if (!customProps) {
             propsParent = new Div(null, {
-                className: "edit-props-table marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+                className: "edit-props-table" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
 
             propsTable = propsParent;
@@ -320,7 +319,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             propsParent = new Div(null, {
-                className: "edit-props-table marginBottom " + (flexPropsEditPanel ? "flexPropsEditPanel" : "")
+                className: "edit-props-table marginBottom x2" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
             mainPropsTable = propsParent;
         }
@@ -337,10 +336,17 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsVisible: boolean = false;
-        if (allowContentEdit) {
-            const rows = editorOpts.contentEditorRows || (getAs().mobileMode ? "8" : "10");
+        /* NOTE: We can simply remove the "&& !typoe.schemaOrg" condition here and the content will show up
+         and work just fine even in a schemaOrg type */
+        if (allowContentEdit && !type.schemaOrg) {
+            let rows = "1";
 
-            mainPropsTable.addChild(this.makeContentEditor(rows));
+            // only take some number of default rows greater than 1 if this is a non-schemaOrg type
+            if (!type.schemaOrg) {
+                rows = getAs().mobileMode ? "8" : "10";
+            }
+
+            mainPropsTable.addChild(this.makeContentEditor(rows, type.schemaOrg ? 1 : 3));
             this.contentEditor.setWordWrap(isWordWrap);
             propsVisible = true;
         }
@@ -351,7 +357,8 @@ export class EditNodeDlg extends DialogBase {
 
             if (type.getAllowPropertyAdd()) {
                 const state = this.getState<LS>();
-                propsHeaderBar = new Div(null, { className: "float-end" }, [
+                propsHeaderBar = new Div(null, { className: "float-end tinyMarginTop" }, [
+                    // ADD PROP ICON
                     new Icon({
                         className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
                         onClick: async () => {
@@ -362,6 +369,7 @@ export class EditNodeDlg extends DialogBase {
                         },
                         title: "Add property"
                     }),
+                    // DELETE PROP ICON
                     state.selectedProps.size > 0 ? new Icon({
                         className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
                         onClick: () => this.utl.deletePropsGesture(this),
@@ -371,7 +379,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        if (!propsVisible) {
+        if (!propsVisible || !mainPropsTable.hasChildren()) {
             mainPropsTable = null;
         }
 
@@ -406,18 +414,30 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsCollapsePanel: CollapsiblePanel = null;
+        let propsPanel: Div = null;
+        const propsDiv = new Div(null, { className: "edit-props-container" }, [
+            propsHeaderBar,
+            propsTable
+        ]);
+
         if (propsTable) {
-            propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
-                new Clearfix(),
-                propsHeaderBar,
-                propsTable
-            ], false,
-                (expanded: boolean) => {
-                    if (autoExpandProps) return;
-                    dispatch("setPropsPanelExpanded", s => {
-                        s.propsPanelExpanded = expanded;
-                    });
-                }, getAs().propsPanelExpanded || autoExpandProps, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+            // only if not schema.org type do we want to have properties collapsible
+            if (!type.schemaOrg) {
+                propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
+                    new Clearfix(),
+                    propsDiv
+                ], false,
+                    (expanded: boolean) => {
+                        if (autoExpandProps) return;
+                        dispatch("setPropsPanelExpanded", s => {
+                            s.propsPanelExpanded = expanded;
+                        });
+                    }, getAs().propsPanelExpanded || autoExpandProps, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+            }
+            // if schema.org type show properties in visible panel always
+            else {
+                propsPanel = propsDiv;
+            }
         }
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [
@@ -430,27 +450,37 @@ export class EditNodeDlg extends DialogBase {
             editorSubPanel = type.renderEditorSubPanel(ast.editNode);
         }
 
-        const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
-            tagsEditRow,
-            new Div(null, { className: "row align-items-end" }, [
-                editorOpts.nodeName ? nodeNameTextField : null,
-                editorOpts.priority ? this.createPrioritySelection() : null
-            ]),
-            flowPanel
-        ], false,
-            (expanded: boolean) => {
-                dispatch("setMorePanelExpanded", s => {
-                    s.morePanelExpanded = expanded;
-                });
-            }, getAs().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
+        let advCollapsePanel = null;
+        let advCollapsePanelContainer = null;
+        const hasAdvControls = tagsEditRow?.hasChildren() || advFlowPanel?.hasChildren() || //
+            editorOpts.nodeName || editorOpts.priority;
 
-        const morePanel = new Div(null, { className: "marginBottom" }, [
-            collapsePanel
-        ]);
+        if (hasAdvControls) {
+            advCollapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+                tagsEditRow,
+                new Div(null, { className: "row align-items-end" }, [
+                    editorOpts.nodeName ? nodeNameTextField : null,
+                    editorOpts.priority ? this.createPrioritySelection() : null
+                ]),
+                advFlowPanel
+            ], false,
+                (expanded: boolean) => {
+                    dispatch("setMorePanelExpanded", s => {
+                        s.morePanelExpanded = expanded;
+                    });
+                }, getAs().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
-        const propsPanel = new Div(null, null, [
-            propsCollapsePanel
-        ]);
+            advCollapsePanelContainer = new Div(null, { className: "marginBottom" }, [
+                advCollapsePanel
+            ]);
+        }
+
+        // Note: for schema.org types we will have already created propsPanel and have no propsCollapsePanel.
+        if (!propsPanel) {
+            propsPanel = new Div(null, null, [
+                propsCollapsePanel
+            ]);
+        }
 
         this.attribs[C.NODE_ID_ATTR] = ast.editNode.id;
         // Allows user to drag-n-drop files onto editor to upload
@@ -493,7 +523,7 @@ export class EditNodeDlg extends DialogBase {
         // -------------------------
 
         propEditFieldContainer.setChildren([editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
-            propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
+            propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()]);
 
         return children;
     }
@@ -525,6 +555,7 @@ export class EditNodeDlg extends DialogBase {
     buildPropsEditPanel = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
         let ret = false;
         const ast = getAs();
+
         if (ast.editNode.properties) {
             const durationProp = S.props.getProp(J.NodeProp.DURATION, ast.editNode);
 
@@ -542,7 +573,10 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
-                        const allowSelection = !_.customProps || _.type?.hasSelectableProp(prop.name);
+                        let allowSelection = !_.customProps || _.type?.hasSelectableProp(prop.name);
+                        if (_.type && !_.type.allowDeleteProperty(prop.name)) {
+                            allowSelection = false;
+                        }
                         const tableRow = this.makePropEditField(_.type, prop, durationProp, allowSelection, _.type ? _.type.getEditorRowsForProp(prop.name) : 1, _.flexPropsEditPanel);
                         _.propsParent.addChild(tableRow);
                         ret = true;
@@ -915,7 +949,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    makeContentEditor = (rows: string): Div => {
+    makeContentEditor = (rows: string, minRows: number): Div => {
         const ast = getAs();
         const editItems: Comp[] = [];
 
@@ -926,7 +960,7 @@ export class EditNodeDlg extends DialogBase {
         this.contentEditor = new TextArea(null, {
             id: C.ID_PREFIX_EDIT + ast.editNode.id,
             rows
-        }, this.contentEditorState, "font-inherit", true, this.contentScrollPos);
+        }, this.contentEditorState, "font-inherit", true, minRows, this.contentScrollPos);
         if (this.decryptFailed) {
             this.contentEditor.setEnabled(false);
         }

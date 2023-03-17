@@ -23,7 +23,7 @@ export class MultiFollowDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextContent("Enter Fediverse Names (one per line)"),
-                new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, this.textScrollPos),
+                new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Follow All", this.follow, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

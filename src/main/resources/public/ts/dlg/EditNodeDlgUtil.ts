@@ -233,7 +233,12 @@ export class EditNodeDlgUtil {
     }
 
     deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
+        if (!propNames) return;
         const ast = getAs();
+        const type = S.plugin.getType(ast.editNode.type);
+        if (type) {
+            propNames = propNames.filter(v => type.allowDeleteProperty(v));
+        }
         const res = await S.rpcUtil.rpc<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
             nodeId: ast.editNode.id,
             propNames
