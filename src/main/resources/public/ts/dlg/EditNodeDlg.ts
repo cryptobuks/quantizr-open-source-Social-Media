@@ -329,7 +329,11 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField: TextField = null;
         if (editorOpts.nodeName) {
-            nodeNameTextField = new TextField({ label: "Node Name", outterClass: "col-9", val: this.nameState });
+            nodeNameTextField = new TextField({
+                label: "Node Name",
+                outterClass: "col-9",
+                val: this.nameState
+            });
         }
 
         let propsVisible: boolean = false;
@@ -823,6 +827,7 @@ export class EditNodeDlg extends DialogBase {
         // NUMBER TYPE
         else if (propType === I.DomainType.Number) {
             valEditor = new TextField({
+                inputType: "number",
                 outterClass: "marginRight",
                 inputClass: S.props.getInputClassForType(propEntry.name),
                 val: propState

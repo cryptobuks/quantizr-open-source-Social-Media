@@ -15,7 +15,6 @@ interface LS { // Local State
 
 export interface TextFieldConfig {
     label?: string;
-    pwd?: boolean;
     enter?: () => void;
     inputClass?: string;
     labelLeft?: boolean;
@@ -24,6 +23,7 @@ export interface TextFieldConfig {
     outterClass?: string;
     placeholder?: string;
     outterTagName?: string; // normally div or span
+    inputType?: string;
 }
 
 export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
@@ -42,7 +42,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         };
 
         this.mergeState<LS>({
-            inputType: this.cfg.pwd ? "password" : "text"
+            inputType: this.cfg.inputType || "text"
         });
     }
 
@@ -95,7 +95,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             id: this.getId("inputId_")
         }, this.cfg.val.v);
 
-        const passwordEye = this.cfg.pwd ? new Span(null, {
+        const passwordEye = this.cfg.inputType === "password" ? new Span(null, {
             className: "input-group-addon"
         }, [
             new Anchor(null, null, {

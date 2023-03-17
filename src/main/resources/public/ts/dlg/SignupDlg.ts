@@ -42,7 +42,7 @@ export class SignupDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextField({ label: "User Name", val: this.userNameState }),
-                new TextField({ label: "Password", pwd: true, val: this.passwordState }),
+                new TextField({ label: "Password", inputType: "password", val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),
 
                 this.adminCreatingUser ? null : new HorizontalLayout([

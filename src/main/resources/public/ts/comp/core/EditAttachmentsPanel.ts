@@ -122,7 +122,12 @@ export class EditAttachmentsPanel extends Div {
             this.editorDlg.attFileNames.set((att as any).key, fileNameFieldState);
         }
 
-        const fileNameField = new TextField({ labelClass: "txtFieldLabelShort", outterClass: "fileNameField", label: "File Name", val: fileNameFieldState });
+        const fileNameField = new TextField({
+            labelClass: "txtFieldLabelShort",
+            outterClass: "fileNameField",
+            label: "File Name",
+            val: fileNameFieldState
+        });
 
         const list: J.Attachment[] = S.props.getOrderedAttachments(ast.editNode);
         const firstAttachment = list[0].o === att.o;
@@ -231,7 +236,7 @@ export class EditAttachmentsPanel extends Div {
         }
 
         this.editorDlg.binaryDirty = true;
-        dispatch("attachmentMoveUp", s => {});
+        dispatch("attachmentMoveUp", s => { });
     }
 
     moveAttachmentUp = (att: J.Attachment, node: J.NodeInfo) => {
@@ -254,7 +259,7 @@ export class EditAttachmentsPanel extends Div {
         }
 
         this.editorDlg.binaryDirty = true;
-        dispatch("attachmentMoveUp", s => {});
+        dispatch("attachmentMoveUp", s => { });
     }
 
     createImgSizeSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
