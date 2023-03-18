@@ -83,6 +83,18 @@ export class TypeBase implements TypeIntf {
         return getAs()?.config?.props?.[this.typeName]?.[prop];
     }
 
+    getSchemaOrgPropComment(prop: string): string {
+        console.log("getting prop comment: "+prop);
+        if (!this.schemaOrg) return null;
+        for (const p of this.schemaOrg.props) {
+            console.log("getting prop comment: "+prop);
+            if (p.label === prop) {
+                return p.comment;
+            }
+        }
+        return null;
+    }
+
     getSchemaOrgPropType(prop: string): string {
         if (!this.schemaOrg) return null;
         for (const p of this.schemaOrg.props) {
@@ -129,22 +141,18 @@ export class TypeBase implements TypeIntf {
     }
 
     allowDeleteProperty = (prop: string) => {
-        console.log("checking allowDelete: " + prop);
         let ret = true;
         const typeObj = getAs()?.config?.props?.[this.typeName];
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {
-            console.log("    found the typeObj");
             S.util.forEachProp(typeObj, (k: string, v: any): boolean => {
-                console.log("    iter: " + k);
                 if (k === prop) {
                     ret = false;
                     return false; // stop iterating
                 }
             });
         }
-        console.log("    ret=" + ret);
         return ret;
     }
 

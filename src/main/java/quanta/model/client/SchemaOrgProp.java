@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaOrgProp {
+    private String comment;
     private String label;
     private List<SchemaOrgRange> ranges = new ArrayList<>();
 
@@ -20,6 +21,14 @@ public class SchemaOrgProp {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public List<SchemaOrgRange> getRanges() {

@@ -336,9 +336,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsVisible: boolean = false;
-        /* NOTE: We can simply remove the "&& !typoe.schemaOrg" condition here and the content will show up
-         and work just fine even in a schemaOrg type */
-        if (allowContentEdit && !type.schemaOrg) {
+        if (allowContentEdit /* && !type.schemaOrg (I like having content even on schemaOrg types */) {
             let rows = "1";
 
             // only take some number of default rows greater than 1 if this is a non-schemaOrg type
@@ -357,24 +355,27 @@ export class EditNodeDlg extends DialogBase {
 
             if (type.getAllowPropertyAdd()) {
                 const state = this.getState<LS>();
-                propsHeaderBar = new Div(null, { className: "float-end tinyMarginTop" }, [
-                    // ADD PROP ICON
-                    new Icon({
-                        className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
-                        onClick: async () => {
-                            dispatch("setPropsPanelExpanded", s => {
-                                s.propsPanelExpanded = true;
-                            });
-                            await this.utl.addProperty(this);
-                        },
-                        title: "Add property"
-                    }),
-                    // DELETE PROP ICON
-                    state.selectedProps.size > 0 ? new Icon({
-                        className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
-                        onClick: () => this.utl.deletePropsGesture(this),
-                        title: "Delete property"
-                    }) : null
+                propsHeaderBar = new Div(null, { className: "editTypesPanelHeader" }, [
+                    type?.schemaOrg?.comment ? new Span(type?.schemaOrg?.comment) : null,
+                    new Div(null, { className: "float-end" }, [
+                        // ADD PROP ICON
+                        new Icon({
+                            className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
+                            onClick: async () => {
+                                dispatch("setPropsPanelExpanded", s => {
+                                    s.propsPanelExpanded = true;
+                                });
+                                await this.utl.addProperty(this);
+                            },
+                            title: "Add property"
+                        }),
+                        // DELETE PROP ICON
+                        state.selectedProps.size > 0 ? new Icon({
+                            className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
+                            onClick: () => this.utl.deletePropsGesture(this),
+                            title: "Delete property"
+                        }) : null
+                    ])
                 ]);
             }
         }

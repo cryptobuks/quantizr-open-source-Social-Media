@@ -83,6 +83,9 @@ export class PluginMgr {
     addSchemaOrgTypes = async () => {
         const res = await S.rpcUtil.rpc<J.GetSchemaOrgTypesRequest, J.GetSchemaOrgTypesResponse>("getSchemaOrgTypes", {
         });
+
+        // console.log("res=" + S.util.prettyPrint(res.classes));
+
         res.classes.forEach(soc => {
             const type = new SchemaOrgType(soc.id, soc.label);
             type.schemaOrg = soc;

@@ -6,14 +6,20 @@ import { ListBoxRow } from "./ListBoxRow";
 
 export class SchemaOrgPropsTableRow extends ListBoxRow {
 
+    comment: string;
+
     constructor(public prop: SchemaOrgProp, private dlg: EditPropertyDlg) {
         super(null, null, null);
         this.attribs.className = "propListItem";
     }
 
     preRender(): void {
+        const attr: any = {};
+        if (this.prop.comment) {
+            attr.title = this.prop.comment;
+        }
         this.setChildren([
-            new Div(null, null, [
+            new Div(null, attr, [
                 new Checkbox(null, { className: "propsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: EditPropertyDlgState = this.dlg.getState();

@@ -42,6 +42,7 @@ export interface TypeIntf {
     getType(prop: string): string;
 
     getPropConfig(prop: string): ConfigProp;
+    getSchemaOrgPropComment(prop: string): string;
 }
 
 export enum NodeActionType {

@@ -1702,6 +1702,7 @@ Will come back later and study this more. todo-3 */
 .propsListItemCheckBox {
     vertical-align: middle;
     margin-left: $microGap;
+    margin-right: 0 !important;
 }
 
 .property-table {}
@@ -2462,6 +2463,7 @@ audio::-webkit-media-controls-play-button {
 .flexPropsDisplayPanel {
     display: flex;
     flex-wrap: wrap;
+    padding-bottom: $smallGap;
 }
 
 .fieldDisplayPanel {
@@ -2490,4 +2492,8 @@ audio::-webkit-media-controls-play-button {
 
 .contentEditor {
     width: 100%;
+}
+
+.editTypesPanelHeader {
+    margin: $tinyGap 0 0 $smallGap;
 }

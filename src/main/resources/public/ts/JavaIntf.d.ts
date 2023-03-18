@@ -112,6 +112,7 @@ export interface SchemaOrgClass {
 }
 
 export interface SchemaOrgProp {
+    comment: string;
     label: string;
     ranges: SchemaOrgRange[];
 }

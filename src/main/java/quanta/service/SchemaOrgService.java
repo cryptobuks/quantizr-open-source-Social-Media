@@ -134,12 +134,16 @@ public class SchemaOrgService extends ServiceBase {
 			Object label = mitem.get("rdfs:label");
 			String slabel = getStringValue(label);
 
+			Object comment = mitem.get("rdfs:comment");
+			String scomment = getStringValue(comment);
+
 			if (slabel == null) {
 				throw new RuntimeException("label not available: " + XString.prettyPrint(mitem));
 			}
 
 			soc.setLabel(slabel);
 			soc.setId(sid);
+			soc.setComment(scomment);
 			classMap.put(sid, soc);
 			classList.add(soc);
 		}
@@ -167,6 +171,11 @@ public class SchemaOrgService extends ServiceBase {
 		setupDomainIncludes(sop, prop);
 		setupRangeIncludes(sop, prop);
 
+		Object comment = prop.get("rdfs:comment");
+		String scomment = getStringValue(comment);
+
+		sop.setComment(scomment);
+		
 		// and these now have no value either, so remove from memory
 		prop.remove("@type");
 		prop.remove("schema:source");

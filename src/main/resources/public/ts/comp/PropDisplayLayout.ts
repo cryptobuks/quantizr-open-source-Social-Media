@@ -21,11 +21,15 @@ export class PropDisplayLayout extends Div {
                 const propConfig = type.getPropConfig(prop.name);
                 const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
                 const label = propConfig?.label || (type ? type.getEditLabelForProp(prop.name) : prop.name);
+                const comment = type.getSchemaOrgPropComment(prop.name);
                 const w: number = propConfig?.width || 100;
                 const widthStr = "" + w + "%";
 
                 // warning: don't put any margin or padding on this div. It depends on precise layouts using precise widths.
-                const attrs: any = { className: "fieldDisplayCell", title: "Property: " + prop.name };
+                const attrs: any = {
+                    className: "fieldDisplayCell",
+                    title: "Property: " + prop.name + (comment ? ("\n\n" + comment) : "")
+                };
                 attrs.style = { width: widthStr, maxWidth: widthStr };
                 const propType = type.getType(prop.name);
                 const displayVal = S.util.formatProperty(prop.value, propType) || "?";
