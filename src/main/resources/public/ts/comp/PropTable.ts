@@ -24,7 +24,7 @@ export class PropTable extends Comp {
                 const propType = type.getType(prop.name);
                 const displayVal = S.util.formatProperty(prop.value, propType);
 
-                if (S.props.isGuiControlBasedProp(prop)) return;
+                if (S.props.isGuiControlBasedProp(prop) || S.props.isHiddenProp(prop)) return;
                 const ptr = new PropTableRow({
                     title: "Property: " + prop.name + (comment ? ("\n\n" + comment) : ""),
                     className: "prop-table-row"

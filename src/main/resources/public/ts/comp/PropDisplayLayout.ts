@@ -16,7 +16,7 @@ export class PropDisplayLayout extends Div {
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {
             this.node.properties.forEach(prop => {
-                if (S.props.isGuiControlBasedProp(prop)) return;
+                if (S.props.isGuiControlBasedProp(prop) || S.props.isHiddenProp(prop)) return;
 
                 const propConfig = type.getPropConfig(prop.name);
                 const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones

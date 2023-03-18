@@ -9,6 +9,8 @@ export class Props {
     that it would never make sense to display an edit field for editing their value in the editor */
     controlBasedPropertyList: Set<string> = new Set<string>();
 
+    hiddenPropertyList: Set<string> = new Set<string>();
+
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
         const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
         if (tagIdx !== -1) {
@@ -262,10 +264,18 @@ export class Props {
             J.NodeProp.ACT_PUB_OBJ_ICONS, //
             J.NodeProp.ACT_PUB_TAG
         ]);
+
+        S.util.addAllToSet(this.hiddenPropertyList, [ //
+            J.NodeProp.TYPE_LOCK //
+        ]);
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
         return !!S.props.controlBasedPropertyList.has(prop.name);
+    }
+
+    isHiddenProp = (prop: J.PropertyInfo): boolean => {
+        return !!S.props.hiddenPropertyList.has(prop.name);
     }
 
     /* This is kind of a hard-coded hack for the one particular type name

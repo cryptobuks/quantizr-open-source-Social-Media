@@ -573,7 +573,7 @@ export class EditNodeDlg extends DialogBase {
                 if (this.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
-                    if (!S.props.isGuiControlBasedProp(prop)) {
+                    if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) {
                         let allowSelection = !_.customProps || _.type?.hasSelectableProp(prop.name);
                         if (_.type && !_.type.allowDeleteProperty(prop.name)) {
                             allowSelection = false;
