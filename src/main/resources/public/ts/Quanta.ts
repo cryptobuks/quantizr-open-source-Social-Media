@@ -273,7 +273,7 @@ export class Quanta {
             S.domUtil.enableMouseEffect();
         }
         catch (e) {
-            console.error(e.message);
+            S.util.logErr(e);
             alert("App failed to startup: " + e.message);
             throw e;
         }

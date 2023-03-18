@@ -97,6 +97,7 @@ export class View {
             await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
         }
         catch (e) {
+            S.util.logErr(e);
             S.nodeUtil.clearLastNodeIds();
         }
     }
@@ -185,6 +186,7 @@ export class View {
             }
         }
         catch (e) {
+            S.util.logErr(e);
             S.nodeUtil.clearLastNodeIds();
         }
     }

@@ -69,6 +69,7 @@ export class Nav {
             this.upLevelResponse(res, null, true);
         }
         catch (e) {
+            S.util.logErr(e);
             S.nodeUtil.clearLastNodeIds();
         }
     }
@@ -113,6 +114,7 @@ export class Nav {
             }
         }
         catch (e) {
+            S.util.logErr(e);
             S.nodeUtil.clearLastNodeIds();
         }
     }
@@ -182,6 +184,7 @@ export class Nav {
             this.navPageNodeResponse(res);
         }
         catch (e) {
+            S.util.logErr(e);
             S.nodeUtil.clearLastNodeIds();
         }
     }
@@ -284,6 +287,7 @@ export class Nav {
                 this.navPageNodeResponse(res);
             }
             catch (e) {
+                S.util.logErr(e);
                 S.nodeUtil.clearLastNodeIds();
             }
         }

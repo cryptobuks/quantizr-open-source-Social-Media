@@ -53,7 +53,7 @@ export class DateTimeField extends Span {
             }
         }
         catch (e) {
-            console.log("Unable to parse: " + dateTimeStr);
+            S.util.logErr(e, "Unable to parse: " + dateTimeStr);
             dateTime = S.util.addTimezoneOffset(new Date(), -1);
         }
 

@@ -122,11 +122,11 @@ export class RpcUtil {
                     });
             });
         } catch (ex) {
-            S.util.logAndReThrow("Failed starting request: " + postName, ex);
+            S.util.logErr(ex, "Failed starting request: " + postName);
             if (!background) {
                 S.quanta.setOverlay(false);
             }
-            return null;
+            throw ex;
         }
 
         reqPromise.then((data: any) => this.rpcSuccess(data, background, postName))
@@ -162,7 +162,8 @@ export class RpcUtil {
                 return;
             }
         } catch (ex) {
-            S.util.logAndReThrow("Failed handling result of: " + postName, ex);
+            S.util.logErr(ex, "Failed handling result of: " + postName);
+            throw ex;
         }
         finally {
             if (!background) {
@@ -211,7 +212,8 @@ export class RpcUtil {
                 S.util.showMessage("Something went wrong. Try refreshing your browser.", "Warning", true);
             }
         } catch (ex) {
-            S.util.logAndReThrow("Failed processing: " + postName, ex);
+            S.util.logErr(ex, "Failed processing: " + postName);
+            throw ex;
         }
         finally {
             if (!background) {

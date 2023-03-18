@@ -163,7 +163,7 @@ export class FriendsDlg extends DialogBase {
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
-                    new Button(!this.nodeId ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
+                    new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])

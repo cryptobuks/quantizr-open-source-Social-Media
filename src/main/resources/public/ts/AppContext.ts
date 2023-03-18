@@ -45,7 +45,7 @@ function reducer(s: AppState, action: DispatchData) {
     }
     // if an error happens we can rollback the state to exactly what it was before (saveState)
     catch (e) {
-        console.error(e.message + "(State rolled back)", e.stack);
+        S.util.logErr(e, "(State rolled back)");
         return saveState;
     }
 }

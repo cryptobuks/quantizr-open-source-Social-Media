@@ -117,7 +117,7 @@ export class EditNodeDlgUtil {
                         prop.value = parseInt(propState.getValue());
                     }
                     catch (e) {
-                        console.error("failed to parse date number: " + propState.getValue());
+                        S.util.logErr(e, "failed to parse date number: " + propState.getValue());
                     }
                 }
                 else {

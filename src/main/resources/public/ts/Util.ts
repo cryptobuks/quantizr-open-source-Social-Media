@@ -360,33 +360,20 @@ export class Util {
         return location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
     }
 
-    logAndThrow = (message: string) => {
-        let stack = "[stack, not supported]";
-        try {
-            stack = (<any>new Error()).stack;
+    logErr = (ex: any, message: string = "") => {
+        let stack;
+        if (!ex.stack) {
+            try {
+                stack = (<any>new Error()).stack;
+            }
+            catch (e) {
+                stack = "";
+            }
         }
-        catch (e) { }
-        console.error(message + "STACK: " + stack);
-        throw message;
-    }
-
-    logAndReThrow = (message: string, exception: any) => {
-        let stack = "[stack, not supported]";
-        try {
-            stack = (<any>new Error()).stack;
+        else {
+            stack = ex.stack;
         }
-        catch (e) { }
-        console.error(message + ": " + exception.message + "\nSTACK: " + stack);
-        throw exception;
-    }
-
-    logErr = (message: string, exception: any) => {
-        let stack = "[stack, not supported]";
-        try {
-            stack = (<any>new Error()).stack;
-        }
-        catch (e) { }
-        console.error(message + ": " + exception.message + "\nSTACK: " + stack);
+        console.error(message + ": " + ex.message + "\nSTACK: " + stack);
     }
 
     isElmVisible = (elm: HTMLElement) => {
@@ -752,6 +739,7 @@ export class Util {
             callback(res.openGraph);
         }
         catch (e) {
+            S.util.logErr(e);
             callback(null);
         }
     }
@@ -903,7 +891,7 @@ export class Util {
             }
         }
         catch (e) {
-            console.warn("anonPageLoad failed.");
+            S.util.logErr(e, "anonPageLoad failed.");
             S.user.userLogin();
         }
     }

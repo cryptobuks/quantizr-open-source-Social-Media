@@ -64,8 +64,8 @@ export class Factory {
             console.log("Factory.ts instances ready.");
         }
         catch (e) {
-            const msg = "app failed to initialize components.\n" + e;
-            console.error(msg);
+            const msg = "app failed to initialize components.";
+            S.util.logErr(e, msg);
             alert(msg);
             throw e;
         }
@@ -78,7 +78,7 @@ export class Factory {
         }
         catch (e) {
             alert("initApp failed: " + e);
-            console.error("initApp failed." + e);
+            S.util.logErr(e, "initApp failed.");
         }
     }
 }

@@ -243,7 +243,7 @@ export abstract class Comp implements CompIntf {
                     return child.create();
                 }
                 catch (e) {
-                    console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
+                    S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
                     return null;
                 }
             }
@@ -314,7 +314,7 @@ export abstract class Comp implements CompIntf {
             }
         }
         catch (e) {
-            console.error("Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
+            S.util.logErr(e, "Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
         }
     }
 
@@ -412,8 +412,8 @@ export abstract class Comp implements CompIntf {
             return ret;
         }
         catch (e) {
-            console.error("Failed to render child (in render method) " + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
-                "\nELEMENTS Stack: " + this.getAncestry()+"\nJS Stack: "+e.stack);
+            S.util.logErr(e, "Failed to render child (in render method) " + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
+                "\nELEMENTS Stack: " + this.getAncestry());
             return null;
         }
     }

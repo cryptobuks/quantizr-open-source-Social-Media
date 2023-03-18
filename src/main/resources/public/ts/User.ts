@@ -123,6 +123,7 @@ export class User {
                 }
             }
             catch (e) {
+                S.util.logErr(e);
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
                 await this.anonInitialRender();

@@ -622,8 +622,8 @@ export class Render {
                 }
             });
         }
-        catch (err) {
-            console.error("render failed: " + S.util.prettyPrint(err));
+        catch (e) {
+            S.util.logErr(e, "render failed");
         }
     }
 

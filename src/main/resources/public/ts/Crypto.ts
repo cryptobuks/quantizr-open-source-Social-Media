@@ -718,7 +718,7 @@ export class Crypto {
         catch (ex) {
             // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
             // retest encryption
-            S.util.logErr("decryptSharableString failed", ex);
+            S.util.logErr(ex, "decryptSharableString failed");
             return null;
         }
     }
@@ -758,8 +758,8 @@ export class Crypto {
             return resStr;
         }
         catch (ex) {
-            S.util.logAndReThrow("decrypt FAILED.", ex);
-            return null;
+            S.util.logErr(ex, "decrypt FAILED.");
+            throw ex;
         }
     }
 
@@ -841,7 +841,8 @@ export class Crypto {
             // console.log("local verify: " + verified);
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
         } catch (e) {
-            S.util.logAndReThrow("Failed to sign data.", e);
+            S.util.logErr(e, "Failed to sign data.");
+            throw e;
         }
         return null;
     }

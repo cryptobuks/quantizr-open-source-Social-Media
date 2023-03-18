@@ -544,7 +544,7 @@ public class NodeSearchService extends ServiceBase {
 
 					// if word is a mention.
 					if (token.startsWith("@")) {
-						if (token.length() == 1)
+						if (token.length() < 3)
 							continue;
 
 						// lazy create and update knownTokens
@@ -565,7 +565,7 @@ public class NodeSearchService extends ServiceBase {
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
 						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
-						if (token.endsWith("#") || token.length() == 1 || //
+						if (token.endsWith("#") || token.length() < 4 || //
 								token.toLowerCase().contains("tallship"))
 							continue;
 
@@ -591,7 +591,7 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// ordinary word
 					else {
-						if (!StringUtils.isAlpha(token)) {
+						if (!StringUtils.isAlpha(token) || token.length() < 3) {
 							continue;
 						}
 
