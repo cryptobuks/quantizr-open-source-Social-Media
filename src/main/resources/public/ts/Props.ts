@@ -275,6 +275,10 @@ export class Props {
     }
 
     isHiddenProp = (prop: J.PropertyInfo): boolean => {
+        // don't show activity pub props
+        if (prop.name.startsWith("ap:") || prop.name === "apid") {
+            return true;
+        }
         return !!S.props.hiddenPropertyList.has(prop.name);
     }
 
