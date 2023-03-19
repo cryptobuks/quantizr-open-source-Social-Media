@@ -1176,7 +1176,7 @@ export const enum NodeProp {
     USER_DID_IPNS = "sn:didIPNS",
     USER_IPFS_KEY = "sn:ipfsKey",
     USER_TAGS = "sn:tags",
-    USER_BLOCKED_WORDS = "sn:blockWords",
+    USER_BLOCK_WORDS = "sn:blockWords",
     PWD_HASH = "sn:pwdHash",
     VOTE = "vote",
     FILE_SYNC_LINK = "fs:link",

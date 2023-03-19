@@ -22,6 +22,7 @@ interface LS { // Local State
     sortField?: string;
     caseSensitive?: boolean;
     fuzzy?: boolean;
+    blockedWords?: boolean;
     recursive?: boolean;
     sortDir?: string;
     requirePriority?: boolean;
@@ -32,6 +33,7 @@ export class SearchContentDlg extends DialogBase {
     static defaultSearchText: string = "";
     static dlgState: any = {
         fuzzy: false,
+        blockedWords: false,
         caseSensitive: false,
         recursive: true,
         sortField: "0",
@@ -72,6 +74,24 @@ export class SearchContentDlg extends DialogBase {
                 new Clearfix(),
 
                 new HorizontalLayout([
+                    ast.userProfile.blockedWords ? new Checkbox("Blocked Words", null, {
+                        setValue: (checked: boolean) => {
+                            SearchContentDlg.dlgState.blockedWords = checked;
+                            this.mergeState<LS>({ blockedWords: checked });
+                            if (checked) {
+                                let words = ast.userProfile.blockedWords;
+                                words = words.replace("\n", " ");
+                                words = words.replace("\r", " ");
+                                words = words.replace("\t", " ");
+
+                                this.searchTextState.setValue(words);
+                            }
+                            else {
+                                this.searchTextState.setValue("");
+                            }
+                        },
+                        getValue: (): boolean => this.getState<LS>().blockedWords
+                    }) : null,
                     new Checkbox("Substring", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
