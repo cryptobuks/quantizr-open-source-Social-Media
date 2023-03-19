@@ -12,6 +12,7 @@ public class UserProfile {
 
 	private String userBio;
 	private String userTags;
+	private String blockedWords;
 
 	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary
 	// attachment)
@@ -59,6 +60,14 @@ public class UserProfile {
 
 	public void setUserTags(String userTags) {
 		this.userTags = userTags;
+	}
+
+	public String getBlockedWords() {
+		return blockedWords;
+	}
+
+	public void setBlockedWords(String blockedWords) {
+		this.blockedWords = blockedWords;
 	}
 
 	public void setUserName(String userName) {

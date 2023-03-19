@@ -41,12 +41,13 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     new Div(null, { className: "accountSettingsCol" }, [
                         this.settingsLink("Logout", S.user.userLogout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
-                        this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()) //
+                        this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
+                        this.settingsLink("Storage Space", () => new ManageStorageDlg().open())
                     ]),
                     new Div(null, { className: "accountSettingsCol" }, [
-                        this.settingsLink("Storage Space", () => new ManageStorageDlg().open()), //
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),
-                        S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null //
+                        this.settingsLink("Blocked Words", S.edit.editBlockedWords),
+                        S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null
                     ])
                 ], horzClass),
 

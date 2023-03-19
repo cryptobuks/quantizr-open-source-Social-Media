@@ -5,6 +5,7 @@ import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { EditTagsDlg } from "./dlg/EditTagsDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
@@ -23,6 +24,11 @@ export class Edit {
 
     editHashtags = async () => {
         const dlg = new EditTagsDlg();
+        await dlg.open();
+    }
+
+    editBlockedWords = async () => {
+        const dlg = new EditBlockedWordsDlg();
         await dlg.open();
     }
 

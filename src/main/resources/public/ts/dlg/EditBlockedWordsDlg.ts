@@ -10,19 +10,19 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
-export class EditTagsDlg extends DialogBase {
-    tagsState: Validator = new Validator();
+export class EditBlockedWordsDlg extends DialogBase {
+    wordsState: Validator = new Validator();
     textScrollPos = new ScrollPos();
 
     constructor() {
-        super("Edit Hashtags", "app-modal-content-medium-width");
+        super("Blocked Words", "app-modal-content-medium-width");
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new Div("Enter custom hashtags, each on a separate line below. Hashtags must start with #."),
-                new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, 3, this.textScrollPos),
+                new Div("Enter words you never want to see. Posts containing these will be hidden from your feed."),
+                new TextArea("Blocked Words", { rows: 15 }, this.wordsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
@@ -37,13 +37,13 @@ export class EditTagsDlg extends DialogBase {
         });
 
         if (res?.userProfile) {
-            this.tagsState.setValue(res.userProfile.userTags);
+            this.wordsState.setValue(res.userProfile.blockedWords);
         }
     }
 
     save = () => {
         const ast = getAs();
-        ast.userProfile.userTags = this.tagsState.getValue();
+        ast.userProfile.blockedWords = this.wordsState.getValue();
 
         dispatch("SetUserProfile", s => {
             s.userProfile = ast.userProfile;

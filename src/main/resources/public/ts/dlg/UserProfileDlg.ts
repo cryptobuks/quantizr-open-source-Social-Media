@@ -258,9 +258,11 @@ export class UserProfileDlg extends DialogBase {
 
     save = async () => {
         const state = this.getState<LS>();
+        const ast = getAs();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: getAs().userProfile.userTags,
+            userTags: ast.userProfile.userTags,
+            blockedWords: ast.userProfile.blockedWords,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: false,
@@ -271,9 +273,11 @@ export class UserProfileDlg extends DialogBase {
 
     publish = async () => {
         const state = this.getState<LS>();
+        const ast = getAs();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: getAs().userProfile.userTags,
+            userTags: ast.userProfile.userTags,
+            blockedWords: ast.userProfile.blockedWords,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: true,

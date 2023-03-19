@@ -851,13 +851,14 @@ public class MongoRead extends ServiceBase {
                     text = "\"" + text + "\"";
                 }
 
-                // This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
-                // bug.
-                // (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR
-                // search
-                // on strings containing special characters, without the special characters basically being ignored.
-                // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
-
+                /*
+                 * his reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
+                 * bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an
+                 * OR search on strings containing special characters, without the special characters basically
+                 * being ignored.
+                 * 
+                 * textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
+                 */
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
                 criterias.add(textCriteria);

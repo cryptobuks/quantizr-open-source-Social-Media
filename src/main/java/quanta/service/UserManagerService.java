@@ -657,6 +657,7 @@ public class UserManagerService extends ServiceBase {
 				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.set(NodeProp.USER_BIO, req.getUserBio());
 				userNode.set(NodeProp.USER_TAGS, req.getUserTags());
+				userNode.set(NodeProp.USER_BLOCK_WORDS, req.getBlockedWords());
 				userNode.set(NodeProp.DISPLAY_NAME, req.getDisplayName());
 				userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
 
@@ -983,6 +984,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
+				userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (att != null) {

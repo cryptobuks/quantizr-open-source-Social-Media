@@ -6,6 +6,7 @@ public class SaveUserProfileRequest extends RequestBase {
 	private String userName;
 	private String userBio;
 	private String userTags;
+	private String blockedWords;
 	private String displayName;
 
 	// only publishes DID/IPNS if this is true
@@ -30,6 +31,14 @@ public class SaveUserProfileRequest extends RequestBase {
 
 	public void setUserTags(String userTags) {
 		this.userTags = userTags;
+	}
+
+	public String getBlockedWords() {
+		return blockedWords;
+	}
+
+	public void setBlockedWords(String blockedWords) {
+		this.blockedWords = blockedWords;
 	}
 
 	public void setUserName(String userName) {

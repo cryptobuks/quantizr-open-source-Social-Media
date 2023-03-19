@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -388,9 +389,27 @@ public class UserFeedService extends ServiceBase {
 		crit = crit.and(SubNode.NAME).ne(NodeName.HOME);
 
 		TextCriteria textCriteria = null;
-		if (!StringUtils.isEmpty(req.getSearchText())) {
 
-			// Just being consistent here, this check is not needed.
+		// Filter USER_BLOCK_WORDS if user has defined any
+		SubNode userNode = read.getNode(ms, ThreadLocals.getSC().getUserNodeId(), false);
+		if (userNode != null) {
+			String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
+			if (StringUtils.isNotEmpty(blockedWords)) {
+
+				StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,|", false);
+				StringBuilder regex = new StringBuilder();
+				while (t.hasMoreTokens()) {
+					if (regex.length() > 0) {
+						regex.append("|");
+					}
+					regex.append(t.nextToken());
+				}
+
+				crit = crit.and(SubNode.CONTENT).not().regex(regex.toString(), "i");
+			}
+		}
+
+		if (!StringUtils.isEmpty(req.getSearchText())) {
 			if (textCriteria == null) {
 				textCriteria = TextCriteria.forDefaultLanguage();
 			}
