@@ -44,13 +44,25 @@ props:
     givenName:
       label: "First Name"
       width: 40
-      ord: 1
     familyName:
       label: "Last Name"
       width: 60
-      ord: 2
+    jobTitle:
+      label: "Job Title"
+      width: 50
+    worksFor:
+      label: "Company"
+      width: 50
+    email:
+      label: "Email"
+      width: 50
+    telephone:
+      label: "Telephone"
+      width: 50
+    address:
+      label: "Address"
+      width: 100
     birthDate:
       label: "Birthday"
       width: 100
-      ord: 3
       

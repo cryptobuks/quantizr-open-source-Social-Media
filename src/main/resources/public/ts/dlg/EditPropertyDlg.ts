@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "../AppContext";
+import { asyncDispatch, dispatch, getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -26,9 +26,14 @@ export class EditPropertyDlg extends DialogBase {
         this.validatedStates = [this.nameState];
         const type = S.plugin.getType(this.editNode.type);
         if (type) {
-            this.title = "Add Property: " + type.getName();
+            this.title = type.getName() + ": Add Property";
         }
-        this.mergeState<LS>({ selections: new Map<string, J.SchemaOrgProp>() })
+        this.mergeState<LS>({ selections: new Map<string, J.SchemaOrgProp>() });
+
+        // if this is a schema.org node go ahead and turn on the display of all those properties automatically
+        if (type.schemaOrg) {
+            asyncDispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = true; });
+        }
     }
 
     renderDlg(): CompIntf[] {

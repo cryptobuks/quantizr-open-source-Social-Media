@@ -3,6 +3,7 @@ package quanta.config;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +63,8 @@ public class AppProp {
 						// otherwise use the internal version (internal to JAR)
 						configMap = readYamlInternal("config-text.yaml");
 					}
+
+					setPropertyOrdinals();
 				} catch (Exception e) {
 					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
@@ -71,6 +74,16 @@ public class AppProp {
 				}
 				configMap.put("ipfsEnabled", ipfsEnabled());
 				return configMap;
+			}
+		}
+	}
+
+	private void setPropertyOrdinals() {
+		LinkedHashMap<String, LinkedHashMap> classes = (LinkedHashMap) configMap.get("props");
+		for (LinkedHashMap<String, LinkedHashMap> clazz : classes.values()) {
+			int attIdx = 1;
+			for (LinkedHashMap<String, Object> prop : clazz.values()) {
+				prop.put("ord", attIdx++);
 			}
 		}
 	}

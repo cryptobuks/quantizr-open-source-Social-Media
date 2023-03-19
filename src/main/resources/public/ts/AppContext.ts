@@ -65,6 +65,12 @@ export function initDispatch(): void {
     PubSub.pub(C.PUBSUB_dispatcherReady);
 }
 
+export function asyncDispatch(type: string, func: StateModFunc) {
+    setTimeout(() => {
+        dispatch(type, func);
+    }, 10);
+}
+
 /**
  * Simple dispatch to transform state. When using this you have no way, however, to wait for
  * the state transform to complete, so use the 'promiseDispatch' for that. Our design pattern is to
