@@ -246,12 +246,14 @@ public class UserFeedService extends ServiceBase {
 			 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
 			 * removed from it.
 			 */
+			// Add ADMIN BLOCKS
 			if (req.getToPublic() && req.isApplyAdminBlocks()) {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 				allowNonEnglish = false;
 			}
 
 			// Add criteria for blocking users using the 'not in' list (nin)
+			// Add THIS USER BLOCKS
 			getBlockedUserIds(blockedUserIds, null);
 			if (blockedUserIds.size() > 0) {
 				crit = crit.and(SubNode.OWNER).nin(blockedUserIds);
@@ -492,34 +494,32 @@ public class UserFeedService extends ServiceBase {
 			}
 
 			Val<SubNode> boostedNodeVal = null;
-			if (!allowNonEnglish || !allowBadWords) {
-				String boostTargetId = node.getStr(NodeProp.BOOST);
-				if (boostTargetId != null) {
-					SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
 
-					// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
-					// even if boostedNode is null here, indicating it's not found.
-					boostedNodeVal = new Val<>(boostedNode);
+			String boostTargetId = node.getStr(NodeProp.BOOST);
+			if (boostTargetId != null) {
+				SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
 
-					if (boostedNode != null) {
-						// if the owner of the boosted node is a blocked user and we're querying public nodes and with
-						// applyAdminBlocks in effect then skip this post.
-						if (req.getToPublic() && req.isApplyAdminBlocks() && blockedUserIds.contains(boostedNode.getOwner())) {
-							skipped++;
-							continue;
-						}
+				// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
+				// even if boostedNode is null here, indicating it's not found.
+				boostedNodeVal = new Val<>(boostedNode);
 
-						if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
-							// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
-							skipped++;
-							continue;
-						}
+				if (boostedNode != null) {
+					// if the owner of the boosted node is a blocked user and we're querying public nodes and with
+					// applyAdminBlocks in effect then skip this post.
+					if (blockedUserIds.contains(boostedNode.getOwner())) {
+						skipped++;
+						continue;
+					}
 
-						if (!allowBadWords && !auth.ownedByThreadUser(boostedNode)
-								&& english.hasBadWords(boostedNode.getContent())) {
-							skipped++;
-							continue;
-						}
+					if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
+						// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
+						skipped++;
+						continue;
+					}
+
+					if (!allowBadWords && !auth.ownedByThreadUser(boostedNode) && english.hasBadWords(boostedNode.getContent())) {
+						skipped++;
+						continue;
 					}
 				}
 			}
@@ -581,9 +581,10 @@ public class UserFeedService extends ServiceBase {
 
 			for (SubNode node : nodeList) {
 				String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
-				// log.debug("BLOCKED: " + userNodeId);
-				ObjectId oid = new ObjectId(userNodeId);
-				set.add(oid);
+				if (userNodeId != null) {
+					// log.debug("BLOCKED: " + userNodeId);
+					set.add(new ObjectId(userNodeId));
+				}
 			}
 			return null;
 		});
