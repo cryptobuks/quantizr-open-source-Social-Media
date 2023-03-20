@@ -205,14 +205,6 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    static createCss(scope: string, cssText: string): Element {
-        if (!scope || !cssText) return;
-        const css = document.createElement("style");
-        css.innerHTML = cssText.replace("$$", scope);
-        document.body.appendChild(css);
-        return css;
-    }
-
     wrapClick = (obj: any) => {
         // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to
         // give the animation time to run.

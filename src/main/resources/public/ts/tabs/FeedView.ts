@@ -181,6 +181,9 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
         else if (!this.data.props.feedResults || this.data.props.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
+            if (ast.userProfile.blockedWords) {
+                children.push(new Div("Note: The 'Blocked Words' defined in your Settings can affect this view."));
+            }
         }
         else {
             let i = 0;

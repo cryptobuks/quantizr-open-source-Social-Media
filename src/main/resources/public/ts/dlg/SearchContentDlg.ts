@@ -80,9 +80,9 @@ export class SearchContentDlg extends DialogBase {
                             this.mergeState<LS>({ blockedWords: checked });
                             if (checked) {
                                 let words = ast.userProfile.blockedWords;
-                                words = words.replace("\n", " ");
-                                words = words.replace("\r", " ");
-                                words = words.replace("\t", " ");
+                                words = S.util.replaceAll(words, "\n", " ");
+                                words = S.util.replaceAll(words, "\r", " ");
+                                words = S.util.replaceAll(words, "\t", " ");
 
                                 this.searchTextState.setValue(words);
                             }
