@@ -255,6 +255,7 @@ public class UserFeedService extends ServiceBase {
 			getBlockedUserIds(blockedUserIds, null);
 			if (blockedUserIds.size() > 0) {
 				crit = crit.and(SubNode.OWNER).nin(blockedUserIds);
+				crit = crit.and(SubNode.PROPS + ".boost").nin(blockedUserIds);
 			}
 
 			for (ObjectId blockedId : blockedUserIds) {
