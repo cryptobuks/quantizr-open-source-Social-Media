@@ -21,7 +21,7 @@ export class EditBlockedWordsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new Div("Enter words you never want to see. Posts containing these will be hidden from your feed."),
+                new Div("Content containing these will be filtered from your feed."),
                 new TextArea("Blocked Words", { rows: 15 }, this.wordsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),

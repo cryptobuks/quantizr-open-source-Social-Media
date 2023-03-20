@@ -753,6 +753,14 @@ public class MongoDelete extends ServiceBase {
 			crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
 		}
 
+		// Only allow deleting of TEXT-ish type node!!!
+		// Bad things can happen if we delete other nodes, even that contain
+		// "bad" content (N-word racial slur, etc.), because when people put those same words in their BLOCKED WORDS
+		// list in their accounts we don't want to mistake that for actual USE of the word, or for places where
+		// people might have blocked someone with an offensive username, we don't want to DELETE those blocked user
+		// nodes either, so for now we just delete if the type is a comment
+		crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
+
 		crit = auth.addSecurityCriteria(ms, crit);
 		criterias.add(crit);
 
