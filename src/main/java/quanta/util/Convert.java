@@ -338,7 +338,7 @@ public class Convert extends ServiceBase {
 			}
 			// Mention
 			else if (tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2 //
-					&& Character.isLetter(tok.charAt(1))) {
+					&& Character.isLetterOrDigit(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
