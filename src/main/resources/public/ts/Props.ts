@@ -276,8 +276,12 @@ export class Props {
     }
 
     isHiddenProp = (prop: J.PropertyInfo): boolean => {
-        // don't show activity pub props
-        if (prop.name.startsWith("ap:") || prop.name === "apid") {
+        // let admin user see all props.
+        if (getAs().isAdminUser) return false;
+
+        // don't show activity pub props (note: ACT_PUB_ID is the one oddball system property that doesn't have a colon in it,
+        // not by design but by accident and will be fixed eventually)
+        if (prop.name.indexOf(":") !== -1 || prop.name === J.NodeProp.ACT_PUB_ID) {
             return true;
         }
         return !!S.props.hiddenPropertyList.has(prop.name);

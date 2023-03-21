@@ -750,7 +750,7 @@ export class EditNodeDlg extends DialogBase {
                 }) : null,
 
             advancedButtons && !datePropExists ? new IconButton("fa-calendar", null, {
-                title: "Add 'date' property to node\n\nMakes node a Calendar Entry)",
+                title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 onClick: () => this.utl.addDateProperty(this)
             }) : null
         ]);

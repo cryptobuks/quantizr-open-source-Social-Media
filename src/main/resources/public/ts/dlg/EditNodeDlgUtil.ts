@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "../AppContext";
+import { dispatch, getAs, promiseDispatch } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
@@ -184,7 +184,7 @@ export class EditNodeDlgUtil {
         return null;
     }
 
-    addDateProperty = (dlg: EditNodeDlg) => {
+    addDateProperty = async (dlg: EditNodeDlg) => {
         const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         ast.editNode.properties = ast.editNode.properties || [];
@@ -192,6 +192,8 @@ export class EditNodeDlgUtil {
         if (S.props.getProp(J.NodeProp.DATE, ast.editNode)) {
             return;
         }
+
+        await promiseDispatch("setPropsPanelExpanded", s => { s.propsPanelExpanded = true; });
 
         ast.editNode.properties.push({
             name: J.NodeProp.DATE,

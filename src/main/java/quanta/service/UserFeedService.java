@@ -392,22 +392,25 @@ public class UserFeedService extends ServiceBase {
 
 		TextCriteria textCriteria = null;
 
-		// Filter USER_BLOCK_WORDS if user has defined any
-		SubNode userNode = read.getNode(ms, ThreadLocals.getSC().getUserNodeId(), false);
-		if (userNode != null) {
-			String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
-			if (StringUtils.isNotEmpty(blockedWords)) {
+		// Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.
+		if (!req.getFromMe() && !req.getFromFriends()) {
+			// Filter USER_BLOCK_WORDS if user has defined any
+			SubNode userNode = read.getNode(ms, ThreadLocals.getSC().getUserNodeId(), false);
+			if (userNode != null) {
+				String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
+				if (StringUtils.isNotEmpty(blockedWords)) {
 
-				StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,|", false);
-				StringBuilder regex = new StringBuilder();
-				while (t.hasMoreTokens()) {
-					if (regex.length() > 0) {
-						regex.append("|");
+					StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
+					StringBuilder regex = new StringBuilder();
+					while (t.hasMoreTokens()) {
+						if (regex.length() > 0) {
+							regex.append("|");
+						}
+						regex.append(t.nextToken());
 					}
-					regex.append(t.nextToken());
-				}
 
-				crit = crit.and(SubNode.CONTENT).not().regex(regex.toString(), "i");
+					crit = crit.and(SubNode.CONTENT).not().regex(regex.toString(), "i");
+				}
 			}
 		}
 

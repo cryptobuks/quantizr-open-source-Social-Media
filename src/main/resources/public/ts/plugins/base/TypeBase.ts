@@ -74,7 +74,7 @@ export class TypeBase implements TypeIntf {
 
     // schema.org compatable types: Text, Date, Number
     getType(prop: string): string {
-        return this.getSchemaOrgPropType(prop) || I.DomainType.Text;
+        return this.getSchemaOrgPropType(prop) || (prop === "date" ? I.DomainType.Date : I.DomainType.Text);
     }
 
     // for doing simplest possible layouts we allow types to set the width percent used by each property
@@ -84,10 +84,8 @@ export class TypeBase implements TypeIntf {
     }
 
     getSchemaOrgPropComment(prop: string): string {
-        console.log("getting prop comment: "+prop);
         if (!this.schemaOrg) return null;
         for (const p of this.schemaOrg.props) {
-            console.log("getting prop comment: "+prop);
             if (p.label === prop) {
                 return p.comment;
             }
