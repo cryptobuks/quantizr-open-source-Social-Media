@@ -279,12 +279,33 @@ export class Props {
         // let admin user see all props.
         if (getAs().isAdminUser) return false;
 
-        // don't show activity pub props (note: ACT_PUB_ID is the one oddball system property that doesn't have a colon in it,
-        // not by design but by accident and will be fixed eventually)
-        if (prop.name.indexOf(":") !== -1 || prop.name === J.NodeProp.ACT_PUB_ID) {
+        if (this.isSystemProp(prop.name)) {
             return true;
         }
         return !!S.props.hiddenPropertyList.has(prop.name);
+    }
+
+    isSystemProp = (prop: string): boolean => {
+        if (prop.indexOf(":") !== -1) return true;
+
+        // todo-1: It's kind of a shame we don't have a colon in each of these system
+        // properties so we hae to listem them here explicitly here to detect them.
+        switch (prop) {
+            case J.NodeProp.ACT_PUB_ID:
+            case J.NodeProp.INLINE_CHILDREN:
+            case J.NodeProp.PRIORITY:
+            case J.NodeProp.LAYOUT:
+            case J.NodeProp.ORDER_BY:
+            case J.NodeProp.NO_OPEN_GRAPH:
+            case J.NodeProp.NO_EXPORT:
+            case J.NodeProp.UNPUBLISHED:
+            case J.NodeProp.BOOST:
+            case J.NodeProp.IN_PENDING_PATH:
+            case J.NodeProp.TRUNCATED:
+                return true;
+            default: break;
+        }
+        return false;
     }
 
     /* This is kind of a hard-coded hack for the one particular type name
