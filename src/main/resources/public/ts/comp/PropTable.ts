@@ -42,6 +42,7 @@ export class PropTable extends Comp {
         }
         this.ordinalSortChildren();
 
+        if (!this.hasChildren()) return null;
         return this.tag("div", { className: "scrollingPropsTable" }, [
             this.tag("table", { className: "customScrollBar smallMarginRight" })
         ]);

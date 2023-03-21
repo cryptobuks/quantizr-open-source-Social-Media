@@ -654,7 +654,7 @@ export class Render {
 
         const isMine = S.props.isMine(node);
         if (isMine) {
-            displayName = "me";
+            displayName = "You";
         }
         else {
             // if user has set their displayName
@@ -682,7 +682,7 @@ export class Render {
         }
 
         // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
-        return new Div("Boosted By: " + displayName, {
+        return new Div("Boosted by " + displayName, {
             className: clazz,
             title: "Show Profile:\n\n" + node.owner,
             onClick: () => {

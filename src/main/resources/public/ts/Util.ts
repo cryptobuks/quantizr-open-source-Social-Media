@@ -9,6 +9,7 @@ import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import * as I from "./Interfaces";
+import { ConfigProp } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
@@ -514,15 +515,23 @@ export class Util {
         });
     }
 
-    formatProperty(val: any, type: string): string {
+    formatProperty(val: any, type: string, configProp?: ConfigProp): string {
         switch (type) {
             case I.DomainType.Text:
                 return val;
             case I.DomainType.Date:
-                if (typeof val === "string") {
-                    return S.util.formatDateTime(new Date(parseInt(val)));
+                if (configProp && !configProp.showTime) {
+                    if (typeof val === "string") {
+                        return S.util.formatDateShort(new Date(parseInt(val)));
+                    }
+                    return S.util.formatDateShort(new Date(val));
                 }
-                return S.util.formatDateTime(new Date(val));
+                else {
+                    if (typeof val === "string") {
+                        return S.util.formatDateTime(new Date(parseInt(val)));
+                    }
+                    return S.util.formatDateTime(new Date(val));
+                }
             case I.DomainType.Number:
                 return "" + val;
             default:

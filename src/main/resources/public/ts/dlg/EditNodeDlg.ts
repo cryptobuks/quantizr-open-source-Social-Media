@@ -839,7 +839,7 @@ export class EditNodeDlg extends DialogBase {
                     this.propStates.set(durationPropEntry.name, durationState);
                 }
             }
-            valEditor = new DateTimeField(propState, durationState);
+            valEditor = new DateTimeField(propState, durationState, !propConfig || propConfig.showTime);
         }
         // TEXT/TEXTAREA TYPE
         else if (propType === I.DomainType.Text) {

@@ -19,6 +19,7 @@ export interface ConfigProp {
     label: string;
     width: number;
     ord: number;
+    showTime: boolean;
 }
 
 export interface EditorOptions {

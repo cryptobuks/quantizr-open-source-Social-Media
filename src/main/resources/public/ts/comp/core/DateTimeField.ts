@@ -10,7 +10,7 @@ export class DateTimeField extends Span {
     timeState: Validator = new Validator();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: Validator, private durationState?: Validator) {
+    constructor(private dateTimeState: Validator, private durationState?: Validator, private showTime?: boolean) {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
@@ -80,7 +80,7 @@ export class DateTimeField extends Span {
     preRender(): void {
         this.setChildren([
             new DateField(this.dateState),
-            new TimeField(this.timeState, "marginLeft"),
+            this.showTime ? new TimeField(this.timeState, "marginLeft") : null,
             this.durationState ? new TextField({
                 // NO LABEL!: Remember we have no room at top for a label because we're lining up with the rest
                 // of these components vertically which also have no labels.

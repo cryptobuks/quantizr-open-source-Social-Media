@@ -65,4 +65,5 @@ props:
     birthDate:
       label: "Birthday"
       width: 100
+      showTime: false
       
