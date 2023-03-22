@@ -9,14 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
 import quanta.model.client.PrincipalName;
@@ -32,9 +31,8 @@ import quanta.util.XString;
  */
 @Component
 @Order(5)
+@Slf4j 
 public class AppFilter extends GenericFilterBean {
-	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
-
 	@Autowired
 	private ApplicationContext context;
 

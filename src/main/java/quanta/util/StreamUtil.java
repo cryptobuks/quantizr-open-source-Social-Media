@@ -4,12 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
 import javax.imageio.ImageReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j 
 public class StreamUtil {
-	private static final Logger log = LoggerFactory.getLogger(StreamUtil.class);
-
 	public static void close(Object... objects) {
 		for (Object obj : objects) {
 			if (obj instanceof Closeable) {

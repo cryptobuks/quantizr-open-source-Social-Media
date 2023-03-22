@@ -1,8 +1,7 @@
 package quanta.mongo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
@@ -14,9 +13,8 @@ import quanta.util.ThreadLocals;
  * Lambda (i.e. 'Functional Interface')
  */
 @Component
+@Slf4j 
 public class AdminRun extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
-
 	// Runs 'runner' using 'ms' if not null, or falls back to using 'admin' if ms is null
 	public <T> T run(MongoSession ms, MongoRunnableEx<T> runner) {
 		return ms != null ? runner.run(ms) : run(runner);

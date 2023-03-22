@@ -13,14 +13,13 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -44,8 +43,8 @@ import quanta.util.Util;
 import quanta.util.Val;
 
 @Component
+@Slf4j 
 public class CryptoService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(CryptoService.class);
 	public static final ObjectMapper mapper = new ObjectMapper();
 
 	public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();

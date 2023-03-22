@@ -10,15 +10,14 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
-import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APOHashtag;
+import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -44,9 +43,8 @@ import quanta.util.XString;
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
 @Component
+@Slf4j 
 public class MongoAuth extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
-
 	private static final boolean verbose = false;
 
 	private static final Object adminSessionLck = new Object();

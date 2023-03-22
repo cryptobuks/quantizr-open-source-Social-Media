@@ -7,9 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -25,9 +24,8 @@ import quanta.util.Val;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class IPFSFiles extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSFiles.class);
-
     public static String API_FILES;
 
     @PostConstruct

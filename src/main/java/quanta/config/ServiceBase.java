@@ -1,12 +1,11 @@
 package quanta.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.CallProcessor;
 import quanta.actpub.ActPubCache;
 import quanta.actpub.ActPubCrypto;
@@ -95,9 +94,8 @@ import quanta.util.Validator;
  * if we called a method in UserFeedService from inside that same service, then unless we call like this:
  * userFeed.myMethod(), then the proxy-based AOP stuff will not execute, becuase it won't ge called thru a proxy.
  */
+@Slf4j 
 public class ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ServiceBase.class);
-
 	@Autowired
     public AppProp prop;
 

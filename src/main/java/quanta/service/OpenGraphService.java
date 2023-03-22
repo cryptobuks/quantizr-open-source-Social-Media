@@ -5,18 +5,16 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.OpenGraph;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
 
 @Component
+@Slf4j 
 public class OpenGraphService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(OpenGraphService.class);
-
 	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
 
 	public static final String BROWSER_USER_AGENT =

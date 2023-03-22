@@ -4,10 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSDirStat;
@@ -33,9 +32,8 @@ import quanta.util.XString;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class SyncToMFSService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SyncToMFSService.class);
-
 	MongoSession session;
 	HashSet<String> allNodePaths = new HashSet<>();
 	HashSet<String> allFilePaths = new HashSet<>();

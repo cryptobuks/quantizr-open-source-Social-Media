@@ -3,14 +3,13 @@ package quanta.service;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -35,9 +34,8 @@ import quanta.util.ThreadLocals;
  * of course.
  */
 @Component
+@Slf4j 
 public class NodeMoveService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
-
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
 	 *

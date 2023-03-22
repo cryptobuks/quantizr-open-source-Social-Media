@@ -3,20 +3,19 @@ package quanta.config;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.LockEx;
 
 /**
  * For keeping track of sessions.
  */
 @Component
+@Slf4j 
 public class AppSessionListener implements HttpSessionListener {
 	@Autowired private AppProp appProp;
-	private final Logger log = LoggerFactory.getLogger(AppSessionListener.class);
 	private static int sessionCounter = 0;
 
 	@Override

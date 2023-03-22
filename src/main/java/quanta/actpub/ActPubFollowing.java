@@ -8,12 +8,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOAccept;
 import quanta.actpub.model.APOActivity;
 import quanta.actpub.model.APOActor;
@@ -42,9 +41,8 @@ import quanta.util.XString;
  * Methods relating to AP following
  */
 @Component
+@Slf4j 
 public class ActPubFollowing extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
-
     @Autowired
     private ActPubLog apLog;
 

@@ -5,11 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
@@ -23,9 +22,8 @@ import quanta.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ExportTextService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ExportTextService.class);
-
 	private MongoSession session;
 
 	private BufferedOutputStream output = null;

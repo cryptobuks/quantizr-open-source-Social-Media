@@ -2,8 +2,6 @@ package quanta.mongo;
 
 import java.util.List;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
@@ -11,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.PropertyInfo;
@@ -23,13 +22,12 @@ import quanta.util.Const;
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  */
 @Component
+@Slf4j 
 public class MongoCreate extends ServiceBase {
 	// this large top reserve size means the "insert at top" will always be done with out multiple node
 	// updates
 	// except for once every thousand times.
 	private static long RESERVE_BLOCK_SIZE = 1000;
-
-	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {

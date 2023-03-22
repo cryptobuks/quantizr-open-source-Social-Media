@@ -2,13 +2,11 @@ package quanta.util;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.exception.base.RuntimeEx;
 
+@Slf4j 
 public class LockEx extends ReentrantLock {
-	private static final Logger log = LoggerFactory.getLogger(LockEx.class);
-
 	private boolean allowRetries = true;
 
 	/* Initial wait before logging something (in seconds). */

@@ -9,12 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
@@ -41,9 +40,8 @@ import quanta.util.XString;
  * AP Outbox
  */
 @Component
+@Slf4j 
 public class ActPubOutbox extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
-
     @Autowired
     private ActPubLog apLog;
 

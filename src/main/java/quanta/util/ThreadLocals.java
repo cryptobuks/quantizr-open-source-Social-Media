@@ -4,8 +4,7 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMonEvent;
@@ -22,9 +21,8 @@ import quanta.response.base.ResponseBase;
  * decouple from Web Requests, and have these variables available on a *any* thread even if it's a
  * worker or deamon thread that isn't an actual Web Request.
  */
+@Slf4j 
 public class ThreadLocals {
-	private static final Logger log = LoggerFactory.getLogger(ThreadLocal.class);
-
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();

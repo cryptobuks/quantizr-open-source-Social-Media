@@ -10,11 +10,11 @@ import java.util.Map;
 import javax.activation.MimetypesFileTypeMap;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 
+@Slf4j 
 public class MimeTypeUtils {
-    private static final Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);
     private static final Tika tika = new Tika();
 
     private static Map<String, String> mimeMap;

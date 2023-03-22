@@ -3,9 +3,6 @@ package quanta.service;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,15 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class IPFSSwarm extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSSwarm.class);
-
     public static String API_SWARM;
 
     @PostConstruct

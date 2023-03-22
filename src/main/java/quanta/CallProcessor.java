@@ -5,10 +5,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
@@ -27,11 +26,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 @Component
+@Slf4j
 public class CallProcessor extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
-
-	// private static int mutexCounter = 0;
-
 	/*
 	 * Wraps the processing of any command by using whatever info is on the session and/or the request
 	 * to perform the login if the user is not logged in, and then call the function to be processed

@@ -6,10 +6,9 @@ import java.io.InputStream;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -29,9 +28,8 @@ import quanta.util.XString;
  */
 
 @Component("MongoTest")
+@Slf4j 
 public class MongoTest extends ServiceBase implements TestIntf {
-	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
-
 	@Override
 	public void test() throws Exception {
 		log.debug("*****************************************************************************************");

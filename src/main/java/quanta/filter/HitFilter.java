@@ -8,11 +8,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.Const;
 import quanta.util.Util;
 
@@ -21,8 +20,8 @@ import quanta.util.Util;
  */
 @Component
 @Order(4)
+@Slf4j 
 public class HitFilter extends GenericFilterBean {
-	private static final Logger log = LoggerFactory.getLogger(HitFilter.class);
 	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override

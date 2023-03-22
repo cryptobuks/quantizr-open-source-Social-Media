@@ -9,8 +9,6 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
@@ -25,6 +23,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -46,14 +45,12 @@ import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
-
 /**
  * Verious utilities related to MongoDB persistence
  */
 @Component
+@Slf4j 
 public class MongoUtil extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
-
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static final Random rand = new Random();
 

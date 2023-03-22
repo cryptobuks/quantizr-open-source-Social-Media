@@ -1,8 +1,7 @@
 package quanta.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DO NOT DELETE
@@ -12,9 +11,8 @@ import org.springframework.boot.SpringApplication;
  */
 // @SpringBootApplication
 // @EnableScheduling
+@Slf4j 
 public class BackupUtil {
-	private static final Logger log = LoggerFactory.getLogger(BackupUtil.class);
-
 	public static void main(String[] args) {
 		SpringApplication.run(BackupUtil.class, args);
 		log.debug("App Started, and will shutdown now.");

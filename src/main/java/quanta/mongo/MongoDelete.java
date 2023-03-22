@@ -10,8 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,6 +19,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -41,9 +40,8 @@ import quanta.util.XString;
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
 @Component
+@Slf4j 
 public class MongoDelete extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
-
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly && deleteAttachments) {

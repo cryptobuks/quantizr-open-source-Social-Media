@@ -1,11 +1,9 @@
 package quanta.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j 
 public class ConcurrencyTest {
-    private static final Logger log = LoggerFactory.getLogger(ConcurrencyTest.class);
-
     public void test() {
         log.debug("Concurrency tester for LockEx is currently commented out. Uncomment the next two lines to enable it.");
         //DeadlockDetectorTest ddt = new DeadlockDetectorTest();

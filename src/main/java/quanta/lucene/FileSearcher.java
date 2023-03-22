@@ -13,10 +13,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.util.StreamUtil;
 
@@ -32,9 +31,8 @@ import quanta.util.StreamUtil;
  */
 // todo-2: make this a prototype-scope bean?
 @Component
+@Slf4j 
 public class FileSearcher {
-	private static final Logger log = LoggerFactory.getLogger(FileSearcher.class);
-
 	@Autowired
 	public AppProp appProp;
 

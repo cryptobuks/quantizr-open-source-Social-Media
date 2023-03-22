@@ -8,15 +8,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import org.apache.commons.io.IOUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
+import lombok.extern.slf4j.Slf4j;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -25,9 +24,8 @@ import quanta.exception.base.RuntimeEx;
  * todo-3: Look for ways to use this: Java 11 adds a few new methods to the String class: isBlank,
  * lines, strip, stripLeading, stripTrailing, and repeat.
  */
+@Slf4j 
 public class XString {
-	private static final Logger log = LoggerFactory.getLogger(XString.class);
-
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	static {
 		jsonMapper.setSerializationInclusion(Include.NON_NULL);

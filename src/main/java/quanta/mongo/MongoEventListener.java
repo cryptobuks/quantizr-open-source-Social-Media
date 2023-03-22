@@ -5,8 +5,6 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -16,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.EventPublisher;
 import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
@@ -50,8 +49,8 @@ import quanta.util.XString;
  * after the Document has been retrieved from the database was converted to a POJO.
  */
 @Component
+@Slf4j 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
-	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
 
 	@Autowired

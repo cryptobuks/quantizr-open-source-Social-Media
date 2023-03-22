@@ -7,8 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
@@ -30,9 +29,8 @@ import quanta.util.XString;
  * accessible immediately to be used by other beans before all are fully initialized.
  */
 @Component
+@Slf4j 
 public class AppProp {
-	private static final Logger log = LoggerFactory.getLogger(AppProp.class);
-
 	@Autowired
 	private Environment env;
 

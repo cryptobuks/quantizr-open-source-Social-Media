@@ -4,8 +4,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.catalina.connector.Connector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -13,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 /* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
 
@@ -22,8 +21,8 @@ import org.springframework.stereotype.Component;
  * NOTE: This is a spring bean instantiated with @Bean elsewhere.
  */
 @Component
+@Slf4j 
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
-    private static final Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
 
     @Autowired

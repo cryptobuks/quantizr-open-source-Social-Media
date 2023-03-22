@@ -8,12 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import lombok.extern.slf4j.Slf4j;
 import quanta.model.UserPreferences;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -30,6 +29,7 @@ import quanta.util.Util;
  */
 @Component
 @Scope("prototype")
+@Slf4j 
 public class SessionContext extends ServiceBase {
 	private HttpSession session;
 	private String urlIdFailMsg;
@@ -41,7 +41,6 @@ public class SessionContext extends ServiceBase {
 
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
-	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
 	public static final String QSC = "QSC";
 	private boolean live = true;

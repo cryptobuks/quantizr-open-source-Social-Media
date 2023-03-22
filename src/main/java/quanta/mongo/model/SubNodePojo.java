@@ -2,15 +2,14 @@ package quanta.mongo.model;
 
 import java.util.Date;
 import java.util.HashMap;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Pure Pojo equivalent of SubNode.java, so we can do serialization to/from JSON without MongoDB
@@ -21,9 +20,8 @@ import lombok.NoArgsConstructor;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
 		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS})
+@Slf4j
 public class SubNodePojo {
-	private static final Logger log = LoggerFactory.getLogger(SubNodePojo.class);
-
 	@JsonProperty(SubNode.ID)
 	private ObjectId id;
 

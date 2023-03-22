@@ -1,19 +1,17 @@
 package quanta.test;
 
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.util.XString;
 
 @Component("IPFSTest")
+@Slf4j 
 public class IPFSTest extends ServiceBase implements TestIntf {
-    private static final Logger log = LoggerFactory.getLogger(IPFSTest.class);
-
     @Override
     public void test() throws Exception {
         log.debug("IPFSTest.test() running.");

@@ -1,16 +1,14 @@
 package quanta.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
 
 @Component("ActPubTest")
+@Slf4j 
 public class ActPubTest extends ServiceBase implements TestIntf {
-    private static final Logger log = LoggerFactory.getLogger(ActPubTest.class);
-
     @Override
     public void test() throws Exception {
         try {

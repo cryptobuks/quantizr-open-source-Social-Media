@@ -10,11 +10,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.Const;
 import quanta.util.Util;
 
@@ -23,9 +22,8 @@ import quanta.util.Util;
  */
 @Component
 @Order(1)
+@Slf4j 
 public class AuditFilter extends GenericFilterBean {
-	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
-
 	private static String INDENT = "    ";
 	public static boolean enabled = false;
 

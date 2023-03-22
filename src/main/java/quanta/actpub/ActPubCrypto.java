@@ -20,10 +20,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -38,9 +37,8 @@ import quanta.util.XString;
  * Crypto functions for AP
  */
 @Component
+@Slf4j 
 public class ActPubCrypto extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
-
     public static final String SIGNATURE_ALGO = "SHA256withRSA";
     public static final String DIGEST_ALGO = "SHA-256";
 

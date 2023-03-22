@@ -4,8 +4,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -26,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.filter.AppFilter;
 
@@ -38,10 +37,9 @@ import quanta.filter.AppFilter;
  */
 @Configuration
 @EnableAsync
+@Slf4j 
 // @EnableAspectJAutoProxy // (proxyTargetClass = true)
 public class AppConfiguration implements WebMvcConfigurer {
-	private static final Logger log = LoggerFactory.getLogger(AppConfiguration.class);
-
 	@Autowired
 	private AppProp appProp;
 

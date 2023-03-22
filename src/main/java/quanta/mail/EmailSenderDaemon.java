@@ -1,10 +1,9 @@
 package quanta.mail;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
@@ -16,9 +15,8 @@ import quanta.mongo.model.SubNode;
  * Deamon for sending emails.
  */
 @Component
+@Slf4j 
 public class EmailSenderDaemon extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
-
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;

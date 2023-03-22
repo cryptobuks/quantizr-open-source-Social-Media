@@ -1,15 +1,13 @@
 package quanta.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
 
 @Component("LangTest")
+@Slf4j 
 public class LangTest extends ServiceBase implements TestIntf {
-	private static final Logger log = LoggerFactory.getLogger(UtilsTest.class);
-
 	@Override
 	public void test() throws Exception {
 		// both true

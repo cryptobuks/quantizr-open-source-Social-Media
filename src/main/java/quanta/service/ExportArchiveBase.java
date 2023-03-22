@@ -11,10 +11,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
@@ -39,9 +38,8 @@ import quanta.util.XString;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
+@Slf4j 
 public abstract class ExportArchiveBase extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
-
 	private String shortFileName;
 	private String fullFileName;
 	private String rootPathParent;

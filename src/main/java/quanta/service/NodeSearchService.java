@@ -9,13 +9,12 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
@@ -57,9 +56,8 @@ import quanta.util.XString;
  * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
+@Slf4j 
 public class NodeSearchService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
 

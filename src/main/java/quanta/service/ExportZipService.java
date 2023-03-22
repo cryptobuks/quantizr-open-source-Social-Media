@@ -5,16 +5,15 @@ import java.io.InputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.ExUtil;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ExportZipService extends ExportArchiveBase {
-    private static final Logger log = LoggerFactory.getLogger(ExportZipService.class);
     private ZipArchiveOutputStream out = null;
 
     @Override

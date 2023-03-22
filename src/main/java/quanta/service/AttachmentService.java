@@ -31,8 +31,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -54,6 +52,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -95,9 +94,8 @@ import quanta.util.XString;
  * Otherwise a download link is what gets displayed on the node.
  */
 @Component
+@Slf4j 
 public class AttachmentService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
-
 	@Autowired
 	public GridFsTemplate grid;
 

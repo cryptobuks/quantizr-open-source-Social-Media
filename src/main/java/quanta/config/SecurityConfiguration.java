@@ -1,7 +1,5 @@
 package quanta.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.filter.AuditFilter;
 import quanta.mongo.MongoAuth;
@@ -23,9 +22,8 @@ import quanta.mongo.MongoAuth;
  */
 // @EnableWebSecurity(debug = true) // #DEBUG-SECURITY
 @EnableWebSecurity
+@Slf4j 
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
-
     @Autowired
     AuditFilter auditFilter;
 

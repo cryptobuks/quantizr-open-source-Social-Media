@@ -8,13 +8,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.config.SessionContext;
 import quanta.util.Const;
@@ -26,9 +25,8 @@ import quanta.util.Util;
  */
 @Component
 @Order(2)
+@Slf4j 
 public class GlobalFilter extends GenericFilterBean {
-	private static final Logger log = LoggerFactory.getLogger(GlobalFilter.class);
-
 	@Autowired
 	private ApplicationContext context;
 

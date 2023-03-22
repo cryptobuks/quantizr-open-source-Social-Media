@@ -14,8 +14,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -23,12 +21,13 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoRepository;
 
+@Slf4j 
 public class Util {
-	private static final Logger log = LoggerFactory.getLogger(Util.class);
 	private static final Random rand = new Random();
 
 	public static boolean allowInsecureUrl(String url) {

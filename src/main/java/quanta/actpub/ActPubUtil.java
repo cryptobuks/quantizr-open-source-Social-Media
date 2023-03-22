@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -33,6 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOWebFinger;
@@ -61,9 +60,8 @@ import quanta.util.XString;
  * AP-related utilities
  */
 @Component
+@Slf4j 
 public class ActPubUtil extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
-
     @Autowired
     private ActPubLog apLog;
 

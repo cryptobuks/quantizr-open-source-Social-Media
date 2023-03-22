@@ -3,11 +3,10 @@ package quanta.util;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
@@ -33,9 +32,8 @@ import quanta.mongo.model.SubNode;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ImportWarAndPeace extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
-
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
 

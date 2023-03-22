@@ -1,9 +1,7 @@
 package quanta.test;
 
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.LockEx;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class intentionally creates a deadlock and using LockEx the deadlock is
@@ -20,9 +18,8 @@ import org.slf4j.LoggerFactory;
  *		throw new RuntimeEx("Aborting. Thread "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by thread "+getOwner().getName());
  *	}
  */
+@Slf4j 
 public class DeadlockDetectorTest {
-	private static final Logger log = LoggerFactory.getLogger(DeadlockDetectorTest.class);
-
 	private int threadsRunning = 0;
 	private final LockEx a = new LockEx("a", true, 7000, 1);
 	private final LockEx b = new LockEx("b", true, 7000, 1);

@@ -6,8 +6,7 @@ import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
@@ -39,9 +38,8 @@ import quanta.util.ThreadLocals;
 //        Adding these annotations is all you need to enable it.
 // @Aspect
 // @Component
+@Slf4j 
 public class Instrument {
-	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
-
 	public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
 
 	private static final int MAX_EVENTS = 10000;

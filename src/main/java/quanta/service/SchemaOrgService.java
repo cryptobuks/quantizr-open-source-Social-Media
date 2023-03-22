@@ -6,14 +6,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
@@ -23,9 +22,8 @@ import quanta.util.StreamUtil;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class SchemaOrgService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
-
 	public static final ObjectMapper mapper = new ObjectMapper();
 	public static HashMap<String, Object> schema = null;
 

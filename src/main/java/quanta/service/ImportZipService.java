@@ -3,11 +3,10 @@ package quanta.service;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoSession;
@@ -27,9 +26,8 @@ import quanta.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ImportZipService extends ImportArchiveBase {
-	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
-
 	private ZipArchiveInputStream zis;
 
 	/*

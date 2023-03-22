@@ -8,9 +8,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOActor;
@@ -40,9 +39,8 @@ import quanta.util.DateUtil;
  * Convenience factory for some types of AP objects
  */
 @Component
+@Slf4j 
 public class ActPubFactory extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
-
 	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, boolean privateMessage,
 			SubNode node) {
 		String objUrl = snUtil.getIdBasedUrl(node);

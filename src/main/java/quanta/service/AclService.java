@@ -7,14 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -45,9 +44,8 @@ import quanta.util.XString;
  * on nodes.
  */
 @Component
+@Slf4j 
 public class AclService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(AclService.class);
-
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
 	 */

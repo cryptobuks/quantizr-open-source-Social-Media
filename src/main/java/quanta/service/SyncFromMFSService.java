@@ -1,12 +1,11 @@
 package quanta.service;
 
 import java.util.HashSet;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSDir;
@@ -23,9 +22,8 @@ import quanta.util.XString;
 /* Does the reverse of SyncToMFSService */
 @Component
 @Scope("prototype")
+@Slf4j 
 public class SyncFromMFSService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SyncFromMFSService.class);
-
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	{
 		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

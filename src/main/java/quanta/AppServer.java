@@ -1,7 +1,5 @@
 package quanta;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -9,6 +7,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 
@@ -19,15 +18,14 @@ import quanta.util.ExUtil;
 @SpringBootApplication
 @EnableScheduling
 @ServletComponentScan
+@Slf4j
 /*
  * NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
  * actual hosting server's fallback error page by adding this annotation, but only do one or the
  * other.
  */
 // @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
-public class AppServer extends ServiceBase { 
-	private static final Logger log = LoggerFactory.getLogger(AppServer.class);
-
+public class AppServer extends ServiceBase {
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
 
@@ -46,7 +44,7 @@ public class AppServer extends ServiceBase {
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		ServiceBase.init(event.getApplicationContext());
-		
+
 		log.info("log.info: ContextRefreshedEvent.");
 		log.debug("log.debug: PROFILE: " + prop.getProfileName());
 		log.trace("log.trace: test trace message.");

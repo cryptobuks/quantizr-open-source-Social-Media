@@ -10,17 +10,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 @Component
+@Slf4j 
 public class EnglishDictionary extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
 	private static final HashSet<String> badWords = new HashSet<>();

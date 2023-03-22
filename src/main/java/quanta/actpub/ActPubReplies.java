@@ -2,11 +2,10 @@ package quanta.actpub;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -19,9 +18,8 @@ import quanta.service.AclService;
  * Methods related to generating AP Replies endpoing
  */
 @Component
+@Slf4j 
 public class ActPubReplies extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubReplies.class);
-
     @Autowired
     private ActPubLog apLog;
 

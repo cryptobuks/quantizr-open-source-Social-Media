@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -25,6 +21,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -41,9 +40,8 @@ import quanta.util.XString;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
 @Component
+@Slf4j 
 public class IPFSPubSub extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
-
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
     private static final String IPSM_TOPIC_TEST = "/ipsm/test";

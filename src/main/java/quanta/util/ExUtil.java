@@ -1,7 +1,7 @@
 package quanta.util;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -13,9 +13,8 @@ import quanta.exception.base.RuntimeEx;
  * of both types, but it just makes the code cleaner, by doing what the Java-language SHOULD have
  * done to begin with.
  */
+@Slf4j 
 public class ExUtil {
-	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);
-
 	public static void run(Runnable runnable) {
 		try {
 			runnable.run();

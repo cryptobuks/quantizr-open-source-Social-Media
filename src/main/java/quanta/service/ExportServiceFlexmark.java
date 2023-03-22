@@ -8,8 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -23,6 +21,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
@@ -45,9 +44,8 @@ import quanta.util.XString;
  */
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ExportServiceFlexmark extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
-
 	private MongoSession session;
 
 	private String shortFileName;

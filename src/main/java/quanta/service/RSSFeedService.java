@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -73,9 +73,8 @@ import quanta.util.XString;
 
 /* Proof of Concept RSS Publishing */
 @Component
+@Slf4j 
 public class RSSFeedService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
-
 	private static boolean refreshingCache = false;
 
 	private static final Object policyLock = new Object();

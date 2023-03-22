@@ -1,8 +1,7 @@
 package quanta.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -18,9 +17,8 @@ import quanta.util.XString;
  * reasonable sized chunk of data (i.e. the entire book)
  */
 @Component
+@Slf4j 
 public class ImportBookService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
-
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
 		ms = ThreadLocals.ensure(ms);

@@ -3,8 +3,6 @@ package quanta.actpub;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -33,10 +32,9 @@ import quanta.util.XString;
  * 
  */
 @Controller
+@Slf4j 
 // @CrossOrigin is done by AppFilter.
 public class ActPubController extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
-
 	@Autowired
 	private ActPubLog apLog;
 

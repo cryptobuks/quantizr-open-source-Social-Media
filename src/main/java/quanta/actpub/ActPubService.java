@@ -21,13 +21,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAccept;
@@ -57,7 +56,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
-import quanta.service.NodeSearchService;
 import quanta.util.Convert;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -70,9 +68,8 @@ import quanta.util.XString;
  * General AP functions
  */
 @Component
+@Slf4j 
 public class ActPubService extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
-
     @Autowired
     private ActPubLog apLog;
 

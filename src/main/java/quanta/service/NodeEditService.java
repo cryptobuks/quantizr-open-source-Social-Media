@@ -9,12 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APList;
@@ -79,9 +78,8 @@ import quanta.util.XString;
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
 @Component
+@Slf4j 
 public class NodeEditService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
 	@Autowired
 	private ActPubLog apLog;
 

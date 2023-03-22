@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -18,9 +17,8 @@ import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class IPFSPin extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSPin.class);
-
     public static String API_PIN;
 
     @PostConstruct

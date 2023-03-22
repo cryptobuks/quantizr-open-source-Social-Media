@@ -16,17 +16,15 @@ import java.util.Set;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 
 @Component
+@Slf4j 
 public class FileUtils extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
-
 	/*
 	 * Creates the set of file extensions that we allow user to edit
 	 */

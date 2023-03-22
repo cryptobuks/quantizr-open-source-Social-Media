@@ -15,8 +15,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -30,6 +28,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
@@ -57,9 +56,8 @@ import quanta.util.XString;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
 @Component
+@Slf4j 
 public class IPFSService extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
-
     public static String API_ID;
 
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();

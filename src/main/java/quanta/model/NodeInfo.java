@@ -4,17 +4,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeLink;
 import quanta.util.DateUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Transient;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
@@ -23,9 +22,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
+@Slf4j 
 public class NodeInfo {
-	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
-
 	private String id;
 	private String path;
 	private String name;

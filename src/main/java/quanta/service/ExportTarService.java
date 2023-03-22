@@ -6,17 +6,15 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.util.ExUtil;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ExportTarService extends ExportArchiveBase {
-    private static final Logger log = LoggerFactory.getLogger(ExportTarService.class);
-
     private TarArchiveOutputStream out = null;
     private boolean gzip = false;
 

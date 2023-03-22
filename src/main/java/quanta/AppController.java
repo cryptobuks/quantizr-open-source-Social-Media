@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -38,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.ActPubLog;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
@@ -181,10 +180,9 @@ import quanta.util.Val;
  * code in the system that looks 'redundant' (non-DRY), but this is because we want certain things
  * in certain layers (abstraction related and for loose-coupling).
  */
+@Slf4j
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
-	private static final Logger log = LoggerFactory.getLogger(AppController.class);
-
 	@Autowired
 	private ActPubLog apLog;
 

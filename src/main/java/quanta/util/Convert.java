@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -41,9 +41,8 @@ import quanta.types.TypeBase;
  * Converting objects from one type to another, and formatting.
  */
 @Component
+@Slf4j 
 public class Convert extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(Convert.class);
-
 	// indicates we don't need to worry about sending back a good logicalOrdinal
 	public static int LOGICAL_ORDINAL_IGNORE = -1;
 

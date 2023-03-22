@@ -5,14 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
@@ -28,9 +27,8 @@ import quanta.util.XString;
  * Performs update (as in CRUD) operations for MongoDB
  */
 @Component
+@Slf4j 
 public class MongoUpdate extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
-
 	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 

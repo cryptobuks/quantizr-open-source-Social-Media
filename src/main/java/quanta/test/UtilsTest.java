@@ -1,17 +1,15 @@
 package quanta.test;
 
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 
 @Component("UtilsTest")
+@Slf4j 
 public class UtilsTest extends ServiceBase implements TestIntf {
-	private static final Logger log = LoggerFactory.getLogger(UtilsTest.class);
-
 	@Override
 	public void test() throws Exception {
 		asyncExecTest();

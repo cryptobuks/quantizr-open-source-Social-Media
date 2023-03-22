@@ -6,10 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -22,8 +21,8 @@ import quanta.util.DateUtil;
  * #todo-optimization: need timer that cleans each of these out once every 8hrs.
  */
 @Component
+@Slf4j 
 public class ActPubCache extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubCache.class);
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed

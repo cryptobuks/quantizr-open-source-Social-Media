@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -36,9 +35,8 @@ import quanta.util.Val;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class UserFeedService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
-
 	static final int MAX_FEED_ITEMS = 25;
 
 	// DO NOT DELETE (part of example to keep below)

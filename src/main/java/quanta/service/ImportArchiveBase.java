@@ -5,9 +5,8 @@ import java.util.HashMap;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -18,9 +17,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
+@Slf4j 
 public abstract class ImportArchiveBase extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
-
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
 	/*

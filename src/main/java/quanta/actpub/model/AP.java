@@ -5,8 +5,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -19,9 +18,8 @@ import quanta.util.XString;
  * instead of having a POJO for the the various types of objects we use the accessor methods and
  * properties in this object.
  */
+@Slf4j 
 public class AP {
-    private static final Logger log = LoggerFactory.getLogger(AP.class);
-
     public static boolean apHasProps(Object obj) {
         return obj instanceof Map<?, ?> || obj instanceof LinkedHashMap<?, ?>;
     }

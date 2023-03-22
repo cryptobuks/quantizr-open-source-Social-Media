@@ -10,11 +10,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.MongoDatabase;
-import quanta.AppController;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -37,9 +35,8 @@ import quanta.util.XString;
  */
 
 @Component
+@Slf4j 
 public class SystemService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
-
 	public String rebuildIndexes() {
 		ThreadLocals.requireAdmin();
 

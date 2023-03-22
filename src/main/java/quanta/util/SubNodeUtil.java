@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
@@ -25,9 +24,8 @@ import quanta.mongo.model.SubNode;
  * scope bean and non-static methods.
  */
 @Component
+@Slf4j 
 public class SubNodeUtil extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
-
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID);
 	}

@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -20,6 +18,7 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -43,11 +42,10 @@ import quanta.util.XString;
  * information in the thread for use during context of one call
  */
 @Component
+@Slf4j 
 public class MongoRead extends ServiceBase {
     int MAX_DOC_DEPTH = 7;
     int MAX_DOC_ITEMS_PER_CALL = 40;
-
-    private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;

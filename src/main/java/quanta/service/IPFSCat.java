@@ -3,18 +3,16 @@ package quanta.service;
 import java.io.InputStream;
 import java.net.URL;
 import javax.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.Util;
 
 @Component
+@Slf4j 
 public class IPFSCat extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSCat.class);
-
     public static String API_CAT;
 
     @PostConstruct

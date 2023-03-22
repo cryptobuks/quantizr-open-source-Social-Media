@@ -15,11 +15,10 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -41,9 +40,8 @@ import quanta.util.XString;
 
 @Component
 @Scope("prototype")
+@Slf4j 
 public class ExportPdfServicePdfBox extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
-
 	private MongoSession session;
 
 	private String shortFileName;

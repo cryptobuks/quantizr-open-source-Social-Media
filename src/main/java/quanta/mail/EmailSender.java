@@ -10,12 +10,11 @@ import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import com.sun.mail.smtp.SMTPTransport;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.sun.mail.smtp.SMTPTransport;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
@@ -25,9 +24,8 @@ import quanta.util.LimitedInputStream;
  * Component that sends emails
  */
 @Component
+@Slf4j 
 public class EmailSender extends ServiceBase implements TransportListener {
-	private static final Logger log = LoggerFactory.getLogger(EmailSender.class);
-
 	@Autowired
 	private AppProp appProp;
 

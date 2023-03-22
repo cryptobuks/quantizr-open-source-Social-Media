@@ -5,11 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.ipfs.dag.DagLink;
@@ -24,9 +23,8 @@ import quanta.util.Val;
 import quanta.util.XString;
 
 @Component
+@Slf4j 
 public class IPFSDag extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(IPFSDag.class);
-
     public static String API_DAG;
 
     @PostConstruct

@@ -2,11 +2,10 @@ package quanta.service;
 
 import java.util.HashSet;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.instrument.PerfMon;
@@ -19,9 +18,8 @@ import quanta.response.ServerPushInfo;
 import quanta.util.Convert;
 
 @Component
+@Slf4j 
 public class PushService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(PushService.class);
-
 	static final int MAX_FEED_ITEMS = 25;
 
 	/* Notify all users being shared to on this node, or everyone if the node is public. */

@@ -4,12 +4,11 @@ import static quanta.actpub.model.AP.apInt;
 import static quanta.actpub.model.AP.apStr;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
@@ -32,9 +31,8 @@ import quanta.util.XString;
  * Methods related to AP Follower
  */
 @Component
+@Slf4j 
 public class ActPubFollower extends ServiceBase {
-    private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
-
     @Autowired
     private ActPubLog apLog;
 
