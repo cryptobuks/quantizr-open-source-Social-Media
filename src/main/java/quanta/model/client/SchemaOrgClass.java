@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import lombok.Data;
+
+@Data
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaOrgClass {
@@ -15,36 +18,4 @@ public class SchemaOrgClass {
     private List<SchemaOrgProp> props = new ArrayList<>();
 
     public SchemaOrgClass() {}
-
-    public List<SchemaOrgProp> getProps() {
-        return props;
-    }
-
-    public void setProps(List<SchemaOrgProp> props) {
-        this.props = props;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
 }
