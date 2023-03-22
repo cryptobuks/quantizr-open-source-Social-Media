@@ -4,10 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents a certain principal and a set of privileges the principal has.
  */
+@Data
+@NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class AccessControlInfo {
 	private String displayName;
@@ -23,32 +27,14 @@ public class AccessControlInfo {
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
-	public AccessControlInfo() {}
-
-	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey,
-			String avatarVer, String foreignAvatarUrl) {
+	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey, String avatarVer,
+			String foreignAvatarUrl) {
 		this.displayName = displayName;
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
 		this.publicKey = publicKey;
 		this.avatarVer = avatarVer;
 		this.foreignAvatarUrl = foreignAvatarUrl;
-	}
-
-	public String getPrincipalName() {
-		return principalName;
-	}
-
-	public void setPrincipalName(String principalName) {
-		this.principalName = principalName;
-	}
-
-	public List<PrivilegeInfo> getPrivileges() {
-		return privileges;
-	}
-
-	public void setPrivileges(List<PrivilegeInfo> privileges) {
-		this.privileges = privileges;
 	}
 
 	public void addPrivilege(PrivilegeInfo priv) {
@@ -56,45 +42,5 @@ public class AccessControlInfo {
 			privileges = new LinkedList<>();
 		}
 		privileges.add(priv);
-	}
-
-	public String getPrincipalNodeId() {
-		return principalNodeId;
-	}
-
-	public void setPrincipalNodeId(String principalNodeId) {
-		this.principalNodeId = principalNodeId;
-	}
-
-	public String getPublicKey() {
-		return publicKey;
-	}
-
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
-	}
-
-	public String getAvatarVer() {
-		return avatarVer;
-	}
-
-	public void setAvatarVer(String avatarVer) {
-		this.avatarVer = avatarVer;
-	}
-
-	public String getForeignAvatarUrl() {
-		return foreignAvatarUrl;
-	}
-
-	public void setForeignAvatarUrl(String foreignAvatarUrl) {
-		this.foreignAvatarUrl = foreignAvatarUrl;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
 	}
 }

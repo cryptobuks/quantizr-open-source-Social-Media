@@ -4,9 +4,12 @@ import java.util.LinkedList;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.NodeInfo;
 import quanta.response.base.ResponseBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class RenderNodeResponse extends ResponseBase {
-
 	/* child ordering flag is set in this node object and is correct */
 	private NodeInfo node;
 
@@ -22,43 +25,4 @@ public class RenderNodeResponse extends ResponseBase {
 
 	private boolean rssNode;
 
-	public NodeInfo getNode() {
-		return node;
-	}
-
-	public void setNode(NodeInfo node) {
-		this.node = node;
-	}
-
-	public boolean isEndReached() {
-		return endReached;
-	}
-
-	public void setEndReached(boolean endReached) {
-		this.endReached = endReached;
-	}
-
-	public String getNoDataResponse() {
-		return noDataResponse;
-	}
-
-	public void setNoDataResponse(String noDataResponse) {
-		this.noDataResponse = noDataResponse;
-	}
-
-	public LinkedList<BreadcrumbInfo> getBreadcrumbs() {
-		return breadcrumbs;
-	}
-
-	public void setBreadcrumbs(LinkedList<BreadcrumbInfo> breadcrumbs) {
-		this.breadcrumbs = breadcrumbs;
-	}
-
-	public boolean isRssNode() {
-		return rssNode;
-	}
-
-	public void setRssNode(boolean rssNode) {
-		this.rssNode = rssNode;
-	}
 }

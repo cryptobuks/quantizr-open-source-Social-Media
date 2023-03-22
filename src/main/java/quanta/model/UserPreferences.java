@@ -1,7 +1,11 @@
 package quanta.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 /**
  * Models UserPreferences
  */
@@ -26,38 +30,6 @@ public class UserPreferences {
 	@JsonProperty(required = false)
 	private long maxUploadFileSize;
 
-	public boolean isEnableIPSM() {
-		return enableIPSM;
-	}
-
-	public void setEnableIPSM(boolean enableIPSM) {
-		this.enableIPSM = enableIPSM;
-	}
-
-	public boolean isRssHeadlinesOnly() {
-		return rssHeadlinesOnly;
-	}
-
-	public void setRssHeadlinesOnly(boolean rssHeadlinesOnly) {
-		this.rssHeadlinesOnly = rssHeadlinesOnly;
-	}
-
-	public boolean isEditMode() {
-		return editMode;
-	}
-
-	public void setEditMode(boolean editMode) {
-		this.editMode = editMode;
-	}
-	
-	public boolean isShowMetaData() {
-		return showMetaData;
-	}
-
-	public void setShowMetaData(boolean showMetaData) {
-		this.showMetaData = showMetaData;
-	}
-
 	@JsonProperty(required = false)
 	public long getMaxUploadFileSize() {
 		return maxUploadFileSize;
@@ -76,45 +48,5 @@ public class UserPreferences {
 	@JsonProperty(required = false)
 	public void setMainPanelCols(long mainPanelCols) {
 		this.mainPanelCols = mainPanelCols;
-	}
-
-	public boolean isShowParents() {
-		return showParents;
-	}
-
-	public void setShowParents(boolean showParents) {
-		this.showParents = showParents;
-	}
-
-	public boolean isShowReplies() {
-		return showReplies;
-	}
-
-	public void setShowReplies(boolean showReplies) {
-		this.showReplies = showReplies;
-	}
-
-	public boolean isNsfw() {
-		return nsfw;
-	}
-
-	public void setNsfw(boolean nsfw) {
-		this.nsfw = nsfw;
-	}
-
-	public boolean isShowProps() {
-		return showProps;
-	}
-
-	public void setShowProps(boolean showProps) {
-		this.showProps = showProps;
-	}
-
-	public boolean isAutoRefreshFeed() {
-		return autoRefreshFeed;
-	}
-
-	public void setAutoRefreshFeed(boolean autoRefreshFeed) {
-		this.autoRefreshFeed = autoRefreshFeed;
 	}
 }

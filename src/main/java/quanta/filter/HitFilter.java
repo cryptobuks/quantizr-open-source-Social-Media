@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.util.Const;
 import quanta.util.Util;
 
 /**
@@ -27,7 +28,11 @@ public class HitFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (Const.debugRequests) {
+			log.debug("HitFilter.doFilter()");
+		}
+		if (!Util.gracefulReadyCheck(response))
+			return;
 
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {

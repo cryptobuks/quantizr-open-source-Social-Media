@@ -20,6 +20,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
 import quanta.model.client.PrincipalName;
+import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -49,6 +50,9 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+		if (Const.debugRequests) {
+			log.debug("AppFilter.doFilter()");
+		}
 		if (!Util.gracefulReadyCheck(res))
 			return;
 

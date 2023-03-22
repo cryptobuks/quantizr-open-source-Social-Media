@@ -4,15 +4,11 @@ import java.util.LinkedList;
 
 import quanta.model.CalendarItem;
 import quanta.response.base.ResponseBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class RenderCalendarResponse extends ResponseBase {
 	private LinkedList<CalendarItem> items;
-
-	public LinkedList<CalendarItem> getItems() {
-		return items;
-	}
-
-	public void setItems(LinkedList<CalendarItem> items) {
-		this.items = items;
-	}
 }

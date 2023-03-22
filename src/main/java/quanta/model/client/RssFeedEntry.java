@@ -3,8 +3,10 @@ package quanta.model.client;
 import java.util.List;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class RssFeedEntry {
     private String parentFeedTitle;
     private String author;

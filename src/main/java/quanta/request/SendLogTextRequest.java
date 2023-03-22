@@ -1,15 +1,11 @@
 package quanta.request;
 
 import quanta.request.base.RequestBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class SendLogTextRequest extends RequestBase {
     private String text;
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
 }

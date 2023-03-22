@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.util.Const;
 import quanta.util.Util;
 
 /**
@@ -31,6 +32,9 @@ public class AuditFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (Const.debugRequests) {
+			log.debug("AuditFilter.doFilter()");
+		}
 		if (!Util.gracefulReadyCheck(response))
 			return;
 

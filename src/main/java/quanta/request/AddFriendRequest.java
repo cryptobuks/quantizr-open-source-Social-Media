@@ -2,14 +2,11 @@ package quanta.request;
 
 import quanta.request.base.RequestBase;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class AddFriendRequest extends RequestBase {
 	private String userName;
-	
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
 }

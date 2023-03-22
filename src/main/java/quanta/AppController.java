@@ -320,8 +320,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					if (AclService.isPublic(as, node)) {
 						render.populateSocialCardProps(node, model);
 					}
-				}
-				else {
+				} else {
 					sc.setUrlIdFailMsg("Unable to access node: " + _id);
 				}
 				return null;
@@ -956,7 +955,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
 	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-
+		log.debug("saveNode()");
 		return callProc.run("saveNode", true, true, req, session, ms -> {
 			return edit.saveNode(ms, req);
 		});
@@ -1443,7 +1442,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			ThreadLocals.getSC().setAppGuid(req.getAppGuid());
 			log.debug("BrowserGuid: " + req.getAppGuid());
 			res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
-		
+
 			// we only need to display this once so remove it.
 			sc.setUrlIdFailMsg(null);
 

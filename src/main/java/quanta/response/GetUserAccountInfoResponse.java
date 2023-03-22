@@ -1,24 +1,12 @@
 package quanta.response;
 
 import quanta.response.base.ResponseBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class GetUserAccountInfoResponse extends ResponseBase {
-	private Integer binTotal;
+    private Integer binTotal;
     private Integer binQuota;
-
-    public Integer getBinTotal() {
-        return binTotal;
-    }
-
-    public void setBinTotal(Integer binTotal) {
-        this.binTotal = binTotal;
-    }
-
-    public Integer getBinQuota() {
-        return binQuota;
-    }
-
-    public void setBinQuota(Integer binQuota) {
-        this.binQuota = binQuota;
-    }
 }

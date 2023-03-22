@@ -1,16 +1,11 @@
 package quanta.response;
 
 import quanta.response.base.ResponseBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class PingResponse extends ResponseBase {
 	private String serverInfo;
-
-	public String getServerInfo() {
-		return serverInfo;
-	}
-
-	public void setServerInfo(String serverInfo) {
-		this.serverInfo = serverInfo;
-	}
-
 }

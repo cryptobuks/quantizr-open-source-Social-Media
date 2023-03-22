@@ -1,7 +1,11 @@
 package quanta.model.ipfs.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class IPFSDirEntry {
     @JsonProperty("Name")
     private String name;
@@ -14,38 +18,6 @@ public class IPFSDirEntry {
 
     @JsonProperty("Hash")
     private String hash;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getSize() {
-        return size;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
 
     public boolean isDir() {
         return type != null && type.intValue() == 1;

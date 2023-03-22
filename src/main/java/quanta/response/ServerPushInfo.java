@@ -2,9 +2,12 @@ package quanta.response;
 
 import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class ServerPushInfo {
-
 	/**
 	 * Examples: type=='newNode' nodeId=[id of the node]
 	 */
@@ -12,19 +15,7 @@ public class ServerPushInfo {
 	@JsonIgnore
 	private String type;
 
-	//WARNING: parameterless constructor required for marshalling.
-	public ServerPushInfo() {
-	}
-
 	public ServerPushInfo(String type) {
-		this.type = type;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
 		this.type = type;
 	}
 }

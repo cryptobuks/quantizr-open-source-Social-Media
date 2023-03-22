@@ -13,11 +13,15 @@ import quanta.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
  * in javascript.
  */
+@Data
+@NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
 public class NodeInfo {
 	private static final Logger log = LoggerFactory.getLogger(NodeInfo.class);
@@ -96,8 +100,6 @@ public class NodeInfo {
 	// if this node is a boost we put in the target node (node being boosted here)
 	private NodeInfo boostedNode;
 
-	public NodeInfo() {}
-
 	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName,
 			String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
 			HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links, List<AccessControlInfo> ac,
@@ -167,82 +169,10 @@ public class NodeInfo {
 		safeGetProperties().add(new PropertyInfo(propName, val));
 	}
 
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getRenderContent() {
-		return renderContent;
-	}
-
-	public void setRenderContent(String renderContent) {
-		this.renderContent = renderContent;
-	}
-
-	public String getTags() {
-		return tags;
-	}
-
-	public void setTag(String tags) {
-		this.tags = tags;
-	}
-
-	public String getCipherKey() {
-		return cipherKey;
-	}
-
-	public void setCipherKey(String cipherKey) {
-		this.cipherKey = cipherKey;
-	}
-
-	public Date getLastModified() {
-		return lastModified;
-	}
-
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
-
-	public String getTimeAgo() {
-		return timeAgo;
-	}
-
-	public void setTimeAgo(String timeAgo) {
-		this.timeAgo = timeAgo;
-	}
-
 	public List<NodeInfo> safeGetChildren() {
 		if (children != null)
 			return children;
 		return children = new LinkedList<>();
-	}
-
-	public List<NodeInfo> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<NodeInfo> children) {
-		this.children = children;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public List<PropertyInfo> safeGetProperties() {
@@ -251,201 +181,9 @@ public class NodeInfo {
 		return properties = new LinkedList<>();
 	}
 
-	public List<PropertyInfo> getProperties() {
-		return properties;
-	}
-
-	public void setProperties(List<PropertyInfo> properties) {
-		this.properties = properties;
-	}
-
-	public HashMap<String, Attachment> getAttachments() {
-		return attachments;
-	}
-
-	public void setAttachments(HashMap<String, Attachment> attachments) {
-		this.attachments = attachments;
-	}
-
-	public HashMap<String, NodeLink> getLinks() {
-		return links;
-	}
-
-	public void setLinks(HashMap<String, NodeLink> links) {
-		this.links = links;
-	}
-
-	public List<AccessControlInfo> getAc() {
-		return ac;
-	}
-
-	public void setAc(List<AccessControlInfo> ac) {
-		this.ac = ac;
-	}
-
-	public boolean isHasChildren() {
-		return hasChildren;
-	}
-
-	public void setHasChildren(boolean hasChildren) {
-		this.hasChildren = hasChildren;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getImgId() {
-		return imgId;
-	}
-
-	public void setImgId(String imgId) {
-		this.imgId = imgId;
-	}
-
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public String getOwnerId() {
-		return ownerId;
-	}
-
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-	}
-
-	public String getTransferFromId() {
-		return transferFromId;
-	}
-
-	public void setTransferFromId(String transferFromId) {
-		this.transferFromId = transferFromId;
-	}
-
-	public Long getOrdinal() {
-		return ordinal;
-	}
-
-	public void setOrdinal(Long ordinal) {
-		this.ordinal = ordinal;
-	}
-
-	public Long getLogicalOrdinal() {
-		return logicalOrdinal;
-	}
-
-	public void setLogicalOrdinal(Long logicalOrdinal) {
-		this.logicalOrdinal = logicalOrdinal;
-	}
-
-	public boolean isLastChild() {
-		return this.lastChild;
-	}
-
-	public void setLastChild(boolean lastChild) {
-		this.lastChild = lastChild;
-	}
-
-	public String getAvatarVer() {
-		return avatarVer;
-	}
-
-	public void setAvatarVer(String avatarVer) {
-		this.avatarVer = avatarVer;
-	}
-
-	public String getApImage() {
-		return apImage;
-	}
-
-	public void setApImage(String apImage) {
-		this.apImage = apImage;
-	}
-
-	public NodeInfo getParent() {
-		return parent;
-	}
-
-	public void setParent(NodeInfo parent) {
-		this.parent = parent;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public String getApAvatar() {
-		return apAvatar;
-	}
-
-	public void setApAvatar(String apAvatar) {
-		this.apAvatar = apAvatar;
-	}
-
 	public List<PropertyInfo> safeGetClientProps() {
 		if (clientProps != null)
 			return clientProps;
 		return clientProps = new LinkedList<>();
-	}
-
-	public List<PropertyInfo> getClientProps() {
-		return clientProps;
-	}
-
-	public void setClientProps(List<PropertyInfo> clientProps) {
-		this.clientProps = clientProps;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	public LinkedList<NodeInfo> getParents() {
-		return parents;
-	}
-
-	public void setParents(LinkedList<NodeInfo> parents) {
-		this.parents = parents;
-	}
-
-	public LinkedList<NodeInfo> getLinkedNodes() {
-		return linkedNodes;
-	}
-
-	public void setLinkedNodes(LinkedList<NodeInfo> linkedNodes) {
-		this.linkedNodes = linkedNodes;
-	}
-
-	public List<String> getLikes() {
-		return likes;
-	}
-
-	public void setLikes(List<String> likes) {
-		this.likes = likes;
-	}
-
-	public NodeInfo getBoostedNode() {
-		return boostedNode;
-	}
-
-	public void setBoostedNode(NodeInfo boostedNode) {
-		this.boostedNode = boostedNode;
 	}
 }

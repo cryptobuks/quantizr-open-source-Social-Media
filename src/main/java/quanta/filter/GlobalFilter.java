@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.actpub.APConst;
 import quanta.config.SessionContext;
+import quanta.util.Const;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
@@ -34,6 +35,9 @@ public class GlobalFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (Const.debugRequests) {
+			log.debug("GlobalFilter.doFilter()");
+		}
 		if (!Util.gracefulReadyCheck(response))
 			return;
 
@@ -45,7 +49,8 @@ public class GlobalFilter extends GenericFilterBean {
 				String uri = sreq.getRequestURI();
 				boolean createSession = "/".equals(uri) || uri.isEmpty();
 
-				// todo-1: This can be done in a cleaner way. Also ONLY create session when accessing "/" (index.htm)
+				// todo-1: This can be done in a cleaner way. Also ONLY create session when accessing "/"
+				// (index.htm)
 
 				// Special checks for Cache-Controls
 				if (sreq.getRequestURI().contains("/images/") || //

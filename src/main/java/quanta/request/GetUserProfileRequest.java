@@ -1,15 +1,11 @@
 package quanta.request;
 
 import quanta.request.base.RequestBase;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class GetUserProfileRequest extends RequestBase {
     public String userId;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }

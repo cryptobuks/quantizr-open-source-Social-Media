@@ -2,8 +2,10 @@ package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class MFSDirEntry {
     @JsonProperty("Name")
     private String name;
