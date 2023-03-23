@@ -261,7 +261,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 
-			// If a node has a property "noexport" (added by power users) then this node will not be exported.
+			// If a node has a property "sn:noexport" (added by power users) then this node will not be exported.
 			String noExport = n.getStr(NodeProp.NO_EXPORT);
 			if (noExport != null) {
 				continue;

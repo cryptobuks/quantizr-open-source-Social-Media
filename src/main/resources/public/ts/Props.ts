@@ -296,7 +296,6 @@ export class Props {
             case J.NodeProp.PRIORITY:
             case J.NodeProp.LAYOUT:
             case J.NodeProp.ORDER_BY:
-            case J.NodeProp.NO_OPEN_GRAPH:
             case J.NodeProp.NO_EXPORT:
             case J.NodeProp.UNPUBLISHED:
             case J.NodeProp.BOOST:

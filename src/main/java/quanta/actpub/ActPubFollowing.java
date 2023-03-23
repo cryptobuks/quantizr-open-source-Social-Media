@@ -101,7 +101,7 @@ public class ActPubFollowing extends ServiceBase {
                 APOActor toActor = apUtil.getActorByUrl(as, followerUserName, actorUrlOfUserBeingFollowed);
                 if (toActor != null) {
                     String privateKey = apCrypto.getPrivateKey(as, followerUserName);
-                    apUtil.securePostEx(toActor.getInbox(), privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
+                    apUtil.securePostEx(apStr(toActor, APObj.inbox), privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -241,9 +241,9 @@ public class ActPubFollowing extends ServiceBase {
                                 prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
                                 acceptPayload); // object
 
-                        log.debug("Sending Accept of Follow Request to inbox " + followerActor.getInbox());
+                        log.debug("Sending Accept of Follow Request to inbox " + apStr(followerActor, APObj.inbox));
 
-                        apUtil.securePostEx(followerActor.getInbox(), privateKey, _actorBeingFollowedUrl, accept,
+                        apUtil.securePostEx(apStr(followerActor, APObj.inbox), privateKey, _actorBeingFollowedUrl, accept,
                                 APConst.MTYPE_LD_JSON_PROF);
                         log.debug("Secure post completed.");
                     });
@@ -289,9 +289,9 @@ public class ActPubFollowing extends ServiceBase {
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowing(MongoSession ms, String userDoingAction, APOActor actor) {
-        APObj followings = getFollowing(ms, userDoingAction, actor.getFollowing());
+        APObj followings = getFollowing(ms, userDoingAction, apStr(actor, APObj.following));
         if (followings == null) {
-            log.debug("Unable to get followings for AP user: " + actor.getFollowing());
+            log.debug("Unable to get followings for AP user: " + apStr(actor, APObj.following));
             return 0;
         }
 
@@ -436,9 +436,9 @@ public class ActPubFollowing extends ServiceBase {
                 // #todo-optimization: we can call apub.getUserProperty() to get 'following' prop right?
                 APOActor actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
                 if (actor != null) {
-                    APObj following = getFollowing(ms, userDoingAction, actor.getFollowing());
+                    APObj following = getFollowing(ms, userDoingAction, apStr(actor, APObj.following));
                     if (following == null) {
-                        log.debug("Unable to get followers for AP user: " + actor.getFollowing());
+                        log.debug("Unable to get followers for AP user: " + apStr(actor, APObj.following));
                     }
                     ret = apInt(following, APObj.totalItems);
                 }

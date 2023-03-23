@@ -52,9 +52,9 @@ public class ActPubFollower extends ServiceBase {
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowers(MongoSession ms, String userMakingRequest, APOActor actor) {
 
-        APObj followers = getRemoteFollowers(ms, userMakingRequest, actor.getFollowers());
+        APObj followers = getRemoteFollowers(ms, userMakingRequest, apStr(actor, APObj.followers));
         if (followers == null) {
-            log.debug("Unable to get followers for AP user: " + actor.getFollowers());
+            log.debug("Unable to get followers for AP user: " + apStr(actor, APObj.followers));
             return 0;
         }
 

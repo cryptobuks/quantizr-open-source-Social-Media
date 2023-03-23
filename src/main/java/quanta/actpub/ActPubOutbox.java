@@ -60,7 +60,8 @@ public class ActPubOutbox extends ServiceBase {
         Val<Boolean> success = new Val<>(true);
         try {
             // try to read outboxUrl first and if we can't we just return false
-            APObj outbox = getOutbox(ms, userDoingAction, actor.getOutbox());
+            // NOTE: There was a bug where we were getting from APObj.inbox here by accident
+            APObj outbox = getOutbox(ms, userDoingAction, apStr(actor, APObj.outbox));
             if (outbox == null) {
                 log.debug("outbox read fail: " + apUserName);
                 return false;

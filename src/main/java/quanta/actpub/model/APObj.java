@@ -14,8 +14,6 @@ import java.util.Map;
  * APObj
  */
 public class APObj extends HashMap<String, Object> {
-    private static final long serialVersionUID = 1L;
-
     public static final String id = "id";
     public static final String context = "@context";
     public static final String type = "type";

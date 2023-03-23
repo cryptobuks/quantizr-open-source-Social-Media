@@ -522,7 +522,7 @@ public class ActPubUtil extends ServiceBase {
      */
     public String getLongUserNameFromActor(APOActor actor) {
         try {
-            URL url = new URL(actor.getInbox());
+            URL url = new URL(apStr(actor, APObj.inbox));
             String host = url.getHost();
 
             // get port number (normally not set and thus '-1')
@@ -537,7 +537,7 @@ public class ActPubUtil extends ServiceBase {
             }
 
             // log.debug("long user name: " + shortUserName + "@" + host);
-            return actor.getPreferredUsername() + "@" + host;
+            return apStr(actor, APObj.preferredUsername) + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
         }
@@ -1219,9 +1219,9 @@ public class ActPubUtil extends ServiceBase {
             changed = true;
 
         // update cache just because we can
-        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), actor.getInbox());
+        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), apStr(actor, APObj.inbox));
 
-        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, actor.getInbox()))
+        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, apStr(actor, APObj.inbox)))
             changed = true;
 
         // this is the URL of the HTML of the actor.

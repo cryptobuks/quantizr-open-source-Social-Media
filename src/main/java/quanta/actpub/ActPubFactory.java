@@ -183,7 +183,7 @@ public class ActPubFactory extends ServiceBase {
 				});
 
 				if (fromActorObj != null) {
-					ccActors.add(fromActorObj.getFollowers());
+					ccActors.add(apStr(fromActorObj, APObj.followers));
 				}
 			}
 		}
