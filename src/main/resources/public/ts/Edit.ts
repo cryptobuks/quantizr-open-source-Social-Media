@@ -1244,6 +1244,16 @@ export class Edit {
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
         pendingEdit: boolean, payloadType: string, content: string) => {
+        let properties: J.PropertyInfo[] = null;
+        if (payloadType === "addDateProp") {
+            properties = [{
+                name: J.NodeProp.DATE,
+                value: new Date().getTime()
+            }, {
+                name: J.NodeProp.DURATION,
+                value: "01:00"
+            }];
+        }
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
@@ -1252,7 +1262,7 @@ export class Edit {
             createAtTop: true,
             content,
             typeLock: true,
-            properties: null,
+            properties,
             payloadType,
             shareToUserId: null,
             boostTarget: null,

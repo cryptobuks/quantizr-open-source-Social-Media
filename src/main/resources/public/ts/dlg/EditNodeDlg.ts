@@ -26,8 +26,8 @@ import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
+import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
 export interface LS {
@@ -142,6 +142,11 @@ export class EditNodeDlg extends DialogBase {
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
                 });
             }, 5000);
+        }
+
+        // if we're editing a DATE property expand properties panel automatically
+        if (S.props.getProp(J.NodeProp.DATE, ast.editNode)) {
+            dispatch("setPropsPanelExpanded", s => { s.propsPanelExpanded = true; }, true);
         }
     }
 
@@ -749,7 +754,9 @@ export class EditNodeDlg extends DialogBase {
                     this.close();
                 }) : null,
 
-            advancedButtons && !datePropExists ? new IconButton("fa-calendar", null, {
+            // show Calendar Entry button only if this node is not a Calendar Entry nor CALENDAR type.
+            // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
+            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 onClick: () => this.utl.addDateProperty(this)
             }) : null
