@@ -248,7 +248,8 @@ export class Edit {
                     shareToUserId: null,
                     boostTarget: null,
                     fediSend: false,
-                    boosterUserId: null
+                    boosterUserId: null,
+                    reply: false
                 });
 
                 if (blob) {
@@ -284,7 +285,8 @@ export class Edit {
                     shareToUserId: null,
                     boostTarget: null,
                     fediSend: false,
-                    boosterUserId: null
+                    boosterUserId: null,
+                    reply: false
                 });
                 this.createSubNodeResponse(res, false, null);
             }
@@ -1104,7 +1106,8 @@ export class Edit {
             shareToUserId: null,
             boostTarget: null,
             fediSend: false,
-            boosterUserId: null
+            boosterUserId: null,
+            reply: false
         });
 
         if (blob) {
@@ -1180,7 +1183,8 @@ export class Edit {
             shareToUserId: null,
             boostTarget: null,
             fediSend: false,
-            boosterUserId: null
+            boosterUserId: null,
+            reply: false
         });
         this.createSubNodeResponse(res, true, null);
     }
@@ -1231,7 +1235,8 @@ export class Edit {
             shareToUserId,
             boostTarget,
             fediSend,
-            boosterUserId
+            boosterUserId,
+            reply
         });
 
         if (!boostTarget) {
@@ -1267,7 +1272,8 @@ export class Edit {
             shareToUserId: null,
             boostTarget: null,
             fediSend: false,
-            boosterUserId: null
+            boosterUserId: null,
+            reply: false
         });
 
         // auto-enable edit mode
@@ -1290,7 +1296,8 @@ export class Edit {
             shareToUserId: null,
             boostTarget: null,
             fediSend: false,
-            boosterUserId: null
+            boosterUserId: null,
+            reply: false
         });
         this.createSubNodeResponse(res, false, null);
     }

@@ -10,6 +10,7 @@ public enum NodeProp {
     ACT_PUB_OBJ_CONTENT("ap:objContent"), //
 
     // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
+    // todo-0: remove the ACT_PUB prefix from this, but for now we can leave the prefix "ap:" in the property
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo"), //
 
     // For "AP Note" Objects (per spec) this is the "url" property on the node.

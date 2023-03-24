@@ -60,7 +60,7 @@ import quanta.util.XString;
  * AP-related utilities
  */
 @Component
-@Slf4j 
+@Slf4j
 public class ActPubUtil extends ServiceBase {
     @Autowired
     private ActPubLog apLog;
@@ -933,15 +933,18 @@ public class ActPubUtil extends ServiceBase {
             try {
                 NodeInfo info = null;
 
-                // note topNode doesn't necessarily mean we're done iterating becasue it's 'inReplyTo' still may
-                // point to further places 'above' (in this conversation thread)
-                boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS);
+                /*
+                 * note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
+                 * point to further places 'logically above' (in this conversation thread)
+                 */
+                boolean topNode =
+                        node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS) || node.isType(NodeType.ACCOUNT);
 
                 if (!topNode) {
                     info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
                             false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, //
-                             false, true, true, null, //
-                             true);
+                            false, true, true, null, //
+                            true);
 
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
@@ -954,8 +957,8 @@ public class ActPubUtil extends ServiceBase {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, //
-                                child, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
-                                        false, false, false, true, true, null, false));
+                                        child, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true,
+                                        null, false));
                             }
                         }
 
@@ -963,30 +966,36 @@ public class ActPubUtil extends ServiceBase {
                          * if this node has a NodeProp.ACT_PUB_ID property, we also add in all nodes that have a
                          * NodeProp.ACT_PUB_OBJ_INREPLYTO pointing to it, because they are also replies
                          */
-                        String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
-                        if (actPubId != null) {
+                        String replyTargetId = node.getStr(NodeProp.ACT_PUB_ID);
 
-                            // todo-1: we have to do both LOCAL and REMOTE users separately here until I create the
-                            // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
-                            // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                            iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
-                                    actPubId);
-                            for (SubNode child : iter) {
-                                // if we didn't already add above, add now
-                                if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                                            false, false, false, false, true, true, null, false));
-                                }
+                        // if node was an ActivityPub one we will have a replyTargetId here that's non null,
+                        // and it will be a full URL to the replyTo, BUT if not then this node might point to
+                        // a replyTo that's a plain SubNode nodeId (instead of full path, so we search on that
+                        // instead)
+                        if (replyTargetId == null) {
+                            replyTargetId = node.getIdStr();
+                        }
+
+                        // todo-0: we have to do both LOCAL and REMOTE users separately here until I create the
+                        // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
+                        // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
+                        iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                                replyTargetId);
+                        for (SubNode child : iter) {
+                            // if we didn't already add above, add now
+                            if (!childIds.contains(child.getIdStr())) {
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false));
                             }
+                        }
 
-                            iter = read.findNodesByProp(ms, NodePath.REMOTE_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
-                                    actPubId);
-                            for (SubNode child : iter) {
-                                // if we didn't already add above, add now
-                                if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                                            false, false, false, false, true, true, null, false));
-                                }
+                        iter = read.findNodesByProp(ms, NodePath.REMOTE_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                                replyTargetId);
+                        for (SubNode child : iter) {
+                            // if we didn't already add above, add now
+                            if (!childIds.contains(child.getIdStr())) {
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false));
                             }
                         }
 
@@ -1001,7 +1010,7 @@ public class ActPubUtil extends ServiceBase {
                     lastNodeId = node.getId();
                 }
 
-                // if we node id known to be topNode, set parent to null, to trigger the only path up to have to
+                // if topNode, set parent to null, to trigger the only path up to have to
                 // go thru an inReplyTo, rather than be based on tree structure.
                 SubNode parent = topNode ? null : read.getParent(ms, node);
                 boolean top = parent != null && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
@@ -1012,8 +1021,16 @@ public class ActPubUtil extends ServiceBase {
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
                     // if node has an inReplyTo...
                     if (inReplyTo != null) {
-                        // then loadObject will get it from DB or else resort to getting it from internet
-                        parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
+
+                        // we distinguish a URL from a nodeId by the fact that only URLs can contain "/"
+                        if (inReplyTo.contains(":")) {
+                            // then loadObject will get it from DB or else resort to getting it from internet
+                            parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
+                        } 
+                        // if inReplyTo not a URL, treat it as a nodeId
+                        else {
+                            parent = read.getNode(ms, inReplyTo);
+                        }
                     }
                 }
 

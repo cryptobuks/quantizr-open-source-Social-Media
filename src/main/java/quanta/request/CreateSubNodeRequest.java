@@ -41,4 +41,6 @@ public class CreateSubNodeRequest extends RequestBase {
 	/* special purpose values for when creating special types of nodes */
 	@Nullable
 	private String payloadType;
+
+	private boolean reply;
 }

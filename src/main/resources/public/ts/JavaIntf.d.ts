@@ -194,6 +194,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     boosterUserId: string;
     fediSend: boolean;
     payloadType?: string;
+    reply: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {

@@ -78,7 +78,7 @@ import quanta.util.XString;
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
 @Component
-@Slf4j 
+@Slf4j
 public class NodeEditService extends ServiceBase {
 	@Autowired
 	private ActPubLog apLog;
@@ -88,20 +88,30 @@ public class NodeEditService extends ServiceBase {
 	 * by the controller that accepts a node being created by the GUI/user
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
-		// log.debug("createSubNode");
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
 
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
 		boolean makePublicWritable = false;
 		boolean allowSharing = true;
+
+		/*
+		 * note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
+		 * that will HOLD the reply, but may not always be WHAT is being replied to.
+		 */
 		SubNode parentNode = null;
+		SubNode nodeBeingRepliedTo = null;
+
+		if (req.isReply()) {
+			nodeBeingRepliedTo = read.getNode(ms, nodeId);
+		}
 
 		/*
 		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
-		 * "My Posts" node
+		 * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
+		 * user's POSTS node.
 		 */
-		if (nodeId == null && !linkBookmark) {
+		if (req.isReply() || (nodeId == null && !linkBookmark)) {
 			parentNode = read.getUserNodeByType(ms, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
 					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
@@ -151,6 +161,11 @@ public class NodeEditService extends ServiceBase {
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 		newNode.touch();
 
+		// NOTE: Be srue to get nodeId off 'req' here, instead of the var
+		if (req.isReply() && req.getNodeId() != null) {
+			newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, req.getNodeId());
+		}
+
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
 			newNode.set(NodeProp.TARGET_ID, req.getNodeId());
 
@@ -162,9 +177,22 @@ public class NodeEditService extends ServiceBase {
 			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 		}
 
-		// If we're inserting a node under the POSTS it should be public, rather than inherit.
-		if (parentNode.isType(NodeType.POSTS)) {
+		if (req.isReply()) {
+			// force to get sharing from node being replied to
+			makePublicWritable = false;
+		}
+		/*
+		 * If we're inserting a node under the POSTS it should be public, rather than inherit sharing,
+		 * unless it's a reply in which case we leave makePublicWitable alone and it picks up shares from
+		 * parent maybe
+		 */
+		else if (parentNode.isType(NodeType.POSTS)) {
 			makePublicWritable = true;
+		}
+
+		// if we never set 'nodeBeingRepliedTo' by now that means it's the parent that we're replying to.
+		if (nodeBeingRepliedTo == null) {
+			nodeBeingRepliedTo = parentNode;
 		}
 
 		if (allowSharing) {
@@ -182,18 +210,19 @@ public class NodeEditService extends ServiceBase {
 			// else add default sharing
 			else {
 				// we always determine the access controls from the parent for any new nodes
-				auth.setDefaultReplyAcl(parentNode, newNode);
+				auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
 
 				if (req.getBoosterUserId() != null) {
 					newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
 				}
 
 				// inherit UNPUBLISHED prop from parent, if we own the parent
-				if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
+				if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
+						&& nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
 					newNode.set(NodeProp.UNPUBLISHED, true);
 				}
 
-				String cipherKey = parentNode.getStr(NodeProp.ENC_KEY);
+				String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
 				if (cipherKey != null) {
 					res.setEncrypt(true);
 				}
