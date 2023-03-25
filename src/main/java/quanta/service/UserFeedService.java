@@ -35,7 +35,7 @@ import quanta.util.Val;
 import quanta.util.XString;
 
 @Component
-@Slf4j 
+@Slf4j
 public class UserFeedService extends ServiceBase {
 	static final int MAX_FEED_ITEMS = 25;
 
@@ -500,28 +500,32 @@ public class UserFeedService extends ServiceBase {
 			if (boostTargetId != null) {
 				SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
 
+				// if we can't find teh boostedNode, don't display this node (the boosting node) at all
+				if (boostedNode == null) {
+					skipped++;
+					continue;
+				}
+
 				// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
 				// even if boostedNode is null here, indicating it's not found.
 				boostedNodeVal = new Val<>(boostedNode);
 
-				if (boostedNode != null) {
-					// if the owner of the boosted node is a blocked user and we're querying public nodes and with
-					// applyAdminBlocks in effect then skip this post.
-					if (blockedUserIds.contains(boostedNode.getOwner())) {
-						skipped++;
-						continue;
-					}
+				// if the owner of the boosted node is a blocked user and we're querying public nodes and with
+				// applyAdminBlocks in effect then skip this post.
+				if (blockedUserIds.contains(boostedNode.getOwner())) {
+					skipped++;
+					continue;
+				}
 
-					if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
-						// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
-						skipped++;
-						continue;
-					}
+				if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
+					// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
+					skipped++;
+					continue;
+				}
 
-					if (!allowBadWords && !auth.ownedByThreadUser(boostedNode) && english.hasBadWords(boostedNode.getContent())) {
-						skipped++;
-						continue;
-					}
+				if (!allowBadWords && !auth.ownedByThreadUser(boostedNode) && english.hasBadWords(boostedNode.getContent())) {
+					skipped++;
+					continue;
 				}
 			}
 
