@@ -1201,7 +1201,7 @@ public class ActPubService extends ServiceBase {
             newNode.set(NodeProp.ACT_PUB_REPLIES, replies);
         }
 
-        newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, inReplyTo);
+        newNode.set(NodeProp.INREPLYTO, inReplyTo);
         newNode.set(NodeProp.ACT_PUB_OBJ_TYPE, obj.getType());
         newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, objAttributedTo);
 

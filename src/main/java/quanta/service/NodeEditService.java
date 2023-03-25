@@ -163,7 +163,7 @@ public class NodeEditService extends ServiceBase {
 
 		// NOTE: Be srue to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
-			newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, req.getNodeId());
+			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {

@@ -16,7 +16,7 @@ export class NodeCompRowFooter extends Div {
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link
          to the actual node because all that's internal. */
         if (this.node.owner.indexOf("@") !== -1) {
-            const inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
+            const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             if (inReplyTo) {
                 // if this is not our own host then show the Remote Parent link
                 if (inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {

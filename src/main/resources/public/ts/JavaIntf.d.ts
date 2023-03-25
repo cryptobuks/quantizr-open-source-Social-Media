@@ -1132,7 +1132,7 @@ export const enum NodeProp {
     ACT_PUB_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
-    ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",
+    INREPLYTO = "ap:objInReplyTo",
     ACT_PUB_OBJ_URL = "ap:objUrl",
     ACT_PUB_OBJ_URLS = "ap:objUrls",
     ACT_PUB_OBJ_ICONS = "ap:objIcons",

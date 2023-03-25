@@ -964,7 +964,7 @@ public class ActPubUtil extends ServiceBase {
 
                         /*
                          * if this node has a NodeProp.ACT_PUB_ID property, we also add in all nodes that have a
-                         * NodeProp.ACT_PUB_OBJ_INREPLYTO pointing to it, because they are also replies
+                         * NodeProp.INREPLYTO pointing to it, because they are also replies
                          */
                         String replyTargetId = node.getStr(NodeProp.ACT_PUB_ID);
 
@@ -976,20 +976,10 @@ public class ActPubUtil extends ServiceBase {
                             replyTargetId = node.getIdStr();
                         }
 
-                        // todo-0: we have to do both LOCAL and REMOTE users separately here until I create the
-                        // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
+                        // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                         // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                        iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
-                                replyTargetId);
-                        for (SubNode child : iter) {
-                            // if we didn't already add above, add now
-                            if (!childIds.contains(child.getIdStr())) {
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false));
-                            }
-                        }
-
-                        iter = read.findNodesByProp(ms, NodePath.REMOTE_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                        iter = read.findNodesByProp(ms, NodePath.USERS_PATH + //
+                                "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(),
                                 replyTargetId);
                         for (SubNode child : iter) {
                             // if we didn't already add above, add now
@@ -1018,7 +1008,7 @@ public class ActPubUtil extends ServiceBase {
                 // if we didn't get a usable (non root) parent from the tree structure, try using the 'inReplyTo'
                 // value
                 if (parent == null || top) {
-                    String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
+                    String inReplyTo = node.getStr(NodeProp.INREPLYTO);
                     // if node has an inReplyTo...
                     if (inReplyTo != null) {
 
@@ -1026,7 +1016,7 @@ public class ActPubUtil extends ServiceBase {
                         if (inReplyTo.contains(":")) {
                             // then loadObject will get it from DB or else resort to getting it from internet
                             parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
-                        } 
+                        }
                         // if inReplyTo not a URL, treat it as a nodeId
                         else {
                             parent = read.getNode(ms, inReplyTo);

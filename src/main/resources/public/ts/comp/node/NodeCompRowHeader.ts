@@ -209,7 +209,7 @@ export class NodeCompRowHeader extends Div {
             // the path to be at least deeper than that to show the history button.
             // L = Local Users, then: [UserNode]/[PostsNode]/[ActualNode]
             // Also if we have 'inReplyTo' that will also enable the button.
-            const inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
+            const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
             if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
                 children.push(new Icon({
