@@ -30,10 +30,6 @@ import quanta.filter.AppFilter;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
- * 
- * NOTE: I'm leaving @EnableAsync for now but I had problems with @Async not being reliable anyway
- * in ways I never understood although my hunch is it was BeanProxy related (proxies Spring can wrap
- * beans with sometimes)
  */
 @Configuration
 @EnableAsync

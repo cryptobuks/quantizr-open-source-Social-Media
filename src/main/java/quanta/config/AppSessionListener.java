@@ -22,8 +22,6 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionCreated(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 
-		// log.debug("sessionCreated: sessionId=" + se.getSession().getId());
-
 		// multiply by 60 to convert minutes to seconds.
 		session.setMaxInactiveInterval(appProp.getSessionTimeoutMinutes() * 60);
 

@@ -41,6 +41,8 @@ export class NodeCompButtonBar extends Div {
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
+        const specialAccountNode = type?.isSpecialAccountNode();
+        if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
         let deleteAllowed = false;
         let editableNode = true;
@@ -58,7 +60,6 @@ export class NodeCompButtonBar extends Div {
             }
         }
         else {
-            // bug fix. this case was not covered.
             if (editingAllowed) {
                 deleteAllowed = true;
             }
@@ -108,8 +109,8 @@ export class NodeCompButtonBar extends Div {
             const checkboxForDelete = ast.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
-                // no need to ever select home node
-                this.node.id !== ast.node.id) {
+                // no need to ever select home node, or special nodes
+                this.node.id !== ast.node.id && !specialAccountNode) {
                 selCheckbox = new Checkbox(null, {
                     title: "Select Nodes."
                 }, {
@@ -146,7 +147,7 @@ export class NodeCompButtonBar extends Div {
             const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
 
             if (editingAllowed) {
-                if (editableNode) {
+                if (editableNode && !specialAccountNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         title: "Edit Node",
                         [C.NODE_ID_ATTR]: this.node.id
@@ -212,7 +213,7 @@ export class NodeCompButtonBar extends Div {
 
         // Note we only allow 'Up Level' on home node if we're the admin.
         if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
-            if (!(type && type.isSpecialAccountNode()) && S.nav.parentVisibleToUser()) {
+            if (S.nav.parentVisibleToUser()) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.navUpLevelClick,
