@@ -18,6 +18,7 @@ public class UserProfile {
 	private String userBio;
 	private String userTags;
 	private String blockedWords;
+	private String recentTypes;
 
 	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary
 	// attachment)

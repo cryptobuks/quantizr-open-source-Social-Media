@@ -100,6 +100,7 @@ export class AppState {
 
     anonShowLHSMenu: boolean = false;
     showSchemaOrgProps: boolean = false;
+    showRecentProps: boolean = false;
 
     userPrefs: J.UserPreferences = {
         editMode: false,

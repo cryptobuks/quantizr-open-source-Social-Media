@@ -6,6 +6,7 @@ import { TabIntf } from "./TabIntf";
 
 /* This interface is how Type Plugins are handled */
 export interface TypeIntf {
+    ordinal: number;
     schemaOrg: J.SchemaOrgClass;
     getTypeName(): string;
     getName(): string;

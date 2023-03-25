@@ -130,6 +130,7 @@ export interface UserProfile {
     userBio: string;
     userTags: string;
     blockedWords: string;
+    recentTypes: string;
     avatarVer: string;
     headerImageVer: string;
     userNodeId: string;
@@ -515,6 +516,7 @@ export interface SaveUserProfileRequest extends RequestBase {
     userBio: string;
     userTags: string;
     blockedWords: string;
+    recentTypes: string;
     displayName: string;
     publish: boolean;
     mfsEnable: boolean;
@@ -1178,6 +1180,7 @@ export const enum NodeProp {
     USER_IPFS_KEY = "sn:ipfsKey",
     USER_TAGS = "sn:tags",
     USER_BLOCK_WORDS = "sn:blockWords",
+    USER_RECENT_TYPES = "sn:recentTypes",
     PWD_HASH = "sn:pwdHash",
     VOTE = "vote",
     FILE_SYNC_LINK = "fs:link",

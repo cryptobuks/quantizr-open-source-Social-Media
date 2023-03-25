@@ -9,6 +9,7 @@ import { NodeTypeListBox } from "../comp/NodeTypeListBox";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
 interface LS { // Local State
@@ -69,6 +70,10 @@ export class PickNodeTypeDlg extends DialogBase {
                     setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
                     getValue: (): boolean => getAs().showSchemaOrgProps
                 }),
+                new Checkbox("Recent Props", { className: "marginRight" }, {
+                    setValue: (checked: boolean) => dispatch("RecentProps", s => { s.showRecentProps = checked; }),
+                    getValue: (): boolean => getAs().showRecentProps
+                }),
                 new NodeTypeListBox(this.valIntf, this.searchTextState.getValue()),
                 new ButtonBar([
                     new Button("Ok", this.setNodeType, null, "btn-primary"),
@@ -86,6 +91,7 @@ export class PickNodeTypeDlg extends DialogBase {
 
     setNodeType = () => {
         this.chosenType = this.getState<LS>().selType;
+        S.props.addRecentType(this.chosenType);
         this.close();
     }
 }

@@ -17,18 +17,18 @@ export class NodeTypeListBox extends ListBox {
     }
 
     preRender(): void {
+        const ast = getAs();
         const children: Comp[] = [];
-        const types = S.plugin.getAllTypes();
-
+        const types = S.plugin.getOrderedTypesArray(ast.showRecentProps);
         const lcSearchText = this.searchText.toLowerCase();
-        const showSchemaOrg = getAs().showSchemaOrgProps;
+        const showSchemaOrg = ast.showSchemaOrgProps;
 
         types.forEach((type, k) => {
             if (type.schemaOrg && !showSchemaOrg) {
                 return;
             }
             if (!this.searchText || type.getName().toLowerCase().indexOf(lcSearchText) !== -1) {
-                if (getAs().isAdminUser || type.getAllowUserSelect()) {
+                if (ast.isAdminUser || type.getAllowUserSelect()) {
                     children.push(new NodeTypeListBoxRow(type, () => {
                         this.updateVal(type.getTypeName());
                     }, this.valueIntf.getValue() === type.getTypeName()));

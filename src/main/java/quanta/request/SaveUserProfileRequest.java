@@ -11,6 +11,7 @@ public class SaveUserProfileRequest extends RequestBase {
 	private String userBio;
 	private String userTags;
 	private String blockedWords;
+	private String recentTypes;
 	private String displayName;
 
 	// only publishes DID/IPNS if this is true

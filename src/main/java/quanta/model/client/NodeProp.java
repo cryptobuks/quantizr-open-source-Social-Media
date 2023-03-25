@@ -99,6 +99,7 @@ public enum NodeProp {
     // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their account node.
     USER_TAGS("sn:tags"), //
     USER_BLOCK_WORDS("sn:blockWords"), //
+    USER_RECENT_TYPES("sn:recentTypes"), //
     
     PWD_HASH("sn:pwdHash"), //
     VOTE("vote"), //

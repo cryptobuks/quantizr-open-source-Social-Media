@@ -1,4 +1,4 @@
-import { getAs } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -320,5 +320,44 @@ export class Props {
         const slashIdx = node.path.lastIndexOf("/");
         if (slashIdx === -1) return null;
         return node.path.substring(0, slashIdx);
+    }
+
+    addRecentType = (type: string): void => {
+        const ast = getAs();
+        const recentTypes = ast.userProfile.recentTypes;
+        let typesArray: string[];
+        if (recentTypes) {
+            typesArray = recentTypes.split(",");
+            if (typesArray) {
+                typesArray = typesArray.filter(t => t !== type);
+            }
+        }
+        else {
+            typesArray = [];
+        }
+
+        // make sure list is short
+        if (typesArray.length >= 9) {
+            typesArray.pop();
+        }
+        // at this type to front of list (Note this ordering is not what controls GUI display ordering,
+        // but is still significant for keeping 'Most Recently Used 10' algo functional for this list)
+        typesArray.unshift(type);
+        ast.userProfile.recentTypes = typesArray.join(",");
+
+        dispatch("SetUserProfile", s => {
+            s.userProfile = ast.userProfile;
+        });
+
+        S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+            userName: null,
+            userTags: ast.userProfile.userTags,
+            blockedWords: ast.userProfile.blockedWords,
+            userBio: ast.userProfile.userBio,
+            displayName: ast.userProfile.displayName,
+            publish: false,
+            mfsEnable: ast.userProfile.mfsEnable,
+            recentTypes: ast.userProfile.recentTypes
+        });
     }
 }

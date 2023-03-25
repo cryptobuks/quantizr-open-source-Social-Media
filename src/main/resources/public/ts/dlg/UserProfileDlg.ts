@@ -266,7 +266,8 @@ export class UserProfileDlg extends DialogBase {
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: false,
-            mfsEnable: state.userProfile.mfsEnable
+            mfsEnable: state.userProfile.mfsEnable,
+            recentTypes: ast.userProfile.recentTypes
         });
         this.saveResponse(res);
     }
@@ -281,7 +282,8 @@ export class UserProfileDlg extends DialogBase {
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: true,
-            mfsEnable: state.userProfile.mfsEnable
+            mfsEnable: state.userProfile.mfsEnable,
+            recentTypes: ast.userProfile.recentTypes
         });
         this.saveResponse(res);
     }

@@ -14,6 +14,7 @@ import * as I from "../../Interfaces";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
+    public ordinal: number;
     public schemaOrg: J.SchemaOrgClass;
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {

@@ -24,11 +24,12 @@ import { TextType } from "./plugins/TextType";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { SchemaOrgType } from "./plugins/SchemaOrgType";
+import { getAs } from "./AppContext";
 
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
 
-    addType = (type: TypeIntf) => {
+    addType = (ordinal: number, type: TypeIntf) => {
         if (this.types.get(type.getTypeName())) {
             throw new Error("duplicate type handler: " + type.getTypeName());
         }
@@ -47,40 +48,54 @@ export class PluginMgr {
         return this.types;
     }
 
+    getOrderedTypesArray = (recentOnly: boolean): TypeIntf[] => {
+        const ast = getAs();
+        const ret: TypeIntf[] = [];
+        const recentTypes = recentOnly ? ast.userProfile.recentTypes?.split(",") : null;
+        this.types.forEach((v, k) => {
+            if (!recentTypes || recentTypes.includes(k)) {
+                ret.push(v);
+            }
+        });
+        ret.sort((a, b) => a.ordinal - b.ordinal);
+        return ret;
+    }
+
     // todo-2: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = () => {
         console.log("initPlugins()");
 
+        let ordinal = 0;
         /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order
         so it's better to just have this one place where we define all them in the order we want */
-        this.addType(new MarkdownType());
-        this.addType(new TextType());
-        this.addType(new RssFeedsType());
-        this.addType(new RssType());
-        this.addType(new CalcType());
-        this.addType(new RoomType());
-        this.addType(new CalendarType());
-        this.addType(new IPFSNodeType());
-        this.addType(new RepoRootType());
-        this.addType(new AccountType());
-        this.addType(new PostsType());
-        this.addType(new APPostsType());
-        this.addType(new ExportsType());
-        this.addType(new InboxNodeType());
-        this.addType(new InboxEntryType());
-        this.addType(new NotesNodeType());
-        this.addType(new BookmarkType());
-        this.addType(new CommentType());
-        this.addType(new BookmarkListType());
-        this.addType(new FriendsListType());
-        this.addType(new BlockedUsersType());
-        this.addType(new FriendType());
+        this.addType(ordinal++, new MarkdownType());
+        this.addType(ordinal++, new TextType());
+        this.addType(ordinal++, new RssFeedsType());
+        this.addType(ordinal++, new RssType());
+        this.addType(ordinal++, new CalcType());
+        this.addType(ordinal++, new RoomType());
+        this.addType(ordinal++, new CalendarType());
+        this.addType(ordinal++, new IPFSNodeType());
+        this.addType(ordinal++, new RepoRootType());
+        this.addType(ordinal++, new AccountType());
+        this.addType(ordinal++, new PostsType());
+        this.addType(ordinal++, new APPostsType());
+        this.addType(ordinal++, new ExportsType());
+        this.addType(ordinal++, new InboxNodeType());
+        this.addType(ordinal++, new InboxEntryType());
+        this.addType(ordinal++, new NotesNodeType());
+        this.addType(ordinal++, new BookmarkType());
+        this.addType(ordinal++, new CommentType());
+        this.addType(ordinal++, new BookmarkListType());
+        this.addType(ordinal++, new FriendsListType());
+        this.addType(ordinal++, new BlockedUsersType());
+        this.addType(ordinal++, new FriendType());
 
         // It's intentional that we don't do an await here, but let it complete async
-        this.addSchemaOrgTypes();
+        this.addSchemaOrgTypes(ordinal);
     }
 
-    addSchemaOrgTypes = async () => {
+    addSchemaOrgTypes = async (ordinal: number) => {
         const res = await S.rpcUtil.rpc<J.GetSchemaOrgTypesRequest, J.GetSchemaOrgTypesResponse>("getSchemaOrgTypes", {
         });
 
@@ -89,7 +104,7 @@ export class PluginMgr {
         res.classes.forEach(soc => {
             const type = new SchemaOrgType(soc.id, soc.label);
             type.schemaOrg = soc;
-            this.addType(type);
+            this.addType(ordinal++, type);
         })
     }
 }

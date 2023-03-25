@@ -277,13 +277,14 @@ export class MenuPanel extends Div {
 
         const createMenuItems: CompIntf[] = [];
         const types = S.plugin.getAllTypes();
-        let hasSchemaOrgTypes = false;
+        const recentTypes = ast.userProfile.recentTypes ? ast.userProfile.recentTypes.split(",") : null;
+        let typesAdded = false;
 
         types.forEach((type: TypeIntf, k: string) => {
-            if (type.schemaOrg) {
-                hasSchemaOrgTypes = true;
+            if (!recentTypes.includes(k)) {
                 return;
             }
+            typesAdded = true;
             if (ast.isAdminUser || type.getAllowUserSelect()) {
                 createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null), //
                     !ast.isAnonUser && !!hltNode));
@@ -291,18 +292,17 @@ export class MenuPanel extends Div {
         });
 
         if (!ast.isAnonUser) {
-            if (hasSchemaOrgTypes) {
-                createMenuItems.push(new MenuItemSeparator());
-                createMenuItems.push(new MenuItem("Other Type...", async () => {
-                    await promiseDispatch("chooseType", s => { s.showSchemaOrgProps = true; });
-                    const dlg = new PickNodeTypeDlg(null);
-                    await dlg.open();
-                    if (dlg.chosenType) {
-                        S.edit.createNode(hltNode, dlg.chosenType, true, true, null, null);
-                    }
-                }, //
-                    !ast.isAnonUser && !!hltNode));
-            }
+            if (typesAdded) createMenuItems.push(new MenuItemSeparator());
+            createMenuItems.push(new MenuItem("Choose Type...", async () => {
+                await promiseDispatch("chooseType", s => { s.showSchemaOrgProps = true; });
+                const dlg = new PickNodeTypeDlg(null);
+                await dlg.open();
+                if (dlg.chosenType) {
+                    S.edit.createNode(hltNode, dlg.chosenType, true, true, null, null);
+                }
+            }, //
+                !ast.isAnonUser && !!hltNode));
+
             children.push(new Menu(state, "Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
         }
 

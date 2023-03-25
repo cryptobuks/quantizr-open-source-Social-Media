@@ -1281,6 +1281,11 @@ export class Edit {
             await this.setEditMode(true);
         }
         this.createSubNodeResponse(res, forceUsePopup, null);
+
+        // this is low priority so do it asynchronously
+        setTimeout(() => {
+            S.props.addRecentType(typeName);
+        }, 1000);
     }
 
     addCalendarEntry = async (initDate: number) => {
