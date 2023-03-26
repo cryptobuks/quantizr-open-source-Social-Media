@@ -1,12 +1,14 @@
+import { getAs } from "./AppContext";
 import { TypeIntf } from "./intf/TypeIntf";
+import * as J from "./JavaIntf";
 import { AccountType } from "./plugins/AccountType";
 import { APPostsType } from "./plugins/APPostsType";
 import { BlockedUsersType } from "./plugins/BlockedUsersType";
 import { BookmarkListType } from "./plugins/BookmarkListType";
 import { BookmarkType } from "./plugins/BookmarkType";
-import { CommentType } from "./plugins/CommentType";
 import { CalcType } from "./plugins/CalcType";
 import { CalendarType } from "./plugins/CalendarType";
+import { CommentType } from "./plugins/CommentType";
 import { ExportsType } from "./plugins/ExportsType";
 import { FriendsListType } from "./plugins/FriendsListType";
 import { FriendType } from "./plugins/FriendType";
@@ -17,14 +19,11 @@ import { MarkdownType } from "./plugins/MarkdownType";
 import { NotesNodeType } from "./plugins/NotesNodeType";
 import { PostsType } from "./plugins/PostsType";
 import { RepoRootType } from "./plugins/RepoRootType";
-import { RoomType } from "./plugins/RoomType";
 import { RssFeedsType } from "./plugins/RssFeedsType";
 import { RssType } from "./plugins/RssType";
-import { TextType } from "./plugins/TextType";
-import * as J from "./JavaIntf";
-import { S } from "./Singletons";
 import { SchemaOrgType } from "./plugins/SchemaOrgType";
-import { getAs } from "./AppContext";
+import { TextType } from "./plugins/TextType";
+import { S } from "./Singletons";
 
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
@@ -73,7 +72,8 @@ export class PluginMgr {
         this.addType(ordinal++, new RssFeedsType());
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new CalcType());
-        this.addType(ordinal++, new RoomType());
+        // backing out chat room feature for now.
+        // this.addType(ordinal++, new RoomType());
         this.addType(ordinal++, new CalendarType());
         this.addType(ordinal++, new IPFSNodeType());
         this.addType(ordinal++, new RepoRootType());

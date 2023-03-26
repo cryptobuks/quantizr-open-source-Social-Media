@@ -340,8 +340,9 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Timeline", [
-                new MenuItem("Live Rev-Chron (Chat Room)", S.nav.messagesNodeFeed, hltNode?.id != null),
-                new MenuItemSeparator(), //
+                // Backing out the Chat Room feature for now.
+                // new MenuItem("Live Rev-Chron (Chat Room)", S.nav.messagesNodeFeed, hltNode?.id != null),
+                // new MenuItemSeparator(), //
                 new MenuItem("Created", MenuPanel.timelineByCreated, !!hltNode), //
                 new MenuItem("Modified", MenuPanel.timelineByModified, !!hltNode), //
                 new MenuItemSeparator(), //
