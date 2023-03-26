@@ -360,4 +360,13 @@ export class Props {
             recentTypes: ast.userProfile.recentTypes
         });
     }
+
+    hasDisplayableProps = (node: J.NodeInfo) => {
+        if (node.properties) {
+            for (const prop of node.properties) {
+                if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) return true;
+            }
+        }
+        return false;
+    }
 }

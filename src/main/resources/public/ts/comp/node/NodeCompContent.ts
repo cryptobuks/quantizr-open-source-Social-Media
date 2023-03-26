@@ -52,7 +52,7 @@ export class NodeCompContent extends Div {
         children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
 
         if ((ast.isAdminUser || this.node.type !== J.NodeType.ACCOUNT) && //
-            (ast.userPrefs.showProps || type.schemaOrg) && this.node.properties?.length > 0) {
+            (ast.userPrefs.showProps || type.schemaOrg) && S.props.hasDisplayableProps(this.node)) {
             if (type.schemaOrg) {
                 children.push(new PropDisplayLayout(this.node));
             }
