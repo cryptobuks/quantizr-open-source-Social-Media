@@ -352,6 +352,12 @@ public class MongoRead extends ServiceBase {
         return read.getNode(ms, identifier, true, null);
     }
 
+    @PerfMon(category = "read(m,i,a)")
+    public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
+        // calling thru proxy for AOP here.
+        return read.getNode(ms, identifier, allowAuth, null);
+    }
+
     /**
      * Gets a node using any of the 5 naming types:
      * 

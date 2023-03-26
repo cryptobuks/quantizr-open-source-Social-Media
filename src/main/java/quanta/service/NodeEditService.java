@@ -161,7 +161,7 @@ public class NodeEditService extends ServiceBase {
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 		newNode.touch();
 
-		// NOTE: Be srue to get nodeId off 'req' here, instead of the var
+		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
@@ -684,10 +684,6 @@ public class NodeEditService extends ServiceBase {
 			return;
 		}
 
-		if (parent == null) {
-			parent = read.getParent(ms, node, false);
-		}
-		final SubNode _parent = parent;
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
 			boolean isAccnt = node.isType(NodeType.ACCOUNT);
@@ -701,40 +697,38 @@ public class NodeEditService extends ServiceBase {
 				push.pushNodeToBrowsers(s, sessionsPushed, node);
 			}
 
-			if (_parent != null) {
-				if (!isAccnt) {
-					HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
+			if (!isAccnt) {
+				HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
 
-					if (tags != null && tags.size() > 0) {
-						String userDoingAction = ThreadLocals.getSC().getUserName();
-						apub.importUsers(ms, tags, userDoingAction);
-						auth.saveMentionsToACL(tags, s, node);
-						node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(tags.values())));
-						update.save(ms, node);
+				if (tags != null && tags.size() > 0) {
+					String userDoingAction = ThreadLocals.getSC().getUserName();
+					apub.importUsers(ms, tags, userDoingAction);
+					auth.saveMentionsToACL(tags, s, node);
+					node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(tags.values())));
+					update.save(ms, node);
+				}
+			}
+
+			// if this is an account type then don't expect it to have any ACL but we still want to broadcast
+			// out to the world the edit that was made to it, as long as it's not admin owned.
+			boolean forceSendToPublic = isAccnt;
+
+			if (forceSendToPublic || node.getAc() != null) {
+				// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
+				if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
+					SubNode _parent = parent;
+					if (_parent == null) {
+						_parent = read.getParent(ms, node, false);
 					}
+					// This broadcasts out to the shared inboxes of all the followers of the user
+					apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
 				}
 
-				// if this is an account type then don't expect it to have any ACL but we still want to broadcast
-				// out to the world the edit that was made to it, as long as it's not admin owned.
-				boolean forceSendToPublic = isAccnt;
+				push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
+			}
 
-				if (forceSendToPublic || node.getAc() != null) {
-					// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-					if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
-						// This broadcasts out to the shared inboxes of all the followers of the user
-						apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
-					}
-
-					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
-				}
-
-				if (AclService.isPublic(ms, node) && !StringUtils.isEmpty(node.getName())) {
-					saveNodeToMFS(ms, node);
-				}
-
-				return null;
-			} else {
-				log.error("Unable to find parent node for path: " + node.getPath());
+			if (AclService.isPublic(ms, node) && !StringUtils.isEmpty(node.getName())) {
+				saveNodeToMFS(ms, node);
 			}
 
 			return null;

@@ -68,7 +68,7 @@ import quanta.util.XString;
  * General AP functions
  */
 @Component
-@Slf4j 
+@Slf4j
 public class ActPubService extends ServiceBase {
     @Autowired
     private ActPubLog apLog;
@@ -139,20 +139,11 @@ public class ActPubService extends ServiceBase {
         exec.run(() -> {
             try {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
-
-                // Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
-                // what the local server version of it is.
-                String inReplyTo = null;
-
-                // When someone posts using the "Post" button, instead of "Reply To" button, we will end up
-                // with the POSTS type as the parent, and we don't want an inReplyTo on the node, because this "Post"
-                // node would never be considered as being replied to.
-                if (!NodeType.POSTS.s().equals(parent.getType())) {
-                    inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
-                }
-
+                String inReplyTo = !isAccnt ? apFactory.makeForeignInReplyTo(ms, node.getStr(NodeProp.INREPLYTO), parent) : null;
                 APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
-                String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
+
+                // replyToType not used right? todo-0;
+                String replyToType = null; // nodeBeingRepliedTo.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
                 String boostTarget = node.getStr(NodeProp.BOOST);
 
                 // toUserNames will hold ALL usernames in the ACL list (both local and foreign user names)

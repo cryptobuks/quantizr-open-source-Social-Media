@@ -39,7 +39,7 @@ import quanta.util.DateUtil;
  * Convenience factory for some types of AP objects
  */
 @Component
-@Slf4j 
+@Slf4j
 public class ActPubFactory extends ServiceBase {
 	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, boolean privateMessage,
 			SubNode node) {
@@ -52,6 +52,8 @@ public class ActPubFactory extends ServiceBase {
 
 	/**
 	 * Creates a new 'note' message
+	 * 
+	 * todo-0: replyToType can be deleted?
 	 */
 	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo,
 			String replyToType, String content, String noteUrl, String repliesUrl, boolean privateMessage, APList attachments) {
@@ -75,9 +77,11 @@ public class ActPubFactory extends ServiceBase {
 
 	/**
 	 * Creates a new 'Note' object, depending on what's being replied to.
+	 * 
+	 * todo-0: replyToType arg can be deleted
 	 */
 	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
-			String inReplyTo, String replyToType, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
+			String inReplyTo, String _replyToType, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
 			boolean privateMessage, APList attachments) {
 		if (content != null) {
 			// convert all double and single spaced lines to <br> for formatting, for servers that don't
@@ -171,7 +175,7 @@ public class ActPubFactory extends ServiceBase {
 					&& !userDoingAction.equals(PrincipalName.ANON.s())) {
 				String followersUrl = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userDoingAction;
 				ccActors.add(followersUrl);
-			} 
+			}
 			// otherwise this is a foreign user? I'm pretty sure this is dead code here. Need to verify (todo-1)
 			else {
 				/*
@@ -240,7 +244,6 @@ public class ActPubFactory extends ServiceBase {
 		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, repliesUrl, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
-
 		// build the 'tags' array for this object from the sharing ACLs.
 		List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
 		if (userNames != null) {
@@ -250,14 +253,40 @@ public class ActPubFactory extends ServiceBase {
 			}
 		}
 
-		if (parent != null) {
-			String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-			if (replyTo != null) {
-				ret = ret.put(APObj.inReplyTo, replyTo);
-			}
+		String inReplyTo = makeForeignInReplyTo(as, child.getStr(NodeProp.INREPLYTO), parent);
+		if (inReplyTo != null) {
+			ret = ret.put(APObj.inReplyTo, inReplyTo);
 		}
 
 		return ret;
+	}
+
+	// Converts an 'inReplyTo' value to the URL that foreign servers can use.
+	public String makeForeignInReplyTo(MongoSession as, String inReplyTo, SubNode parent) {
+		// if node has an inReplyTo property on it
+		if (inReplyTo != null) {
+			// if the reply to is a nodeId, lookup that node, and get it's proper url (maybe foreign one)
+			if (!inReplyTo.contains(":")) {
+				SubNode nodeBeingRepliedTo = read.getNode(as, inReplyTo, false);
+				if (nodeBeingRepliedTo != null) {
+					String replyTo = apUtil.buildUrlForReplyTo(as, nodeBeingRepliedTo);
+					if (replyTo != null) {
+						return replyTo;
+					}
+				}
+			}
+			// else the repyTo is already in the form of a URL so use it.
+			else {
+				return inReplyTo;
+			}
+		}
+		// If there's no reply to on the node treat the parent as the thing being replied to.
+		else {
+			if (parent != null) {
+				return apUtil.buildUrlForReplyTo(as, parent);
+			}
+		}
+		return null;
 	}
 
 	public APObj makeAPOCreateNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
