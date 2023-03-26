@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 @Component
-@Slf4j 
+@Slf4j
 public class EnglishDictionary extends ServiceBase {
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
@@ -39,8 +39,8 @@ public class EnglishDictionary extends ServiceBase {
 
 		try {
 			/*
-			 * todo-1: Update: I have a shell script now and here's the entirity of it (below), which starts
-			 * with unsorted ununique 'words.txt' and processes it into unique sorted list in 'words-unique.txt'
+			 * todo-1: Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes
+			 * it into unique sorted list in 'words-unique.txt'
 			 */
 			// sed 's/[[:blank:]]//g' words.txt > cleaned.txt
 			// awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt

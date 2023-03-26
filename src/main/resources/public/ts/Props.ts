@@ -289,7 +289,7 @@ export class Props {
         if (prop.indexOf(":") !== -1) return true;
 
         // todo-1: It's kind of a shame we don't have a colon in each of these system
-        // properties so we hae to listem them here explicitly here to detect them.
+        // properties so we have to list them here explicitly here to detect them.
         switch (prop) {
             case J.NodeProp.ACT_PUB_ID:
             case J.NodeProp.INLINE_CHILDREN:

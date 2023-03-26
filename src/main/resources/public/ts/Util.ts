@@ -693,8 +693,7 @@ export class Util {
         if (val.indexOf(":") !== -1) {
 
             // split val into words (space delimited)
-            // todo-1: compare this to "/ /g" (which is best, or are they same?)
-            tags = val.split(/ /);
+            tags = val.split(" ");
             val = "";
             tags.forEach((t: any) => {
                 // skip any `:tag:` words.

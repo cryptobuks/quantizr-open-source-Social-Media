@@ -1309,18 +1309,7 @@ public class AttachmentService extends ServiceBase {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
-						// checking for the obsolete key (we can remove this some day, or clean the db of these)
-						if (id == null) {
-							id = (ObjectId) meta.get("nodeIdh");
-						}
-
-						// checking for the obsolete key (we can remove this some day, or clean the db of these)
-						if (id == null) {
-							id = (ObjectId) meta.get("nodeIdHeader");
-						}
-
 						if (id != null) {
-							/* Find the node */
 							SubNode subNode = read.getNode(as, id);
 
 							/*
@@ -1335,6 +1324,7 @@ public class AttachmentService extends ServiceBase {
 								// Note: It's not a bug that we don't call this here:
 								// usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);
 								// Because all the userstats are updated at the end of this scan.
+								// todo-0: does grid support bulkOp deleting?
 								grid.delete(q);
 								delCount++;
 							}

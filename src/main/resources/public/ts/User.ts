@@ -209,15 +209,20 @@ export class User {
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
 
+                setTimeout(() => {
+                    // NOTE: All these are async methods, but we don't use 'await' because we can let them
+                    // execute in parallel and not wait for any of them to complete before any of the others.
+                    if (usr !== J.PrincipalName.ADMIN) {
+                        this.checkMessages();
+                    }
+                    S.util.loadBookmarks();
+                }, 500);
+
                 // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
-                setTimeout(async () => {
-                    if (usr !== J.PrincipalName.ADMIN) {
-                        await this.checkMessages();
-                    }
-                    await S.util.loadBookmarks();
-                    await S.util.resumeEditingOfAbandoned();
-                }, 500);
+                setTimeout(() => {
+                    S.util.resumeEditingOfAbandoned();
+                }, 1500);
             }
 
             await S.util.setStateVarsUsingLoginResponse(res);

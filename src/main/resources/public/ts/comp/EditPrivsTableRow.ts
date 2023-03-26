@@ -72,8 +72,6 @@ export class EditPrivsTableRow extends ListBoxRow {
                     ]) : null
                 ]),
                 new Div(null, { className: "sharingDisplayName" }, [
-                    // todo-1: I tried for 30min to get spacing to show up at bottom of of 'sharingDisplayName'
-                    // and failed. welp, I guess I'm done on that for a minute. I must be missing something.
                     isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
                         : new Div(displayName, {
                             className: "friendName",

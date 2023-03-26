@@ -117,8 +117,6 @@ export class NodeCompTableRowLayout extends Div {
             }
 
             if (this.level <= 1) {
-                // todo-1: this button should have same enablement as "new" button, on the page root
-
                 children.push(new Button(null, () => {
                     if (lastNode) {
                         S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, ast);

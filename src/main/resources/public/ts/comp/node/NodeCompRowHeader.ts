@@ -384,11 +384,6 @@ export class NodeCompRowHeader extends Div {
         let jumpButtonAdded = false;
         /* If we're not on a search result display (or timeline) and there's a TARGET_ID on the node
         then we need to show the jump button point to it.
-
-        NOTE: todo-1: This logic will be the key to how we can make
-        bookmarks work (a future feature). If bookmarks simply have the TARGET_ID then that basically
-        can make them functional as bookmarks, because TARGET_ID is essentially all it
-        takes to be a functional bookmark to the id.
         */
         if (this.isMainTree) {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

@@ -564,7 +564,7 @@ public class NodeSearchService extends ServiceBase {
 					else if (token.startsWith("#")) {
 						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
 						if (token.endsWith("#") || token.length() < 4 || //
-								token.toLowerCase().contains("tallship"))
+								token.toLowerCase().contains("blockthishashtag"))
 							continue;
 
 						// ignore stuff like #1 #23

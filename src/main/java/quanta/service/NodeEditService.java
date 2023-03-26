@@ -375,32 +375,6 @@ public class NodeEditService extends ServiceBase {
 				newNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
 			}
 
-			// log.debug("Saving Friend Node (as a Follow): " + XString.prettyPrint(newNode));
-
-			/////////////////////////////////////////////////////////////////////////////////////
-			// Leaving this temporary code here for now.
-			// todo-1: this block was temporary troubleshooting
-			// Criteria crit = Criteria.where(SubNode.OWNER).is(ms.getUserNodeId()) //
-			// .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()) //
-			// .and(SubNode.TYPE).is(NodeType.FRIEND.s());
-
-			// Query q = new Query();
-			// q.addCriteria(crit);
-			// SubNode ret = mongoUtil.findOne(q);
-			// if (ok(ret)) {
-			// log.debug("oops!! duplicates this existing FRIEND node: " + XString.prettyPrint(ret));
-			// throw new RuntimeException("Duplicate Friend: " + userToFollow);
-			// }
-
-			// troubleshooting this constraint violation
-			// ops.indexOps(SubNode.class).ensureIndex(//
-			// new Index().on(SubNode.OWNER, Direction.ASC) //
-			// .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC) //
-			// .unique() //
-			// .named(indexName) //
-			// .partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
-			///////////////////////////////////////////////////////////////////////////////////////////////
-
 			update.save(ms, newNode);
 			return newNode;
 		} else {
@@ -477,8 +451,6 @@ public class NodeEditService extends ServiceBase {
 						// set node to dirty only if it just changed.
 						ThreadLocals.dirty(node);
 
-						// todo-1: send undo to foreign server
-						// if likes set is now empty make it null.
 						if (node.getLikes().size() == 0) {
 							node.setLikes(null);
 						}
@@ -821,8 +793,6 @@ public class NodeEditService extends ServiceBase {
 					node.mcid = null;
 					node.prevMcid = null;
 
-					// todo-1: quick hack: i keep seeing tag="" in the JSON, but don't want to check that now.
-					// need to fix this the correct way.
 					if ("".equals(node.getTags())) {
 						node.setTags(null);
 					}
@@ -1397,6 +1367,7 @@ public class NodeEditService extends ServiceBase {
 	public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
 		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
 		int replacements = 0;
+		int cachedChanges = 0;
 		String nodeId = req.getNodeId();
 
 		// log.debug("searchingAndReplace node: " + nodeId);
@@ -1405,12 +1376,20 @@ public class NodeEditService extends ServiceBase {
 
 		if (replaceText(ms, node, req.getSearch(), req.getReplace())) {
 			replacements++;
+			cachedChanges++;
 		}
 
 		if (req.isRecursive()) {
 			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
 					replacements++;
+					cachedChanges++;
+
+					// save session immediately every time we get up to 100 pending updates cached.
+					if (cachedChanges >= 100) {
+						cachedChanges = 0;
+						update.saveSession(ms);
+					}
 				}
 			}
 		}

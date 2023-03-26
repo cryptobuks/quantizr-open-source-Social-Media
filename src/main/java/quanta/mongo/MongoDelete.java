@@ -40,7 +40,7 @@ import quanta.util.XString;
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
 @Component
-@Slf4j 
+@Slf4j
 public class MongoDelete extends ServiceBase {
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
 		auth.ownerAuth(ms, node);
@@ -152,14 +152,8 @@ public class MongoDelete extends ServiceBase {
 
 	/**
 	 * This method assumes security check is already done.
-	 * 
-	 * todo-1: performance enhancement: We could just delete the one node identified by 'path', and then
-	 * run the recursive delete operation in an async thread. That's not ACID, but it's ok here, for the
-	 * performance benefit. Perhaps only for 'admin' user only do it synchronously all without any
-	 * async.
 	 */
 	public long deleteUnderPath(MongoSession ms, String path) {
-		// log.debug("Deleting under path: " + path);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
@@ -174,9 +168,7 @@ public class MongoDelete extends ServiceBase {
 		}
 
 		DeleteResult res = ops.remove(q, SubNode.class);
-		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
-		long totalDelCount = res.getDeletedCount();
-		return totalDelCount;
+		return res.getDeletedCount();
 	}
 
 	/**
@@ -563,8 +555,9 @@ public class MongoDelete extends ServiceBase {
 		int batchSize = 0;
 
 		for (String nodeId : req.getNodeIds()) {
-			// lookup the node we're going to delete
-			SubNode node = read.getNode(ms, nodeId);
+			// lookup the node we're going to delete, we call with allowAuth, becasuse it would be redundant
+			// since the next thing we do is an 'ownerAuth', which is even more restrictive
+			SubNode node = read.getNode(ms, nodeId, false, null);
 			if (node == null)
 				continue;
 			auth.ownerAuth(ms, node);
@@ -588,7 +581,7 @@ public class MongoDelete extends ServiceBase {
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from.
 				 * 
-				 * todo-1: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
+				 * todo-0: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
 				 * grant them back the space, so this would rob users of some space. Need to fix that.
 				 */
 				long totalBytes = user.getTotalAttachmentBytes(ms, node);
@@ -600,8 +593,11 @@ public class MongoDelete extends ServiceBase {
 				nodes.add(node);
 			}
 
-			// if 'add' returns true that means this IS the first encounter and so we add to the operations
-			// the call to set it's hasChildren to null
+			/*
+			 * if 'add' returns true that means this IS the first encounter and so we add to the operations the
+			 * call to set it's hasChildren to null. Note setting HAS_CHILDREN to null doesn't indicate we think
+			 * there's no chilren it indicates we don't KNOW if it still has children or not.
+			 */
 			if (parentIds.add(parent.getId())) {
 				bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
 			}
@@ -660,9 +656,10 @@ public class MongoDelete extends ServiceBase {
 
 		int opCount = 0;
 		/*
-		 * Now Query the entire subgraph of this deleted 'node' todo-1: Actually we can do even better here,
-		 * and just run a single command 'delete' op on the underlying query that this getSubGraph ends up
-		 * using, and not even need a bulk op.
+		 * Now Query the entire subgraph of this deleted 'node'
+		 * 
+		 * todo-1: Actually we can do even better here, and just run a single command 'delete' op on the
+		 * underlying query that this getSubGraph ends up using, and not even need a bulk op.
 		 */
 		for (SubNode child : read.getSubGraph(ms, node, null, 0, false, false, false)) {
 			/*
@@ -734,8 +731,8 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	// Deletes all matches to this search criteria. Very dangerous! Only admin can run.
-	public void deleteMatches(MongoSession ms, SubNode node, String prop, String text, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
-			boolean requirePriority) {
+	public void deleteMatches(MongoSession ms, SubNode node, String prop, String text, boolean fuzzy, boolean caseSensitive,
+			String timeRangeType, boolean recursive, boolean requirePriority) {
 		ThreadLocals.requireAdmin();
 		List<CriteriaDefinition> criterias = new LinkedList<>();
 
@@ -753,9 +750,12 @@ public class MongoDelete extends ServiceBase {
 
 		// Only allow deleting of TEXT-ish type node!!!
 		// Bad things can happen if we delete other nodes, even that contain
-		// "bad" content (N-word racial slur, etc.), because when people put those same words in their BLOCKED WORDS
-		// list in their accounts we don't want to mistake that for actual USE of the word, or for places where
-		// people might have blocked someone with an offensive username, we don't want to DELETE those blocked user
+		// "bad" content (N-word racial slur, etc.), because when people put those same words in their
+		// BLOCKED WORDS
+		// list in their accounts we don't want to mistake that for actual USE of the word, or for places
+		// where
+		// people might have blocked someone with an offensive username, we don't want to DELETE those
+		// blocked user
 		// nodes either, so for now we just delete if the type is a comment
 		crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
 
@@ -791,11 +791,12 @@ public class MongoDelete extends ServiceBase {
 					text = "\"" + text + "\"";
 				}
 
-				// This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
-				// bug.
-				// (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR
-				// search
-				// on strings containing special characters, without the special characters basically being ignored.
+				/*
+				 * This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is sure seems like a
+				 * MongoDb bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible
+				 * to do an OR search on strings containing special characters, without the special characters
+				 * basically being ignored.
+				 */
 				// textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
 
 				textCriteria.matching(text);

@@ -42,8 +42,10 @@ export class RpcUtil {
         return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/mobile/api/");
     }
 
-    rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
-        background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
+    /* Makes calls to server */
+    rpc = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
+        (postName: string, postData: RequestType = null,
+            background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
         if (this.sessionTimedOut || !this.rpcEnable) {
             return Promise.resolve(null);
         }

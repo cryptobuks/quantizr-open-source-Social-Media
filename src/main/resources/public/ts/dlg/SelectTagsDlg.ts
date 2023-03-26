@@ -48,8 +48,7 @@ export class SelectTagsDlg extends DialogBase {
         const tagSet = new Set<string>();
 
         if (this.curTags) {
-            // todo-1: is this better with "/ /g" ?
-            const tags = this.curTags.split(/ /);
+            const tags = this.curTags.split(" ");
             tags?.forEach(t => {
                 t = S.util.replaceAll(t, "\"", "");
                 tagSet.add(t);

@@ -281,7 +281,7 @@ export class MenuPanel extends Div {
         let typesAdded = false;
 
         types.forEach((type: TypeIntf, k: string) => {
-            if (!recentTypes.includes(k)) {
+            if (recentTypes && !recentTypes.includes(k)) {
                 return;
             }
             typesAdded = true;
@@ -410,7 +410,7 @@ export class MenuPanel extends Div {
             ], null, this.makeHelpIcon(":transfers")));
         }
 
-        // //need to make export safe for end users to use (recarding file sizes)
+        // //need to make export safe for end users to use (regarding file sizes)
         // if (state.isAdminUser) {
         //     children.push(new Menu(localState, "Admin Tools", [
         //         //todo-2: disabled during mongo conversion

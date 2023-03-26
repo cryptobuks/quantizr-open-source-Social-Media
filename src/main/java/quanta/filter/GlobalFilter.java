@@ -47,16 +47,11 @@ public class GlobalFilter extends GenericFilterBean {
 				String uri = sreq.getRequestURI();
 				boolean createSession = "/".equals(uri) || uri.isEmpty();
 
-				// todo-1: This can be done in a cleaner way. Also ONLY create session when accessing "/"
-				// (index.htm)
-
 				// Special checks for Cache-Controls
 				if (sreq.getRequestURI().contains("/images/") || //
 						sreq.getRequestURI().contains("/fonts/") || //
 						sreq.getRequestURI().contains("/dist/main.") || // JS bundle file
 						sreq.getRequestURI().endsWith("/images/favicon.ico") || //
-						// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
-						// v param.
 						sreq.getRequestURI().contains("?v=")) {
 					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 				}
@@ -67,13 +62,11 @@ public class GlobalFilter extends GenericFilterBean {
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
 				}
 
-				// NOTE: this is new logic! We used to create session always here.
 				HttpSession session = sreq.getSession(createSession);
 				if (session != null) {
 					SessionContext.init(context, session);
 				}
 			}
-			// log.debug("GlobalFilter->doFilter");
 			chain.doFilter(request, response);
 		} finally {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */

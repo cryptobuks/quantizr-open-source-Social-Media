@@ -185,7 +185,7 @@ export class Search {
             J.NodeProp.PRIORITY_FULL, "asc", true, false, false, null);
     }
 
-    // todo-1: We should make this method return a Promise<boolean> for success and get rid of the successCallback arg.
+    // todo-0: We should make this method return a Promise<boolean> for success and get rid of the successCallback arg.
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,

@@ -339,7 +339,6 @@ export class NodeUtil {
         return ret;
     }
 
-    // todo-1: this method is way more complicated than it needs to be.
     getPublicPrivilegsSuffix = (principalName: string, node: J.NodeInfo): string => {
         if (!node || !node.ac) return "";
         let val = "";
