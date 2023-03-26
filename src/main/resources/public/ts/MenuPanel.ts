@@ -281,7 +281,7 @@ export class MenuPanel extends Div {
         let typesAdded = false;
 
         types.forEach((type: TypeIntf, k: string) => {
-            if (recentTypes && !recentTypes.includes(k)) {
+            if (type.schemaOrg && !(recentTypes?.includes(k))) {
                 return;
             }
             typesAdded = true;
