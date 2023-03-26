@@ -182,83 +182,80 @@ export class Search {
             return;
         }
         this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
-            J.NodeProp.PRIORITY_FULL, "asc", true, false, false, null);
+            J.NodeProp.PRIORITY_FULL, "asc", true, false, false);
     }
 
-    // todo-0: We should make this method return a Promise<boolean> for success and get rid of the successCallback arg.
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
-        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
-        successCallback: Function) => {
+        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean): Promise<boolean> => {
+        return new Promise<boolean>(async (resolve, reject) => {
+            const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+                searchRoot,
+                page,
+                nodeId: node ? node.id : null, // for user searchTypes this node can be null
+                searchText,
+                sortDir,
+                sortField,
+                searchProp: prop,
+                fuzzy,
+                caseSensitive,
+                searchType,
+                searchDefinition: "",
+                timeRangeType: null,
+                recursive,
+                requirePriority,
+                requireAttachment,
+                deleteMatches
+            });
 
-        const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            searchRoot,
-            page,
-            nodeId: node ? node.id : null, // for user searchTypes this node can be null
-            searchText,
-            sortDir,
-            sortField,
-            searchProp: prop,
-            fuzzy,
-            caseSensitive,
-            searchType,
-            searchDefinition: "",
-            timeRangeType: null,
-            recursive,
-            requirePriority,
-            requireAttachment,
-            deleteMatches
-        });
-
-        if (res.success && deleteMatches) {
-            S.util.showMessage("Matches were deleted.", "Warning");
-            return;
-        }
-
-        if (res.searchResults && res.searchResults.length > 0) {
-            if (successCallback) {
-                successCallback();
+            if (res.success && deleteMatches) {
+                S.util.showMessage("Matches were deleted.", "Warning");
+                resolve(true);
             }
 
-            dispatch("RenderSearchResults", s => {
-                S.domUtil.focusId(C.TAB_SEARCH);
-                S.tabUtil.tabScroll(C.TAB_SEARCH, 0);
-                const data = SearchTab.inst;
-                if (!data) return;
+            if (res.searchResults && res.searchResults.length > 0) {
+                resolve(true);
+                dispatch("RenderSearchResults", s => {
+                    S.domUtil.focusId(C.TAB_SEARCH);
+                    S.tabUtil.tabScroll(C.TAB_SEARCH, 0);
+                    const data = SearchTab.inst;
+                    if (!data) return;
 
-                s.highlightText = searchText;
+                    s.highlightText = searchText;
 
-                data.openGraphComps = [];
+                    data.openGraphComps = [];
 
-                data.props.results = res.searchResults;
-                data.props.page = page;
-                data.props.searchType = searchType;
-                data.props.description = description;
-                data.props.node = node;
-                data.props.searchText = searchText;
-                data.props.fuzzy = fuzzy;
-                data.props.caseSensitive = caseSensitive;
-                data.props.recursive = recursive;
-                data.props.sortField = sortField;
-                data.props.requirePriority = requirePriority;
-                data.props.requireAttachment = requireAttachment;
-                data.props.sortDir = sortDir;
-                data.props.prop = prop;
-                data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+                    data.props.results = res.searchResults;
+                    data.props.page = page;
+                    data.props.searchType = searchType;
+                    data.props.description = description;
+                    data.props.node = node;
+                    data.props.searchText = searchText;
+                    data.props.fuzzy = fuzzy;
+                    data.props.caseSensitive = caseSensitive;
+                    data.props.recursive = recursive;
+                    data.props.sortField = sortField;
+                    data.props.requirePriority = requirePriority;
+                    data.props.requireAttachment = requireAttachment;
+                    data.props.sortDir = sortDir;
+                    data.props.prop = prop;
+                    data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.tabUtil.selectTabStateOnly(data.id);
+                    S.tabUtil.selectTabStateOnly(data.id);
 
-                // DO NOT DELETE
-                // This was an experiment an it does work, but it only highlights one thing at a time, when I
-                // was hoping it would highlight ALL search results at once. So I think CTRL-F is superior.
-                // if (searchText) {
-                //     setTimeout(() => (window as any).find(searchText, false), 1000); //window.find
-                // }
-            });
-        }
-        else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, null).open();
-        }
+                    // DO NOT DELETE
+                    // This was an experiment an it does work, but it only highlights one thing at a time, when I
+                    // was hoping it would highlight ALL search results at once. So I think CTRL-F is superior.
+                    // if (searchText) {
+                    //     setTimeout(() => (window as any).find(searchText, false), 1000); //window.find
+                    // }
+                });
+            }
+            else {
+                new MessageDlg("No search results found.", "Search", null, null, false, 0, null).open();
+                resolve(false);
+            }
+        });
     }
 
     showDocument = async (node: J.NodeInfo, growPage: boolean) => {

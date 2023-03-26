@@ -34,7 +34,7 @@ export class SearchByNameDlg extends DialogBase {
         ];
     }
 
-    search = () => {
+    search = async () => {
         if (!this.validate()) {
             return;
         }
@@ -42,7 +42,10 @@ export class SearchByNameDlg extends DialogBase {
         SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "Node Name: " + SearchByNameDlg.defaultSearchText;
-        S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, null, desc, null, false,
-            false, 0, true, "mtm", "DESC", false, false, false, this.close);
+        const success = await S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, null, desc, null, false,
+            false, 0, true, "mtm", "DESC", false, false, false);
+        if (success) {
+            this.close();
+        }
     }
 }

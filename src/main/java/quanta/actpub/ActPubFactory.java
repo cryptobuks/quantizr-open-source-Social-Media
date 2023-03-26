@@ -52,15 +52,13 @@ public class ActPubFactory extends ServiceBase {
 
 	/**
 	 * Creates a new 'note' message
-	 * 
-	 * todo-0: replyToType can be deleted?
 	 */
 	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo,
-			String replyToType, String content, String noteUrl, String repliesUrl, boolean privateMessage, APList attachments) {
+			String content, String noteUrl, String repliesUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 
-		APObj payload = newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, repliesUrl,
+		APObj payload = newNote(userDoingAction, toUserNames, fromActor, inReplyTo, content, noteUrl, repliesUrl,
 				now, privateMessage, attachments);
 
 		return newCreate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
@@ -77,11 +75,9 @@ public class ActPubFactory extends ServiceBase {
 
 	/**
 	 * Creates a new 'Note' object, depending on what's being replied to.
-	 * 
-	 * todo-0: replyToType arg can be deleted
 	 */
 	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
-			String inReplyTo, String _replyToType, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
+			String inReplyTo, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
 			boolean privateMessage, APList attachments) {
 		if (content != null) {
 			// convert all double and single spaced lines to <br> for formatting, for servers that don't

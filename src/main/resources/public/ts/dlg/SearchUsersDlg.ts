@@ -76,7 +76,7 @@ export class SearchUsersDlg extends DialogBase {
         ];
     }
 
-    search = () => {
+    search = async () => {
         if (!this.validate()) {
             return;
         }
@@ -84,11 +84,14 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
+        const success = await S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
             this.getState<LS>().searchType,
             desc,
             null,
             false,
-            false, 0, true, "mtm", "DESC", false, false, false, this.close);
+            false, 0, true, "mtm", "DESC", false, false, false);
+        if (success) {
+            this.close();
+        }
     }
 }

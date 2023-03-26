@@ -581,7 +581,7 @@ public class MongoDelete extends ServiceBase {
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from.
 				 * 
-				 * todo-0: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
+				 * todo-1: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
 				 * grant them back the space, so this would rob users of some space. Need to fix that.
 				 */
 				long totalBytes = user.getTotalAttachmentBytes(ms, node);

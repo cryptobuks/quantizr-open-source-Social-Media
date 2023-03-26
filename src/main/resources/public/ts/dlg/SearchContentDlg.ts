@@ -242,7 +242,7 @@ export class SearchContentDlg extends DialogBase {
         }
     }
 
-    search = (deleteMatches: boolean) => {
+    search = async (deleteMatches: boolean) => {
         // until we have better validation
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
@@ -264,7 +264,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        S.srch.search(node, null, SearchContentDlg.defaultSearchText, null, desc,
+        const success = await S.srch.search(node, null, SearchContentDlg.defaultSearchText, null, desc,
             state.searchRoot,
             state.fuzzy,
             state.caseSensitive, 0,
@@ -273,7 +273,9 @@ export class SearchContentDlg extends DialogBase {
             state.sortDir,
             requirePriority,
             state.requireAttachment,
-            deleteMatches,
-            this.close);
+            deleteMatches);
+        if (success) {
+            this.close();
+        }
     }
 }

@@ -141,9 +141,6 @@ public class ActPubService extends ServiceBase {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
                 String inReplyTo = !isAccnt ? apFactory.makeForeignInReplyTo(ms, node.getStr(NodeProp.INREPLYTO), parent) : null;
                 APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
-
-                // replyToType not used right? todo-0;
-                String replyToType = null; // nodeBeingRepliedTo.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
                 String boostTarget = node.getStr(NodeProp.BOOST);
 
                 // toUserNames will hold ALL usernames in the ACL list (both local and foreign user names)
@@ -218,7 +215,7 @@ public class ActPubService extends ServiceBase {
                         }
 
                         String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + node.getIdStr();
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, content,
                                 objUrl, repliesUrl, privateMessage, attachments);
 
                         // log.debug("Outbound Note: " + XString.prettyPrint(message));

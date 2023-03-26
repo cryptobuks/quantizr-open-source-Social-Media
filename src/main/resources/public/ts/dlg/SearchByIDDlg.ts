@@ -34,7 +34,7 @@ export class SearchByIDDlg extends DialogBase {
         ];
     }
 
-    search = () => {
+    search = async () => {
         if (!this.validate()) {
             return;
         }
@@ -42,7 +42,10 @@ export class SearchByIDDlg extends DialogBase {
         SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "For ID: " + SearchByIDDlg.defaultSearchText;
-        S.srch.search(null, "node.id", SearchByIDDlg.defaultSearchText, null, desc, null, false,
-            false, 0, true, null, null, false, false, false, this.close);
+        const success = await S.srch.search(null, "node.id", SearchByIDDlg.defaultSearchText, null, desc, null, false,
+            false, 0, true, null, null, false, false, false);
+        if (success) {
+            this.close();
+        }
     }
 }

@@ -11,7 +11,7 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
         data.inst = this;
     }
 
-    pageChange(delta: number): void {
+    pageChange(delta: number) {
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
@@ -31,8 +31,7 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
             this.data.props.sortDir,
             this.data.props.requirePriority,
             this.data.props.requireAttachment,
-            false,
-            null);
+            false);
     }
 
     extraPagingComps = (): Comp[] => {
