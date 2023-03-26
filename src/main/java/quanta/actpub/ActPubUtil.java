@@ -1141,7 +1141,7 @@ public class ActPubUtil extends ServiceBase {
                             }
 
                             node = apub.saveInboundForeignObj(as, userDoingAction, accountNode, outboxNode, obj, APType.Create,
-                                    null, null, false);
+                                    null, null, false, null);
                         }
                         return node;
                     });

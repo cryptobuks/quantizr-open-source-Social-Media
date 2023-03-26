@@ -215,8 +215,8 @@ public class ActPubService extends ServiceBase {
                         }
 
                         String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + node.getIdStr();
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, content,
-                                objUrl, repliesUrl, privateMessage, attachments);
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, content, objUrl,
+                                repliesUrl, privateMessage, attachments);
 
                         // log.debug("Outbound Note: " + XString.prettyPrint(message));
                     }
@@ -863,7 +863,7 @@ public class ActPubService extends ServiceBase {
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
                     saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce,
-                            boostedNode.getIdStr(), null, true);
+                            boostedNode.getIdStr(), null, true, null);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");
@@ -963,29 +963,39 @@ public class ActPubService extends ServiceBase {
          * 'inbox'
          */
         String inReplyTo = apStr(obj, APObj.inReplyTo);
+        String replyToId = null;
 
         /* This will say null unless inReplyTo is used to get an id to lookup */
         SubNode nodeBeingRepliedTo = null;
 
         /*
-         * Detect if inReplyTo is formatted like this: 'https://domain.com?id=xxxxx' (proprietary URL format
-         * for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
+         * Detect if inReplyTo is formatted like this: 'https://quanta.wiki?id=xxxxx' (proprietary URL
+         * format for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
          */
         if (apUtil.isLocalUrl(inReplyTo)) {
+            // todo-1: need a cleaner way to parse "id" out of this url.
             int lastIdx = inReplyTo.lastIndexOf("=");
-            String replyToId = null;
             if (lastIdx != -1) {
                 replyToId = inReplyTo.substring(lastIdx + 1);
-                nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
+
+                // DO NOT DELETE (THIS MAY COME BACK)
+                // by removing this line, we change the design to where inbound replies always go into user's POSTS
+                // node, rather than underneath the node they're replying to. I'm leaving this line here in case there
+                // are scenarios in the future where we might want this old functionality back where replies go in to
+                // subnodes under the thing bring replied to,.
+                // nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
             }
         }
 
         /*
          * If a foreign user is replying to a specific node, we put the reply under that node
+         * 
+         * NOTE: yes this is code path is intentionally disabled by commenting out the setting of nodeBeingRepliedTo above
+         * (see note above: do not delete this dead block of code)
          */
         if (nodeBeingRepliedTo != null) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true);
+            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true, replyToId);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -994,14 +1004,13 @@ public class ActPubService extends ServiceBase {
          */
         else {
             apLog.trace("not reply to existing Quanta node.");
-
             // get actor's account node from their actorUrl
             SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true);
+                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true, replyToId);
             }
         }
     }
@@ -1020,7 +1029,7 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode,
-            APObj obj, String action, String boostTargetId, String encodedKey, boolean allowFiltering) {
+            APObj obj, String action, String boostTargetId, String encodedKey, boolean allowFiltering, String inReplyTo) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
 
         /*
@@ -1047,7 +1056,12 @@ public class ActPubService extends ServiceBase {
         }
 
         Date published = apDate(obj, APObj.published);
-        String inReplyTo = apStr(obj, APObj.inReplyTo);
+
+        // NOTE: If this is an inbound reply to a local node, normally we can expect inReplyTo to be set here and
+        // it will be the nodeId of the node being replied to.
+        if (inReplyTo == null) {
+            inReplyTo = apStr(obj, APObj.inReplyTo);
+        }
         String contentHtml = APType.Announce.equals(action) ? "" : apStr(obj, APObj.content);
 
         String objUrl = apStr(obj, APObj.url);

@@ -555,10 +555,7 @@ export class EditNodeDlg extends DialogBase {
         S.edit.updateNode(ast.editNode);
     }
 
-    /* returns true if props table is not empty. This method has an "options object" arguments
-    pattern I'm trying out.
-    todo-0: This pattern of argument passing by name, not position is better for larg argument lists. Need to implement
-    this on all methods with more than 5 arguments */
+    /* returns true if props table is not empty. */
     buildPropsEditPanel = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
         let ret = false;
         const ast = getAs();
