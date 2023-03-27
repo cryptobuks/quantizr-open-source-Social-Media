@@ -18,6 +18,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,14 @@ import quanta.util.XString;
 		SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
 @Slf4j
 public class SubNode {
+	public static final ObjectMapper mapper = new ObjectMapper();
+
+	// NOTE: This didn't allow unknown properties as expected but putting the
+	// following in the JSON classes did:
+	// @JsonIgnoreProperties(ignoreUnknown = true)
+	{
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
 	// This optimization is optional and we have this flag if we need to turn it off.
 	public static final boolean USE_HAS_CHILDREN = true;
 
@@ -805,6 +816,21 @@ public class SubNode {
 		}
 	}
 
+	@Transient
+	@JsonIgnore
+	public <T> T getTypedObj(String key, TypeReference ref) {
+		if (props == null)
+			return null;
+
+		synchronized (propLock) {
+			try {
+				return (T) mapper.convertValue(props().get(key), ref);
+			} catch (Exception e) {
+				log.debug("Failed to read prop " + key + " as a type " + ref.toString());
+				return null;
+			}
+		}
+	}
 
 	@Transient
 	@JsonIgnore

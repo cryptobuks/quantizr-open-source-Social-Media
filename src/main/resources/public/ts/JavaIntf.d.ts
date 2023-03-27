@@ -13,6 +13,12 @@ export interface APObjUrl {
     href: string;
 }
 
+export interface APTag {
+    name: string;
+    href: string;
+    type: string;
+}
+
 export interface Attachment {
     o: number;
     w: number;

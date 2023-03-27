@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -14,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -21,6 +21,7 @@ import quanta.instrument.PerfMon;
 import quanta.instrument.PerfMonEvent;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.client.APTag;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
@@ -568,7 +569,6 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
-						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
 						if (token.endsWith("#") || token.length() < 4)
 							continue;
 
@@ -747,56 +747,46 @@ public class NodeSearchService extends ServiceBase {
 	private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
 			HashMap<String, WordStats> mentionMap, HashSet<String> blockTerms) {
 
-		// todo-1: we can use jackson to do this much smarter.
-		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
+		List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
 		if (tags == null)
 			return;
 
-		for (Object tag : tags) {
+		for (APTag tag : tags) {
 			try {
-				if (tag instanceof Map) {
-					Map<?, ?> m = (Map) tag;
-					Object type = m.get("type");
-					// Object href = m.get("href");
-					Object name = m.get("name");
-					if (!(type instanceof String) || !(name instanceof String)) {
-						continue;
+				String _name = tag.getName().toLowerCase();
+
+				// we use the knownTags to avoid double counting stuff we already counted from the content text
+				if (knownTokens != null && knownTokens.contains(_name))
+					continue;
+
+				if (blockTerms != null && blockTerms.contains(_name.replace("#", "")))
+					continue;
+
+				// Mentions
+				if (tag.getType().equals("Mention")) {
+					/*
+					 * Technically the fully qualified name would be the perfect identification for user, but to avoid
+					 * double-counting names that are parset out of the content as the short (no instance) version of
+					 * the name we ignore the href, in here, but href *could* be used if we needed the full name, like
+					 * what we do in parseMentionsFromNode()
+					 */
+					WordStats ws = mentionMap.get(_name);
+					if (ws == null) {
+						ws = new WordStats(_name);
+						mentionMap.put(_name, ws);
 					}
-
-					String _name = ((String) name).toLowerCase();
-
-					// we use the knownTags to avoid double counting stuff we already counted from the content text
-					if (knownTokens != null && knownTokens.contains(_name))
-						continue;
-
-					if (blockTerms != null && blockTerms.contains(_name.replace("#", "")))
-						continue;
-
-					// Mentions
-					if (type.equals("Mention")) {
-						/*
-						 * Technically the fully qualified name would be the perfect identification for user, but to avoid
-						 * double-counting names that are parset out of the content as the short (no instance) version of
-						 * the name we ignore the href, in here, but href *could* be used if we needed the full name, like
-						 * what we do in parseMentionsFromNode()
-						 */
-						WordStats ws = mentionMap.get(_name);
-						if (ws == null) {
-							ws = new WordStats(_name);
-							mentionMap.put(_name, ws);
-						}
-						ws.count++;
-					}
-					// Hashtags
-					else if (type.equals("Hashtag")) {
-						WordStats ws = tagMap.get(_name);
-						if (ws == null) {
-							ws = new WordStats(_name);
-							tagMap.put(_name, ws);
-						}
-						ws.count++;
-					}
+					ws.count++;
 				}
+				// Hashtags
+				else if (tag.getType().equals("Hashtag")) {
+					WordStats ws = tagMap.get(_name);
+					if (ws == null) {
+						ws = new WordStats(_name);
+						tagMap.put(_name, ws);
+					}
+					ws.count++;
+				}
+
 			} catch (Exception e) {
 				// just ignore this.
 			}
