@@ -174,7 +174,7 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
-                ], "smallMarginTop smallMarginBottom");
+                ], "smallMarginBottom");
             }
         }
         // if no image just display the description in a div

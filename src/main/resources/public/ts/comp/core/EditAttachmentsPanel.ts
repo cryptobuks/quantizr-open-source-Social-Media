@@ -1,7 +1,7 @@
 import { dispatch, getAs } from "../../AppContext";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
-import { LS as EditNodeDlgState, EditNodeDlg } from "../../dlg/EditNodeDlg";
+import { EditNodeDlg, LS as EditNodeDlgState } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -137,29 +137,27 @@ export class EditAttachmentsPanel extends Div {
             attCheckbox,
             new NodeCompBinary(ast.editNode, key, true, false, true),
 
-            new FlexRowLayout([
-                new Div(null, null, [
-                    ipfsLink ? new Div("IPFS", {
-                        className: "smallHeading"
-                    }) : null
-                ]),
-                imgSizeSelection,
-                imgPositionSelection,
-                fileNameField,
-                pinCheckbox,
-                new Div(null, { className: "bigMarginLeft" }, [
-                    !firstAttachment ? new Icon({
-                        className: "fa fa-lg fa-arrow-up clickable marginLeft",
-                        title: "Move Attachment Up",
-                        onClick: () => this.moveAttachmentUp(att, ast.editNode)
-                    }) : null,
-                    !lastAttachment ? new Icon({
-                        className: "fa fa-lg fa-arrow-down clickable marginLeft",
-                        title: "Move Attachment Down",
-                        onClick: () => this.moveAttachmentDown(att, ast.editNode)
-                    }) : null
-                ])
-            ], "bigMarginLeft")
+            new Div(null, null, [
+                ipfsLink ? new Div("IPFS", {
+                    className: "smallHeading"
+                }) : null
+            ]),
+            imgSizeSelection,
+            imgPositionSelection,
+            fileNameField,
+            pinCheckbox,
+            new Div(null, null, [
+                !firstAttachment ? new Icon({
+                    className: "fa fa-lg fa-arrow-up clickable marginLeft",
+                    title: "Move Attachment Up",
+                    onClick: () => this.moveAttachmentUp(att, ast.editNode)
+                }) : null,
+                !lastAttachment ? new Icon({
+                    className: "fa fa-lg fa-arrow-down clickable marginLeft",
+                    title: "Move Attachment Down",
+                    onClick: () => this.moveAttachmentDown(att, ast.editNode)
+                }) : null
+            ])
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
             // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.ast), { title: "Show the IPFS URL for the attached file." }) : null
@@ -182,14 +180,20 @@ export class EditAttachmentsPanel extends Div {
 
         let fileNameTagTip = null;
         if (att.p === "ft") {
+            const content = this.editorDlg?.contentEditor?.getValue() || ast.editNode.content;
             const fileName = fileNameFieldState.getValue();
-            fileNameTagTip = new Div(`File Tag: Image goes where you type {{${fileName}}}`, {
-                title: "Click to insert File Tag",
-                className: "clickable",
-                onClick: () => {
-                    this.editorDlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
-                }
-            });
+
+            // if fileName tag not already in the content give the user help inserting it.
+            console.log("content check: " + content);
+            if (content.indexOf(`{{${fileName}}}`) === -1) {
+                fileNameTagTip = new Div(`Insert {{${fileName}}} in text`, {
+                    title: "Click to insert File Tag",
+                    className: "clickable smallMarginTop",
+                    onClick: () => {
+                        this.editorDlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
+                    }
+                });
+            }
         }
 
         return new Div(null, { className: "binaryEditorItem" }, [

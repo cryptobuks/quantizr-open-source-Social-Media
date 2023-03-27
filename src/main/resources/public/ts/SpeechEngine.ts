@@ -536,7 +536,7 @@ export class SpeechEngine {
         const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
-        // This is a dirty but clever hack to fix lots of initials like (J.F.K., or even John F. Kennedy)
+        // This is a dirty but clever hack to fix lots of initials like (J.F.K.)
         // and make them not do any sentence breaks there.
         for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
             text = text.replaceAll(char + ".", char + " ");

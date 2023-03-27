@@ -161,7 +161,7 @@ td {
 }
 
 .fileNameField {
-    width: 15em;
+    width: 12em;
     min-width: 3em;
 }
 
@@ -1111,7 +1111,7 @@ Will come back later and study this more. todo-3 */
     margin-bottom: 12px;
     display: block;
     border: 1px solid $gray-700;
-
+    border-radius: $border-radius;
 }
 
 // WARNING: This class is used for finding in the DOM also, and isn't just for styling.
@@ -1126,8 +1126,8 @@ Will come back later and study this more. todo-3 */
     margin-top: $smallGap;
     float: left !important;
     border: 1px solid $gray-700;
+    border-radius: $border-radius;
     vertical-align: top;
-
 }
 
 .img-upper-right {
@@ -1136,8 +1136,8 @@ Will come back later and study this more. todo-3 */
     margin-top: $smallGap;
     float: right !important;
     border: 1px solid $gray-700;
+    border-radius: $border-radius;
     vertical-align: top;
-
 }
 
 .img-upper-center {
@@ -1147,7 +1147,7 @@ Will come back later and study this more. todo-3 */
     margin-bottom: $smallGap;
     margin-top: $smallGap;
     border: 1px solid $gray-700;
-
+    border-radius: $border-radius;
 }
 
 .microMarginTop {
@@ -1171,7 +1171,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .smallMarginTop {
-    margin-bottom: $tinyGap;
+    margin-top: $tinyGap;
 }
 
 .smallMarginBottom {
@@ -1925,6 +1925,7 @@ Will come back later and study this more. todo-3 */
 .widthDropDown {
     display: inline-block;
     margin-right: $smallGap;
+    margin-left: $smallGap;
     width: 6rem;
 }
 
