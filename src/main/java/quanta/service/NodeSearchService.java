@@ -56,7 +56,7 @@ import quanta.util.XString;
  * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class NodeSearchService extends ServiceBase {
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
@@ -384,16 +384,22 @@ public class NodeSearchService extends ServiceBase {
 		 * If this is the 'feed' being queried (i.e. the Trending tab on the app), then get the data from
 		 * trendingFeedInfo (the cache), or else cache it
 		 */
-		synchronized (NodeSearchService.trendingFeedInfoLock) {
-			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
-				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
-				res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
-				res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
-				res.setTopWords(NodeSearchService.trendingFeedInfo.getTopWords());
-				res.setSuccess(true);
-				return;
+		if (req.isFeed()) {
+			synchronized (NodeSearchService.trendingFeedInfoLock) {
+				if (NodeSearchService.trendingFeedInfo != null) {
+					res.setStats(NodeSearchService.trendingFeedInfo.getStats());
+					res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
+					res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
+					res.setTopWords(NodeSearchService.trendingFeedInfo.getTopWords());
+					res.setSuccess(true);
+					return;
+				}
 			}
 		}
+
+		// If we're doing the system-wide statistics get blockedTerms from Admin account and
+		// use those to ban unwanted things from trending
+		HashSet<String> blockTerms = getAdminBlockedWords(req);
 
 		HashMap<String, WordStats> wordMap = req.isGetWords() ? new HashMap<>() : null;
 		HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
@@ -563,8 +569,11 @@ public class NodeSearchService extends ServiceBase {
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
 						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
-						if (token.endsWith("#") || token.length() < 4 || //
-								token.toLowerCase().contains("blockthishashtag"))
+						if (token.endsWith("#") || token.length() < 4)
+							continue;
+
+						String tokSearch = token.replace("#", "").toLowerCase();
+						if (blockTerms != null && blockTerms.contains(tokSearch))
 							continue;
 
 						// ignore stuff like #1 #23
@@ -593,6 +602,9 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 						}
 
+						if (blockTerms != null && blockTerms.contains(token.toLowerCase()))
+							continue;
+
 						if (wordMap != null) {
 							WordStats ws = wordMap.get(lcToken);
 							if (ws == null) {
@@ -605,7 +617,7 @@ public class NodeSearchService extends ServiceBase {
 				}
 				totalWords++;
 			}
-			extractTagsAndMentions(node, knownTokens, tagMap, mentionMap);
+			extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms);
 
 			if (countVotes) {
 				String vote = node.getStr(NodeProp.VOTE.s());
@@ -715,9 +727,27 @@ public class NodeSearchService extends ServiceBase {
 		}
 	}
 
+	private HashSet<String> getAdminBlockedWords(GetNodeStatsRequest req) {
+		HashSet<String> blockTerms = null;
+		if (req.isFeed()) {
+			blockTerms = new HashSet<>();
+			SubNode root = read.getDbRoot();
+			String blockedWords = root.getStr(NodeProp.USER_BLOCK_WORDS);
+			if (StringUtils.isNotEmpty(blockedWords)) {
+				StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
+				while (t.hasMoreTokens()) {
+					blockTerms.add(t.nextToken().replace("#", "").toLowerCase());
+				}
+			}
+		}
+		return blockTerms;
+	}
+
 	// #tag-array
 	private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
-			HashMap<String, WordStats> mentionMap) {
+			HashMap<String, WordStats> mentionMap, HashSet<String> blockTerms) {
+
+		// todo-1: we can use jackson to do this much smarter.
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
 		if (tags == null)
 			return;
@@ -737,6 +767,9 @@ public class NodeSearchService extends ServiceBase {
 
 					// we use the knownTags to avoid double counting stuff we already counted from the content text
 					if (knownTokens != null && knownTokens.contains(_name))
+						continue;
+
+					if (blockTerms != null && blockTerms.contains(_name.replace("#", "")))
 						continue;
 
 					// Mentions
