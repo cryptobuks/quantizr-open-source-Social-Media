@@ -240,7 +240,7 @@ export class NodeCompRowHeader extends Div {
                         if (getAs().speechSpeaking) {
                             await S.speech.stopSpeaking();
                         }
-                        if (this.node.content) {
+                        else if (this.node.content) {
                             S.speech.speakText(this.node.content, false);
                         }
                     },
