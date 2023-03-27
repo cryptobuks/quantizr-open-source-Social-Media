@@ -2,6 +2,7 @@ package quanta.service;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +91,7 @@ import quanta.util.XString;
  * preferences, and settings persisted per-user
  */
 @Component
-@Slf4j 
+@Slf4j
 public class UserManagerService extends ServiceBase {
 	@Autowired
 	private ActPubLog apLog;
@@ -652,10 +654,9 @@ public class UserManagerService extends ServiceBase {
 			// }
 
 			if (!failed) {
-				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.set(NodeProp.USER_BIO, req.getUserBio());
 				userNode.set(NodeProp.USER_TAGS, req.getUserTags());
-				userNode.set(NodeProp.USER_BLOCK_WORDS, req.getBlockedWords());
+				userNode.set(NodeProp.USER_BLOCK_WORDS, processBlockedWords(req.getBlockedWords()));
 				userNode.set(NodeProp.USER_RECENT_TYPES, req.getRecentTypes());
 				userNode.set(NodeProp.DISPLAY_NAME, req.getDisplayName());
 				userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
@@ -673,6 +674,21 @@ public class UserManagerService extends ServiceBase {
 			return null;
 		});
 		return res;
+	}
+
+	/* Takes in blockedWords and returns them as a unique and sorted array, each on a separate line */
+	public String processBlockedWords(String blockedWords) {
+		if (blockedWords == null)
+			return null;
+	
+		HashSet<String> wordsSet = new HashSet<>();
+		StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
+		while (t.hasMoreTokens()) {
+			wordsSet.add(t.nextToken());
+		}
+		ArrayList<String> wordsList = new ArrayList<>(wordsSet);
+		wordsList.sort((a, b) -> a.compareTo(b));
+		return String.join("\n", wordsList);
 	}
 
 	public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
