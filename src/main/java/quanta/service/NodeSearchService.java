@@ -753,6 +753,11 @@ public class NodeSearchService extends ServiceBase {
 
 		for (APTag tag : tags) {
 			try {
+				// ActPub spec originally didn't have Hashtag here, so default to that if no type
+				if (tag.getType() == null) {
+					tag.setType("Hashtag");
+				}
+
 				String _name = tag.getName().toLowerCase();
 
 				// we use the knownTags to avoid double counting stuff we already counted from the content text

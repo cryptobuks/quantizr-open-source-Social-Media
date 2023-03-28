@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APOHashtag;
@@ -27,6 +27,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.AccessControlInfo;
 import quanta.model.PrivilegeInfo;
+import quanta.model.client.APTag;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -43,7 +44,7 @@ import quanta.util.XString;
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class MongoAuth extends ServiceBase {
 	private static final boolean verbose = false;
 
@@ -674,7 +675,7 @@ public class MongoAuth extends ServiceBase {
 			String tok = t.nextToken();
 
 			if (tok.length() > 1) {
-				// Mention (@name@server.com or @name)
+				// MENTION (@name@server.com or @name)
 				int atMatches = StringUtils.countMatches(tok, "@");
 				if (parseMentions && tok.startsWith("@") && atMatches <= 2) {
 					String actor = null;
@@ -693,7 +694,7 @@ public class MongoAuth extends ServiceBase {
 					}
 					tags.put(tok, new APOMention(actor, tok));
 				}
-				// Hashtag
+				// HASHTAG
 				else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
 					String shortTok = XString.stripIfStartsWith(tok, "#");
 					tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
@@ -708,83 +709,65 @@ public class MongoAuth extends ServiceBase {
 	 * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
 	 */
 	public HashMap<String, APObj> parseTags(SubNode node) {
-		HashMap<String, APObj> tagSet = new HashMap<>();
+		HashMap<String, APObj> tagMap = new HashMap<>();
 		if (node == null)
-			return tagSet;
+			return tagMap;
 
-		// todo-0: everywhere we access the ACT_PUB_TAG use the new APTag way of marshalling it
-		// into a List
-		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
-		if (tags != null) {
-			for (Object tag : tags) {
-				try {
-					if (tag instanceof Map) {
-						Map<?, ?> m = (Map) tag;
-						Object type = m.get("type");
-						Object href = m.get("href");
-						Object name = m.get("name");
+		List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
+		if (tags == null)
+			return tagMap;
 
-						// ActPub spec originally didn't have Hashtag here, so default to that if no type
-						if (type == null) {
-							type = "Hashtag";
-						}
-
-						// skip if not all strings
-						if (!(type instanceof String) || !(href instanceof String) || !(name instanceof String)) {
-							continue;
-						}
-
-						String typeStr = (String) type;
-
-						if (typeStr.equalsIgnoreCase("Hashtag")) {
-							tagSet.put((String) name, new APOHashtag((String) href, (String) name));
-						}
-						// Process Mention
-						else if (typeStr.equalsIgnoreCase("Mention")) {
-
-							APOMention tagObj = new APOMention((String) href, (String) name);
-
-							// add a string like host@username
-							URL hrefUrl = new URL((String) href);
-
-							// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
-							// or else we end up with "user@server.com@server.com"
-							String longName = (String) name;
-
-							// if 'longName' is like "@user" with no domain, then add the domain.
-							if (StringUtils.countMatches(longName, "@") < 2) {
-								longName += "@" + hrefUrl.getHost();
-							}
-
-							// I'm just adding this as a sanity check but it should be unnecessary
-							if (!longName.startsWith("@")) {
-								longName = "@" + longName;
-							}
-
-							// one more sanity check to be sure everything is ok with the name
-							if (StringUtils.countMatches(longName, "@") > 2) {
-								continue;
-							}
-
-							// build this name without host part if it's a local user, otherwise full fediverse name
-							String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name : longName;
-
-							// add the name if it's not the current user. No need to self-mention in a reply?
-							if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
-								tagSet.put(user, tagObj);
-							}
-						}
-					} else {
-						log.debug("Failed to parse tag on nodeId " + node.getIdStr() + " because it was type="
-								+ tag.getClass().getName());
-					}
-				} catch (Exception e) {
-					log.error("Unable to process tag.", e);
-					// ignore errors on any tag and continue to next tag
+		for (APTag tag : tags) {
+			try {
+				// ActPub spec originally didn't have Hashtag here, so default to that if no type
+				if (tag.getType() == null) {
+					tag.setType("Hashtag");
 				}
+
+				if ("Hashtag".equalsIgnoreCase(tag.getType())) {
+					tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
+				}
+				// Process Mention
+				else if ("Mention".equalsIgnoreCase(tag.getType())) {
+					APOMention tagObj = new APOMention(tag.getHref(), tag.getName());
+
+					// add a string like host@username
+					URL hrefUrl = new URL(tag.getHref());
+
+					// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
+					// or else we end up with "user@server.com@server.com"
+					String longName = tag.getName();
+
+					// if 'longName' is like "@user" with no domain, then add the domain.
+					if (StringUtils.countMatches(longName, "@") < 2) {
+						longName += "@" + hrefUrl.getHost();
+					}
+
+					// I'm just adding this as a sanity check but it should be unnecessary
+					if (!longName.startsWith("@")) {
+						longName = "@" + longName;
+					}
+
+					// one more sanity check to be sure everything is ok with the name
+					if (StringUtils.countMatches(longName, "@") > 2) {
+						continue;
+					}
+
+					// build this name without host part if it's a local user, otherwise full fediverse name
+					String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? tag.getName() : longName;
+
+					// add the name if it's not the current user. No need to self-mention in a reply?
+					if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
+						tagMap.put(user, tagObj);
+					}
+				}
+			} catch (Exception e) {
+				log.error("Unable to process tag.", e);
+				// ignore errors on any tag and continue to next tag
 			}
 		}
-		return tagSet;
+
+		return tagMap;
 	}
 
 	/*

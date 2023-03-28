@@ -142,7 +142,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 						.put("url",
 								"https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
 
-		log.debug("Complex Object (5): " + XString.prettyPrint(node));
+		log.debug("Complex Object: " + XString.prettyPrint(node));
 		update.saveSession(as);
 	}
 
