@@ -298,8 +298,8 @@ public class Convert extends ServiceBase {
 
 		// todo-1: look for other places where we only call parseTags(text) or parseTags(node) but needed to
 		// parse both.
-		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
-		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
+		HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, false);
+		HashMap<String, APObj> nodePropTags = apub.parseTags(node);
 		if (nodePropTags != null) {
 			tags.putAll(nodePropTags);
 		}

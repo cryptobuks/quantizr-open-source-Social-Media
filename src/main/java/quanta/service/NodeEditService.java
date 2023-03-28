@@ -698,7 +698,7 @@ public class NodeEditService extends ServiceBase {
 			}
 
 			if (!isAccnt) {
-				HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
+				HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, true);
 
 				if (tags != null && tags.size() > 0) {
 					String userDoingAction = ThreadLocals.getSC().getUserName();

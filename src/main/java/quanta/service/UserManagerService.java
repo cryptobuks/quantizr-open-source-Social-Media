@@ -1266,8 +1266,8 @@ public class UserManagerService extends ServiceBase {
 		String ownerIdStr = node.getOwner().toHexString();
 
 		HashSet<String> idSet = new HashSet<>();
-		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
-		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
+		HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, false);
+		HashMap<String, APObj> nodePropTags = apub.parseTags(node);
 		if (nodePropTags != null) {
 			tags.putAll(nodePropTags);
 		}

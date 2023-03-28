@@ -7,6 +7,7 @@ import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apParseList;
 import static quanta.actpub.model.AP.apStr;
+import java.net.URL;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
@@ -45,6 +48,7 @@ import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMon;
+import quanta.model.client.APTag;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -1162,7 +1166,7 @@ public class ActPubService extends ServiceBase {
 
             // DO NOT DELETE
             // NOTE: LEAVE HERE, in case we ever need to parse contentHtml into the tagArray
-            // HashMap<String, APObj> tags = auth.parseTags(contentHtml, true, false);
+            // HashMap<String, APObj> tags = apub.parseTags(contentHtml, true, false);
 
             if (tags != null) {
                 importUsers(ms, tags, null);
@@ -1290,7 +1294,6 @@ public class ActPubService extends ServiceBase {
 
         // now build our own stronger typed APObj-derived objects for the array into tags
         for (Object tag : tagArray) {
-
             String type = apStr(tag, APObj.type);
             String name = apStr(tag, APObj.name);
             String href = apStr(tag, APObj.href);
@@ -2105,4 +2108,114 @@ public class ActPubService extends ServiceBase {
             return "Error: " + e.getMessage();
         }
     }
+
+	/*
+	 * Returns map of of APOHashtag and/or APOMention objects, where the keys are the hashtag or mention
+	 * including the # or @ as first char of the key.
+	 */
+	public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
+		HashMap<String, APObj> tags = new HashMap<>();
+		if (content == null)
+			return tags;
+
+		StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
+
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken();
+
+			if (tok.length() > 1) {
+				// MENTION (@name@server.com or @name)
+				int atMatches = StringUtils.countMatches(tok, "@");
+				if (parseMentions && tok.startsWith("@") && atMatches <= 2) {
+					String actor = null;
+
+					String userName = tok;
+					boolean isLocalUserName = userName.endsWith("@" + prop.getMetaHost().toLowerCase());
+					if (isLocalUserName) {
+						userName = XString.stripIfStartsWith(userName, "@");
+						userName = apUtil.stripHostFromUserName(userName);
+						actor = apUtil.makeActorUrlForUserName(userName);
+					}
+					// foreign userName
+					else if (atMatches == 2) {
+						String userDoingAction = ThreadLocals.getSC().getUserName();
+						actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
+					}
+					tags.put(tok, new APOMention(actor, tok));
+				}
+				// HASHTAG
+				else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
+					String shortTok = XString.stripIfStartsWith(tok, "#");
+					tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
+				}
+			}
+		}
+
+		return tags;
+	}
+
+	/**
+	 * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
+	 */
+	public HashMap<String, APObj> parseTags(SubNode node) {
+		HashMap<String, APObj> tagMap = new HashMap<>();
+		if (node == null)
+			return tagMap;
+
+		List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
+		if (tags == null)
+			return tagMap;
+
+		for (APTag tag : tags) {
+			try {
+				// ActPub spec originally didn't have Hashtag here, so default to that if no type
+				if (tag.getType() == null) {
+					tag.setType("Hashtag");
+				}
+
+				if ("Hashtag".equalsIgnoreCase(tag.getType())) {
+					tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
+				}
+				// Process Mention
+				else if ("Mention".equalsIgnoreCase(tag.getType())) {
+					APOMention tagObj = new APOMention(tag.getHref(), tag.getName());
+
+					// add a string like host@username
+					URL hrefUrl = new URL(tag.getHref());
+
+					// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
+					// or else we end up with "user@server.com@server.com"
+					String longName = tag.getName();
+
+					// if 'longName' is like "@user" with no domain, then add the domain.
+					if (StringUtils.countMatches(longName, "@") < 2) {
+						longName += "@" + hrefUrl.getHost();
+					}
+
+					// I'm just adding this as a sanity check but it should be unnecessary
+					if (!longName.startsWith("@")) {
+						longName = "@" + longName;
+					}
+
+					// one more sanity check to be sure everything is ok with the name
+					if (StringUtils.countMatches(longName, "@") > 2) {
+						continue;
+					}
+
+					// build this name without host part if it's a local user, otherwise full fediverse name
+					String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? tag.getName() : longName;
+
+					// add the name if it's not the current user. No need to self-mention in a reply?
+					if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
+						tagMap.put(user, tagObj);
+					}
+				}
+			} catch (Exception e) {
+				log.error("Unable to process tag.", e);
+				// ignore errors on any tag and continue to next tag
+			}
+		}
+
+		return tagMap;
+	}
 }
