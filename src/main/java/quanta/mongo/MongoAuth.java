@@ -712,6 +712,8 @@ public class MongoAuth extends ServiceBase {
 		if (node == null)
 			return tagSet;
 
+		// todo-0: everywhere we access the ACT_PUB_TAG use the new APTag way of marshalling it
+		// into a List
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
 		if (tags != null) {
 			for (Object tag : tags) {

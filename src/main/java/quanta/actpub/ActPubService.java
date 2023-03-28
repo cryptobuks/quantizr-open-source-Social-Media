@@ -1077,7 +1077,6 @@ public class ActPubService extends ServiceBase {
 
         Boolean sensitive = apBool(obj, APObj.sensitive);
         List<?> tagArray = (List<?>) apList(obj, APObj.tag, false);
-
         APObj replies = apAPObj(obj, APObj.replies);
 
         // Ignore non-english for now (later we can make this a user-defined language selection)

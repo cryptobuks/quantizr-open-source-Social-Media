@@ -57,7 +57,7 @@ export class IconButton extends Comp {
             }),
             this.text ? new Span(this.text, {
                 key: this.getId("t_"),
-                className: "icon-button-font"
+                className: "iconButtonFont"
             }) : null
         ]);
     }

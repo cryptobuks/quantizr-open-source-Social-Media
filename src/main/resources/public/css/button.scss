@@ -51,13 +51,7 @@
     cursor: pointer;
 }
 
-.button-font {
-    font-family: $fontFamily !important;
-    // font-size: $fontSize;
-    white-space: nowrap;
-}
-
-.icon-button-font {
+.iconButtonFont {
     font-family: $fontFamily !important;
     // font-size: $fontSize;
     white-space: nowrap;
@@ -75,10 +69,6 @@
 
 .feedDirtyButton {
     color: yellow;
-}
-
-.bash-exec-button {
-    margin: 1rem;
 }
 
 .scrollTopButtonUpperRight {
