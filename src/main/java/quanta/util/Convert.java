@@ -63,11 +63,6 @@ public class Convert extends ServiceBase {
 			long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
 			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
 
-		log.debug("convertToNodeInfo: " + node.getIdStr());
-		if ("6418f108241bc534e8dbf2fc".equals(node.getIdStr())) {
-			log.debug("got it.");
-		}
-
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
 		// if we have a signature, check it.
