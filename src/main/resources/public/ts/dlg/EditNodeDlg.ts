@@ -75,7 +75,7 @@ export class EditNodeDlg extends DialogBase {
     tagTextField: TextField;
 
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
-        super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
+        super("[none]", (mode === DialogMode.EMBED ? "appEmbedContent" : "appModalCont") + " " + C.TAB_MAIN, false, mode);
         const ast = getAs();
 
         // need a deterministic id here, that can be found across renders, for scrolling.
@@ -233,7 +233,7 @@ export class EditNodeDlg extends DialogBase {
             span = span || new Span();
             span.addChild(new Icon({
                 title: "Jump to Node",
-                className: "fa fa-arrow-right fa-lg jumpButton",
+                className: "fa fa-arrowRight fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit(this);
                     S.nav.closeFullScreenViewer();
@@ -313,7 +313,7 @@ export class EditNodeDlg extends DialogBase {
         let propsParent: Div = null;
         if (!customProps) {
             propsParent = new Div(null, {
-                className: "edit-props-table" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+                className: "editPropsTable" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
 
             propsTable = propsParent;
@@ -324,7 +324,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             propsParent = new Div(null, {
-                className: "edit-props-table marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+                className: "editPropsTable marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
             mainPropsTable = propsParent;
         }
@@ -421,7 +421,7 @@ export class EditNodeDlg extends DialogBase {
 
         let propsCollapsePanel: CollapsiblePanel = null;
         let propsPanel: Div = null;
-        const propsDiv = new Div(null, { className: "edit-props-container" }, [
+        const propsDiv = new Div(null, { className: "editPropsCont" }, [
             propsHeaderBar,
             propsTable
         ]);
@@ -852,7 +852,7 @@ export class EditNodeDlg extends DialogBase {
                 valEditor = new TextArea(null, {
                     rows: "" + rows,
                     id: "prop_" + ast.editNode.id
-                }, propState, "textarea-min-4 marginRight");
+                }, propState, "textareaMin4 marginRight");
             }
             else {
                 valEditor = new TextField({
@@ -963,7 +963,7 @@ export class EditNodeDlg extends DialogBase {
         this.contentEditor = new TextArea(null, {
             id: C.ID_PREFIX_EDIT + ast.editNode.id,
             rows
-        }, this.contentEditorState, "font-inherit", true, minRows, this.contentScrollPos);
+        }, this.contentEditorState, "fontInherit", true, minRows, this.contentScrollPos);
         if (this.decryptFailed) {
             this.contentEditor.setEnabled(false);
         }

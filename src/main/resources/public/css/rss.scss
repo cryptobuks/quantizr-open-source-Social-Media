@@ -39,14 +39,12 @@
     margin: 8px;
     display: inline-block;
     cursor: pointer;
-    
 }
 
 .rssChapterPanel {
     border: 2px solid $nodeBorderBottomColor;
     margin-top: 12px;
     padding: 13px;
-    
 }
 
 .rssAnchor {
@@ -74,28 +72,27 @@
     font-size: 110%;
 }
 
-.rss-feed-image {
+.rssFeedImage {
     border: 1px solid $nodeBorderBottomColor;
-    // margin-top: 12px;
     margin-bottom: 12px;
     margin-right: 12px;
     max-width: 50%;
 }
 
-.rss-feed-item {
+.rssFeedItem {
     border-top: 2px solid $nodeBorderBottomColor;
     margin-bottom: 4px;
     margin-left: 12px;
     padding-top: 4px;
 }
 
-.rss-feed-item:last-child {
+.rssFeedItem:last-child {
     border-bottom: 2px solid $nodeBorderBottomColor;
     margin-bottom: 4px;
     margin-left: 12px;
     padding-top: 4px;
 }
 
-.rss-feed-listing {
+.rssFeedListing {
     margin-left: $smallGap;
 }

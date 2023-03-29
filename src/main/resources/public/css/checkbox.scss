@@ -2,9 +2,9 @@
     align-items: center;
 }
 
-.form-check-inline-nomargin {
+.formCheckInlineNoMargin {
     display: inline-block;
-    margin-right: 0px !important; //<--- this overrides the default form-check-inline margin
+    margin-right: 0px !important; // <--- this overrides the default form-check-inline margin
 }
 
 .form-check label {
@@ -35,7 +35,6 @@
 
 .checkboxLabel {
     margin-right: 16px;
-    // margin-bottom: $smallGap;
 }
 
 .radioLabel {

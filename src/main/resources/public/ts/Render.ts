@@ -85,26 +85,26 @@ export class Render {
 
                 // Center Top
                 if (a.p === "c") {
-                    topClass = "img-upper-center";
+                    topClass = "imgUpperCenter";
                 }
                 // Upper Left
                 else if (a.p === "ul") {
-                    topClass = "img-upper-left";
+                    topClass = "imgUpperLeft";
                     suffix = "<div class=\"clearfix\"/>";
                 }
                 // Upper Right
                 else if (a.p === "ur") {
-                    topClass = "img-upper-right";
+                    topClass = "imgUpperRight";
                     suffix = "<div class=\"clearfix\"/>";
                 }
 
                 if (topClass) {
-                    imgHtml += `<img class="${topClass} enlargable-img" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">` + suffix;
+                    imgHtml += `<img class="${topClass} enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">` + suffix;
                 }
 
                 // ft=at file tag
                 else if (a.p === "ft") {
-                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="img-block enlargable-img" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
+                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
                 }
             }
 
@@ -143,7 +143,7 @@ export class Render {
 
         // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
         this.markedRenderer.codespan = (code: string) => {
-            return `<span class='markdown-codespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
+            return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
         }
 
         // From Stack Overflow
@@ -675,10 +675,10 @@ export class Render {
 
         let clazz = null;
         if (treeRender) {
-            clazz = isMine ? "boosted-by-me" : "boosted-by-other";
+            clazz = isMine ? "boostedByMe" : "boostedByOther";
         }
         else {
-            clazz = isMine ? "boosted-by-me-onfeed" : "boosted-by-other-onfeed";
+            clazz = isMine ? "boostedByMeOnFeed" : "boostedByOtherOnFeed";
         }
 
         // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.

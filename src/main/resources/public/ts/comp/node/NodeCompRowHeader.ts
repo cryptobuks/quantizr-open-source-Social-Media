@@ -23,7 +23,7 @@ export class NodeCompRowHeader extends Div {
         super(null);
 
         const ast = getAs();
-        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "row-header-edit" : "row-header";
+        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "rowHeaderEdit" : "row-header";
     }
 
     preRender(): void {
@@ -75,7 +75,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             children.push(new Span(displayName, {
-                className: (this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other")),
+                className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,
                 onClick: () => {
                     new UserProfileDlg(this.node.ownerId).open();
@@ -113,7 +113,7 @@ export class NodeCompRowHeader extends Div {
         if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
-                className: "fa fa-reply fa-lg row-header-icon",
+                className: "fa fa-reply fa-lg rowHeaderIcon",
                 onClick: () => {
                     if (ast.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -132,7 +132,7 @@ export class NodeCompRowHeader extends Div {
             if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
                 children.push(new Icon({
                     title: "Boost this Node",
-                    className: "fa fa-retweet fa-lg row-header-icon",
+                    className: "fa fa-retweet fa-lg rowHeaderIcon",
                     onClick: () => {
                         if (ast.isAnonUser) {
                             S.util.showMessage("Login to boost nodes.", "Login!");
@@ -161,7 +161,7 @@ export class NodeCompRowHeader extends Div {
             if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
-                    className: "fa fa-star fa-lg row-header-icon " + (youLiked ? "likedByMeIcon" : ""),
+                    className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
                     onClick: () => {
                         if (ast.isAdminUser) {
                             S.util.showMessage("Admin user can't do Likes.", "Admin");
@@ -183,14 +183,14 @@ export class NodeCompRowHeader extends Div {
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 children.push(new Icon({
                     title: "People mentioned or shared related to this node",
-                    className: "fa fa-users fa-lg row-header-icon",
+                    className: "fa fa-users fa-lg rowHeaderIcon",
                     onClick: () => S.user.showUsersList(this.node)
                 }));
             }
 
             if (showInfo && allowWideViewIcons) {
                 children.push(new Icon({
-                    className: "fa fa-link fa-lg row-header-icon",
+                    className: "fa fa-link fa-lg rowHeaderIcon",
                     title: "Show URLs for this node",
                     onClick: () => S.render.showNodeUrl(this.node)
                 }));
@@ -199,7 +199,7 @@ export class NodeCompRowHeader extends Div {
             // Allow bookmarking any kind of node other than bookmark nodes.
             if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
                 children.push(new Icon({
-                    className: "fa fa-bookmark fa-lg row-header-icon",
+                    className: "fa fa-bookmark fa-lg rowHeaderIcon",
                     title: "Bookmark this Node",
                     onClick: () => S.edit.addBookmark(this.node)
                 }));
@@ -213,7 +213,7 @@ export class NodeCompRowHeader extends Div {
             const slashCount = S.util.countChars(this.node.path, "/");
             if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
                 children.push(new Icon({
-                    className: "fa fa-th-list fa-lg row-header-icon",
+                    className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",
                     onClick: () => S.srch.showThread(this.node)
                 }));
@@ -222,7 +222,7 @@ export class NodeCompRowHeader extends Div {
             const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
             if (showInfo && ast.allowedFeatures?.indexOf("ap:replies") !== -1 && repliesProp) {
                 children.push(new Icon({
-                    className: "fa fa-commenting fa-lg row-header-icon",
+                    className: "fa fa-commenting fa-lg rowHeaderIcon",
                     title: "Show Replies",
                     onClick: () => S.srch.showReplies(this.node)
                 }));
@@ -233,7 +233,7 @@ export class NodeCompRowHeader extends Div {
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!actPubId && !ast.isAnonUser && allowWideViewIcons) {
                 children.push(new Icon({
-                    className: "fa fa-lg fa-volume-up row-header-icon",
+                    className: "fa fa-lg fa-volume-up rowHeaderIcon",
                     onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                     onMouseOut: () => { S.quanta.selectedForTts = null; },
                     onClick: async () => {
@@ -390,7 +390,7 @@ export class NodeCompRowHeader extends Div {
             if (targetId) {
                 jumpButtonAdded = true;
                 jumpButton = new Icon({
-                    className: "fa fa-arrow-right fa-lg buttonBarIcon",
+                    className: "fa fa-arrowRight fa-lg buttonBarIcon",
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to Tree"
                 });
@@ -400,7 +400,7 @@ export class NodeCompRowHeader extends Div {
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
         if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new Icon({
-                className: "fa fa-arrow-right fa-lg buttonBarIcon",
+                className: "fa fa-arrowRight fa-lg buttonBarIcon",
                 onClick: () => S.srch.clickSearchNode(this.node.id),
                 title: "Jump to Tree"
             });

@@ -16,7 +16,7 @@ export class SearchByFediUrlDlg extends DialogBase {
     ]);
 
     constructor() {
-        super("Fediverse URL", "app-modal-content-medium-width");
+        super("Fediverse URL", "appModalContMediumWidth");
         this.onMount(() => this.searchTextField?.focus());
         this.searchTextState.setValue(SearchByFediUrlDlg.defaultSearchText);
         this.validatedStates = [this.searchTextState];

@@ -90,7 +90,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
 
         const input = this.input = new Input({
             placeholder: this.cfg.placeholder || "",
-            className: "form-control pre-textfield " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
+            className: "form-control preTextField " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: this.getId("inputId_")
         }, this.cfg.val.v);

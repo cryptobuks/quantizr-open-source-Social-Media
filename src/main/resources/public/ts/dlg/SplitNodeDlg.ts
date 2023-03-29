@@ -62,7 +62,7 @@ export class SplitNodeDlg extends DialogBase {
                     },
                     getValue: (): boolean => this.getState<LS>().splitType === "children"
                 })
-            ], "form-group-border splitNodeRadioButtonGroup"),
+            ], "formGrpBorder splitNodeRadioButtonGroup"),
 
             new RadioButtonGroup([
                 new RadioButton("Single Blank Line", true, "splitSpacingGroup", null, {
@@ -89,7 +89,7 @@ export class SplitNodeDlg extends DialogBase {
                     },
                     getValue: (): boolean => this.getState<LS>().splitMode === "custom"
                 })
-            ], "form-group-border splitNodeRadioButtonGroup"),
+            ], "formGrpBorder splitNodeRadioButtonGroup"),
 
             (this.getState<LS>().splitMode === "custom") ? new TextField({ label: "Delimiter", val: this.delimiterState }) : null,
 

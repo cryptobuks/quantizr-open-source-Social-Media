@@ -49,7 +49,7 @@ export class NodeCompMainNode extends Div {
         else {
             const focusNode = S.nodeUtil.getHighlightedNode();
             const selected: boolean = (focusNode && focusNode.id === node.id);
-            this.attribs.className = selected ? "active-row-main" : "inactive-row-main";
+            this.attribs.className = selected ? "activeRowMain" : "inactiveRowMain";
 
             if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
                 S.render.fadeInId = null;
@@ -83,7 +83,7 @@ export class NodeCompMainNode extends Div {
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
                 if (targetId) {
-                    jumpButton = new IconButton("fa-arrow-right", null, {
+                    jumpButton = new IconButton("fa-arrowRight", null, {
                         onClick: () => S.view.jumpToId(targetId),
                         title: "Jump to the Node"
                     }, "btn-secondary float-end");

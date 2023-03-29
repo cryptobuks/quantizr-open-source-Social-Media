@@ -17,7 +17,7 @@ export class PasteOrLinkDlg extends DialogBase {
     nameState: Validator = new Validator("");
 
     constructor(private nodeId: string, private sourceId: string) {
-        super("Select Action", "app-modal-content-narrow-width");
+        super("Select Action", "appModalContNarrowWidth");
     }
 
     renderDlg(): CompIntf[] {

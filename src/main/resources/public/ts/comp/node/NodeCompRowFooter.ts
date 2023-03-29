@@ -7,7 +7,7 @@ export class NodeCompRowFooter extends Div {
 
     constructor(private node: J.NodeInfo) {
         super(null, {
-            className: "row-footer float-end"
+            className: "rowFooter float-end"
         });
     }
 

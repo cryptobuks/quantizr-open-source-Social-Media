@@ -15,7 +15,7 @@ export class EditTagsDlg extends DialogBase {
     textScrollPos = new ScrollPos();
 
     constructor() {
-        super("Edit Hashtags", "app-modal-content-medium-width");
+        super("Edit Hashtags", "appModalContMediumWidth");
     }
 
     renderDlg(): CompIntf[] {

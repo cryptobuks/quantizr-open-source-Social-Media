@@ -172,11 +172,11 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             }
 
             const propTableRow = new FilesTableRow({
-                className: "files-table-row"
+                className: "filesTableRow"
             }, [
                 // TYPE ICON
                 new FilesTableCell(null, {
-                    className: "files-table-type-col"
+                    className: "filesTableTypeCol"
                 }, [
                     new Icon({
                         className: "fa fa-lg " + iconClass
@@ -185,7 +185,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
 
                 // NAME
                 new FilesTableCell(null, {
-                    className: "files-table-name-col"
+                    className: "filesTableNameCol"
                 }, [
                     new Div(null, null, [
                         new Div(entry.Name, {
@@ -218,13 +218,13 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
 
                 // SIZE
                 new FilesTableCell(sizeStr, {
-                    className: "files-table-size-col"
+                    className: "filesTableSizeCol"
                 }),
 
                 // DELETE ICON
                 // only show the delete button for local mfsMode stuff.
                 mfsMode ? new FilesTableCell(null, {
-                    className: "files-table-delete-col"
+                    className: "filesTableDelCol"
                     // onClick: () => { this.deleteItem(fullName); }
                 }, [
                     !foldersOnly ? new Div(null, null, [

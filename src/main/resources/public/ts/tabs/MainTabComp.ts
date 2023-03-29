@@ -56,7 +56,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 // if we have some parents to display...
                 ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
 
-                new Div(null, { className: ast.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
+                new Div(null, { className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
                     new NodeCompMainNode(this.data),
                     new NodeCompMainList(this.data)
                 ])

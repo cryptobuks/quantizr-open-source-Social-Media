@@ -400,7 +400,7 @@ export class DomUtil {
         const d = document.createElement("div");
 
         const a = document.createElement("div");
-        a.className = "arrow-up";
+        a.className = "arrowUp";
         a.style.left = `${this.mouseX + 15}px`;
         a.style.top = `${this.mouseY - 10}px`;
         document.body.appendChild(a);
@@ -490,12 +490,12 @@ export class DomUtil {
                     case "bl":
                         arrow.style.left = (targX + 15) + "px";
                         arrow.style.top = (targY + elmnt.clientHeight - 1) + "px";
-                        arrow.className = "arrow-down";
+                        arrow.className = "arrowDown";
                         break;
                     case "br":
                         arrow.style.left = (targX + elmnt.clientWidth - 30) + "px";
                         arrow.style.top = (targY + elmnt.clientHeight - 1) + "px";
-                        arrow.className = "arrow-down";
+                        arrow.className = "arrowDown";
                         break;
                     default: break;
                 }
@@ -596,9 +596,9 @@ export class DomUtil {
             elm.childNodes.forEach((e: HTMLElement) => this.domHighlight(e, regex, allRegex));
         }
         else if (elm.nodeType === 3) { // 3 == Text.TEXT_NODE
-            if (elm.textContent.search(regex) !== -1 && !elm.classList?.contains("highlight-text")) {
+            if (elm.textContent.search(regex) !== -1 && !elm.classList?.contains("highlightText")) {
                 const newElement = document.createElement("span");
-                newElement.innerHTML = elm.textContent.replace(allRegex, '<span class="highlight-text">$1</span>');
+                newElement.innerHTML = elm.textContent.replace(allRegex, '<span class="highlightText">$1</span>');
                 elm.replaceWith(newElement)
             }
         }

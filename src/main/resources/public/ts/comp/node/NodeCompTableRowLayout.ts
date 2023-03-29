@@ -11,13 +11,13 @@ import { NodeCompRow } from "./NodeCompRow";
 export class NodeCompTableRowLayout extends Div {
 
     constructor(public node: J.NodeInfo, private tabData: TabIntf<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
-        super(null, { className: "node-grid-table" });
+        super(null, { className: "nodeGridTable" });
     }
 
     preRender(): void {
         const ast = getAs();
         const nodesToMove = ast.nodesToMove;
-        let curRow = new Div(null, { className: "node-grid-row" });
+        let curRow = new Div(null, { className: "nodeGridRow" });
         const children: Comp[] = [];
         const childCount: number = this.node.children.length;
         let rowCount: number = 0;
@@ -66,7 +66,7 @@ export class NodeCompTableRowLayout extends Div {
                 else {
                     lastNode = n;
                     if (n.children && !inVerticalSpace) {
-                        comps.push(new Div(null, { className: "vertical-space" }));
+                        comps.push(new Div(null, { className: "verticalSpace" }));
                     }
                     const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, false);
                     inVerticalSpace = false;
@@ -78,12 +78,12 @@ export class NodeCompTableRowLayout extends Div {
                 // This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-                    comps.push(new Div(null, { className: "vertical-space" }));
+                    comps.push(new Div(null, { className: "verticalSpace" }));
                     inVerticalSpace = true;
                 }
 
                 const curCol = new Div(null, {
-                    className: "node-grid-cell",
+                    className: "nodeGridCell",
                     style: {
                         width: cellWidth + "%",
                         maxWidth: cellWidth + "%"

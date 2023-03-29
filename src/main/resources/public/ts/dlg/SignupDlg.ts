@@ -34,7 +34,7 @@ export class SignupDlg extends DialogBase {
     captchaState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor(private adminCreatingUser: boolean = false) {
-        super("Create Account", "app-modal-content-medium-width");
+        super("Create Account", "appModalContMediumWidth");
         this.validatedStates = [this.userNameState, this.passwordState, this.emailState, this.captchaState];
     }
 

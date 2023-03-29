@@ -5,7 +5,7 @@ import { MenuPanel } from "../MenuPanel";
 export class MainMenuDlg extends DialogBase {
 
     constructor() {
-        super(null, "app-modal-menu", true, DialogMode.POPUP, true);
+        super(null, "appModalMenu", true, DialogMode.POPUP, true);
     }
 
     renderDlg(): CompIntf[] {

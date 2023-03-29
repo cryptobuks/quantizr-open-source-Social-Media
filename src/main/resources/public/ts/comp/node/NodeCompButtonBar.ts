@@ -166,7 +166,7 @@ export class NodeCompButtonBar extends Div {
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
                     if (this.node.logicalOrdinal > 0) {
                         moveNodeUpIcon = new Icon({
-                            className: "fa fa-lg fa-arrow-up buttonBarIcon",
+                            className: "fa fa-lg fa-arrowUp buttonBarIcon",
                             title: "Move Node Up",
                             [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeUp
@@ -175,7 +175,7 @@ export class NodeCompButtonBar extends Div {
 
                     if (!this.node.lastChild && ast.node.children && ast.node.children.length > 1) {
                         moveNodeDownIcon = new Icon({
-                            className: "fa fa-lg fa-arrow-down buttonBarIcon",
+                            className: "fa fa-lg fa-arrowDown buttonBarIcon",
                             title: "Move Node Down",
                             [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeDown

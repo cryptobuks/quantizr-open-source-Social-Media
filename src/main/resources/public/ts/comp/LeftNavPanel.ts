@@ -69,7 +69,7 @@ export class LeftNavPanel extends Div {
                     onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
                 }) : null,
-                // todo-2: need to add a similar message over to the 'logo-text' that's active for mobile
+                // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                 // which is in a different class.
                 new Span(null, { className: "float-end" }, [
                     messages ? new Span(messages, {

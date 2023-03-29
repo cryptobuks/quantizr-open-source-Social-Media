@@ -5,6 +5,6 @@ export class Markdown extends Html {
 
     constructor(text: string) {
         super(S.util.markdown(text));
-        this.attribs.className = "markdown-content";
+        this.attribs.className = "mkCont";
     }
 }

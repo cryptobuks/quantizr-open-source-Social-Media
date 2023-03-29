@@ -22,7 +22,6 @@
     padding: 0px 4px 0px 4px;
     white-space: nowrap;
     display: inline-block;
-
 }
 
 .treeFriendImage {
@@ -30,18 +29,12 @@
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 0px 10px;
-
 }
 
 .commentMarkdownClass {
     border: 2px solid darkkhaki;
     margin: 8px;
-
     background-color: #17202A;
-}
-
-.row-toolbar {
-    margin-left: 16px;
 }
 
 .downloadLink {
@@ -64,7 +57,7 @@
     padding-bottom: $smallGap;
 }
 
-.img-in-row {
+.imgInRow {
     cursor: pointer;
     vertical-align: top;
     border-radius: $border-radius;
@@ -76,7 +69,6 @@
 
 .attachmentLinksPanel {
     border: 1px solid $nodeBorderBottomColor;
-
     padding-left: $smallGap;
     padding-right: $smallGap;
     margin-bottom: $smallGap;
@@ -86,42 +78,40 @@
     padding: 3px 6px 3px 6px;
     margin-right: 10px;
     margin-left: $microGap;
-    // margin-bottom: 8px;
-
     border: 1px solid gray;
     display: inline-block;
 }
 
-.created-by-me {
+.createdByMe {
     @extend .created-by;
     background: $createdByMeBackgroundColor;
     color: $createdByMeTextColor;
 }
 
-.created-by-me:first-child {
-    margin-left: 0px;
+.createdByMe:first-child {
+    margin-left: 0;
 }
 
-.boosted-by {
+.boostedBy {
     display: inline-block;
     padding: 3px 6px 3px 6px;
     border: 1px solid gray;
     margin: 0 $tinyGap $tinyGap $smallGap;
 }
 
-.boosted-by-me {
-    @extend .boosted-by;
+.boostedByMe {
+    @extend .boostedBy;
     background: $createdByMeBackgroundColor;
     color: $createdByMeTextColor;
 }
 
-.boosted-by-other {
-    @extend .boosted-by;
+.boostedByOther {
+    @extend .boostedBy;
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
 }
 
-.boosted-by-onfeed {
+.boostedByOnFeed {
     display: inline-block;
     padding: 3px 10px 3px 10px;
     border: 1px solid gray;
@@ -129,80 +119,60 @@
     margin: 0 $tinyGap 0 $smallGap;
 }
 
-.boosted-by-me-onfeed {
-    @extend .boosted-by-onfeed;
+.boostedByMeOnFeed {
+    @extend .boostedByOnFeed;
     background: $createdByMeBackgroundColor;
     color: $createdByMeTextColor;
 }
 
-.boosted-by-other-onfeed {
-    @extend .boosted-by-onfeed;
+.boostedByOtherOnFeed {
+    @extend .boostedByOnFeed;
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
 }
 
-.transfer-pending {
+.transferPending {
     @extend .created-by;
     background: darkkhaki;
     color: black;
 }
 
-.transfer-pending:first-child {
-    margin-left: 0px;
+.transferPending:first-child {
+    margin-left: 0;
 }
 
-.created-by-other {
+.createdByOther {
     @extend .created-by;
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
 }
 
-.created-by-other:first-child {
-    margin-left: 0px;
+.createdByOther:first-child {
+    margin-left: 0;
 }
 
-.reply-indicator {
-    padding: 6px;
-    margin-right: 8px;
-    margin-left: 6px;
-
-    background: $createdByAnotherBackgroundColor;
-    color: $createdByAnotherTextColor;
-}
-
-.row-header-icon {
+.rowHeaderIcon {
     margin-right: 16px;
     cursor: pointer;
     vertical-align: middle;
 }
 
 .row-header {
-    // font-size: small;
     margin-left: $smallGap;
-
-    // warning: don't be tempted again to make this less than 2em!
-    min-height: 2rem;
+    min-height: 2rem; // warning: don't make this less than 2em!
     margin-bottom: $tinyGap;
 }
 
-.row-header-compact {
+.rowHeaderEdit {
     margin-left: $smallGap;
-    margin-right: $smallGap;
-}
-
-.row-header-edit {
-    margin-left: $smallGap;
-
-    // warning: don't be tempted again to make this less than 2em!
-    min-height: 2rem;
-
+    min-height: 2rem; // warning: don't make this less than 2em!
     border: 1px solid gray;
     background-color: darken($secondary, 10%);
-    padding: 4px;
+    padding: 4px 4px 4px 12px;
     margin-bottom: $tinyGap;
 }
 
-.row-footer {
+.rowFooter {
     font-size: small;
     cursor: pointer;
 }
@@ -211,15 +181,14 @@
     padding: 6px;
     margin-right: 10px;
     cursor: pointer;
-
 }
 
-.node-table-row {
+.nodeTableRow {
     position: relative;
     padding-top: $tinyGap;
 }
 
-.node-table-row-edit {
+.nodeTableRowEdit {
     position: relative;
 }
 
@@ -228,79 +197,75 @@
     border-bottom: 1px dotted $nodeBorderBottomColor;
 }
 
-.row-border-inline-children {
+.rowBorderInlineChildren {
     /* If no border is defined here then borders only show up during edit or metadata display modes */
     border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
-.row-border-edit {
+.rowBorderEdit {
     border-bottom: 1px solid $nodeBorderBottomColor;
     padding-top: 4px;
 }
 
-.row-border-edit-info-boost {
+.rowBorderEditInfoBoost {
     border-top: 1px solid $nodeBorderBottomColor;
     margin-bottom: $smallGap;
 }
 
-.row-border-edit-info {
-    // border-bottom: 1px solid $nodeBorderBottomColor;
+.rowBorderEditInfo {
 }
 
 /*
-With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
+With "Display: table", the only way to get the internal 'nodeGridItem' cell content to render with the SAME
 height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 
 and the table-cell (all three)
 
 update: oops, that 100% is causing vertical scrollbar to ALWAYS show up because something's off by a few pixels, so
 i'm backing out for now
 */
-.node-grid-table {
+.nodeGridTable {
     display: table;
     width: 100%;
     table-layout: fixed;
-    // remove border-collapse for round borders
-    // border-collapse: collapse;
     border-spacing: 8px;
 }
 
-.node-grid-item {
+.nodeGridItem {
     height: 100%;
     width: 100%;
     padding-right: 12px;
 }
 
-.node-grid-row {
+.nodeGridRow {
     display: table-row;
 }
 
-.node-grid-cell {
+.nodeGridCell {
     border: 1px solid $nodeBorderBottomColor;
     display: table-cell;
     overflow: hidden;
     vertical-align: top;
 }
 
-.node-table-row .top-right-image {
+.nodeTableRow .top-right-image {
     position: absolute;
     top: 0;
     right: 0;
 }
 
-.active-row {
+.activeRow {
     border-left: $highlightBorderSize solid $primary;
 }
 
-.boost-row {
+.boostRow {
     border: 1px solid gray;
-
     margin: 4px 12px 4px 12px;
     padding: $smallGap $smallGap $tinyGap 0;
     background-color: #17202A;
     cursor: pointer;
 }
 
-.boost-row-onfeed {
+.boostRowOnFeed {
     border: 1px solid gray;
     border-radius: 0px 6px 6px 6px;
     margin: -1px 12px 4px 12px;
@@ -310,39 +275,39 @@ i'm backing out for now
     cursor: pointer;
 }
 
-.active-row:hover {
+.activeRow:hover {
     // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
     // see other places with a lighten function on a ":hover"
     // background-color: lighten($body-bg, $lightenRowFactor);
 }
 
-.inactive-row {
+.inactiveRow {
     border-left: $highlightBorderSize solid transparent;
 }
 
-.inactive-row:hover {
+.inactiveRow:hover {
     // background-color: lighten($body-bg, $lightenRowFactor);
 }
 
-.active-row-main {
+.activeRowMain {
     border-left: $highlightBorderSize solid $primary;
     border-bottom: $highlightBorderSize solid $primary;
     padding-top: 8px;
     margin-bottom: 5px;
 }
 
-.active-row-main:hover {
+.activeRowMain:hover {
     // background-color: lighten($body-bg, $lightenRowFactor);
 }
 
-.inactive-row-main {
+.inactiveRowMain {
     border-left: $highlightBorderSize solid transparent;
     border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
     padding-top: 8px;
     margin-bottom: 5px;
 }
 
-.inactive-row-main:hover {
+.inactiveRowMain:hover {
     // background-color: lighten($body-bg, $lightenRowFactor);
 }
 
@@ -415,7 +380,6 @@ i'm backing out for now
     margin-right: $smallGap;
     padding: 4px;
     border: 1px solid gray;
-
     background-color: $primary;
 }
 
@@ -431,7 +395,7 @@ i'm backing out for now
 }
 
 .sharingName:first-child {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .sharingNamePublic {
@@ -442,5 +406,5 @@ i'm backing out for now
 }
 
 .sharingName:first-child {
-    margin-left: 0px;
+    margin-left: 0;
 }

@@ -107,7 +107,7 @@ export class TTSView extends AppTab<any, TTSView> {
         let paraComps: CompIntf[];
         if (S.speech.queuedSpeech?.length > 0) {
             paraComps = [];
-            let curDiv = new Div(null, { className: "tts-paragraph" });
+            let curDiv = new Div(null, { className: "ttsPara" });
 
             let idx = 0;
             // scan each utterance
@@ -117,7 +117,7 @@ export class TTSView extends AppTab<any, TTSView> {
                     if (curDiv.hasChildren()) {
                         paraComps.push(curDiv);
                     }
-                    curDiv = new Div(null, { className: "tts-paragraph" });
+                    curDiv = new Div(null, { className: "ttsPara" });
                 }
                 else {
                     const utterTrim = utter.trim();
@@ -125,8 +125,8 @@ export class TTSView extends AppTab<any, TTSView> {
                     curDiv.addChild(new Span(utter + "  ", {
                         onClick: this.spanClick, // <--- special function KNOWS how to work with no args
                         id: "tts" + idx,
-                        className: "tts-span" + (S.speech.ttsHighlightIdx === idx ? " tts-hlt" : "") +
-                            (isQuote ? " tts-quote" : "")
+                        className: "ttsSpan" + (S.speech.ttsHighlightIdx === idx ? " ttsHlt" : "") +
+                            (isQuote ? " ttsQuote" : "")
                     }));
                 }
                 idx++;
@@ -161,8 +161,8 @@ export class TTSView extends AppTab<any, TTSView> {
                 rows: 3
             }, TTSView.textAreaState) : null,
             paraComps?.length > 0
-                ? new Div(null, { className: "speech-text-area" }, [
-                    new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),
+                ? new Div(null, { className: "speechTxtArea" }, [
+                    new Heading(4, heading, { className: "speechAreaTitle alert alert-primary" }),
                     ...paraComps
                 ]) : null
         ]);

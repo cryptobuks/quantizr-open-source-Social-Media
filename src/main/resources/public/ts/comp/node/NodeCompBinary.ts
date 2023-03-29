@@ -42,7 +42,7 @@ export class NodeCompBinary extends Div {
             size = ast.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            // same as 'img-in-editor' class width
+            // same as 'imgInEditor' class width
             style.width = "75px";
         }
         else {
@@ -74,7 +74,7 @@ export class NodeCompBinary extends Div {
         }
 
         const imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
-        const className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
+        const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow")
         const imgAttrs: any = {
             src,
             className,

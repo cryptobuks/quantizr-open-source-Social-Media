@@ -30,7 +30,7 @@ export class HistoryPanel extends Div {
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean) => ast.nodeHistoryLocked = checked,
                 getValue: (): boolean => ast.nodeHistoryLocked
-            }, "form-switch form-check-inline-nomargin")
+            }, "form-switch formCheckInlineNoMargin")
         ]));
 
         ast.nodeHistory.forEach(h => {

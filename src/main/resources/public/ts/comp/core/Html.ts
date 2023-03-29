@@ -64,8 +64,8 @@ export class Html extends Comp {
         // make all "a" tags inside this div to have a target=_blank
         elm.querySelectorAll("a").forEach(e => e.setAttribute("target", "_blank"));
 
-        // adds the click handler function to all .enlargable-img images
-        elm.querySelectorAll(".enlargable-img").forEach(e => {
+        // adds the click handler function to all .enlargableImg images
+        elm.querySelectorAll(".enlargableImg").forEach(e => {
             e.addEventListener("click", (evt: MouseEvent) => {
                 NodeCompBinary.clickOnImage(e.getAttribute("data-nodeid"), e.getAttribute("data-attkey"), false, false);
             });

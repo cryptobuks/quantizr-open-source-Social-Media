@@ -15,7 +15,7 @@ export class EditBlockedWordsDlg extends DialogBase {
     textScrollPos = new ScrollPos();
 
     constructor() {
-        super("Blocked Words", "app-modal-content-medium-width");
+        super("Blocked Words", "appModalContMediumWidth");
     }
 
     renderDlg(): CompIntf[] {

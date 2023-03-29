@@ -51,7 +51,7 @@ export class ServerPush {
             new MessageDlg("Your session has ended due to inactivity." + message, S.quanta.configRes.brandingAppName,
                 () => {
                     history.go(0);
-                }, null, false, 0, "app-modal-content-tiny-width"
+                }, null, false, 0, "appModalContTinyWidth"
             ).open();
         });
 

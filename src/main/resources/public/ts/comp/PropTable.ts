@@ -9,7 +9,7 @@ export class PropTable extends Comp {
 
     constructor(private node: J.NodeInfo) {
         super({
-            className: "property-table"
+            className: "propertyTable"
         });
     }
 
@@ -27,13 +27,13 @@ export class PropTable extends Comp {
                 if (S.props.isGuiControlBasedProp(prop) || S.props.isHiddenProp(prop)) return;
                 const ptr = new PropTableRow({
                     title: "Property: " + prop.name + (comment ? ("\n\n" + comment) : ""),
-                    className: "prop-table-row"
+                    className: "propTableRow"
                 }, [
                     new PropTableCell(label, {
-                        className: "prop-table-name-col"
+                        className: "propTableNameCol"
                     }),
                     new PropTableCell(displayVal, {
-                        className: "prop-table-val-col"
+                        className: "propTableValCol"
                     })
                 ]);
                 ptr.ordinal = propConfig?.ord || 200;

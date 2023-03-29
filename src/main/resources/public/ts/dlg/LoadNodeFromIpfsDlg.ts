@@ -16,7 +16,7 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
     ]);
 
     constructor() {
-        super("Load from IPFS", "app-modal-content-narrow-width");
+        super("Load from IPFS", "appModalContNarrowWidth");
         this.validatedStates = [this.ipfsPathState];
     }
 

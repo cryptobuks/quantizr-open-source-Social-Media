@@ -396,11 +396,11 @@ export class Util {
     }
 
     flashMessage = (message: string, title: string, preformatted: boolean = false) => {
-        new MessageDlg(message, title, null, null, preformatted, 3000, "app-modal-content-narrow-width").open();
+        new MessageDlg(message, title, null, null, preformatted, 3000, "appModalContNarrowWidth").open();
     }
 
     flashMessageQuick = (message: string, title: string, preformatted: boolean = false) => {
-        new MessageDlg(message, title, null, null, preformatted, 2000, "app-modal-content-narrow-width").open();
+        new MessageDlg(message, title, null, null, preformatted, 2000, "appModalContNarrowWidth").open();
     }
 
     showMessage = (message: string, title: string = null, preformatted: boolean = false): Promise<DialogBase> => {

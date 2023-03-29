@@ -3,8 +3,8 @@
     //we need zero margin and padding here so that the border area around the list item
     //when clicked on by the user (in a selectable list), looks good. That is the border should
     //maximally surround the list row and any padding margins contained in that list row. 
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     background-color: #17202A;
 
     &:not(:last-child) {

@@ -22,7 +22,7 @@ export class SearchUsersDlg extends DialogBase {
     searchTextState: Validator = new Validator();
 
     constructor() {
-        super("Search Users", "app-modal-content-medium-width");
+        super("Search Users", "appModalContMediumWidth");
         this.onMount(() => this.searchTextField?.focus());
 
         this.mergeState<LS>({

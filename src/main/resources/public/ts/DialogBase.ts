@@ -165,7 +165,7 @@ export abstract class DialogBase extends Comp {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+            new Div(null, { className: "dlgModalTitleCloseIcon float-end" }, [
                 new Icon({
                     className: "fa fa-times",
                     onClick: () => {
@@ -183,21 +183,21 @@ export abstract class DialogBase extends Comp {
         // this 'closeByOutsideClick' and a other uses of that variable in here also really need to be
         // 'isMenu' instead.
         if (this.mode === DialogMode.POPUP && !this.closeByOutsideClick) {
-            extraTitleClass = (isTopmost ? " dlg-title-topmost" : "dlg-title-normal");
-            contentAreaClass = "app-modal-content-area-popup" + (isTopmost ? " dlg-content-border-topmost" : " dlg-content-border-normal");
+            extraTitleClass = (isTopmost ? " dlgTitleTopmost" : "dlgTitleNormal");
+            contentAreaClass = "appModalContentAreaPopup" + (isTopmost ? " dlgContentBorderTopmost" : " dlgContentBorderNormal");
         }
         else {
-            contentAreaClass = "app-modal-content-area-embed";
+            contentAreaClass = "appModalContentAreaEmbed";
         }
 
         this.setChildren([
             // todo-1: it's tricky but 'closeByOutsideClick' means this is a "menu", so, no title.
             this.title && !this.closeByOutsideClick ? (this.titleDiv = new Div(null, {
-                className: (this.mode === DialogMode.POPUP ? "app-modal-title-popup " : "app-modal-title-normal ") +
+                className: (this.mode === DialogMode.POPUP ? "appModalTitlePopup " : "appModalTitleNormal ") +
                     extraTitleClass
             },
                 [
-                    new Div(null, { className: "dlg-title-content" }, titleChildren),
+                    new Div(null, { className: "dlgTitleContent" }, titleChildren),
                     this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
                 ]
             )) : null,
@@ -211,13 +211,13 @@ export abstract class DialogBase extends Comp {
             ret = this.tag("div");
         }
         else if (this.mode === DialogMode.FULLSCREEN) {
-            this.attribs.className = "app-modal-content-fullscreen";
+            this.attribs.className = "appModalContFullscreen";
             ret = this.tag("div", { style: { zIndex: this.zIndex } });
         }
         else {
             const clazzName = ast.mobileMode
-                ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
-                : (this.overrideClass ? this.overrideClass : "app-modal-content");
+                ? (this.closeByOutsideClick ? "appModalMainMenu" : "appModalContFullscreen")
+                : (this.overrideClass ? this.overrideClass : "appModalCont");
 
             // if fullscreen we render without backdrop
             if (this.mode !== DialogMode.POPUP) {
@@ -229,7 +229,7 @@ export abstract class DialogBase extends Comp {
                 const style: any = { zIndex: this.zIndex };
                 ret = this.tag("div", {
                     id: this.getId(DialogBase.BACKDROP_PREFIX),
-                    className: (isTopmost ? "app-modal-top-backdrop " : "app-modal-backdrop ") + "customScrollbar",
+                    className: (isTopmost ? "appModalTopBackdrop " : "appModalBackdrop ") + "customScrollbar",
                     style,
                     onClick: (evt: Event) => {
                         if (this.closeByOutsideClick) {
@@ -281,13 +281,13 @@ export abstract class DialogBase extends Comp {
     genInitWidth = (): number => {
         let width = 800;
         if (this.overrideClass) {
-            if (this.overrideClass.indexOf("app-modal-content-tiny-width") !== -1) {
+            if (this.overrideClass.indexOf("appModalContTinyWidth") !== -1) {
                 width = 350;
             }
-            else if (this.overrideClass.indexOf("app-modal-content-narrow-width") !== -1) {
+            else if (this.overrideClass.indexOf("appModalContNarrowWidth") !== -1) {
                 width = 500;
             }
-            else if (this.overrideClass.indexOf("app-modal-content-medium-width") !== -1) {
+            else if (this.overrideClass.indexOf("appModalContMediumWidth") !== -1) {
                 width = 650;
             }
         }

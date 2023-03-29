@@ -5,7 +5,7 @@ export class VerticalLayout extends Div {
 
     constructor(children: Comp[] = null, justify: string = "left-justified") {
         super();
-        this.attribs.className = "vertical " + justify + " layout vertical-layout-row";
+        this.attribs.className = "vertical " + justify + " layout vertLayoutRow";
 
         if (children) {
             children = children.map(child => {

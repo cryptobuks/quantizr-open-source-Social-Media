@@ -22,7 +22,7 @@ export class EditPropertyDlg extends DialogBase {
     nameState: Validator = new Validator("");
 
     constructor(private editNode: J.NodeInfo) {
-        super("Add Property", "app-modal-content-medium-width");
+        super("Add Property", "appModalContMediumWidth");
         this.validatedStates = [this.nameState];
         const type = S.plugin.getType(this.editNode.type);
         if (type) {

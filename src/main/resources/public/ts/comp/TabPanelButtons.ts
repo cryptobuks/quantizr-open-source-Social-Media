@@ -19,7 +19,7 @@ export class TabPanelButtons extends Div {
     preRender(): void {
         this.setChildren([
             new Div(null, {
-                className: "tab-buttons-container"
+                className: "tabButtonsContainer"
             }, [
                 new Ul(null, {
                     className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,

@@ -33,13 +33,13 @@ export class TabPanel extends Div {
         if (!ast.tabPanelVisible) {
             // not sure why, but this had no effect, we're ok without it, but
             // would be nicer if we could hide the comp during preparing final scrolling.
-            this.attribs.className += " comp-hidden";
+            this.attribs.className += " compHidden";
         }
 
         this.setChildren([
             this.customTopComp,
             new Div(null, {
-                className: "row tab-content",
+                className: "row tabContent",
                 role: "main",
                 id: "tabPanelContentId"
             }, this.buildTabs())

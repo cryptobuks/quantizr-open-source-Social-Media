@@ -30,11 +30,11 @@ export class NodeCompMarkdown extends Html {
         this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
 
         if (!getAs().mobileMode) {
-            const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
-            this.attribs.className = "markdown-content " + widthStyle;
+            const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "contentWide" : "contentNarrow";
+            this.attribs.className = "mkCont " + widthStyle;
         }
         else {
-            this.attribs.className = "markdown-content";
+            this.attribs.className = "mkCont";
         }
 
         if (extraContainerClass) {

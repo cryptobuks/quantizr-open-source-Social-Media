@@ -26,7 +26,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         }
         this.textareaAttribs = {
             ...this.textareaAttribs, ...{
-                className: "form-control pre-textarea " + moreClasses
+                className: "form-control preTextarea " + moreClasses
             }
         };
 

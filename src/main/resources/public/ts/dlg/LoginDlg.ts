@@ -18,7 +18,7 @@ export class LoginDlg extends DialogBase {
     pwdState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
-        super("Login", "app-modal-content-narrow-width");
+        super("Login", "appModalContNarrowWidth");
         this.validatedStates = [this.userState, this.pwdState];
     }
 

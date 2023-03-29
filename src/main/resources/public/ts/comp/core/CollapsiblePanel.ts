@@ -33,7 +33,7 @@ export class CollapsiblePanel extends Comp {
 
     compRender = (): ReactNode => {
         const state = this.getState<LS>();
-        const style = this.textLink ? "collapse-panel-link" : "btn btn-primary ";
+        const style = this.textLink ? "collapsePanelLink" : "btn btn-primary ";
         const collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
@@ -48,7 +48,7 @@ export class CollapsiblePanel extends Comp {
                 }, [
                     // This span is the expande/collapse button itself
                     new Span(this.expandedButtonText === "n/a" ? null : (this.expandedButtonText + "   "), {
-                        className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
+                        className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
                         // Warning: This can't be camel case!
                         "data-bs-toggle": collapseClass,
                         onClick: this.onToggle
@@ -63,7 +63,7 @@ export class CollapsiblePanel extends Comp {
             }, [
                 // This span is the expande/collapse button itself
                 new Span(this.collapsedButtonText === "n/a" ? null : (this.collapsedButtonText + "   "), {
-                    className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
+                    className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
                     // Warning: This can't be camel case!
                     "data-bs-toggle": collapseClass,
                     onClick: this.onToggle

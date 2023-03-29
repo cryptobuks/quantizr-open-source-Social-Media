@@ -40,7 +40,7 @@ export class PickNodeTypeDlg extends DialogBase {
     }, 500);
 
     constructor(curType: string) {
-        super("Choose Type", "app-modal-content-narrow-width");
+        super("Choose Type", "appModalContNarrowWidth");
         PickNodeTypeDlg.inst = this;
 
         this.valIntf = {

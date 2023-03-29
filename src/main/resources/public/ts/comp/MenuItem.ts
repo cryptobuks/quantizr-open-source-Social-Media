@@ -36,7 +36,7 @@ export class MenuItem extends Div {
             ...enablement,
             ...{
                 style: { display: (state.visible ? "" : "none") },
-                className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent" +
+                className: "listGroupMenuItem list-group-item-action " + enablementClass + "  listGroupTransparent" +
                     (getAs().mobileMode ? " mobileMenuText" : ""),
                 onClick: this.onClick
             }

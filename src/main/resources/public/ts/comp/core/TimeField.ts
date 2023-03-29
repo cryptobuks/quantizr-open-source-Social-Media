@@ -29,7 +29,7 @@ export class TimeField extends Div implements I.ValueIntf {
                 className: this.extraClass + " timeField"
             }, [
                 this.input = new Input({
-                    className: "form-control pre-textfield",
+                    className: "form-control preTextField",
                     type: "time"
                 }, this.valState.v)
             ])

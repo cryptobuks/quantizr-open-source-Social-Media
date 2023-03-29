@@ -17,20 +17,19 @@
     margin-right: $smallGap;
 }
 
-.feed-node {
+.feedNode {
     position: relative;
     cursor: pointer;
 }
 
-.inactive-feed-row {
+.inactiveFeedRow {
     border-left: 2px solid $nodeBorderBottomColor;
-    // margin-left: 25px;
 }
 
-.inactive-feed-row-parent {
+.inactiveFeedRowParent {
     border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
-.feed-boost {
+.feedBoost {
     margin-right: 14px;
 }

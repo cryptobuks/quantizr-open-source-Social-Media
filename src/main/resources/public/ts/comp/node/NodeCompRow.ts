@@ -94,7 +94,7 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData ? "node-table-row-edit" : "node-table-row");
+        let layoutClass = this.isTableCell ? "nodeGridItem" : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData ? "nodeTableRowEdit" : "nodeTableRow");
         layoutClass += " " + this.tabData.id;
 
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
@@ -118,14 +118,14 @@ export class NodeCompRow extends Div {
         else {
             // special class if BOTH edit and info is on
             if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
-                layoutClass += this.node.boostedNode ? " row-border-edit-info-boost" : " row-border-edit-info";
+                layoutClass += this.node.boostedNode ? " rowBorderEditInfoBoost" : " rowBorderEditInfo";
             }
             // else if either is on
             else if (ast.userPrefs.editMode || ast.userPrefs.showMetaData) {
-                layoutClass += " row-border-edit";
+                layoutClass += " rowBorderEdit";
             }
             else if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
-                layoutClass += " row-border-inline-children";
+                layoutClass += " rowBorderInlineChildren";
             }
             else {
                 layoutClass += " row-border";
@@ -137,10 +137,10 @@ export class NodeCompRow extends Div {
         const selected: boolean = (focusNode && focusNode.id === this.node.id);
 
         if (this.isLinkedNode) {
-            this.attribs.className = "boost-row";
+            this.attribs.className = "boostRow";
         }
         else {
-            this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
+            this.attribs.className = (layoutClass || "") + (selected ? " activeRow" : " inactiveRow");
             const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
             this.attribs.style = style;
         }
@@ -165,7 +165,7 @@ export class NodeCompRow extends Div {
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
-                jumpButton = new IconButton("fa-arrow-right", null, {
+                jumpButton = new IconButton("fa-arrowRight", null, {
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to the Node"
                 }, "btn-secondary float-end");

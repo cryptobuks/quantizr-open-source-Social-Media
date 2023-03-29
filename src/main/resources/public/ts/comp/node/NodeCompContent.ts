@@ -179,7 +179,7 @@ export class NodeCompContent extends Div {
         // eventually use this just for plain (non-markdown) editing in the future in some
         // future use case.
         //
-        // elm.querySelectorAll(".markdown-content").forEach((e: Element) => {
+        // elm.querySelectorAll(".mkCont").forEach((e: Element) => {
         //     if (!this.node?.content) return;
         //     // let text = e.textContent;
         //     let text = "";

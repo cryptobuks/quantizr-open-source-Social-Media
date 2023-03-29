@@ -28,7 +28,7 @@ export class DateField extends Div implements I.ValueIntf {
                 className: "dateField"
             }, [
                 this.input = new Input({
-                    className: "form-control pre-textfield",
+                    className: "form-control preTextField",
                     type: "date"
                 }, this.valState.v)
             ])

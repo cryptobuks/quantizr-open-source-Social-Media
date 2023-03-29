@@ -605,7 +605,7 @@ export class Search {
         }
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
-        let clazz = isFeed ? "feed-node" : "results-node";
+        let clazz = isFeed ? "feedNode" : "resultsNode";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
@@ -614,11 +614,11 @@ export class Search {
         }
 
         if (isParent) {
-            clazz += " inactive-feed-row-parent";
+            clazz += " inactiveFeedRowParent";
         }
         else {
             if (parentItem) {
-                clazz += " inactive-feed-row";
+                clazz += " inactiveFeedRow";
             }
         }
 
@@ -626,7 +626,7 @@ export class Search {
 
         let boostComp: Div = null;
         if (node.boostedNode) {
-            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
+            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
 
             let allowBoostFooter = isFeed;
             if (isFeed) {
@@ -639,7 +639,7 @@ export class Search {
                     // after updating state we need this to ensure this click also focused this window.
                     S.domUtil.focusId(tabData.id);
                 },
-                className: "boost-row-onfeed"
+                className: "boostRowOnFeed"
             }, [
                 allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
@@ -655,13 +655,13 @@ export class Search {
         // if (node.linkedNodes) {
         //     // all the styles etc in here need to be changed from boost to nodeLinks
         //     node.linkedNodes.forEach(n => {
-        //         const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
+        //         const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
 
         //         let allowFooter = isFeed;
         //         if (isFeed) {
         //             allowFooter = ast.showAllRowDetails.has(n.id);
         //         }
-        //         linkedNodesComp = new Div(null, { className: "boost-row" }, [
+        //         linkedNodesComp = new Div(null, { className: "boostRow" }, [
         //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
         //             linkContent,
         //             allowFooter ? new NodeCompRowFooter(n) : null,

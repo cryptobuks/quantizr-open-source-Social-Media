@@ -14,7 +14,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
     ]);
 
     constructor() {
-        super("Node Link Name", "app-modal-content-narrow-width");
+        super("Node Link Name", "appModalContNarrowWidth");
         this.validatedStates = [this.nameState];
     }
 

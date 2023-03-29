@@ -369,7 +369,7 @@ export class SpeechEngine {
     removeHighlight = () => {
         if (this.ttsHighlightIdx !== -1) {
             const lastElm = document.getElementById("tts" + this.ttsHighlightIdx);
-            lastElm?.classList.remove("tts-hlt");
+            lastElm?.classList.remove("ttsHlt");
             this.ttsHighlightIdx = -1; // keep this consistent just for best practice
         }
     }
@@ -380,7 +380,7 @@ export class SpeechEngine {
 
         const elm = document.getElementById("tts" + idx);
         if (elm) {
-            elm.classList.add("tts-hlt");
+            elm.classList.add("ttsHlt");
         }
         this.ttsHighlightIdx = idx;
     }

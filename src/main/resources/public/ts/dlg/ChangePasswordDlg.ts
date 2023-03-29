@@ -19,7 +19,7 @@ export class ChangePasswordDlg extends DialogBase {
     ]);
 
     constructor(private passCode: string) {
-        super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width");
+        super(passCode ? "Password Reset" : "Change Password", "appModalContNarrowWidth");
         this.onMount(() => this.passwordField?.focus());
         this.validatedStates = [this.pwdState];
     }

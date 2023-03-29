@@ -23,7 +23,7 @@ export class TransferNodeDlg extends DialogBase {
     fromUserState: Validator = new Validator();
 
     constructor(private operation: string) {
-        super(TransferNodeDlg.operationName(operation) + " Nodes", "app-modal-content-narrow-width");
+        super(TransferNodeDlg.operationName(operation) + " Nodes", "appModalContNarrowWidth");
         this.mergeState<LS>({ recursive: false });
 
         if (operation === "transfer") {

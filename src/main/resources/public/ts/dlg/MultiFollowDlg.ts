@@ -15,7 +15,7 @@ export class MultiFollowDlg extends DialogBase {
     textScrollPos = new ScrollPos();
 
     constructor() {
-        super("Follow Multiple Accounts", "app-modal-content-medium-width");
+        super("Follow Multiple Accounts", "appModalContMediumWidth");
         this.validatedStates = [this.userNamesState];
     }
 

@@ -17,7 +17,6 @@ $baseBgColor: black; // rgb(32, 34, 36);
 $body-bg: black; // darken($baseBgColor, 7%);
 $body-color: white;
 $font-size-base: 1rem !default;
-// $fontSize: 120%;
 
 $disabled-body-color: gray; //darken($body-color, 90%);
 
@@ -33,11 +32,12 @@ $form-select-indicator-color: lightGray;
 // Removed custom fonts, because I need emojis to look good
 $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 
-//This does work (border around focused edit fields) but we don't need it.
-// .form-control:focus {
-//     border-color: green;
-//     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
-// }
+// This does work (border around focused edit fields) but we don't need it.
+/*
+.form-control:focus {
+    border-color: green;
+}
+*/
 
 @import "click-effect.scss";
 
@@ -47,32 +47,24 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
-$dlgBorderColor: var(--bs-green); // silver
+$dlgBorderColor: var(--bs-green);
 $dlgBorderWidth: 2px;
-
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
-
 $createdByAnotherBackgroundColor: $gray-700;
 $createdByAnotherTextColor: white;
-
 $listBackgroundColor: lightGray;
-
 $smallGap: 12px;
 $mediumGap: 18px;
 $bigGap: 24px;
 $tinyGap: 8px;
 $microGap: 4px;
-
 $smallerFont: 80%;
-
 $lightenRowFactor: 5;
-
 $fatBorderSize: 8px;
 $mediumBorderSize: 6px;
 $highlightBorderSize: 8px;
 $smallBorderSize: 3px;
-
 $mobileHeaderHeight: 3.5rem;
 
 @font-face {
@@ -99,6 +91,12 @@ $mobileHeaderHeight: 3.5rem;
 
 body {
     font-family: "QuantaCustomFont" !important;
+}
+
+#app {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 .mention {
@@ -132,14 +130,14 @@ body {
     word-wrap: break-word;
 }
 
-.markdown-content table,
+.mkCont table,
 th,
 td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;
 }
 
-.markdown-content th,
+.mkCont th,
 td {
     padding: $tinyGap;
 }
@@ -152,8 +150,8 @@ td {
 .mobileHeaderBar {
     padding: 10px;
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 100%;
     background-color: $nodeBorderBottomColor;
     border-bottom: 1px solid gray;
@@ -176,7 +174,6 @@ td {
     padding-top: $smallGap;
     padding-left: $smallGap;
     padding-right: $smallGap;
-
 }
 
 .mainAppRow {
@@ -218,7 +215,6 @@ td {
     margin-left: $smallGap;
     max-height: 600px;
     overflow-y: auto;
-
     border: 2px solid olivedrab;
     margin-top: 12px;
     padding: 8px;
@@ -249,7 +245,6 @@ td {
     margin-bottom: $smallGap;
     max-height: 200px;
     overflow-y: auto;
-
     background-color: $baseBgColor;
 }
 
@@ -261,7 +256,7 @@ td {
     padding: 12px;
 }
 
-.speech-text-area {
+.speechTxtArea {
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 24px;
     margin-top: $smallGap;
@@ -272,43 +267,36 @@ td {
 
 .stickySpeechButtons {
     position: sticky;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     z-index: 15000001;
     background: $primary;
     border: 2px solid $nodeBorderBottomColor;
-
     padding: 6px 12px 6px 12px;
 }
 
-.speech-area-title {
+.speechAreaTitle {
     margin-bottom: 10px;
     padding: 6px 6px 6px 12px;
     border: 1px solid $nodeBorderBottomColor;
 }
 
-.tts-paragraph {
+.ttsPara {
     margin-top: 16px;
 }
 
-.tts-span {
+.ttsSpan {
     font-size: large;
     padding-top: 4px;
     padding-bottom: 4px;
     cursor: pointer;
 }
 
-.tts-quote {
+.ttsQuote {
     color: var(--bs-green);
 }
 
-// Spend 45mins trying to make this work. Nothing shows up. I'm giving up for now. Not worth the effort. This \
-// idea was really just to help people realize they can click anyway.
-// .tss-span:hover {
-//     border: 1px dotted gray !important;
-// }
-
-.tts-hlt {
+.ttsHlt {
     background: blue;
     color: yellow;
 }
@@ -326,8 +314,6 @@ td {
 }
 
 .d3Graph {
-    // margin: 2em;
-    // border: 1px solid gray;
 }
 
 .popupNodeLinks {
@@ -337,13 +323,12 @@ td {
 .graphPopup {
     background-color: $modal-content-bg;
     border: 2px solid gray;
-
     max-width: 30%;
     margin: $smallGap !important;
     padding: $smallGap !important;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
 }
 
 .d3PieChart {
@@ -358,7 +343,7 @@ td {
 }
 
 // for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
-.comp-hidden {
+.compHidden {
     opacity: 0;
 }
 
@@ -374,38 +359,22 @@ a:visited {
     color: #00bc8c !important;
     font-weight: bold;
     cursor: pointer;
-    //font-size: 110%;
 }
 
 a:active {
     color: #00bc8c !important;
     font-weight: bold;
     cursor: pointer;
-    //font-size: 110%;
 }
 
 a {
     color: #00bc8c !important;
     font-weight: bold;
     cursor: pointer;
-    //font-size: 110%;
-}
-
-.welcomeBackground {
-    //This 100 and auto makes the image fill horizontally but not alter it's aspect ratio
-
-    //background-size:100% 100%;
-    height: 100vh;
-    max-width: 100% !important;
-    min-height: 100vh !important;
 }
 
 .mediaStreamInputOption {
     width: 30rem;
-}
-
-.myFooterText {
-    font-size: 80%;
 }
 
 .footerLink {
@@ -413,32 +382,8 @@ a {
     cursor: pointer;
 }
 
-.mainLogoImg {
-    /* this margin and display is for making the logo horizontally centered */
-    margin: auto;
-    display: block;
-}
-
-.infoBlock {
-    margin-bottom: 2rem;
-    //padding-right: 2em;
-}
-
-.welcome-container-with-navbar {
-    margin-top: 4rem;
-}
-
-.welcome-container-no-navbar {
-    margin-top: 20px;
-}
-
 .navbar {
-    margin-bottom: 0px;
-}
-
-.navbar-font {
-    font-size: 1.4rem;
-    font-weight: 400;
+    margin-bottom: 0;
 }
 
 .smallLogoButton {
@@ -455,7 +400,7 @@ a {
     border-radius: $border-radius;
 }
 
-.logo-text {
+.logoText {
     cursor: pointer;
     font-size: 1.5rem;
     font-weight: 600;
@@ -471,23 +416,6 @@ a {
     margin-right: $smallGap;
     color: var(--bs-green);
     border: 2px solid var(--bs-green);
-}
-
-#app {
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-}
-
-.app-body {
-    background-color: $body-bg;
-    font-family: $fontFamily !important;
-    // font-size: $fontSize;
-    width: 100%;
-    height: 100%;
-
-    // 'app' class takes care of 'hidden' don't need it twice.
-    // overflow: hidden;
 }
 
 .highlightBorder {
@@ -516,7 +444,6 @@ a {
     padding: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
-
     border: 1px solid gray;
 }
 
@@ -537,13 +464,12 @@ a {
     object-fit: cover;
     border: 2px solid $nodeBorderBottomColor;
     min-height: 60px;
-
     max-height: 200px;
 }
 
 .rhsMenu {
     width: 60%;
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .rhsMenuMobile {
@@ -556,9 +482,6 @@ a {
 }
 
 .rhsUserName {
-    // top: -40px;
-    // left: 30px;
-    // position: relative;
 }
 
 .lhsHeaderPanel {
@@ -578,7 +501,6 @@ a {
     max-width: 70px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
-
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -597,38 +519,23 @@ strong {
     font-size: 110%;
 }
 
-.width-7rem {
-    width: 7rem;
-}
-
-.textfield-label {
-    margin-bottom: 0px;
-}
-
-.form-group-border {
+.formGrpBorder {
     border: 1px solid $gray-600;
 }
 
-.edit-props-container {
+.editPropsCont {
     background-color: #17202A;
     border: 1px solid $gray-600;
     margin-bottom: $smallGap;
 }
 
-.edit-props-table {
+.editPropsTable {
     padding-left: $smallGap;
     width: 100%;
 }
 
 .fixedFont {
     font-family: 'Courier New', Courier, monospace;
-}
-
-.file-link {
-    margin-top: $smallGap;
-    margin-left: $smallGap;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
 }
 
 .splitNodeRadioButtonGroup {
@@ -647,25 +554,14 @@ strong {
 }
 
 .propsPanelExpanded {
-    // margin-top: $smallGap;
-    // margin-bottom: $smallGap;
 }
 
 .propsPanelCollapsed {
-    // margin-top: $smallGap;
-    // margin-bottom: $smallGap;
 }
 
-.collapse-panel-link {
+.collapsePanelLink {
     margin: $smallGap;
     cursor: pointer;
-}
-
-.folder-link {
-    margin-top: $smallGap;
-    margin-left: $smallGap;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
 }
 
 .dlgContainer {
@@ -690,7 +586,7 @@ strong {
 }
 
 .extraPagingComps {
-    margin: 0px 0px 4px 0px;
+    margin: 0px 0px 4px 0;
     display: inline-block;
 }
 
@@ -713,42 +609,37 @@ strong {
     margin-right: $smallGap;
 }
 
-.ogBookmarkIcon {
-    cursor: pointer;
-    margin-left: 8px;
-}
-
-.app-modal-title-normal {
+.appModalTitleNormal {
     font-size: 130%;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
 }
 
-.app-modal-title-popup {
+.appModalTitlePopup {
     font-size: 130%;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
     background-color: $primary;
 }
 
-.dlg-title-topmost {
+.dlgTitleTopmost {
     border-top: $dlgBorderWidth solid $dlgBorderColor;
     border-left: $dlgBorderWidth solid $dlgBorderColor;
     border-right: $dlgBorderWidth solid $dlgBorderColor;
 }
 
-.dlg-title-normal {
+.dlgTitleNormal {
     border-top: 2px solid gray;
     border-left: 2px solid gray;
     border-right: 2px solid gray;
 }
 
-.app-modal-title-close-icon {
+.dlgModalTitleCloseIcon {
     cursor: pointer;
-    margin-right: 4px;
+    margin-right: 8px;
 }
 
-.app-modal-backdrop {
+.appModalBackdrop {
     position: fixed;
     z-index: 16000000;
     left: 0;
@@ -758,14 +649,14 @@ strong {
     overflow: auto;
 }
 
-.app-modal-top-backdrop {
-    @extend .app-modal-backdrop;
+.appModalTopBackdrop {
+    @extend .appModalBackdrop;
     background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
 
-.app-embed-content {
+.appEmbedContent {
     background-color: $modal-content-bg;
     border: 2px solid gray;
     border-radius: $border-radius;
@@ -774,40 +665,38 @@ strong {
     margin-top: 12px;
 }
 
-.app-modal-content-area-embed {
+.appModalContentAreaEmbed {
     padding: 0px 12px 12px 12px;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
 }
 
-.app-modal-content-area-popup {
+.appModalContentAreaPopup {
     padding: 12px;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
 }
 
-
-.app-modal-content {
+.appModalCont {
     position: absolute;
     background-color: $modal-content-bg;
     margin: $smallGap auto;
     max-width: 800px;
-
 }
 
-.dlg-content-border-topmost {
+.dlgContentBorderTopmost {
     border-left: $dlgBorderWidth solid $dlgBorderColor;
     border-right: $dlgBorderWidth solid $dlgBorderColor;
     border-bottom: $dlgBorderWidth solid $dlgBorderColor;
 }
 
-.dlg-content-border-normal {
+.dlgContentBorderNormal {
     border-left: 2px solid gray;
     border-right: 2px solid gray;
     border-bottom: 2px solid gray;
 }
 
-.dlg-title-content {
+.dlgTitleContent {
     padding: 6px 6px 4px 12px;
     width: 100%;
 }
@@ -817,18 +706,18 @@ strong {
     border-bottom: 2px solid gray;
 }
 
-.app-modal-content-tiny-width {
-    @extend .app-modal-content;
+.appModalContTinyWidth {
+    @extend .appModalCont;
     max-width: 350px;
 }
 
-.app-modal-content-narrow-width {
-    @extend .app-modal-content;
+.appModalContNarrowWidth {
+    @extend .appModalCont;
     max-width: 500px;
 }
 
-.app-modal-content-medium-width {
-    @extend .app-modal-content;
+.appModalContMediumWidth {
+    @extend .appModalCont;
     max-width: 650px;
 }
 
@@ -850,11 +739,10 @@ Will come back later and study this more. todo-3 */
     display: block;
     width: 75%;
     border: 2px solid gray;
-
     margin: 0 auto;
 }
 
-.app-modal-content-fullscreen {
+.appModalContFullscreen {
     background-color: $modal-content-bg;
     padding: $smallGap;
     position: fixed;
@@ -866,7 +754,7 @@ Will come back later and study this more. todo-3 */
 }
 
 /* Max-width of 18em allows most of the page to the right to be clicked on to dismiss the menu */
-.app-modal-main-menu {
+.appModalMainMenu {
     border: 2px solid $modal-content-border-color;
     background-color: $modal-content-bg;
     width: 80%;
@@ -875,11 +763,11 @@ Will come back later and study this more. todo-3 */
 
 /* Modal Content/ Dialog Box */
 
-.app-modal-menu {
+.appModalMenu {
     border: 2px solid $modal-content-border-color;
     left: 0;
     top: 0;
-    padding: 0px;
+    padding: 0;
     width: 20%;
     margin-top: 60px;
     margin-left: $smallGap;
@@ -890,11 +778,11 @@ Will come back later and study this more. todo-3 */
     background-color: $modal-content-bg;
 }
 
-.app-modal-nav-panel {
+.appModalNavPanel {
     border: 2px solid $modal-content-border-color;
     left: 0;
     top: 0;
-    padding: 0px;
+    padding: 0;
     width: 60%;
     margin-top: 60px;
     margin-left: $smallGap;
@@ -906,12 +794,12 @@ Will come back later and study this more. todo-3 */
 }
 
 .mainContainer {
-    padding: 0px;
+    padding: 0;
     overflow: hidden;
 }
 
 .mainContainerMobile {
-    padding: 0px;
+    padding: 0;
     font-size: 1.2rem;
 }
 
@@ -951,7 +839,7 @@ Will come back later and study this more. todo-3 */
     padding: 12px;
 }
 
-.tab-buttons-container {
+.tabButtonsContainer {
     margin-bottom: 8px;
 }
 
@@ -976,7 +864,7 @@ Will come back later and study this more. todo-3 */
 // Tip: It's best practice to have overflow:hidden, on all 
 // parent divs that are the 'same size' or same screen rectangle
 // to prevent any 'double scroll' bars showing up.
-.my-tab-pane {
+.appTabPane {
     width: 100%;
     height: 100%;
     overflow-y: scroll;
@@ -985,32 +873,32 @@ Will come back later and study this more. todo-3 */
     padding-bottom: 20px;
 }
 
-.my-tab-pane-mobile {
-    @extend .my-tab-pane;
+.appTabPaneMobile {
+    @extend .appTabPane;
     padding: 0px !important;
 }
 
 // This padding is what makes room for the '+' buttons to the right of the rows during editing
-.my-tab-pane-editmode {
+.appTabPaneEditMode {
     padding-right: 50px;
 }
 
 .tabPanel {
     height: 100%;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .tabPanelMobile {
     height: 100%;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0;
+    padding-right: 0;
     padding-top: $mobileHeaderBarHeight;
 }
 
-.tab-content {
-    margin: 0px;
-    padding: 0px;
+.tabContent {
+    margin: 0;
+    padding: 0;
     height: 100%;
 
     // important to have 'hidden' to avoid a double scroll bar when this is NOT the thing we're scrolling
@@ -1021,23 +909,9 @@ Will come back later and study this more. todo-3 */
     cursor: pointer;
 }
 
-.ipfs-text {
+.ipfsText {
     margin: $smallGap;
     padding: 5px;
-}
-
-.small-margin-right {
-    margin-right: 8px;
-}
-
-.edit-prop-checkbox-col {
-    width: 50px;
-    display: table-cell;
-    margin-left: 16px;
-}
-
-.edit-prop-textfield-col {
-    display: table-cell;
 }
 
 /* I experimented with limiting height of rows and allowing individual scrolling on nodes but
@@ -1066,22 +940,22 @@ Will come back later and study this more. todo-3 */
     margin: 0 auto;
 }
 
-.list-group-menu-item {
+.listGroupMenuItem {
     background-color: transparent;
     padding: 5px 5px 4px 10px;
 }
 
-.list-group-transparent {
+.listGroupTransparent {
     background-color: transparent;
     padding: 5px 5px 4px 10px;
 }
 
 .audioPlayer {
     width: 100%;
-    padding: 0px;
-    margin-top: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
+    padding: 0;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
     margin-bottom: 10px;
 }
 
@@ -1105,7 +979,7 @@ Will come back later and study this more. todo-3 */
     margin-right: $mediumGap;
 }
 
-.img-block {
+.imgBlock {
     margin-top: 12px;
     margin-right: 12px;
     margin-bottom: 12px;
@@ -1116,11 +990,11 @@ Will come back later and study this more. todo-3 */
 
 // WARNING: This class is used for finding in the DOM also, and isn't just for styling.
 // Without this class some images won't be clickable to enlarge
-.enlargable-img {
+.enlargableImg {
     cursor: pointer;
 }
 
-.img-upper-left {
+.imgUpperLeft {
     margin-right: 24px;
     margin-bottom: $smallGap;
     margin-top: $smallGap;
@@ -1130,7 +1004,7 @@ Will come back later and study this more. todo-3 */
     vertical-align: top;
 }
 
-.img-upper-right {
+.imgUpperRight {
     margin-left: 24px;
     margin-bottom: $smallGap;
     margin-top: $smallGap;
@@ -1140,7 +1014,7 @@ Will come back later and study this more. todo-3 */
     vertical-align: top;
 }
 
-.img-upper-center {
+.imgUpperCenter {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -1212,7 +1086,6 @@ Will come back later and study this more. todo-3 */
     margin-left: 20px;
     padding: $tinyGap;
     border: 1px solid gray;
-
     cursor: pointer;
 }
 
@@ -1290,28 +1163,26 @@ Will come back later and study this more. todo-3 */
 &#x25BC; ▼
 &#x25C0; ◀
 */
-.icon-up:after {
+.iconUp:after {
     content: "\25B2";
     padding-left: 5px;
 }
 
-.icon-down:after {
+.iconDown:after {
     content: "\25BC";
     padding-left: 5px;
 }
 
-.textarea-min-4 {
+.textareaMin4 {
     font-family: inherit;
     min-height: 4rem;
 }
 
-.font-inherit {
+.fontInherit {
     font-family: inherit;
-    // min-height: 10em;
-    // max-height: 60em;
 }
 
-.markdown-codespan {
+.mkDownCodespan {
     color: var(--bs-green);
     word-wrap: break-word;
     cursor: pointer;
@@ -1322,7 +1193,7 @@ Will come back later and study this more. todo-3 */
     // unicode-bidi: bidi-override;
 }
 
-.pre-textarea {
+.preTextarea {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
     font-family: inherit;
@@ -1331,7 +1202,7 @@ Will come back later and study this more. todo-3 */
     border: 1px solid gray;
 }
 
-.pre-textfield {
+.preTextField {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
     padding: 5px 5px 5px 10px;
@@ -1378,7 +1249,6 @@ Will come back later and study this more. todo-3 */
     vertical-align: middle;
     border: 1px solid gray;
     padding: 6px;
-
     cursor: pointer;
 }
 
@@ -1398,52 +1268,47 @@ Will come back later and study this more. todo-3 */
     margin-left: 10px;
 }
 
-.bash-script {
-    margin-left: 1rem;
-    margin-top: 1rem;
-}
-
-.markdown-content {
+.mkCont {
     padding-top: .5rem;
     padding-left: 1.2rem;
     padding-bottom: 1.2rem;
     padding-right: 1rem;
 }
 
-.markdown-content h1 {
+.mkCont h1 {
     font-size: 2.8rem;
 }
 
-.markdown-content h2 {
+.mkCont h2 {
     font-size: 2.6rem;
 }
 
-.markdown-content h3 {
+.mkCont h3 {
     font-size: 2.4rem;
 }
 
-.markdown-content h4 {
+.mkCont h4 {
     font-size: 2.1rem;
 }
 
-.markdown-content h5 {
+.mkCont h5 {
     font-size: 1.8rem;
 }
 
-.markdown-content h6 {
+.mkCont h6 {
     font-size: 1.5rem;
 }
 
 // without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
-// amount of spacing we want in the markdown-content style itself so we stop this from messing that up with this 'last-child' style
-.markdown-content p:last-child {
-    margin-bottom: 0px;
+// amount of spacing we want in the mkCont style itself so we stop this from messing that up with this 'last-child' style
+.mkCont p:last-child {
+    margin-bottom: 0;
 }
 
 // Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
-.markdown-content kbd,
-.markdown-content pre,
-.markdown-content samp {
+.mkCont kbd,
+.mkCont pre,
+.mkCont samp {
     width: 100%;
     border: 1px solid olivedrab;
     background-color: $baseBgColor;
@@ -1457,22 +1322,17 @@ Will come back later and study this more. todo-3 */
     // margin-top: $tinyGap;
 }
 
-.full-screen-img {
+.fullScreenImg {
     cursor: pointer;
     margin: 12px;
     border: 3px solid $gray-700;
 }
 
-.img-in-editor {
+.imgInEditor {
     cursor: pointer;
     border: 1px solid gray;
     vertical-align: top;
-
     width: 75px;
-}
-
-.systemFileRow {
-    margin-botom: 16px;
 }
 
 .systemFileActionLink {
@@ -1484,13 +1344,7 @@ Will come back later and study this more. todo-3 */
 .systemFile {
     font-family: Courier New, Courier, Roboto, Tahoma, Verdana, Arial;
     cursor: pointer;
-    /* background: lightGray; */
     padding-bottom: 5px;
-}
-
-.vert-space {
-    display: block;
-    height: 0.5rem;
 }
 
 .mainTabPanel {
@@ -1503,37 +1357,29 @@ Will come back later and study this more. todo-3 */
 
     //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
     margin-bottom: $smallGap;
-    //margin-top: 0px;
     width: 100%;
 }
 
 .searchResultsPanel {
-    // padding: $smallGap;
-    // margin: $smallGap;
 }
 
 .timelinePanel {
-    // padding: $smallGap;
-    // margin: $smallGap;
 }
 
 .parentNodeContentStyle {
-    // border: 1px solid $gray-700;
-
-
     padding-right: 8px;
     padding-top: 8px;
     margin-bottom: 8px;
     margin-top: 8px;
 }
 
-.vertical-layout-row {
+.vertLayoutRow {
     margin-bottom: $smallGap;
 }
 
 .validationError {
     color: #E74C3C;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .validationErrorBorder {
@@ -1566,13 +1412,6 @@ Will come back later and study this more. todo-3 */
 .dialogSubTitle {
     font-size: 20px;
     margin-bottom: 20px;
-}
-
-.dialog-header {
-    font-weight: bold;
-    font-size: large;
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
 }
 
 .headerInfoDivExpanded {
@@ -1636,7 +1475,6 @@ Will come back later and study this more. todo-3 */
     from {
         opacity: hidden;
     }
-
     to {
         visibility: visible;
     }
@@ -1671,33 +1509,22 @@ Will come back later and study this more. todo-3 */
 }
 
 // todo-1: once I'm certain about it I can remove these
-.content-narrow {
-    // max-width: 50rem;
+.contentNarrow {
 }
 
-.content-medium {
-    // max-width: 60rem;
+.contentMedium {
 }
 
-.content-wide {
-    // max-width: 70rem;
+.contentWide {
 }
 
 .mousePointer {
     cursor: pointer;
 }
 
-.tags-content {
-    margin-left: 1rem;
-    /* we limit page width of text content, because text that goes to wide
-		becomes difficult to read.
-	*/
-    border: 1px dotted lightGray;
-    max-width: 800px;
-    background: #f9e79f;
-}
+.propsList {
 
-.propsList {}
+}
 
 .propsListItemCheckBox {
     vertical-align: middle;
@@ -1705,23 +1532,21 @@ Will come back later and study this more. todo-3 */
     margin-right: 0 !important;
 }
 
-.property-table {}
+.propertyTable {
 
-.prop-table-row {
+}
+
+.propTableRow {
     width: 100%;
 }
 
-.prop-table-name-col {
+.propTableNameCol {
     width: 25%;
     background-color: darkolivegreen;
 }
 
-.prop-table-val-col {
+.propTableValCol {
     width: 70%;
-}
-
-.prop-table {
-    width: 100%;
 }
 
 .folderIcon {
@@ -1737,33 +1562,33 @@ Will come back later and study this more. todo-3 */
     margin-top: $smallGap;
 }
 
-.files-table-row {
+.filesTableRow {
     width: 100%;
 }
 
-.files-table-type-col {
+.filesTableTypeCol {
     width: 5%;
 }
 
-.files-table-size-col {
+.filesTableSizeCol {
     width: 15%;
 }
 
-.files-table-delete-col {
+.filesTableDelCol {
     width: 5%;
 }
 
-.files-table-name-col {
+.filesTableNameCol {
     cursor: pointer;
     width: 75%;
 }
 
-.vertical-space {
+.verticalSpace {
     height: 16px;
     min-height: 16px;
 }
 
-.results-node {
+.resultsNode {
     // why relative here ? todo-1
     position: relative;
     cursor: pointer;
@@ -1788,23 +1613,8 @@ Will come back later and study this more. todo-3 */
     font-size: 1.3rem;
 }
 
-.form-control-dark {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.form-control-dark:focus {
-    border-color: transparent;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
-}
-
 .timeRemainingEditField {
     margin-left: 5px;
-}
-
-.border-top {
-    border-top: 1px solid #e5e5e5;
 }
 
 .clearBoth {
@@ -1881,7 +1691,6 @@ Will come back later and study this more. todo-3 */
 }
 
 .iconToggle {
-    // padding: 2px;
 }
 
 .iconToggleOn {
@@ -1957,7 +1766,6 @@ Will come back later and study this more. todo-3 */
 
 .binaryEditorSection {
     border: 1px solid gray;
-
     margin-bottom: $smallGap;
     margin-top: $tinyGap;
     padding: $smallGap;
@@ -1979,7 +1787,6 @@ Will come back later and study this more. todo-3 */
     margin-left: 1px;
     margin-right: $smallGap;
     border: 2px solid $gray-700;
-
 }
 
 .heading5 {
@@ -2061,14 +1868,6 @@ Will come back later and study this more. todo-3 */
     font-size: 140%;
 }
 
-.height-75vh {
-    max-height: 70vh;
-}
-
-.vert-scroll {
-    overflow: auto;
-}
-
 .ipfsPinnedCheckbox {
     margin-left: 24px;
 }
@@ -2100,7 +1899,6 @@ audio::-webkit-media-controls-play-button {
     display: inline-block;
     padding: 12px;
     border: 6px solid lightGray;
-
 }
 
 // WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
@@ -2110,7 +1908,7 @@ audio::-webkit-media-controls-play-button {
     border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
     background-color: $body-bg;
     position: sticky;
-    top: 0px;
+    top: 0;
     z-index: 100;
     min-height: 4em;
 }
@@ -2129,7 +1927,6 @@ audio::-webkit-media-controls-play-button {
     font-weight: bold;
     vertical-align: middle;
     color: var(--bs-green);
-    // margin-bottom: 6px;
 }
 
 .monospace {
@@ -2215,7 +2012,6 @@ audio::-webkit-media-controls-play-button {
 
 .horizontalLayoutCompBorderCollapse {
     @extend .horizontalLayoutComp;
-
     border-collapse: collapse;
 }
 
@@ -2355,7 +2151,6 @@ audio::-webkit-media-controls-play-button {
 .dragTargetDlgSection {
     margin-top: $smallGap;
     border: 1px solid gray;
-
     padding: $smallGap;
 }
 
@@ -2406,7 +2201,7 @@ audio::-webkit-media-controls-play-button {
     filter: brightness(70%);
 }
 
-.highlight-text {
+.highlightText {
     background-color: blue;
     color: yellow;
     padding-top: 4px;
@@ -2414,7 +2209,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .lastModifiedTime {
-    margin-right: $smallGap;
+    margin-right: $tinyGap;
 }
 
 .boost-header {

@@ -99,7 +99,7 @@ export class RSSView extends AppTab<any, RSSView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("RSS Feed", { className: "tabTitle" }),
-                new IconButton("fa-arrow-left", "", {
+                new IconButton("fa-arrowLeft", "", {
                     onClick: () => S.view.jumpToId(ast.rssNode.id),
                     title: "Back to Folders View"
                 }, "bigMarginLeft"),
@@ -170,7 +170,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
     renderFeed(feed: J.RssFeed, feedSrc: string): Comp {
         const ast = getAs();
-        const feedList = new Div("", { className: "rss-feed-listing" });
+        const feedList = new Div("", { className: "rssFeedListing" });
         const feedOut: Comp[] = [];
 
         const feedSrcHash = S.util.hashOfString(feedSrc);
@@ -182,7 +182,7 @@ export class RSSView extends AppTab<any, RSSView> {
         /* Main Feed Image */
         if (feed.image) {
             feedOut.push(new Img({
-                className: "rss-feed-image",
+                className: "rssFeedImage",
                 src: feed.image
                 // align: "left" // causes text to flow around
             }));
@@ -349,7 +349,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 if (enc.type && enc.type.indexOf("image/") !== -1) {
                     imageShown = true;
                     children.push(new Img({
-                        className: "rss-feed-image",
+                        className: "rssFeedImage",
                         src: enc.url
                     }));
                 }
@@ -359,14 +359,14 @@ export class RSSView extends AppTab<any, RSSView> {
         if (entry.image) {
             imageShown = true;
             children.push(new Img({
-                className: "rss-feed-image",
+                className: "rssFeedImage",
                 src: entry.image
             }));
         }
         else if (entry.thumbnail) {
             imageShown = true;
             children.push(new Img({
-                className: "rss-feed-image",
+                className: "rssFeedImage",
                 src: entry.thumbnail
             }));
         }
@@ -380,7 +380,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 if (mc.medium === "image" && !imageAdded) {
                     imageAdded = true;
                     children.push(new Img({
-                        className: "rss-feed-image",
+                        className: "rssFeedImage",
                         src: mc.url
                     }));
                 }
@@ -439,7 +439,7 @@ export class RSSView extends AppTab<any, RSSView> {
             new Clearfix()
         ]));
 
-        return new Div(null, { className: "rss-feed-item" }, children);
+        return new Div(null, { className: "rssFeedItem" }, children);
     }
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
@@ -448,7 +448,7 @@ export class RSSView extends AppTab<any, RSSView> {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 
-        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i: any) => {
+        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rssFeedListing img", (el: HTMLElement, i: any) => {
 
             // this logic doesn't apply to openGraphImages, so we detect those and bail out
             // Warning: this applies to openGraphImage, openGrapImageRss, and openGraphImageVert
@@ -493,7 +493,7 @@ export class RSSView extends AppTab<any, RSSView> {
             el.removeAttribute("height");
         });
 
-        // S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
+        // S.domUtil.forEachElmBySel("#" + parent.getId() + " .rssFeedImage", (el, i) => {
         //     el.style.maxWidth = "40%";
         // });
     }
