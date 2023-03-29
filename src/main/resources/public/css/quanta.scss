@@ -97,6 +97,10 @@ $mobileHeaderHeight: 3.5rem;
 @import 'edit.scss';
 @import 'text.scss';
 
+// todo-1: Eventually we need to have all SCSS in as targeted/specific a location as possible by 
+// makeing an SCSS file like this one, for each component that has any of it's own completely private CSS
+@import '../ts/comp/App.scss';
+
 body {
     font-family: "QuantaCustomFont" !important;
 }
@@ -111,17 +115,6 @@ body {
     margin: $smallGap;
 }
 
-.mobileHeaderBar {
-    padding: 10px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: $nodeBorderBottomColor;
-    border-bottom: 1px solid gray;
-    height: $mobileHeaderBarHeight;
-}
-
 .helpPanel {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -129,13 +122,6 @@ body {
     padding-top: $smallGap;
     padding-left: $smallGap;
     padding-right: $smallGap;
-}
-
-.mainAppRow {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    height: 100vh;
-    overflow: hidden;
 }
 
 .fullScreenToolbar {
