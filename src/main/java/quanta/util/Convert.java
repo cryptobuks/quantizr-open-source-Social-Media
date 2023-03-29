@@ -41,7 +41,7 @@ import quanta.types.TypeBase;
  * Converting objects from one type to another, and formatting.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class Convert extends ServiceBase {
 	// indicates we don't need to worry about sending back a good logicalOrdinal
 	public static int LOGICAL_ORDINAL_IGNORE = -1;
@@ -62,6 +62,11 @@ public class Convert extends ServiceBase {
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
 			long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
 			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
+
+		log.debug("convertToNodeInfo: " + node.getIdStr());
+		if ("6418f108241bc534e8dbf2fc".equals(node.getIdStr())) {
+			log.debug("got it.");
+		}
 
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
@@ -177,7 +182,7 @@ public class Convert extends ServiceBase {
 		String content = node.getContent();
 		String renderContent = replaceTagsWithHtml(node, true);
 
-		if (logicalOrdinal==LOGICAL_ORDINAL_GENERATE) {
+		if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
 			logicalOrdinal = read.generateLogicalOrdinal(ms, node);
 		}
 
@@ -264,13 +269,18 @@ public class Convert extends ServiceBase {
 				// otherwise check to see if we have a boosted node from scratch.
 				String boostTargetId = node.getStr(NodeProp.BOOST);
 				if (boostTargetId != null) {
-					boostedNode = read.getNode(ms, boostTargetId);
+					try {
+						boostedNode = read.getNode(ms, boostTargetId);
+					} catch (Exception e) {
+						log.debug("Unable to access boosted node: " + boostTargetId);
+						return null;
+					}
 				}
 			}
 
 			if (boostedNode != null) {
-				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, false,
-						null, false);
+				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
+						false, false, false, false, null, false);
 				if (info != null) {
 					nodeInfo.setBoostedNode(info);
 				}
