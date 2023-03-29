@@ -1412,7 +1412,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
 	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
-
 		return callProc.run("unblockUser", true, true, req, session, ms -> {
 			return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
 		});

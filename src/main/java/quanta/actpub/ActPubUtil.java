@@ -917,6 +917,9 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
         ObjectId lastNodeId = null;
 
+        HashSet<ObjectId> blockedUserIds = new HashSet<>();
+        userFeed.getBlockedUserIds(blockedUserIds, null);
+
         // todo-1: This is an unfinished work in progress. I was unable to find any foreign posts
         // that put any messages in their 'replies' collection, or at least when I query collections
         // I get back an empty array of items for whatever reason.
@@ -950,6 +953,9 @@ public class ActPubUtil extends ServiceBase {
                         List<NodeInfo> children = new LinkedList<>();
 
                         for (SubNode child : iter) {
+                            if (blockedUserIds.contains(child.getOwner()))
+                                continue;
+
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, //
@@ -975,9 +981,11 @@ public class ActPubUtil extends ServiceBase {
                         // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                         // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
                         iter = read.findNodesByProp(ms, NodePath.USERS_PATH + //
-                                "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(),
-                                replyTargetId);
+                                "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(), replyTargetId);
                         for (SubNode child : iter) {
+                            if (blockedUserIds.contains(child.getOwner()))
+                                continue;
+
                             // if we didn't already add above, add now
                             if (!childIds.contains(child.getIdStr())) {
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
@@ -1021,6 +1029,10 @@ public class ActPubUtil extends ServiceBase {
                 }
 
                 node = parent;
+                if (blockedUserIds.contains(node.getOwner())) {
+                    node = null;
+                }
+
                 if (node == null) {
                     topReached = true;
                 }
