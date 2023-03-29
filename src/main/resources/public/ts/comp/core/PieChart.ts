@@ -8,8 +8,9 @@ export class PieChart extends Div {
         super(null, { className: "marginBottom" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([new Svg(null, { className: this.className })]);
+        return true;
     }
 
     domPreUpdateEvent = () => {

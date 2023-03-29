@@ -19,7 +19,6 @@ export abstract class Comp implements CompIntf {
     public debug: boolean = false;
     public mounted: boolean = false;
     public rendered: boolean = false;
-    public allowRenderEmpty: boolean = true; // allows rendering if no children exist
     private static guid: number = 0;
     private static renderClassInDom: boolean = false;
 
@@ -395,11 +394,8 @@ export abstract class Comp implements CompIntf {
             // of our framework (i.e. this Comp class)
             this.attribs.ref = useRef();
 
-            this.preRender();
+            if (!this.preRender()) return null;
             const ret = this.compRender();
-            if (!this.allowRenderEmpty && !this.hasChildren()) {
-                return null;
-            }
 
             if (this.debug) {
                 // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
@@ -450,7 +446,8 @@ export abstract class Comp implements CompIntf {
 
     /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should be
     just to set the children */
-    preRender(): void {
+    preRender(): boolean {
+        return true;
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state

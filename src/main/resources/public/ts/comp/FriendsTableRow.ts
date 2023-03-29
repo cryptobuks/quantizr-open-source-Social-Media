@@ -19,7 +19,7 @@ export class FriendsTableRow extends ListBoxRow {
         this.attribs.className = "personsListItem";
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         let src: string = null;
 
@@ -79,6 +79,7 @@ export class FriendsTableRow extends ListBoxRow {
                 }) : null
             ])
         ]);
+        return true;
     }
 
     editTags = async () => {

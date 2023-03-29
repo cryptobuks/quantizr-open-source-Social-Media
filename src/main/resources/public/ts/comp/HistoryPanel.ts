@@ -17,7 +17,7 @@ export class HistoryPanel extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (ast.nodeHistory.length === 0) {
@@ -68,6 +68,7 @@ export class HistoryPanel extends Div {
             S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
         });
         this.setChildren(children);
+        return true;
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */

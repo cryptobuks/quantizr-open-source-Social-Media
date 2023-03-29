@@ -30,7 +30,7 @@ export class NodeCompContent extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (!this.node) {
@@ -87,6 +87,7 @@ export class NodeCompContent extends Div {
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.setChildren(children);
+        return true;
     }
 
     renderActPubUrls = (children: CompIntf[], node: J.NodeInfo) => {

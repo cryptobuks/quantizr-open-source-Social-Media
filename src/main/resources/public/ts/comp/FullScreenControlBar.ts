@@ -17,8 +17,9 @@ export class FullScreenControlBar extends Div {
         this.attribs.className = "float-end fullScreenToolbar";
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren(this.getButtons());
+        return true;
     }
 
     getButtons = (): Comp[] => {

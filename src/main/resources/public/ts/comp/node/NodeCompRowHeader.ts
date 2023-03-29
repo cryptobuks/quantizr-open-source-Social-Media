@@ -26,7 +26,7 @@ export class NodeCompRowHeader extends Div {
         this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "rowHeaderEdit" : "row-header";
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         let displayName = null;
@@ -417,5 +417,6 @@ export class NodeCompRowHeader extends Div {
         }
 
         this.setChildren(children);
+        return true;
     }
 }

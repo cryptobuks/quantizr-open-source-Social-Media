@@ -28,7 +28,7 @@ export class App extends Main {
         super(null, { id: "appPanelId", role: "main" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (!ast.appInitComplete) {
@@ -79,6 +79,7 @@ export class App extends Main {
         if (ast.dialogStack?.length > 0) {
             this.addChildren(ast.dialogStack);
         }
+        return true;
     }
 
     /* This is where we send an event that lets code hook into the render cycle to process whatever needs

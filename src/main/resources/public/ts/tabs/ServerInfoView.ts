@@ -14,7 +14,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         this.setChildren([
@@ -28,5 +28,6 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
                 new Pre(ast.serverInfoText, { className: "serverInfoText" })
             ])
         ]);
+        return true;
     }
 }

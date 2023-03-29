@@ -10,7 +10,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
         super(null, onClickFunc);
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const iconClass = this.type.getIconClass();
 
         this.setChildren([
@@ -19,5 +19,6 @@ export class NodeTypeListBoxRow extends ListBoxRow {
                 new Span(this.type.getName())
             ], this.isSelected ? "selectedListItem" : "unselectedListItem")
         ]);
+        return true;
     }
 }

@@ -15,7 +15,7 @@ export class NodeCompParentNodes extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
@@ -43,5 +43,6 @@ export class NodeCompParentNodes extends Div {
             // so not worried about that here, for now.
             new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null)
         ]);
+        return true;
     }
 }

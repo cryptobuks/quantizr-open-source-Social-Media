@@ -78,7 +78,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.onMount(() => this.input?.focus());
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const state = this.getState<LS>();
         const children = [new ErrorDiv(this.valState.e)];
 
@@ -132,5 +132,6 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
         children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.minRows, this.scrollPos));
         this.setChildren(children);
+        return true;
     }
 }

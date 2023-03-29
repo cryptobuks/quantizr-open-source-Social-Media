@@ -17,7 +17,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return;
@@ -79,6 +79,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         });
 
         this.setChildren(children);
+        return true;
     }
 
     /* overridable (don't use arrow function) */

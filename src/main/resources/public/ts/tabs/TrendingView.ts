@@ -50,7 +50,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const res = this.data ? this.data.props.res : null;
 
@@ -108,6 +108,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
             wordPanel.hasChildren() ? wordPanel : null
         ]);
+        return true;
     }
 
     static searchWord = (evt: Event, word: string) => {

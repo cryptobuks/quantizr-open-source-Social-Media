@@ -22,7 +22,7 @@ export class DateField extends Div implements I.ValueIntf {
         return this.valState.getValue();
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([
             new Div(null, {
                 className: "dateField"
@@ -33,5 +33,6 @@ export class DateField extends Div implements I.ValueIntf {
                 }, this.valState.v)
             ])
         ]);
+        return true;
     }
 }

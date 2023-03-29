@@ -162,7 +162,7 @@ export class MenuPanel extends Div {
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const state = this.getState<MenuPanelState>();
 
@@ -446,6 +446,7 @@ export class MenuPanel extends Div {
         }
 
         this.setChildren(children);
+        return true;
     }
 
     makeHelpIcon = (nodeName: string): Tag => {

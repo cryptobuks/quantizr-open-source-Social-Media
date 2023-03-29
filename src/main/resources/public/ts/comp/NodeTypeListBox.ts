@@ -16,7 +16,7 @@ export class NodeTypeListBox extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const children: Comp[] = [];
         const types = S.plugin.getOrderedTypesArray(ast.showRecentProps);
@@ -37,6 +37,7 @@ export class NodeTypeListBox extends ListBox {
         });
 
         this.setChildren(children);
+        return true;
     }
 
     getScrollPos = (): number => {

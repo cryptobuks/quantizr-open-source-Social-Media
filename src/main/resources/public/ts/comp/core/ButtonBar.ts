@@ -11,7 +11,6 @@ export class ButtonBar extends Comp {
     constructor(buttons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
         super(null);
         this.setChildren(buttons);
-        this.allowRenderEmpty = false;
     }
 
     compRender = (): ReactNode => {

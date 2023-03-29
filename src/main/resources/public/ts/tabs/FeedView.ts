@@ -31,7 +31,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         /*
@@ -283,6 +283,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             ]),
             new Div(null, { className: "feedView" }, children)
         ]);
+        return true;
     }
 
     /* overridable (don't use arrow function) */

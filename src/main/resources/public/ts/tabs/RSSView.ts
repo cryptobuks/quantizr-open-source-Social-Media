@@ -37,7 +37,7 @@ export class RSSView extends AppTab<any, RSSView> {
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         let comp: NodeCompMarkdown = null;
         let feedContent: Comp = null;
@@ -117,6 +117,7 @@ export class RSSView extends AppTab<any, RSSView> {
             comp,
             feedContent
         ]);
+        return true;
     }
 
     static loadFeed = async (ust: AppState, feedSrcHash: string, feedSrc: string) => {

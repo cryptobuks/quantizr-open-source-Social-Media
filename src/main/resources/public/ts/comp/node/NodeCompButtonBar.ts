@@ -21,7 +21,7 @@ export class NodeCompButtonBar extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         if (!this.node) {
             this.setChildren(null);
@@ -272,22 +272,31 @@ export class NodeCompButtonBar extends Div {
         // }
         // ---------------------------
 
-        const floatEndSpan = new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
-            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */ pasteSpan])
-        floatEndSpan.allowRenderEmpty = false;
+        const spanArray = [moveNodeUpIcon, //
+            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon,
+            /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */
+            pasteSpan];
+
+        let floatEndSpan = null;
+        if (spanArray.some(c => !!c)) {
+            floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
+        }
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, //
             prevButton, nextButton, floatEndSpan
         ];
 
-        if (this.extraButtons) {
-            btnArray = btnArray.concat(this.extraButtons);
+        btnArray = btnArray.concat(this.extraButtons);
+
+        let buttonBar = null;
+        if (btnArray.some(c => !!c)) {
+            buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
         }
 
-        const buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
-        buttonBar.allowRenderEmpty = false;
-        this.allowRenderEmpty = false;
-
-        this.setChildren([selCheckbox, sharedIcon, buttonBar]);
+        if (selCheckbox || sharedIcon || buttonBar) {
+            this.setChildren([selCheckbox, sharedIcon, buttonBar]);
+            return true;
+        }
+        return false;
     }
 }

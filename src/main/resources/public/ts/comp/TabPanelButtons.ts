@@ -16,7 +16,7 @@ export class TabPanelButtons extends Div {
         super(null);
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([
             new Div(null, {
                 className: "tabButtonsContainer"
@@ -27,6 +27,7 @@ export class TabPanelButtons extends Div {
                 }, this.buildTabButtons())]
             )
         ]);
+        return true;
     }
 
     buildTabButtons = (): Comp[] => {

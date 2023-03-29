@@ -40,7 +40,7 @@ export class RightNavPanel extends Div {
         RightNavPanel.scrollPos = pos;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (!ast.mobileMode) {
@@ -221,6 +221,7 @@ export class RightNavPanel extends Div {
                 ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
             ])
         ]);
+        return true;
     }
 
     makeRHSAvatarDiv = (): CompIntf => {

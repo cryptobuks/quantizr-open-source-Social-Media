@@ -14,8 +14,9 @@ export class FullScreenGraphViewer extends Main {
     tooltip: any;
     isDragging: boolean;
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([new Div(null, { className: "d3Graph" })]);
+        return true;
     }
 
     domPreUpdateEvent = () => {

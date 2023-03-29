@@ -46,7 +46,7 @@ export class LeftNavPanel extends Div {
         LeftNavPanel.scrollPos = pos;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         const s = ast.newMessageCount > 1 ? "s" : "";
@@ -93,5 +93,6 @@ export class LeftNavPanel extends Div {
             // if anon user
             ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
         ]);
+        return true;
     }
 }

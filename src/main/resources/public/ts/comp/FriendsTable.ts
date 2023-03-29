@@ -15,7 +15,7 @@ export class FriendsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    preRender(): void {
+    preRender(): boolean {
         if (this.friends) {
             const friendsComps = this.friends.map(friend => {
                 if (!friend) return null;
@@ -29,6 +29,7 @@ export class FriendsTable extends ListBox {
                 this.setChildren([new Div("No matching users.")]);
             }
         }
+        return true;
     }
 
     getScrollPos = (): number => {

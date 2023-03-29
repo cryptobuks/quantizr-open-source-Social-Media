@@ -964,6 +964,11 @@ export class Util {
             s.anonUserLandingPageNode = res.anonUserLandingPageNode;
             s.allowFileSystemSearch = res.allowFileSystemSearch;
             s.userPrefs = res.userPreferences;
+
+            if (s.userPrefs && (J.NodeType.POSTS === s.node?.type || J.NodeType.COMMENT === s.node?.type)) {
+                s.userPrefs.showMetaData = true;
+            }
+
             // s.title = !s.isAnonUser ? res.userName : "";
             s.displayName = !s.isAnonUser ? res.userProfile.displayName : "";
         });

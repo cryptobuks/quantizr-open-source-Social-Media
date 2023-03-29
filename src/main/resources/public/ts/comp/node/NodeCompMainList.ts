@@ -13,7 +13,7 @@ export class NodeCompMainList extends Div {
         super(null, { key: "nodeCompMaiList" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         const children: Comp[] = [];
@@ -30,6 +30,7 @@ export class NodeCompMainList extends Div {
         }
 
         this.setChildren(children);
+        return true;
     }
 
     addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, pageTop: boolean) => {

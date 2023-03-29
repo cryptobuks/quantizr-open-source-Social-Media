@@ -27,7 +27,7 @@ export class TabPanel extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (!ast.tabPanelVisible) {
@@ -44,6 +44,7 @@ export class TabPanel extends Div {
                 id: "tabPanelContentId"
             }, this.buildTabs())
         ]);
+        return true;
     }
 
     buildTabs = (): AppTab[] => {

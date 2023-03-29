@@ -11,7 +11,7 @@ export class PropDisplayLayout extends Div {
         });
     }
 
-    preRender = (): void => {
+    preRender = (): boolean => {
         const children: CompIntf[] = [];
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {
@@ -45,5 +45,6 @@ export class PropDisplayLayout extends Div {
         const innerDiv = new Div(null, { className: "flexPropsDisplayPanel" }, children)
         innerDiv.ordinalSortChildren();
         this.setChildren([innerDiv]);
+        return true;
     }
 }

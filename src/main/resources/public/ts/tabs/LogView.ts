@@ -30,11 +30,12 @@ export class LogView extends AppTab<any, LogView> implements LogViewIntf {
         LogView.logs += "\n";
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([
             new Heading(3, "Log", { className: "logView" }),
             new Html("<pre>" + LogView.logs + "</pre>")
         ]);
+        return true;
     }
 
     // Opens the tab, querying the info from the server to update

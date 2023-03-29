@@ -13,7 +13,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
         this.attribs.className = "propListItem";
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const attr: any = {};
         if (this.prop.comment) {
             attr.title = this.prop.comment;
@@ -37,6 +37,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
                 new Div(this.makeRangesListString(), { className: "propRangesInList float-end" })
             ])
         ]);
+        return true;
     }
 
     makeRangesListString = () => {

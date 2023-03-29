@@ -10,7 +10,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const children: Comp[] = [];
 
         children.push(new Div(null, null, [
@@ -25,6 +25,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
         }
 
         this.setChildren([new Div(null, { className: "feedView" }, children)]);
+        return true;
     }
 
     /* overridable (don't use arrow function) */

@@ -36,7 +36,7 @@ export class TTSView extends AppTab<any, TTSView> {
         }
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable",
@@ -166,6 +166,7 @@ export class TTSView extends AppTab<any, TTSView> {
                     ...paraComps
                 ]) : null
         ]);
+        return true;
     }
 
     makeVoiceChooser = (voiceKey: string, primaryVoice: boolean): Selection => {

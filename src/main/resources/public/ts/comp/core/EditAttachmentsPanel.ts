@@ -21,7 +21,7 @@ export class EditAttachmentsPanel extends Div {
         super(null, { className: "binaryEditorSection" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         if (!this.node.attachments) return null;
         this.setChildren([]);
         let isFirst = true;
@@ -39,6 +39,7 @@ export class EditAttachmentsPanel extends Div {
             this.addChild(this.makeAttachmentPanel(att, isFirst));
             isFirst = false;
         });
+        return true;
     }
 
     makeAttachmentPanel = (att: J.Attachment, isFirst: boolean): Div => {

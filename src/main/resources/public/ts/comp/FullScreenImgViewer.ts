@@ -13,7 +13,7 @@ export class FullScreenImgViewer extends Main {
         this.attribs.className = "fullScreenViewer customScrollBar"
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
@@ -37,6 +37,7 @@ export class FullScreenImgViewer extends Main {
         }
 
         this.setChildren(children);
+        return true;
     }
 
     domUpdateEvent = () => {

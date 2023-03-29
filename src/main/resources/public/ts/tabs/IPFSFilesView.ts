@@ -39,7 +39,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const children = [];
 
         if (this.data.props.loading) {
@@ -118,6 +118,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         }
 
         this.setChildren([new Div(null, { className: "mfsFileView" }, children)]);
+        return true;
     }
 
     renderFilesTable = (mfsFiles: J.MFSDirEntry[]): FilesTable => {

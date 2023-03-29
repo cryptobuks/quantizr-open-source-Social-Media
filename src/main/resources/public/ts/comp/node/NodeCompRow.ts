@@ -40,7 +40,7 @@ export class NodeCompRow extends Div {
         }
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         if (this.allowHeaders) {
@@ -92,7 +92,6 @@ export class NodeCompRow extends Div {
         let buttonBar = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !ast.inlineEditId) {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
-            buttonBar.allowRenderEmpty = false;
         }
 
         let layoutClass = this.isTableCell ? "nodeGridItem" : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData ? "nodeTableRowEdit" : "nodeTableRow");
@@ -192,5 +191,6 @@ export class NodeCompRow extends Div {
             this.allowHeaders ? new NodeCompRowFooter(this.node) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
+        return true;
     }
 }

@@ -23,7 +23,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         data.inst = this;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;
@@ -109,5 +109,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         else {
             this.attribs.className += " mediumPaddingTop";
         }
+        return true;
     }
 }

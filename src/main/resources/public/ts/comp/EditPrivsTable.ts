@@ -14,7 +14,7 @@ export class EditPrivsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const children = [];
 
         if (this.acl) {
@@ -38,5 +38,6 @@ export class EditPrivsTable extends ListBox {
         }
 
         this.setChildren(children);
+        return true;
     }
 }

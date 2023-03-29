@@ -14,7 +14,7 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: "nodeGridTable" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const nodesToMove = ast.nodesToMove;
         let curRow = new Div(null, { className: "nodeGridRow" });
@@ -134,5 +134,6 @@ export class NodeCompTableRowLayout extends Div {
             }
         }
         this.setChildren(children);
+        return true;
     }
 }

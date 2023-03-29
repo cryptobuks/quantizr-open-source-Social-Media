@@ -116,7 +116,7 @@ export class NodeCompMarkdown extends Html {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {
@@ -140,6 +140,7 @@ export class NodeCompMarkdown extends Html {
                 }, 10);
             }
         }
+        return true;
     }
 
     decrypt = async () => {

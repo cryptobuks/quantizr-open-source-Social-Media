@@ -32,7 +32,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return;
@@ -94,6 +94,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
         this.addPaginationBar(children, true, true, false);
         this.setChildren(children);
+        return true;
     }
 
     /* overridable (don't use arrow function) */

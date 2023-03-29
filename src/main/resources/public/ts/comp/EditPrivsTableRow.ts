@@ -37,7 +37,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         return div;
     }
 
-    preRender(): void {
+    preRender(): boolean {
         let src: string = null;
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
@@ -87,5 +87,6 @@ export class EditPrivsTableRow extends ListBoxRow {
                 ])
             ])
         ]);
+        return true;
     }
 }

@@ -33,7 +33,7 @@ export class NodeCompMainNode extends Div {
         }
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const ast = getAs();
         const node = ast.node;
 
@@ -103,9 +103,6 @@ export class NodeCompMainNode extends Div {
             }
 
             const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null;
-            if (buttonBar) {
-                buttonBar.allowRenderEmpty = false;
-            }
 
             this.setChildren([
                 S.render.renderBoostHeader(node, true),
@@ -121,5 +118,6 @@ export class NodeCompMainNode extends Div {
                 new Clearfix()
             ]);
         }
+        return true;
     }
 }

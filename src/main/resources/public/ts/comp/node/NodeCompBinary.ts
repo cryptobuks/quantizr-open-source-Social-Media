@@ -123,7 +123,7 @@ export class NodeCompBinary extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);
@@ -192,5 +192,6 @@ export class NodeCompBinary extends Div {
                 ])
             ])]);
         }
+        return true;
     }
 }

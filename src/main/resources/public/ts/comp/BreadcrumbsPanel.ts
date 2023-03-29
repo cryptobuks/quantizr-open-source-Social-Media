@@ -13,8 +13,9 @@ export class BreadcrumbsPanel extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([this.createBreadcrumbs()]);
+        return true;
     }
 
     createBreadcrumbs = (): Comp => {

@@ -118,7 +118,7 @@ export class OpenGraphPanel extends Div {
         });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {
@@ -195,5 +195,6 @@ export class OpenGraphPanel extends Div {
             })) : null,
             imgAndDesc
         ]);
+        return true;
     }
 }

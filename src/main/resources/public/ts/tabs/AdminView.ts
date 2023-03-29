@@ -41,7 +41,7 @@ export class AdminView extends AppTab<any, AdminView> {
         return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
-    preRender(): void {
+    preRender(): boolean {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Admin Console", { className: "tabTitle" })
@@ -119,6 +119,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 })
             ])
         ]);
+        return true;
     }
 
     settingsLink = (name: string, onClick: Function, moreClasses: string = ""): Div => {
