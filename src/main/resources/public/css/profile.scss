@@ -66,3 +66,29 @@
 .userBio {
     margin: 15px 10px 10px 10px;
 }
+
+.profileInfoButton {
+    display: inline-block;
+    margin-top: $smallGap;
+    font-weight: bold;
+    margin-left: 15px;
+    padding: 8px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.followingText {
+    @extend .profileInfoButton;
+    background-color: green;
+}
+
+.blockingText {
+    @extend .profileInfoButton;
+    background-color: orangered;
+}
+
+.followCount {
+    @extend .profileInfoButton;
+}
+

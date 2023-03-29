@@ -1,0 +1,187 @@
+.appModalTitleNormal {
+    font-size: 130%;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+}
+
+.appModalTitlePopup {
+    font-size: 130%;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    background-color: $primary;
+}
+
+.dlgTitleTopmost {
+    border-top: $dlgBorderWidth solid $dlgBorderColor;
+    border-left: $dlgBorderWidth solid $dlgBorderColor;
+    border-right: $dlgBorderWidth solid $dlgBorderColor;
+}
+
+.dlgTitleNormal {
+    border-top: 2px solid gray;
+    border-left: 2px solid gray;
+    border-right: 2px solid gray;
+}
+
+.dlgModalTitleCloseIcon {
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.appModalBackdrop {
+    position: fixed;
+    z-index: 16000000;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+}
+
+.appModalTopBackdrop {
+    @extend .appModalBackdrop;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.dlgContainer {
+    display: none;
+}
+
+.overlay {
+    z-index: 2147483500;
+    background-color: rgba(1, 1, 1, 0.1);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: progress;
+    display: none;
+}
+
+.appEmbedContent {
+    background-color: $modal-content-bg;
+    border: 2px solid gray;
+    border-radius: $border-radius;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-top: 12px;
+}
+
+.appModalContentAreaEmbed {
+    padding: 0px 12px 12px 12px;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
+.appModalContentAreaPopup {
+    padding: 12px;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
+.appModalCont {
+    position: absolute;
+    background-color: $modal-content-bg;
+    margin: $smallGap auto;
+    max-width: 800px;
+}
+
+.dlgContentBorderTopmost {
+    border-left: $dlgBorderWidth solid $dlgBorderColor;
+    border-right: $dlgBorderWidth solid $dlgBorderColor;
+    border-bottom: $dlgBorderWidth solid $dlgBorderColor;
+}
+
+.dlgContentBorderNormal {
+    border-left: 2px solid gray;
+    border-right: 2px solid gray;
+    border-bottom: 2px solid gray;
+}
+
+.dlgTitleContent {
+    padding: 6px 6px 4px 12px;
+    width: 100%;
+}
+
+.appModalContTinyWidth {
+    @extend .appModalCont;
+    max-width: 350px;
+}
+
+.appModalContNarrowWidth {
+    @extend .appModalCont;
+    max-width: 500px;
+}
+
+.appModalContMediumWidth {
+    @extend .appModalCont;
+    max-width: 650px;
+}
+
+.appModalContFullscreen {
+    background-color: $modal-content-bg;
+    padding: $smallGap;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    overflow: auto;
+}
+
+/* Max-width of 18em allows most of the page to the right to be clicked on to dismiss the menu */
+.appModalMainMenu {
+    border: 2px solid $modal-content-border-color;
+    background-color: $modal-content-bg;
+    width: 80%;
+    max-width: 80%;
+}
+
+/* Modal Content/ Dialog Box */
+
+.appModalMenu {
+    border: 2px solid $modal-content-border-color;
+    left: 0;
+    top: 0;
+    padding: 0;
+    width: 20%;
+    margin-top: 60px;
+    margin-left: $smallGap;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
+    max-width: 400px;
+    min-width: 350px;
+    background-color: $modal-content-bg;
+}
+
+.appModalNavPanel {
+    border: 2px solid $modal-content-border-color;
+    left: 0;
+    top: 0;
+    padding: 0;
+    width: 60%;
+    margin-top: 60px;
+    margin-left: $smallGap;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
+    max-width: 500px;
+    min-width: 350px;
+    background-color: $modal-content-bg;
+}
+
+.dialogTitle {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.dialogSubTitle {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.dlgIcon {
+    margin-right: 8px;
+    vertical-align: "middle";
+}
+

@@ -1,0 +1,56 @@
+.speechTxtArea {
+    border: 2px solid $nodeBorderBottomColor;
+    margin-bottom: 24px;
+    margin-top: $smallGap;
+    border-radius: $border-radius;
+    background-color: $baseBgColor;
+    padding: 16px;
+}
+
+.speechAreaTitle {
+    margin-bottom: 10px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.ttsPara {
+    margin-top: 16px;
+}
+
+.ttsSpan {
+    font-size: large;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    cursor: pointer;
+}
+
+.ttsQuote {
+    color: var(--bs-green);
+}
+
+.ttsHlt {
+    background: blue;
+    color: yellow;
+}
+
+.selectVoiceDropDown {
+    margin-bottom: 12px;
+    max-width: 30rem;
+    margin-right: $smallGap;
+}
+
+.rateChooserDropDown {
+    margin-bottom: 12px;
+    width: 7rem;
+    margin-right: $smallGap;
+}
+
+.stickySpeechButtons {
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 15000001;
+    background: $primary;
+    border: 2px solid $nodeBorderBottomColor;
+    padding: 6px 12px 6px 12px;
+}

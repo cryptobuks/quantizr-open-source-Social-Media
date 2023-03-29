@@ -88,6 +88,12 @@ $mobileHeaderHeight: 3.5rem;
 @import 'profile.scss';
 @import 'openGraph.scss';
 @import 'nodeItem.scss';
+@import 'tabs.scss';
+@import 'dialog.scss';
+@import 'icon.scss';
+@import 'image.scss';
+@import 'layout.scss';
+@import 'tts.scss';
 
 body {
     font-family: "QuantaCustomFont" !important;
@@ -256,63 +262,6 @@ td {
     padding: 12px;
 }
 
-.speechTxtArea {
-    border: 2px solid $nodeBorderBottomColor;
-    margin-bottom: 24px;
-    margin-top: $smallGap;
-    border-radius: $border-radius;
-    background-color: $baseBgColor;
-    padding: 16px;
-}
-
-.stickySpeechButtons {
-    position: sticky;
-    top: 0;
-    right: 0;
-    z-index: 15000001;
-    background: $primary;
-    border: 2px solid $nodeBorderBottomColor;
-    padding: 6px 12px 6px 12px;
-}
-
-.speechAreaTitle {
-    margin-bottom: 10px;
-    padding: 6px 6px 6px 12px;
-    border: 1px solid $nodeBorderBottomColor;
-}
-
-.ttsPara {
-    margin-top: 16px;
-}
-
-.ttsSpan {
-    font-size: large;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    cursor: pointer;
-}
-
-.ttsQuote {
-    color: var(--bs-green);
-}
-
-.ttsHlt {
-    background: blue;
-    color: yellow;
-}
-
-.selectVoiceDropDown {
-    margin-bottom: 12px;
-    max-width: 30rem;
-    margin-right: $smallGap;
-}
-
-.rateChooserDropDown {
-    margin-bottom: 12px;
-    width: 7rem;
-    margin-right: $smallGap;
-}
-
 .d3Graph {
 }
 
@@ -334,22 +283,6 @@ td {
 .d3PieChart {
     width: 250px;
     height: 250px;
-}
-
-// HTML comming from Mastodon includes this so tolerate if for now.
-.invisible {
-    display: none;
-    visibility: hidden !important;
-}
-
-// for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
-.compHidden {
-    opacity: 0;
-}
-
-.visible {
-    display: inline-block;
-    visibility: visible !important;
 }
 
 /* Need a way that we can set font sizes, on anchors but this actually messes up button styling because my buttons
@@ -393,13 +326,6 @@ a {
     background-color: black;
 }
 
-.leftNavLogoImg {
-    border: 1px solid gray;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: $border-radius;
-}
-
 .logoText {
     cursor: pointer;
     font-size: 1.5rem;
@@ -431,14 +357,6 @@ a {
     font-weight: normal;
 }
 
-.avatarImage {
-    max-width: 48px;
-    max-height: 80px;
-    cursor: pointer;
-    border: 1px solid gray;
-    vertical-align: top;
-}
-
 .resultsContentHeading {
     font-size: 120%;
     padding: 10px;
@@ -456,15 +374,6 @@ a {
     padding: 6px 6px 6px 12px;
     border: 1px solid $nodeBorderBottomColor;
     text-align: center;
-}
-
-.headerImageRHS {
-    cursor: pointer;
-    width: 100%;
-    object-fit: cover;
-    border: 2px solid $nodeBorderBottomColor;
-    min-height: 60px;
-    max-height: 200px;
 }
 
 .rhsMenu {
@@ -494,13 +403,6 @@ a {
 
 .friendRhs {
     width: 75%;
-}
-
-/* it's a bit ugly that we have to style the icon differently based on if it's on a list view or the main tree */
-.listFriendImage {
-    max-width: 70px;
-    cursor: pointer;
-    border: 2px solid $nodeBorderBottomColor;
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -564,25 +466,9 @@ strong {
     cursor: pointer;
 }
 
-.dlgContainer {
-    display: none;
-}
-
 .progressSpinner {
     width: 5rem;
     margin: 0 auto;
-}
-
-.overlay {
-    z-index: 2147483500;
-    background-color: rgba(1, 1, 1, 0.1);
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    cursor: progress;
-    display: none;
 }
 
 .extraPagingComps {
@@ -590,135 +476,9 @@ strong {
     display: inline-block;
 }
 
-.signatureIcon {
-    color: darkkhaki;
-    margin-right: $smallGap;
-}
-
-.lockIcon {
-    color: darkkhaki;
-    margin-right: $smallGap;
-}
-
-.bigSignatureIcon {
-    color: darkkhaki;
-}
-
-.bigLockIcon {
-    color: darkkhaki;
-    margin-right: $smallGap;
-}
-
-.appModalTitleNormal {
-    font-size: 130%;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
-}
-
-.appModalTitlePopup {
-    font-size: 130%;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
-    background-color: $primary;
-}
-
-.dlgTitleTopmost {
-    border-top: $dlgBorderWidth solid $dlgBorderColor;
-    border-left: $dlgBorderWidth solid $dlgBorderColor;
-    border-right: $dlgBorderWidth solid $dlgBorderColor;
-}
-
-.dlgTitleNormal {
-    border-top: 2px solid gray;
-    border-left: 2px solid gray;
-    border-right: 2px solid gray;
-}
-
-.dlgModalTitleCloseIcon {
-    cursor: pointer;
-    margin-right: 8px;
-}
-
-.appModalBackdrop {
-    position: fixed;
-    z-index: 16000000;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    overflow: auto;
-}
-
-.appModalTopBackdrop {
-    @extend .appModalBackdrop;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-/* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
-
-.appEmbedContent {
-    background-color: $modal-content-bg;
-    border: 2px solid gray;
-    border-radius: $border-radius;
-    width: 100%;
-    margin-bottom: 10px;
-    margin-top: 12px;
-}
-
-.appModalContentAreaEmbed {
-    padding: 0px 12px 12px 12px;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
-}
-
-.appModalContentAreaPopup {
-    padding: 12px;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
-}
-
-.appModalCont {
-    position: absolute;
-    background-color: $modal-content-bg;
-    margin: $smallGap auto;
-    max-width: 800px;
-}
-
-.dlgContentBorderTopmost {
-    border-left: $dlgBorderWidth solid $dlgBorderColor;
-    border-right: $dlgBorderWidth solid $dlgBorderColor;
-    border-bottom: $dlgBorderWidth solid $dlgBorderColor;
-}
-
-.dlgContentBorderNormal {
-    border-left: 2px solid gray;
-    border-right: 2px solid gray;
-    border-bottom: 2px solid gray;
-}
-
-.dlgTitleContent {
-    padding: 6px 6px 4px 12px;
-    width: 100%;
-}
-
 .line {
     width: 100%;
     border-bottom: 2px solid gray;
-}
-
-.appModalContTinyWidth {
-    @extend .appModalCont;
-    max-width: 350px;
-}
-
-.appModalContNarrowWidth {
-    @extend .appModalCont;
-    max-width: 500px;
-}
-
-.appModalContMediumWidth {
-    @extend .appModalCont;
-    max-width: 650px;
 }
 
 .scrollingPropsTable {
@@ -740,57 +500,6 @@ Will come back later and study this more. todo-3 */
     width: 75%;
     border: 2px solid gray;
     margin: 0 auto;
-}
-
-.appModalContFullscreen {
-    background-color: $modal-content-bg;
-    padding: $smallGap;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: 0;
-    overflow: auto;
-}
-
-/* Max-width of 18em allows most of the page to the right to be clicked on to dismiss the menu */
-.appModalMainMenu {
-    border: 2px solid $modal-content-border-color;
-    background-color: $modal-content-bg;
-    width: 80%;
-    max-width: 80%;
-}
-
-/* Modal Content/ Dialog Box */
-
-.appModalMenu {
-    border: 2px solid $modal-content-border-color;
-    left: 0;
-    top: 0;
-    padding: 0;
-    width: 20%;
-    margin-top: 60px;
-    margin-left: $smallGap;
-    margin-right: $smallGap;
-    margin-bottom: $smallGap;
-    max-width: 400px;
-    min-width: 350px;
-    background-color: $modal-content-bg;
-}
-
-.appModalNavPanel {
-    border: 2px solid $modal-content-border-color;
-    left: 0;
-    top: 0;
-    padding: 0;
-    width: 60%;
-    margin-top: 60px;
-    margin-left: $smallGap;
-    margin-right: $smallGap;
-    margin-bottom: $smallGap;
-    max-width: 500px;
-    min-width: 350px;
-    background-color: $modal-content-bg;
 }
 
 .mainContainer {
@@ -818,31 +527,6 @@ Will come back later and study this more. todo-3 */
     padding-bottom: 20px;
 }
 
-.tabPanelHeader {
-    background-color: $primary ;
-}
-
-.tabSubOptions {
-    margin-left: 2rem;
-    margin-top: .5rem;
-    margin-bottom: .8rem;
-}
-
-.tabSubOptionsItem {
-    cursor: pointer;
-    margin-bottom: 6px;
-}
-
-.tabSubOptionsItemMobile {
-    cursor: pointer;
-    margin-bottom: 6px;
-    padding: 12px;
-}
-
-.tabButtonsContainer {
-    margin-bottom: 8px;
-}
-
 .rightNavPanelInner {
     min-width: 15rem;
     margin-left: 10px;
@@ -861,50 +545,6 @@ Will come back later and study this more. todo-3 */
     border: 1px solid gray;
 }
 
-// Tip: It's best practice to have overflow:hidden, on all 
-// parent divs that are the 'same size' or same screen rectangle
-// to prevent any 'double scroll' bars showing up.
-.appTabPane {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    padding-right: 15px;
-    padding-bottom: 20px;
-}
-
-.appTabPaneMobile {
-    @extend .appTabPane;
-    padding: 0px !important;
-}
-
-// This padding is what makes room for the '+' buttons to the right of the rows during editing
-.appTabPaneEditMode {
-    padding-right: 50px;
-}
-
-.tabPanel {
-    height: 100%;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.tabPanelMobile {
-    height: 100%;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: $mobileHeaderBarHeight;
-}
-
-.tabContent {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-
-    // important to have 'hidden' to avoid a double scroll bar when this is NOT the thing we're scrolling
-    overflow: hidden;
-}
-
 .ipfsCidText {
     cursor: pointer;
 }
@@ -913,11 +553,6 @@ Will come back later and study this more. todo-3 */
     margin: $smallGap;
     padding: 5px;
 }
-
-/* I experimented with limiting height of rows and allowing individual scrolling on nodes but
-   i think usability and asthetics make this slightly awkward. You can simply uncomment these styles
-   and look, any time, to remember what that looks like. The style is in place in the code
-   */
 
 .tallTextContent {
     max-height: 650px;
@@ -959,127 +594,6 @@ Will come back later and study this more. todo-3 */
     margin-bottom: 10px;
 }
 
-.marginLeftIfNotFirst {
-    margin-left: $smallGap;
-}
-
-.marginLeftIfNotFirst:first-child {
-    margin-left: 0;
-}
-
-.marginLeft {
-    margin-left: $smallGap;
-}
-
-.marginRight {
-    margin-right: $smallGap;
-}
-
-.mediumMarginRight {
-    margin-right: $mediumGap;
-}
-
-.imgBlock {
-    margin-top: 12px;
-    margin-right: 12px;
-    margin-bottom: 12px;
-    display: block;
-    border: 1px solid $gray-700;
-    border-radius: $border-radius;
-}
-
-// WARNING: This class is used for finding in the DOM also, and isn't just for styling.
-// Without this class some images won't be clickable to enlarge
-.enlargableImg {
-    cursor: pointer;
-}
-
-.imgUpperLeft {
-    margin-right: 24px;
-    margin-bottom: $smallGap;
-    margin-top: $smallGap;
-    float: left !important;
-    border: 1px solid $gray-700;
-    border-radius: $border-radius;
-    vertical-align: top;
-}
-
-.imgUpperRight {
-    margin-left: 24px;
-    margin-bottom: $smallGap;
-    margin-top: $smallGap;
-    float: right !important;
-    border: 1px solid $gray-700;
-    border-radius: $border-radius;
-    vertical-align: top;
-}
-
-.imgUpperCenter {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: $smallGap;
-    margin-top: $smallGap;
-    border: 1px solid $gray-700;
-    border-radius: $border-radius;
-}
-
-.microMarginTop {
-    margin-top: $microGap;
-}
-
-.microMarginBottom {
-    margin-bottom: $microGap;
-}
-
-.microMarginRight {
-    margin-right: $microGap;
-}
-
-.marginTop {
-    margin-top: $smallGap;
-}
-
-.mediumPaddingTop {
-    padding-top: $mediumGap;
-}
-
-.smallMarginTop {
-    margin-top: $tinyGap;
-}
-
-.smallMarginBottom {
-    margin-bottom: $tinyGap;
-}
-
-.smallMarginRight {
-    margin-right: $smallGap;
-}
-
-.bigMarginBottom {
-    margin-bottom: $bigGap;
-}
-
-.bigMarginRight {
-    margin-right: $bigGap;
-}
-
-.bigPaddingRight {
-    padding-right: $bigGap;
-}
-
-.bigMarginTop {
-    margin-top: $bigGap;
-}
-
-.bigMarginLeft {
-    margin-left: $bigGap;
-}
-
-.bigMargin {
-    margin: $bigGap;
-}
-
 .linkDisplay {
     display: inline-block;
     margin-bottom: $smallGap;
@@ -1102,75 +616,8 @@ Will come back later and study this more. todo-3 */
     margin-left: 20px;
 }
 
-.microMarginTop {
-    margin-top: $microGap;
-}
-
-.marginBottom {
-    margin-bottom: $smallGap;
-}
-
-.marginBottomIfNotLast {
-    &:not(:last-child) {
-        margin-bottom: $smallGap;
-    }
-}
-
 .selectOption {
     font-size: 120%;
-}
-
-.marginAll {
-    margin: $smallGap;
-}
-
-.microMarginAll {
-    margin: $microGap;
-}
-
-.tinyMarginAll {
-    margin: $tinyGap;
-}
-
-.tinyMarginTop {
-    margin-top: $tinyGap;
-}
-
-.tinyMarginBottom {
-    margin-bottom: $tinyGap;
-}
-
-.small-padding {
-    margin-top: 7px;
-    padding: 4px;
-}
-
-// see if flexRowLayout can be used here (CSS class and or TS class)
-.horizontalLayout {
-    // flex will layout things all on the same horizontal row
-    display: flex;
-}
-
-.quickEditIcon {
-    cursor: pointer;
-    color: $nodeBorderBottomColor;
-    margin-left: $smallGap;
-}
-
-/* 
-&#x25B2; ▲
-&#x25B6; ▶
-&#x25BC; ▼
-&#x25C0; ◀
-*/
-.iconUp:after {
-    content: "\25B2";
-    padding-left: 5px;
-}
-
-.iconDown:after {
-    content: "\25BC";
-    padding-left: 5px;
 }
 
 .textareaMin4 {
@@ -1220,11 +667,6 @@ Will come back later and study this more. todo-3 */
     margin-left: 2rem;
 }
 
-// todo-1: ended up with two different version of this class. only difference is lowercase of 'F'. fix it.
-.textfield {
-    font-family: "monospace";
-}
-
 .textField {
     font-family: "monospace";
 }
@@ -1234,38 +676,13 @@ Will come back later and study this more. todo-3 */
     margin-bottom: $tinyGap;
 }
 
-.rowIcon {
-    margin-left: 10px;
-    margin-right: 6px;
-    vertical-align: middle;
-    cursor: pointer;
-}
-
 .typeSearchField {
     margin-bottom: $smallGap;
-}
-
-.rowTypeIcon {
-    vertical-align: middle;
-    border: 1px solid gray;
-    padding: 6px;
-    cursor: pointer;
-}
-
-.histTypeIcon {
-    @extend .rowTypeIcon;
-    margin-right: $tinyGap;
-    vertical-align: bottom; // important so long text looks consistent in row spacing
 }
 
 .rowTypeName {
     vertical-align: middle;
     margin-left: 6px;
-}
-
-.passwordEyeIcon {
-    cursor: pointer;
-    margin-left: 10px;
 }
 
 .mkCont {
@@ -1315,26 +732,6 @@ Will come back later and study this more. todo-3 */
     padding: 0;
 }
 
-.rowImageContainer {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: $smallGap;
-    // margin-top: $tinyGap;
-}
-
-.fullScreenImg {
-    cursor: pointer;
-    margin: 12px;
-    border: 3px solid $gray-700;
-}
-
-.imgInEditor {
-    cursor: pointer;
-    border: 1px solid gray;
-    vertical-align: top;
-    width: 75px;
-}
-
 .systemFileActionLink {
     cursor: pointer;
     margin-right: 16px;
@@ -1345,19 +742,6 @@ Will come back later and study this more. todo-3 */
     font-family: Courier New, Courier, Roboto, Tahoma, Verdana, Arial;
     cursor: pointer;
     padding-bottom: 5px;
-}
-
-.mainTabPanel {
-    //border: 1px solid black;
-    //background-color: $mainContentBackground;
-    //setting a max-width here ruins the centering horizontally on the page, my goal was
-    //to narrow the main tab content in center of page
-    //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
-    // max-width: 750px;
-
-    //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
-    margin-bottom: $smallGap;
-    width: 100%;
 }
 
 .searchResultsPanel {
@@ -1371,10 +755,6 @@ Will come back later and study this more. todo-3 */
     padding-top: 8px;
     margin-bottom: 8px;
     margin-top: 8px;
-}
-
-.vertLayoutRow {
-    margin-bottom: $smallGap;
 }
 
 .validationError {
@@ -1404,16 +784,6 @@ Will come back later and study this more. todo-3 */
     margin-top: 1rem;
 }
 
-.dialogTitle {
-    font-size: 30px;
-    margin-bottom: 20px;
-}
-
-.dialogSubTitle {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-
 .headerInfoDivExpanded {
     display: block;
     width: 100%;
@@ -1427,12 +797,6 @@ Will come back later and study this more. todo-3 */
     background-color: transparent;
     margin-right: $smallGap;
     margin-bottom: $smallGap;
-}
-
-.typeListIcon {
-    margin-right: 12px;
-    margin-top: 4px;
-    vertical-align: "middle";
 }
 
 /* This positioning puts the plus buttion right outside the row to the right between rows
@@ -1450,7 +814,6 @@ Will come back later and study this more. todo-3 */
     // from {
     //     opacity: 1;
     // }
-
     to {
         opacity: 0;
     }
@@ -1490,14 +853,6 @@ Will come back later and study this more. todo-3 */
     // animation-name: fadeToVisible;
     // animation-duration: 1s; <-------this didn't work. Comes back to visible instantly (no amination).
     margin-bottom: 20px;
-}
-
-.noMargin {
-    margin: 0;
-}
-
-.noPaddingRight {
-    padding-right: 0px !important;
 }
 
 .systemNodeContent {
@@ -1549,14 +904,6 @@ Will come back later and study this more. todo-3 */
     width: 70%;
 }
 
-.folderIcon {
-    color: darkkhaki;
-}
-
-.fileIcon {
-    color: darkgreen;
-}
-
 .files-table {
     width: 100%;
     margin-top: $smallGap;
@@ -1583,11 +930,6 @@ Will come back later and study this more. todo-3 */
     width: 75%;
 }
 
-.verticalSpace {
-    height: 16px;
-    min-height: 16px;
-}
-
 .resultsNode {
     // why relative here ? todo-1
     position: relative;
@@ -1600,11 +942,6 @@ Will come back later and study this more. todo-3 */
     background: $body-bg;
 }
 
-.showParentsIcon {
-    cursor: pointer;
-    color: gray;
-}
-
 .main {
     background-color: #eee;
 }
@@ -1615,18 +952,6 @@ Will come back later and study this more. todo-3 */
 
 .timeRemainingEditField {
     margin-left: 5px;
-}
-
-.clearBoth {
-    clear: both;
-}
-
-.border-bottom {
-    border-bottom: 1px solid #e5e5e5;
-}
-
-.testHighlight {
-    background-color: green;
 }
 
 .threadNodeDivider {
@@ -1690,24 +1015,6 @@ Will come back later and study this more. todo-3 */
     border: 2px solid $nodeBorderBottomColor;
 }
 
-.iconToggle {
-}
-
-.iconToggleOn {
-    @extend .iconToggle;
-    border: 3px solid var(--bs-green);
-    padding: 1px;
-}
-
-.alignBottom {
-    vertical-align: bottom !important;
-}
-
-.iconToggleOff {
-    @extend .iconToggle;
-    border: 3px solid transparent;
-}
-
 .searchDlgOrderBy {
     width: 12rem;
     margin-left: $bigGap;
@@ -1720,11 +1027,6 @@ Will come back later and study this more. todo-3 */
 .layoutSelection {
     max-width: 14rem;
     margin-right: 1rem;
-}
-
-.imagesSelection {
-    max-width: 7rem;
-    margin-right: $smallGap;
 }
 
 .selectLabel {
@@ -1783,20 +1085,10 @@ Will come back later and study this more. todo-3 */
     }
 }
 
-.captchaImage {
-    margin-left: 1px;
-    margin-right: $smallGap;
-    border: 2px solid $gray-700;
-}
-
 .heading5 {
     font-size: 1.2rem;
     font-weight: 500;
     line-height: 1.2;
-}
-
-.inlineBlock {
-    display: inline-block;
 }
 
 .friendListText {
@@ -1819,10 +1111,6 @@ Will come back later and study this more. todo-3 */
     cursor: pointer;
 }
 
-.friendListImgDivCont {
-    display: inline-block;
-}
-
 .propNameInList {
     display: inline-block;
     margin: $tinyGap;
@@ -1833,35 +1121,8 @@ Will come back later and study this more. todo-3 */
     margin: $tinyGap;
 }
 
-.friendListImgDiv {
-    width: 70px;
-    max-width: 70px;
-    min-height: 70px; // min hight needed to make list boxes look good.
-    cursor: pointer;
-    margin: $tinyGap 2px 2px $tinyGap;
-    border: 1px solid gray;
-}
-
-// centers the child that's inside this div (both vertically and horizontall centering)
-.centerChild {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}
-
-.friendListImage {
-    width: 100%;
-}
-
 .mobileRHSPanel {
     font-size: 140%;
-}
-
-.editorIcon {
-    margin-left: $smallGap;
-    cursor: pointer;
 }
 
 .largeFont {
@@ -1921,18 +1182,6 @@ audio::-webkit-media-controls-play-button {
     min-height: 4em;
 }
 
-.tabTitle {
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: bold;
-    vertical-align: middle;
-    color: var(--bs-green);
-}
-
-.monospace {
-    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
-}
-
 .rowHeaderSharingNames {
     margin-right: $smallGap;
 }
@@ -1942,90 +1191,13 @@ audio::-webkit-media-controls-play-button {
     cursor: pointer;
 }
 
-.dlgIcon {
-    margin-right: 8px;
-    vertical-align: "middle";
-}
-
-.iconMarginLeft {
-    margin-left: 12px;
-    vertical-align: "middle";
-}
-
 .tableRow {
     display: table-row;
-}
-
-.profileInfoButton {
-    display: inline-block;
-    margin-top: $smallGap;
-    font-weight: bold;
-    margin-left: 15px;
-    padding: 8px;
-    border: 2px solid $nodeBorderBottomColor;
-    border-radius: 100px;
-    cursor: pointer;
-}
-
-.followingText {
-    @extend .profileInfoButton;
-    background-color: green;
-}
-
-.blockingText {
-    @extend .profileInfoButton;
-    background-color: orangered;
-}
-
-.followCount {
-    @extend .profileInfoButton;
 }
 
 .displayTable {
     display: table;
     border-spacing: 10px;
-}
-
-.flexRowLayout {
-    display: flex;
-    flex-wrap: wrap;
-
-    // WARNING: without this items can stretch vertically and this warps images 
-    align-items: flex-start;
-}
-
-.flexRowAlignBottom {
-    align-items: end;
-}
-
-.horizontalLayoutComp {
-    display: table;
-    border-spacing: 10px;
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
-}
-
-.horizontalLayoutCompCompact {
-    display: table;
-    border-spacing: 10px;
-}
-
-.horizontalLayoutCompBorderCollapse {
-    @extend .horizontalLayoutComp;
-    border-collapse: collapse;
-}
-
-.displayTableNoSpacing {
-    display: table;
-}
-
-.displayRow {
-    display: table-row;
-}
-
-.displayCell {
-    display: table-cell;
-    vertical-align: top;
 }
 
 .clickable {
@@ -2042,30 +1214,6 @@ audio::-webkit-media-controls-play-button {
 .stickyNote {
     margin-top: 6px;
     color: darkkhaki;
-}
-
-.warningIcon {
-    color: darkkhaki;
-}
-
-.likedByMeIcon {
-    color: yellow;
-    border: 2px solid yellow;
-    padding: 6px;
-    border-radius: 8px;
-}
-
-.apObjIconContainer {
-    margin-left: $smallGap;
-}
-
-.apObjIcon {
-    display: inline;
-    vertical-align: top;
-    max-width: 32%;
-    min-width: 200px;
-    margin-left: $smallGap;
-    margin-bottom: $smallGap;
 }
 
 .apObjLinksContainer {
@@ -2086,16 +1234,6 @@ audio::-webkit-media-controls-play-button {
 .floatRightHeaderDiv {
     margin-left: 10px;
     margin-top: 2px;
-}
-
-.welcomeText {
-    max-width: 30rem;
-    display: inline-block;
-}
-
-.supportText {
-    font-size: 80%;
-    font-style: italic;
 }
 
 .historyPanelTitle {
@@ -2195,10 +1333,6 @@ audio::-webkit-media-controls-play-button {
 .linksPanelInEditor {
     display: flex;
     flex-wrap: wrap;
-}
-
-.dimImg {
-    filter: brightness(70%);
 }
 
 .highlightText {

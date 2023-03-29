@@ -1,0 +1,126 @@
+.leftNavLogoImg {
+    border: 1px solid gray;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: $border-radius;
+}
+
+.imgBlock {
+    margin-top: 12px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    display: block;
+    border: 1px solid $gray-700;
+    border-radius: $border-radius;
+}
+
+// WARNING: This class is used for finding in the DOM also, and isn't just for styling.
+// Without this class some images won't be clickable to enlarge
+.enlargableImg {
+    cursor: pointer;
+}
+
+.imgUpperLeft {
+    margin-right: 24px;
+    margin-bottom: $smallGap;
+    margin-top: $smallGap;
+    float: left !important;
+    border: 1px solid $gray-700;
+    border-radius: $border-radius;
+    vertical-align: top;
+}
+
+.imgUpperRight {
+    margin-left: 24px;
+    margin-bottom: $smallGap;
+    margin-top: $smallGap;
+    float: right !important;
+    border: 1px solid $gray-700;
+    border-radius: $border-radius;
+    vertical-align: top;
+}
+
+.imgUpperCenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: $smallGap;
+    margin-top: $smallGap;
+    border: 1px solid $gray-700;
+    border-radius: $border-radius;
+}
+
+.fullScreenImg {
+    cursor: pointer;
+    margin: 12px;
+    border: 3px solid $gray-700;
+}
+
+.imgInEditor {
+    cursor: pointer;
+    border: 1px solid gray;
+    vertical-align: top;
+    width: 75px;
+}
+
+.friendListImgDivCont {
+    display: inline-block;
+}
+
+.friendListImgDiv {
+    width: 70px;
+    max-width: 70px;
+    min-height: 70px; // min hight needed to make list boxes look good.
+    cursor: pointer;
+    margin: $tinyGap 2px 2px $tinyGap;
+    border: 1px solid gray;
+}
+
+.dimImg {
+    filter: brightness(70%);
+}
+
+.avatarImage {
+    max-width: 48px;
+    max-height: 80px;
+    cursor: pointer;
+    border: 1px solid gray;
+    vertical-align: top;
+}
+
+.headerImageRHS {
+    cursor: pointer;
+    width: 100%;
+    object-fit: cover;
+    border: 2px solid $nodeBorderBottomColor;
+    min-height: 60px;
+    max-height: 200px;
+}
+
+/* it's a bit ugly that we have to style the icon differently based on if it's on a list view or the main tree */
+.listFriendImage {
+    max-width: 70px;
+    cursor: pointer;
+    border: 2px solid $nodeBorderBottomColor;
+}
+
+.rowImageContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: $smallGap;
+}
+
+.imagesSelection {
+    max-width: 7rem;
+    margin-right: $smallGap;
+}
+
+.captchaImage {
+    margin-left: 1px;
+    margin-right: $smallGap;
+    border: 2px solid $gray-700;
+}
+
+.friendListImage {
+    width: 100%;
+}

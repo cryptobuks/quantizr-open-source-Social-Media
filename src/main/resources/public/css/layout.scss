@@ -1,0 +1,212 @@
+.marginLeftIfNotFirst {
+    margin-left: $smallGap;
+}
+
+.marginLeftIfNotFirst:first-child {
+    margin-left: 0;
+}
+
+.marginLeft {
+    margin-left: $smallGap;
+}
+
+.marginRight {
+    margin-right: $smallGap;
+}
+
+.mediumMarginRight {
+    margin-right: $mediumGap;
+}
+
+.microMarginTop {
+    margin-top: $microGap;
+}
+
+.microMarginBottom {
+    margin-bottom: $microGap;
+}
+
+.microMarginRight {
+    margin-right: $microGap;
+}
+
+.marginTop {
+    margin-top: $smallGap;
+}
+
+.mediumPaddingTop {
+    padding-top: $mediumGap;
+}
+
+.smallMarginTop {
+    margin-top: $tinyGap;
+}
+
+.smallMarginBottom {
+    margin-bottom: $tinyGap;
+}
+
+.smallMarginRight {
+    margin-right: $smallGap;
+}
+
+.bigMarginBottom {
+    margin-bottom: $bigGap;
+}
+
+.bigMarginRight {
+    margin-right: $bigGap;
+}
+
+.bigPaddingRight {
+    padding-right: $bigGap;
+}
+
+.bigMarginTop {
+    margin-top: $bigGap;
+}
+
+.bigMarginLeft {
+    margin-left: $bigGap;
+}
+
+.bigMargin {
+    margin: $bigGap;
+}
+
+.microMarginTop {
+    margin-top: $microGap;
+}
+
+.marginBottom {
+    margin-bottom: $smallGap;
+}
+
+.marginBottomIfNotLast {
+    &:not(:last-child) {
+        margin-bottom: $smallGap;
+    }
+}
+
+.marginAll {
+    margin: $smallGap;
+}
+
+.microMarginAll {
+    margin: $microGap;
+}
+
+.tinyMarginAll {
+    margin: $tinyGap;
+}
+
+.tinyMarginTop {
+    margin-top: $tinyGap;
+}
+
+.tinyMarginBottom {
+    margin-bottom: $tinyGap;
+}
+
+// see if flexRowLayout can be used here (CSS class and or TS class)
+.horizontalLayout {
+    // flex will layout things all on the same horizontal row
+    display: flex;
+}
+
+.vertLayoutRow {
+    margin-bottom: $smallGap;
+}
+
+.noMargin {
+    margin: 0;
+}
+
+.noPaddingRight {
+    padding-right: 0px !important;
+}
+
+.verticalSpace {
+    height: 16px;
+    min-height: 16px;
+}
+
+.alignBottom {
+    vertical-align: bottom !important;
+}
+
+.inlineBlock {
+    display: inline-block;
+}
+
+// centers the child that's inside this div (both vertically and horizontall centering)
+.centerChild {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.flexRowLayout {
+    display: flex;
+    flex-wrap: wrap;
+
+    // WARNING: without this items can stretch vertically and this warps images 
+    align-items: flex-start;
+}
+
+.flexRowAlignBottom {
+    align-items: end;
+}
+
+.horizontalLayoutComp {
+    display: table;
+    border-spacing: 10px;
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.horizontalLayoutCompCompact {
+    display: table;
+    border-spacing: 10px;
+}
+
+.horizontalLayoutCompBorderCollapse {
+    @extend .horizontalLayoutComp;
+    border-collapse: collapse;
+}
+
+.displayTableNoSpacing {
+    display: table;
+}
+
+.displayRow {
+    display: table-row;
+}
+
+.displayCell {
+    display: table-cell;
+    vertical-align: top;
+}
+
+// HTML comming from Mastodon includes this so tolerate if for now.
+.invisible {
+    display: none;
+    visibility: hidden !important;
+}
+
+// for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
+.compHidden {
+    opacity: 0;
+}
+
+.visible {
+    display: inline-block;
+    visibility: visible !important;
+}
+
+.clearBoth {
+    clear: both;
+}
+

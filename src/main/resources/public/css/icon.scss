@@ -1,0 +1,126 @@
+.signatureIcon {
+    color: darkkhaki;
+    margin-right: $smallGap;
+}
+
+.lockIcon {
+    color: darkkhaki;
+    margin-right: $smallGap;
+}
+
+.bigSignatureIcon {
+    color: darkkhaki;
+}
+
+.bigLockIcon {
+    color: darkkhaki;
+    margin-right: $smallGap;
+}
+
+/* 
+&#x25B2; ▲
+&#x25B6; ▶
+&#x25BC; ▼
+&#x25C0; ◀
+*/
+.iconUp:after {
+    content: "\25B2";
+    padding-left: 5px;
+}
+
+.iconDown:after {
+    content: "\25BC";
+    padding-left: 5px;
+}
+
+.rowIcon {
+    margin-left: 10px;
+    margin-right: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.rowTypeIcon {
+    vertical-align: middle;
+    border: 1px solid gray;
+    padding: 6px;
+    cursor: pointer;
+}
+
+.histTypeIcon {
+    @extend .rowTypeIcon;
+    margin-right: $tinyGap;
+    vertical-align: bottom; // important so long text looks consistent in row spacing
+}
+
+.passwordEyeIcon {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.typeListIcon {
+    margin-right: 12px;
+    margin-top: 4px;
+    vertical-align: "middle";
+}
+
+.folderIcon {
+    color: darkkhaki;
+}
+
+.fileIcon {
+    color: darkgreen;
+}
+
+.showParentsIcon {
+    cursor: pointer;
+    color: gray;
+}
+
+.iconToggle {
+}
+
+.iconToggleOn {
+    @extend .iconToggle;
+    border: 3px solid var(--bs-green);
+    padding: 1px;
+}
+
+.iconToggleOff {
+    @extend .iconToggle;
+    border: 3px solid transparent;
+}
+
+.editorIcon {
+    margin-left: $smallGap;
+    cursor: pointer;
+}
+
+.iconMarginLeft {
+    margin-left: 12px;
+    vertical-align: "middle";
+}
+
+.warningIcon {
+    color: darkkhaki;
+}
+
+.likedByMeIcon {
+    color: yellow;
+    border: 2px solid yellow;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.apObjIconContainer {
+    margin-left: $smallGap;
+}
+
+.apObjIcon {
+    display: inline;
+    vertical-align: top;
+    max-width: 32%;
+    min-width: 200px;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+}

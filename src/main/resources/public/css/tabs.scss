@@ -1,0 +1,89 @@
+.tabPanelHeader {
+    background-color: $primary ;
+}
+
+.tabSubOptions {
+    margin-left: 2rem;
+    margin-top: .5rem;
+    margin-bottom: .8rem;
+}
+
+.tabSubOptionsItem {
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.tabSubOptionsItemMobile {
+    cursor: pointer;
+    margin-bottom: 6px;
+    padding: 12px;
+}
+
+.tabButtonsContainer {
+    margin-bottom: 8px;
+}
+
+// Tip: It's best practice to have overflow:hidden, on all 
+// parent divs that are the 'same size' or same screen rectangle
+// to prevent any 'double scroll' bars showing up.
+.appTabPane {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-right: 15px;
+    padding-bottom: 20px;
+}
+
+.appTabPaneMobile {
+    @extend .appTabPane;
+    padding: 0px !important;
+}
+
+// This padding is what makes room for the '+' buttons to the right of the rows during editing
+.appTabPaneEditMode {
+    padding-right: 50px;
+}
+
+.tabPanel {
+    height: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.tabPanelMobile {
+    height: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: $mobileHeaderBarHeight;
+}
+
+.tabContent {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+
+    // important to have 'hidden' to avoid a double scroll bar when this is NOT the thing we're scrolling
+    overflow: hidden;
+}
+
+.mainTabPanel {
+    //border: 1px solid black;
+    //background-color: $mainContentBackground;
+    //setting a max-width here ruins the centering horizontally on the page, my goal was
+    //to narrow the main tab content in center of page
+    //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
+    // max-width: 750px;
+
+    //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
+    margin-bottom: $smallGap;
+    width: 100%;
+}
+
+.tabTitle {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    vertical-align: middle;
+    color: var(--bs-green);
+}
