@@ -11,10 +11,11 @@ export class ButtonBar extends Comp {
     constructor(buttons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
         super(null);
         this.setChildren(buttons);
+        this.allowRenderEmpty = false;
     }
 
     compRender = (): ReactNode => {
-        if (!this.hasChildren()) return null;
+        // if (!this.hasChildren()) return null;
 
         const props = {
             className: "btn-group btnGroup flex-wrap " + this.extraClass,

@@ -94,6 +94,8 @@ $mobileHeaderHeight: 3.5rem;
 @import 'image.scss';
 @import 'layout.scss';
 @import 'tts.scss';
+@import 'edit.scss';
+@import 'text.scss';
 
 body {
     font-family: "QuantaCustomFont" !important;
@@ -105,52 +107,8 @@ body {
     height: 100%;
 }
 
-.mention {
-    margin-right: 3px;
-    margin-left: 3px;
-}
-
-.alert {
-    // these sizes are half the default for bootstrap
-    padding: .5rem;
-    margin-bottom: .5rem;
-}
-
 .mfsFileView {
     margin: $smallGap;
-}
-
-.textTypeContent {
-    margin: 12px 0px 12px 12px;
-    padding: 8px;
-    border: 1px solid $nodeBorderBottomColor;
-    background-color: #17202A;
-}
-
-.preWordWrap {
-    // overflow-x: auto; //<--- highly upvoted stack overflow didn't have this.
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-    white-space: -pre-wrap;
-    white-space: -o-pre-wrap;
-    word-wrap: break-word;
-}
-
-.mkCont table,
-th,
-td {
-    border: 1px solid $nodeBorderBottomColor;
-    border-collapse: collapse;
-}
-
-.mkCont th,
-td {
-    padding: $tinyGap;
-}
-
-.serverInfoText {
-    width: 100%;
-    overflow: auto;
 }
 
 .mobileHeaderBar {
@@ -162,15 +120,6 @@ td {
     background-color: $nodeBorderBottomColor;
     border-bottom: 1px solid gray;
     height: $mobileHeaderBarHeight;
-}
-
-.fileNameField {
-    width: 12em;
-    min-width: 3em;
-}
-
-.displayNameTextField {
-    max-width: 40rem;
 }
 
 .helpPanel {
@@ -187,18 +136,6 @@ td {
     margin-right: 0px !important;
     height: 100vh;
     overflow: hidden;
-}
-
-.signupLinkText {
-    cursor: pointer;
-    margin-bottom: 16px;
-    margin-right: 16px;
-}
-
-.signupLinkTextMobile {
-    display: inline-block;
-    margin-top: 16px;
-    cursor: pointer;
 }
 
 .fullScreenToolbar {
@@ -262,8 +199,7 @@ td {
     padding: 12px;
 }
 
-.d3Graph {
-}
+.d3Graph {}
 
 .popupNodeLinks {
     margin-top: $smallGap
@@ -326,24 +262,6 @@ a {
     background-color: black;
 }
 
-.logoText {
-    cursor: pointer;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-left: 10px;
-    margin-right: 15px;
-    vertical-align: top;
-    color: var(--bs-green);
-}
-
-.newMessagesNote {
-    cursor: pointer;
-    padding: 2px 6px 2px 6px;
-    margin-right: $smallGap;
-    color: var(--bs-green);
-    border: 2px solid var(--bs-green);
-}
-
 .highlightBorder {
     border: 1px solid green;
 }
@@ -351,29 +269,6 @@ a {
 .binary-link {
     margin-left: $smallGap;
     margin-bottom: $smallGap;
-}
-
-.normalText {
-    font-weight: normal;
-}
-
-.resultsContentHeading {
-    font-size: 120%;
-    padding: 10px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    border: 1px solid gray;
-}
-
-.logViewTitle {
-    margin-bottom: 10px;
-}
-
-.trendingSectionTitle {
-    margin-bottom: 10px;
-    padding: 6px 6px 6px 12px;
-    border: 1px solid $nodeBorderBottomColor;
-    text-align: center;
 }
 
 .rhsMenu {
@@ -384,13 +279,6 @@ a {
 .rhsMenuMobile {
     width: 85%;
     padding-left: 0;
-}
-
-.userName {
-    font-weight: bold;
-}
-
-.rhsUserName {
 }
 
 .lhsHeaderPanel {
@@ -436,10 +324,6 @@ strong {
     width: 100%;
 }
 
-.fixedFont {
-    font-family: 'Courier New', Courier, monospace;
-}
-
 .splitNodeRadioButtonGroup {
     padding: $smallGap;
     margin-bottom: $smallGap;
@@ -455,16 +339,9 @@ strong {
     margin-left: $smallGap;
 }
 
-.propsPanelExpanded {
-}
+.propsPanelExpanded {}
 
-.propsPanelCollapsed {
-}
-
-.collapsePanelLink {
-    margin: $smallGap;
-    cursor: pointer;
-}
+.propsPanelCollapsed {}
 
 .progressSpinner {
     width: 5rem;
@@ -545,34 +422,9 @@ Will come back later and study this more. todo-3 */
     border: 1px solid gray;
 }
 
-.ipfsCidText {
-    cursor: pointer;
-}
-
-.ipfsText {
-    margin: $smallGap;
-    padding: 5px;
-}
-
-.tallTextContent {
-    max-height: 650px;
-}
-
-.cryptoKeyTextContent {
-    max-height: 300px;
-    border: 1px solid $gray-700;
-    padding: 1rem;
-}
-
 .selectKeyTypeDropDown {
     margin-bottom: 12px;
     max-width: 20rem;
-}
-
-.centeredTitle {
-    width: 500px;
-    /* This margin trick causes horizontal centering */
-    margin: 0 auto;
 }
 
 .listGroupMenuItem {
@@ -594,15 +446,6 @@ Will come back later and study this more. todo-3 */
     margin-bottom: 10px;
 }
 
-.linkDisplay {
-    display: inline-block;
-    margin-bottom: $smallGap;
-    margin-left: 20px;
-    padding: $tinyGap;
-    border: 1px solid gray;
-    cursor: pointer;
-}
-
 .delAttachmentButton {
     margin-top: $tinyGap;
     margin-right: $tinyGap;
@@ -620,44 +463,6 @@ Will come back later and study this more. todo-3 */
     font-size: 120%;
 }
 
-.textareaMin4 {
-    font-family: inherit;
-    min-height: 4rem;
-}
-
-.fontInherit {
-    font-family: inherit;
-}
-
-.mkDownCodespan {
-    color: var(--bs-green);
-    word-wrap: break-word;
-    cursor: pointer;
-    font-size: 110%;
-
-    // I saw these in browser elements view but not sure if we need them.
-    // direction: ltr /* rtl:ignore */;
-    // unicode-bidi: bidi-override;
-}
-
-.preTextarea {
-    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
-    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    font-family: inherit;
-    background-color: #1b2631 !important;
-    border-radius: 0px !important;
-    border: 1px solid gray;
-}
-
-.preTextField {
-    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
-    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    padding: 5px 5px 5px 10px;
-    font-family: inherit;
-    border-radius: 0px !important;
-    border: 1px solid gray;
-}
-
 .formSelect {
     border: 1px solid gray !important;
     padding: 5px 5px 5px 10px;
@@ -667,69 +472,9 @@ Will come back later and study this more. todo-3 */
     margin-left: 2rem;
 }
 
-.textField {
-    font-family: "monospace";
-}
-
-/* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
-.passwordTextField {
-    margin-bottom: $tinyGap;
-}
-
-.typeSearchField {
-    margin-bottom: $smallGap;
-}
-
 .rowTypeName {
     vertical-align: middle;
     margin-left: 6px;
-}
-
-.mkCont {
-    padding-top: .5rem;
-    padding-left: 1.2rem;
-    padding-bottom: 1.2rem;
-    padding-right: 1rem;
-}
-
-.mkCont h1 {
-    font-size: 2.8rem;
-}
-
-.mkCont h2 {
-    font-size: 2.6rem;
-}
-
-.mkCont h3 {
-    font-size: 2.4rem;
-}
-
-.mkCont h4 {
-    font-size: 2.1rem;
-}
-
-.mkCont h5 {
-    font-size: 1.8rem;
-}
-
-.mkCont h6 {
-    font-size: 1.5rem;
-}
-
-// without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
-// amount of spacing we want in the mkCont style itself so we stop this from messing that up with this 'last-child' style
-.mkCont p:last-child {
-    margin-bottom: 0;
-}
-
-// Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
-.mkCont kbd,
-.mkCont pre,
-.mkCont samp {
-    width: 100%;
-    border: 1px solid olivedrab;
-    background-color: $baseBgColor;
-    padding: 0;
 }
 
 .systemFileActionLink {
@@ -744,11 +489,9 @@ Will come back later and study this more. todo-3 */
     padding-bottom: 5px;
 }
 
-.searchResultsPanel {
-}
+.searchResultsPanel {}
 
-.timelinePanel {
-}
+.timelinePanel {}
 
 .parentNodeContentStyle {
     padding-right: 8px;
@@ -773,15 +516,6 @@ Will come back later and study this more. todo-3 */
 .tagsFlexContainer {
     display: flex;
     flex-wrap: wrap;
-}
-
-.txtFieldLabelShort {
-    margin-right: .25rem;
-}
-
-.txtFieldLabel {
-    margin-right: .25rem;
-    margin-top: 1rem;
 }
 
 .headerInfoDivExpanded {
@@ -811,6 +545,7 @@ Will come back later and study this more. todo-3 */
 }
 
 @keyframes fadeToHidden {
+
     // from {
     //     opacity: 1;
     // }
@@ -838,6 +573,7 @@ Will come back later and study this more. todo-3 */
     from {
         opacity: hidden;
     }
+
     to {
         visibility: visible;
     }
@@ -864,22 +600,17 @@ Will come back later and study this more. todo-3 */
 }
 
 // todo-1: once I'm certain about it I can remove these
-.contentNarrow {
-}
+.contentNarrow {}
 
-.contentMedium {
-}
+.contentMedium {}
 
-.contentWide {
-}
+.contentWide {}
 
 .mousePointer {
     cursor: pointer;
 }
 
-.propsList {
-
-}
+.propsList {}
 
 .propsListItemCheckBox {
     vertical-align: middle;
@@ -887,9 +618,7 @@ Will come back later and study this more. todo-3 */
     margin-right: 0 !important;
 }
 
-.propertyTable {
-
-}
+.propertyTable {}
 
 .propTableRow {
     width: 100%;
@@ -944,10 +673,6 @@ Will come back later and study this more. todo-3 */
 
 .main {
     background-color: #eee;
-}
-
-.smallHeading {
-    font-size: 1.3rem;
 }
 
 .timeRemainingEditField {
@@ -1085,21 +810,6 @@ Will come back later and study this more. todo-3 */
     }
 }
 
-.heading5 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    line-height: 1.2;
-}
-
-.friendListText {
-    display: inline-block;
-    font-weight: 500;
-    padding-left: 8px;
-    padding-top: 6px;
-    vertical-align: top;
-    cursor: pointer;
-}
-
 .friendName {
     font-size: 1rem;
     font-weight: bold;
@@ -1122,10 +832,6 @@ Will come back later and study this more. todo-3 */
 }
 
 .mobileRHSPanel {
-    font-size: 140%;
-}
-
-.largeFont {
     font-size: 140%;
 }
 
@@ -1184,11 +890,6 @@ audio::-webkit-media-controls-play-button {
 
 .rowHeaderSharingNames {
     margin-right: $smallGap;
-}
-
-.editDlgSharingNames {
-    padding: 3px 4px 3px 4px;
-    cursor: pointer;
 }
 
 .tableRow {
@@ -1304,17 +1005,6 @@ audio::-webkit-media-controls-play-button {
     text-align: right;
 }
 
-.linkLabel {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-left: $smallGap;
-    margin-bottom: $smallGap;
-    background-color: cadetblue;
-    color: black;
-    padding: $microGap;
-    border-radius: $border-radius;
-}
-
 .nodeLink {
     display: inline-block;
     background-color: $primary;
@@ -1333,13 +1023,6 @@ audio::-webkit-media-controls-play-button {
 .linksPanelInEditor {
     display: flex;
     flex-wrap: wrap;
-}
-
-.highlightText {
-    background-color: blue;
-    color: yellow;
-    padding-top: 4px;
-    padding-bottom: 4px;
 }
 
 .lastModifiedTime {

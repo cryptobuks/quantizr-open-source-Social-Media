@@ -1,0 +1,150 @@
+.mention {
+    margin-right: 3px;
+    margin-left: 3px;
+}
+
+.alert {
+    // these sizes are half the default for bootstrap
+    padding: .5rem;
+    margin-bottom: .5rem;
+}
+
+.serverInfoText {
+    width: 100%;
+    overflow: auto;
+}
+
+.signupLinkText {
+    cursor: pointer;
+    margin-bottom: 16px;
+    margin-right: 16px;
+}
+
+.signupLinkTextMobile {
+    display: inline-block;
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+.logoText {
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-left: 10px;
+    margin-right: 15px;
+    vertical-align: top;
+    color: var(--bs-green);
+}
+
+.newMessagesNote {
+    cursor: pointer;
+    padding: 2px 6px 2px 6px;
+    margin-right: $smallGap;
+    color: var(--bs-green);
+    border: 2px solid var(--bs-green);
+}
+
+.normalText {
+    font-weight: normal;
+}
+
+.resultsContentHeading {
+    font-size: 120%;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border: 1px solid gray;
+}
+
+.logViewTitle {
+    margin-bottom: 10px;
+}
+
+.trendingSectionTitle {
+    margin-bottom: 10px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+}
+
+.userName {
+    font-weight: bold;
+}
+
+.fixedFont {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.collapsePanelLink {
+    margin: $smallGap;
+    cursor: pointer;
+}
+
+.ipfsCidText {
+    cursor: pointer;
+}
+
+.ipfsText {
+    margin: $smallGap;
+    padding: 5px;
+}
+
+.tallTextContent {
+    max-height: 650px;
+}
+
+.cryptoKeyTextContent {
+    max-height: 300px;
+    border: 1px solid $gray-700;
+    padding: 1rem;
+}
+
+.linkDisplay {
+    display: inline-block;
+    margin-bottom: $smallGap;
+    margin-left: 20px;
+    padding: $tinyGap;
+    border: 1px solid gray;
+    cursor: pointer;
+}
+
+.smallHeading {
+    font-size: 1.3rem;
+}
+
+.heading5 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.friendListText {
+    display: inline-block;
+    font-weight: 500;
+    padding-left: 8px;
+    padding-top: 6px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.largeFont {
+    font-size: 140%;
+}
+
+.linkLabel {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    background-color: cadetblue;
+    color: black;
+    padding: $microGap;
+    border-radius: $border-radius;
+}
+
+.highlightText {
+    background-color: blue;
+    color: yellow;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}

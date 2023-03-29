@@ -102,11 +102,16 @@ export class NodeCompMainNode extends Div {
                 S.render.setNodeDropHandler(this.attribs, node);
             }
 
+            const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null;
+            if (buttonBar) {
+                buttonBar.allowRenderEmpty = false;
+            }
+
             this.setChildren([
                 S.render.renderBoostHeader(node, true),
                 S.render.renderLinkLabel(node.id),
                 header,
-                !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
+                buttonBar,
                 new Clearfix(),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),

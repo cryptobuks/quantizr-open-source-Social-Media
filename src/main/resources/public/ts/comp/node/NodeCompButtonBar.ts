@@ -271,25 +271,22 @@ export class NodeCompButtonBar extends Div {
         // }
         // ---------------------------
 
-        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
-            new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
-                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */ pasteSpan])];
+        const floatEndSpan = new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
+            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */ pasteSpan])
+        floatEndSpan.allowRenderEmpty = false;
+
+        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, //
+            prevButton, nextButton, floatEndSpan
+        ];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);
         }
 
-        let buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
-        if (buttonBar && !buttonBar.hasChildren()) {
-            buttonBar = null;
-        }
+        const buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
+        buttonBar.allowRenderEmpty = false;
+        this.allowRenderEmpty = false;
 
         this.setChildren([selCheckbox, sharedIcon, buttonBar]);
-
-        // this is a workaround for when this component renders empty and consumes space, but we might need to just
-        // do this in the base class Comp for ALL components, or have a hidden-if-no-children flag
-        if (!this.hasChildren()) {
-            delete this.attribs.className;
-        }
     }
 }

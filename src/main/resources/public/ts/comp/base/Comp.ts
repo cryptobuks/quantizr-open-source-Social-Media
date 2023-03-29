@@ -19,6 +19,7 @@ export abstract class Comp implements CompIntf {
     public debug: boolean = false;
     public mounted: boolean = false;
     public rendered: boolean = false;
+    public allowRenderEmpty: boolean = true; // allows rendering if no children exist
     private static guid: number = 0;
     private static renderClassInDom: boolean = false;
 
@@ -396,6 +397,9 @@ export abstract class Comp implements CompIntf {
 
             this.preRender();
             const ret = this.compRender();
+            if (!this.allowRenderEmpty && !this.hasChildren()) {
+                return null;
+            }
 
             if (this.debug) {
                 // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());

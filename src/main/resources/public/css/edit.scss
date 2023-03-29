@@ -1,0 +1,143 @@
+.textTypeContent {
+    margin: 12px 0px 12px 12px;
+    padding: 8px;
+    border: 1px solid $nodeBorderBottomColor;
+    background-color: #17202A;
+}
+
+.preWordWrap {
+    // overflow-x: auto; //<--- highly upvoted stack overflow didn't have this.
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
+.mkCont table,
+th,
+td {
+    border: 1px solid $nodeBorderBottomColor;
+    border-collapse: collapse;
+}
+
+.mkCont th,
+td {
+    padding: $tinyGap;
+}
+
+.fileNameField {
+    width: 12em;
+    min-width: 3em;
+}
+
+.displayNameTextField {
+    max-width: 40rem;
+}
+
+.textareaMin4 {
+    font-family: inherit;
+    min-height: 4rem;
+}
+
+.fontInherit {
+    font-family: inherit;
+}
+
+.mkDownCodespan {
+    color: var(--bs-green);
+    word-wrap: break-word;
+    cursor: pointer;
+    font-size: 110%;
+
+    // I saw these in browser elements view but not sure if we need them.
+    // direction: ltr /* rtl:ignore */;
+    // unicode-bidi: bidi-override;
+}
+
+.preTextarea {
+    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    font-family: inherit;
+    background-color: #1b2631 !important;
+    border-radius: 0px !important;
+    border: 1px solid gray;
+}
+
+.preTextField {
+    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    padding: 5px 5px 5px 10px;
+    font-family: inherit;
+    border-radius: 0px !important;
+    border: 1px solid gray;
+}
+
+.textField {
+    font-family: "monospace";
+}
+
+/* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
+.passwordTextField {
+    margin-bottom: $tinyGap;
+}
+
+.typeSearchField {
+    margin-bottom: $smallGap;
+}
+
+.mkCont {
+    padding-top: .5rem;
+    padding-left: 1.2rem;
+    padding-bottom: 1.2rem;
+    padding-right: 1rem;
+}
+
+.mkCont h1 {
+    font-size: 2.8rem;
+}
+
+.mkCont h2 {
+    font-size: 2.6rem;
+}
+
+.mkCont h3 {
+    font-size: 2.4rem;
+}
+
+.mkCont h4 {
+    font-size: 2.1rem;
+}
+
+.mkCont h5 {
+    font-size: 1.8rem;
+}
+
+.mkCont h6 {
+    font-size: 1.5rem;
+}
+
+// without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
+// amount of spacing we want in the mkCont style itself so we stop this from messing that up with this 'last-child' style
+.mkCont p:last-child {
+    margin-bottom: 0;
+}
+
+// Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
+.mkCont kbd,
+.mkCont pre,
+.mkCont samp {
+    width: 100%;
+    border: 1px solid olivedrab;
+    background-color: $baseBgColor;
+    padding: 0;
+}
+
+.txtFieldLabelShort {
+    margin-right: .25rem;
+}
+
+.txtFieldLabel {
+    margin-right: .25rem;
+    margin-top: 1rem;
+}
