@@ -212,8 +212,14 @@ export class NodeCompButtonBar extends Div {
         let prevButton: Button;
         let nextButton: Button;
 
+        const isMine = S.props.isMine(this.node);
+
         // Note we only allow 'Up Level' on home node if we're the admin.
-        if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
+        if (isPageRootNode &&
+            (
+                ((isMine || this.node.type !== J.NodeType.POSTS) && this.node.name !== "home") ||
+                ast.isAdminUser
+            )) {
             if (S.nav.parentVisibleToUser()) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     [C.NODE_ID_ATTR]: this.node.id,
