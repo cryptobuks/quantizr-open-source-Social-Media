@@ -230,7 +230,7 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
-            if (node.tags && (ast.userPrefs.showMetaData || ast.userPrefs.editMode)) {
+            if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
                 return new Div(null, null, [
                     comp,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),

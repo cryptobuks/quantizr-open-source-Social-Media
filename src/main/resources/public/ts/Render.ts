@@ -495,15 +495,6 @@ export class Render {
                     if (res) {
                         S.quanta.configRes.urlIdFailMsg = null;
                         s.node = res.node;
-
-                        /* Automatically turn on info mode if page root is a comment or POSTs node. This is so that
-                         in cases (especially for anon users) where nothing makes sense without avatar images at least
-                         then we can see avatars and WHO the content is from rather than just showing a page
-                         of text with no context about who it's from. */
-                        if (s.userPrefs && (J.NodeType.POSTS === s.node?.type || J.NodeType.COMMENT === s.node?.type)) {
-                            s.userPrefs.showMetaData = true;
-                        }
-
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
 
@@ -521,12 +512,6 @@ export class Render {
                                     });
                                 }, 250);
                             }
-                        }
-
-                        /* Slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
-                        if (s.node.type === J.NodeType.POSTS ||
-                            s.node.type === J.NodeType.ROOM) {
-                            S.edit.setMetadataOption(true);
                         }
                     }
 

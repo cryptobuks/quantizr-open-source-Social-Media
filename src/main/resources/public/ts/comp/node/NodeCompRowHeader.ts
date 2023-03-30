@@ -23,7 +23,7 @@ export class NodeCompRowHeader extends Div {
         super(null);
 
         const ast = getAs();
-        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "rowHeaderEdit" : "row-header";
+        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? "rowHeaderEdit" : "row-header";
     }
 
     preRender(): boolean {
@@ -55,7 +55,7 @@ export class NodeCompRowHeader extends Div {
 
         // we always enable showInfo even on Tree Tab, so that we can have anonymous users comming to a shared tree link
         // and they can see whose node it is rather than seeing just content on the page that's confusing who it came from or what it is.
-        const showInfo = type.getName() === J.NodeType.COMMENT || ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
+        const showInfo = type.getName() === J.NodeType.COMMENT || S.util.showMetaData(ast, this.node) || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeHeaderAvatar(this.node);

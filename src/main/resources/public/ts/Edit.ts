@@ -484,12 +484,6 @@ export class Edit {
         }, 100);
     };
 
-    setMetadataOption = (val: boolean) => {
-        setTimeout(() => {
-            S.util.saveUserPrefs(s => s.userPrefs.showMetaData = val);
-        }, 100);
-    };
-
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     saveTabsTopmostVisible = async (): Promise<boolean> => {
         let doScrolling = false;

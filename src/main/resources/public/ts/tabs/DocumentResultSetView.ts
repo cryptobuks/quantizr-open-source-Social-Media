@@ -28,7 +28,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either
         // of these user prefs is active we show the header bar.
-        const allowHeader = ast.userPrefs.showMetaData || ast.userPrefs.editMode;
+        const allowHeader = S.util.showMetaData(ast, node) || ast.userPrefs.editMode;
 
         // we have 'marginButtom' on these just to add extra space between paragraphs for a less compact view. We could
         // make this paragraph spacing a user preference...some day.

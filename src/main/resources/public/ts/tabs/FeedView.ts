@@ -232,7 +232,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     onClick: (event: Event) => {
                         event.stopPropagation();
                         event.preventDefault();
-                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, false);
+                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), false);
                     }
                 });
                 const buttonCreateTime: number = new Date().getTime();
@@ -254,7 +254,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                                         else {
                                             // console.log("Loading more...")
                                             moreButton.replaceWithWaitIcon();
-                                            S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
+                                            S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true);
                                         }
                                     }
                                 });

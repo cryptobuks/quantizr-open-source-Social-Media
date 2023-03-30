@@ -71,7 +71,7 @@ export class NodeCompMainNode extends Div {
                 // leave allowHeader false
             }
             else {
-                allowHeader = ast.userPrefs.showMetaData && (type == null || type?.getAllowRowHeader())
+                allowHeader = S.util.showMetaData(ast, node) && (type == null || type?.getAllowRowHeader())
             }
 
             if (allowHeader && !node.boostedNode) {

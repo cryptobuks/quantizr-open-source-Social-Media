@@ -391,7 +391,7 @@ export class Search {
             }
         });
 
-        this.feed(FeedTab.inst.props.page, searchText, false, false);
+        this.feed(FeedTab.inst.props.page, searchText, false);
     }
 
     loadSingleFeedItemByUrl = async (url: string) => {
@@ -408,7 +408,6 @@ export class Search {
                     s.newMessageCount = 0;
                 }
 
-                S.edit.setMetadataOption(true);
                 FeedTab.inst.props.feedResults = [res.node];
                 FeedTab.inst.props.feedEndReached = true;
                 FeedTab.inst.props.feedDirty = false;
@@ -423,7 +422,7 @@ export class Search {
     }
 
     /* growResults==true is the "infinite scrolling" support */
-    feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
+    feed = async (page: number, searchText: string, growResults: boolean) => {
         const ast = getAs();
         if (!FeedTab.inst) {
             return;
@@ -442,9 +441,7 @@ export class Search {
             localOnly: FeedTab.inst.props.feedFilterLocalServer,
             name: FeedTab.inst.props.name,
             fromFriends: FeedTab.inst.props.feedFilterFriends,
-
-            // never show anonymous users NSFW content.
-            nsfw: ast.isAnonUser ? false : ast.userPrefs.nsfw,
+            nsfw: ast.isAnonUser ? false : ast.userPrefs.nsfw, // never show anonymous users NSFW content.
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,
@@ -461,10 +458,6 @@ export class Search {
             }
 
             let scrollToTop = true;
-
-            if (forceMetadataOn) {
-                S.edit.setMetadataOption(true);
-            }
 
             // if scrolling in new results grow the existing array
             if (growResults) {
@@ -642,6 +635,7 @@ export class Search {
                 className: "boostRowOnFeed"
             }, [
                 allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
+                allowHeader ? new Clearfix() : null,
                 boostContent,
                 allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
                 allowBoostFooter ? new Clearfix() : null
@@ -700,6 +694,7 @@ export class Search {
         const itemDiv = new Div(null, attrs, [
             S.render.renderBoostHeader(node, false),
             allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
+            allowHeader && !node.boostedNode ? new Clearfix() : null,
             content,
             boostComp,
             S.render.renderLinks(node),

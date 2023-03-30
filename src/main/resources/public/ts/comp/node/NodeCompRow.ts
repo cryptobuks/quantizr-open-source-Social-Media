@@ -94,7 +94,9 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "nodeGridItem" : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData ? "nodeTableRowEdit" : "nodeTableRow");
+        let layoutClass = this.isTableCell ? "nodeGridItem" //
+            : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && //
+                S.util.showMetaData(ast, this.node) ? "nodeTableRowEdit" : "nodeTableRow");
         layoutClass += " " + this.tabData.id;
 
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
@@ -106,7 +108,7 @@ export class NodeCompRow extends Div {
             // leave allowHeader false.
         }
         else {
-            allowHeader = this.allowHeaders && ast.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
+            allowHeader = this.allowHeaders && S.util.showMetaData(ast, this.node) && (this.type == null || this.type?.getAllowRowHeader())
         }
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
@@ -117,11 +119,12 @@ export class NodeCompRow extends Div {
         // }
         else {
             // special class if BOTH edit and info is on
-            if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
+            if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && //
+                S.util.showMetaData(ast, this.node)) {
                 layoutClass += this.node.boostedNode ? " rowBorderEditInfoBoost" : " rowBorderEditInfo";
             }
             // else if either is on
-            else if (ast.userPrefs.editMode || ast.userPrefs.showMetaData) {
+            else if (ast.userPrefs.editMode || S.util.showMetaData(ast, this.node)) {
                 layoutClass += " rowBorderEdit";
             }
             else if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {

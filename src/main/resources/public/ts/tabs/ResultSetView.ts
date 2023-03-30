@@ -107,7 +107,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     // it's essentially to support DOM finding.
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
         const ast = getAs();
-        const allowHeader = this.allowHeader && (ast.userPrefs.showMetaData || ast.userPrefs.editMode);
+        const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false, true,
             jumpButton, allowHeader, this.allowFooter, true, "userFeedItem",
             "userFeedItemHighlight", null);

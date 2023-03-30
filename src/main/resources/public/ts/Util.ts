@@ -1,6 +1,7 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
+import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
 import { Constants as C } from "./Constants";
@@ -965,10 +966,6 @@ export class Util {
             s.allowFileSystemSearch = res.allowFileSystemSearch;
             s.userPrefs = res.userPreferences;
 
-            if (s.userPrefs && (J.NodeType.POSTS === s.node?.type || J.NodeType.COMMENT === s.node?.type)) {
-                s.userPrefs.showMetaData = true;
-            }
-
             // s.title = !s.isAnonUser ? res.userName : "";
             s.displayName = !s.isAnonUser ? res.userProfile.displayName : "";
         });
@@ -988,6 +985,13 @@ export class Util {
 
         // now return filtered list only for items where 'id' is not in the set above.
         return feedRes.filter(ni => !idSet.has(ni.id));
+    }
+
+    /* show metadata if the user has the setting ON or if on POSTS node or a COMMENT node as the
+        top page-root node */
+    showMetaData = (ast: AppState, node: J.NodeInfo) => {
+        return ast.userPrefs.showMetaData ||
+            (J.NodeType.POSTS === node?.type || J.NodeType.COMMENT === node?.type);
     }
 
     fullscreenViewerActive = (): boolean => {
