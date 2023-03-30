@@ -47,7 +47,6 @@ export class NodeCompRowHeader extends Div {
             }
         }
         const isMine = S.props.isMine(this.node);
-
         const children = [];
         let avatarImg: Img = null;
 
@@ -55,7 +54,7 @@ export class NodeCompRowHeader extends Div {
 
         // we always enable showInfo even on Tree Tab, so that we can have anonymous users comming to a shared tree link
         // and they can see whose node it is rather than seeing just content on the page that's confusing who it came from or what it is.
-        const showInfo = type.getName() === J.NodeType.COMMENT || S.util.showMetaData(ast, this.node) || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
+        const showInfo = S.util.showMetaData(ast, this.node) || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeHeaderAvatar(this.node);

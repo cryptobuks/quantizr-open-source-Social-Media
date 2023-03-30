@@ -991,7 +991,10 @@ export class Util {
         top page-root node */
     showMetaData = (ast: AppState, node: J.NodeInfo) => {
         return ast.userPrefs.showMetaData ||
-            (J.NodeType.POSTS === node?.type || J.NodeType.COMMENT === node?.type);
+            J.NodeType.POSTS === node?.type ||
+            // todo-0: Look for places in the code where we check for POSTS but needed todo POSTS or ACT_PUB_POSTS
+            J.NodeType.ACT_PUB_POSTS === node?.type ||
+            J.NodeType.COMMENT === node?.type;
     }
 
     fullscreenViewerActive = (): boolean => {

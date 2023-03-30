@@ -185,7 +185,6 @@ export class RightNavPanel extends Div {
                             addNoteButton]) : null
                     ]),
                     new Clearfix(),
-
                     // new Div(null, { className: "marginBottom" }, [
                     //     new ButtonBar([
                     //         clipboardPasteButton,

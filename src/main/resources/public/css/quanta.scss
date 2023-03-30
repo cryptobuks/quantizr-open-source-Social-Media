@@ -335,7 +335,7 @@ strong {
 }
 
 .extraPagingComps {
-    margin: 0px 0px 4px 0;
+    margin: 0 0 4px 0;
     display: inline-block;
 }
 
@@ -438,7 +438,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .delAttCheckbox {
-    margin-right: 0px !important;
+    margin-right: 0 !important;
 }
 
 .attachmentLinkGroup {
@@ -581,8 +581,8 @@ Will come back later and study this more. todo-3 */
     border: 1px solid gray;
     padding: $tinyGap;
     background-color: $secondary;
-    margin: $tinyGap $smallGap $smallGap $smallGap;
-    width: 97%;
+    margin: $tinyGap 0 $smallGap $smallGap;
+    //width: 97%;
 }
 
 // todo-1: once I'm certain about it I can remove these
