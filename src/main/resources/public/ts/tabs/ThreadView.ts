@@ -33,7 +33,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
-                new IconButton("fa-arrowLeft", null, {
+                new IconButton("fa-arrow-left", null, {
                     onClick: () => {
                         const ast = getAs();
                         if (ast.threadViewFromTab === C.TAB_MAIN) {

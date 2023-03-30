@@ -83,7 +83,7 @@ export class NodeCompMainNode extends Div {
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
                 if (targetId) {
-                    jumpButton = new IconButton("fa-arrowRight", null, {
+                    jumpButton = new IconButton("fa-arrow-right", null, {
                         onClick: () => S.view.jumpToId(targetId),
                         title: "Jump to the Node"
                     }, "btn-secondary float-end");

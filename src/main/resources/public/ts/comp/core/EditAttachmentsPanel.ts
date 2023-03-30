@@ -149,12 +149,12 @@ export class EditAttachmentsPanel extends Div {
             pinCheckbox,
             new Div(null, null, [
                 !firstAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrowUp clickable marginLeft",
+                    className: "fa fa-lg fa-arrow-up clickable marginLeft",
                     title: "Move Attachment Up",
                     onClick: () => this.moveAttachmentUp(att, ast.editNode)
                 }) : null,
                 !lastAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrowDown clickable marginLeft",
+                    className: "fa fa-lg fa-arrow-down clickable marginLeft",
                     title: "Move Attachment Down",
                     onClick: () => this.moveAttachmentDown(att, ast.editNode)
                 }) : null

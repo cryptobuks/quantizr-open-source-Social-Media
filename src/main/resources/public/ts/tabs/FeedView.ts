@@ -270,7 +270,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 this.renderHeading(),
-                this.data.props.feedFilterRootNode ? new IconButton("fa-arrowLeft", null, {
+                this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,

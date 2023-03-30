@@ -31,7 +31,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
                 new Div(this.data.name, { className: "tabTitle" }),
-                new IconButton("fa-arrowLeft", null, {
+                new IconButton("fa-arrow-left", null, {
                     onClick: () => {
                         const ast = getAs();
                         if (ast.repliesViewFromTab === C.TAB_MAIN) {

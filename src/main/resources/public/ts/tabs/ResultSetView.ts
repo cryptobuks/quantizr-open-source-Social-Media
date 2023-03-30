@@ -55,7 +55,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.node && this.showContentHeading
-                    ? new IconButton("fa-arrowLeft", "", {
+                    ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
                         title: "Back to Folders View"
                     }, "bigMarginLeft") : null,
