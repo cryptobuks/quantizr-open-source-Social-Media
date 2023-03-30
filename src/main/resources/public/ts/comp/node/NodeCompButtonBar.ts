@@ -217,7 +217,7 @@ export class NodeCompButtonBar extends Div {
         // Note we only allow 'Up Level' on home node if we're the admin.
         if (isPageRootNode &&
             (
-                ((isMine || this.node.type !== J.NodeType.POSTS) && this.node.name !== "home") ||
+                ((isMine || (this.node.type !== J.NodeType.POSTS && this.node.type !== J.NodeType.ACT_PUB_POSTS)) && this.node.name !== "home") ||
                 ast.isAdminUser
             )) {
             if (S.nav.parentVisibleToUser()) {
