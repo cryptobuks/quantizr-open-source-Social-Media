@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/tsx-test.scss";
+import "../css/imports/tsx-test.scss";
 
 // Example use:
 // http://localhost:8182/demo/tsx-test

@@ -39,8 +39,6 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 }
 */
 
-@import "click-effect.scss";
-
 * {
     outline: none;
 }
@@ -74,32 +72,8 @@ $mobileHeaderHeight: 3.5rem;
     font-style: normal;
 }
 
-@import 'scrollbar.scss';
-@import 'nav.scss';
-@import 'menu.scss';
-@import 'checkbox.scss';
-@import 'list.scss';
-@import 'button.scss';
-@import 'dropzone.scss';
-@import 'breadcrumbs.scss';
-@import 'media-queries.scss';
-@import 'feed.scss';
-@import 'rss.scss';
-@import 'profile.scss';
-@import 'openGraph.scss';
-@import 'nodeItem.scss';
-@import 'tabs.scss';
-@import 'dialog.scss';
-@import 'icon.scss';
-@import 'image.scss';
-@import 'layout.scss';
-@import 'tts.scss';
-@import 'edit.scss';
-@import 'text.scss';
-
-// todo-1: Eventually we need to have all SCSS in as targeted/specific a location as possible by 
-// makeing an SCSS file like this one, for each component that has any of it's own completely private CSS
-@import '../ts/comp/App.scss';
+// Import this auto-generated file (see build.sh) which brings in all the imports
+@import 'imports.scss';
 
 body {
     font-family: "QuantaCustomFont" !important;

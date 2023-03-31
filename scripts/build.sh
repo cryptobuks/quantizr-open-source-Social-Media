@@ -43,6 +43,9 @@ echo "mvn install the /pom/common/pom.xml into repo"
 mvn -T 1C install -Dmaven.javadoc.skip=true
 
 cd ${PRJROOT}
+./scripts/gen-css-imports.sh
+
+cd ${PRJROOT}
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
