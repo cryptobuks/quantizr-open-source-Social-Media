@@ -156,7 +156,7 @@ export class App extends Main {
     }
 
     domPreUpdateEvent = (): void => {
-        const elm = this.getRef();
+        const elm = this.getRef(false);
         if (!elm) return;
 
         const ast = getAs();

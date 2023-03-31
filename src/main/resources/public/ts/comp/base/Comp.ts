@@ -423,7 +423,7 @@ export abstract class Comp implements CompIntf {
 
     private domAdd = (): void => {
         // console.log("domAddEvent: " + this.getCompClass());
-        const elm = this.getRef();
+        const elm = this.getRef(false);
         if (!elm) {
             return;
         }
