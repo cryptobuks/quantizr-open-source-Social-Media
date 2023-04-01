@@ -10,7 +10,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { SettingsTab } from "../tabs/data/SettingsTab";
 import { CompIntf } from "./base/CompIntf";
-import { Clearfix } from "./core/Clearfix";
+import { HorizontalLayout } from "./core/HorizontalLayout";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
@@ -58,7 +58,6 @@ export class RightNavPanel extends Div {
             this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
         }
 
-        const headerImg: Div = null;
         const avatarImg = this.makeRHSAvatarDiv();
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
@@ -139,83 +138,76 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const rightNavPanelClass = ast.mobileMode ? "rightNavPanelInnerMobile" : "rightNavPanelInner";
+        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-end" }, [
+            // Not showing login on this panel in mobileMode, because it's shown at top of page instead
+            new Span("Login", {
+                className: "signupLinkText",
+                onClick: () => {
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
+                    S.user.userLogin();
+                }
+            }),
+
+            new Span("Signup", {
+                className: "signupLinkText float-end",
+                onClick: () => {
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
+                    S.user.userSignup();
+                }
+            })
+        ]) : null;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
-                // for anon user float this more to the right so the main view looks less jammed up
-                new Div(null, { className: rightNavPanelClass }, [
+                new HorizontalLayout([
+                    avatarImg,
+                    new Div(null, null, [
+                        new Div(null, { className: "marginBottom" }, [
+                            !ast.isAnonUser ? new Span(displayName, {
+                                className: "clickable marginRight",
+                                onClick: () => {
+                                    PubSub.pub(C.PUBSUB_closeNavPanel);
+                                    new UserProfileDlg(null).open();
+                                }
+                            }) : null,
 
-                    // I don't think I want this for now (leaving commented)
-                    // !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
+                            !ast.isAnonUser ? new Icon({
+                                className: "fa fa-gear fa-lg marginRight clickable",
+                                onClick: () => {
+                                    SettingsTab.tabSelected = true;
+                                    S.tabUtil.selectTab(C.TAB_SETTINGS);
+                                },
+                                title: "Edit Account Settings"
+                            }) : null,
 
-                    new Div(null, { className: "float-end" }, [
-                        // Not showing login on this panel in mobileMode, because it's shown at top of page instead
-                        ast.isAnonUser && !ast.mobileMode ? new Span("Login", {
-                            className: "signupLinkText",
-                            onClick: () => {
-                                PubSub.pub(C.PUBSUB_closeNavPanel);
-                                S.user.userLogin();
-                            }
-                        }) : null,
+                            textToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
+                                textToSpeech,
+                                addNoteButton]) : null
+                        ]),
+                        loginSignupDiv,
 
-                        ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
-                            className: "signupLinkText float-end",
-                            onClick: () => {
-                                PubSub.pub(C.PUBSUB_closeNavPanel);
-                                S.user.userSignup();
-                            }
-                        }) : null
-                    ]),
-
-                    // kinda this clearfix makes sure the following stuff is BELOW Login/Signup text.
-                    ast.isAnonUser && !ast.mobileMode ? new Clearfix() : null,
-
-                    new Div(null, { className: "bigMarginBottom float-end" }, [
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
                             setValue: (checked: boolean) => S.edit.setEditMode(checked),
                             getValue: (): boolean => ast.userPrefs.editMode
-                        }, "form-switch form-check-inline") : null,
+                        }, "form-switch formCheckInlineNoMargin") : null,
 
                         !fullScreenViewer ? new Checkbox("Info", { title: "Display of avatars, timestamps, etc." }, {
                             setValue: (checked: boolean) => S.edit.setShowMetaData(checked),
                             getValue: (): boolean => ast.userPrefs.showMetaData
-                        }, "form-switch form-check-inline") : null,
-                        textToSpeech || addNoteButton ? new Span(null, null, [
-                            textToSpeech,
-                            addNoteButton]) : null
-                    ]),
-                    new Clearfix(),
-                    // new Div(null, { className: "marginBottom" }, [
-                    //     new ButtonBar([
-                    //         clipboardPasteButton,
-                    //         addNoteButton,
-                    //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                    //             title: "Go to your Account Root Node",
-                    //             onClick: e => S.nav.navHome(state)
-                    //         }) : null
-                    //     ])
-                    // ]),
-                    displayName && !ast.isAnonUser ? new Div(null, { className: "float-end" }, [
-                        new Span(displayName, {
-                            className: "clickable marginRight",
-                            onClick: () => {
-                                PubSub.pub(C.PUBSUB_closeNavPanel);
-                                new UserProfileDlg(null).open();
-                            }
-                        }),
-                        new Icon({
-                            className: "fa fa-gear fa-lg marginRight clickable",
-                            onClick: () => {
-                                SettingsTab.tabSelected = true;
-                                S.tabUtil.selectTab(C.TAB_SETTINGS);
-                            },
-                            title: "Edit Account Settings"
-                        })
-                    ]) : null,
-                    headerImg,
-                    !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
-                ]),
+                        }, "form-switch formCheckInlineNoMargin") : null
+                    ])
+                ], "horizontalLayoutCompCompact fullWidth"),
+                // new Div(null, { className: "marginBottom" }, [
+                //     new ButtonBar([
+                //         clipboardPasteButton,
+                //         addNoteButton,
+                //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+                //             title: "Go to your Account Root Node",
+                //             onClick: e => S.nav.navHome(state)
+                //         }) : null
+                //     ])
+                // ]),
+                !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
 
                 ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
             ])

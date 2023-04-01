@@ -1,5 +1,13 @@
+// * {
+//     border: 1px solid red;
+// }
+
 body {
     font-family: "QuantaCustomFont" !important;
+}
+
+.fullWidth {
+    width: 100%;
 }
 
 .mobileHeaderBar {
@@ -79,7 +87,7 @@ body {
 }
 
 .rightNavPanel {
-    padding-top: 15px;
+    padding-top: 12px;
     padding-left: $smallGap;
     height: 100%;
     overflow-y: scroll;
@@ -91,15 +99,6 @@ body {
     overflow-y: scroll;
     padding-top: 12px;
     padding-bottom: 20px;
-}
-
-.rightNavPanelInner {
-    min-width: 15rem;
-    margin-left: 10px;
-}
-
-.rightNavPanelInnerMobile {
-    min-width: 15rem;
 }
 
 .scrollY {
