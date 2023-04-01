@@ -1,0 +1,29 @@
+.mfsFileView {
+    margin: $smallGap;
+}
+
+.files-table {
+    width: 100%;
+    margin-top: $smallGap;
+}
+
+.filesTableRow {
+    width: 100%;
+}
+
+.filesTableTypeCol {
+    width: 5%;
+}
+
+.filesTableSizeCol {
+    width: 15%;
+}
+
+.filesTableDelCol {
+    width: 5%;
+}
+
+.filesTableNameCol {
+    cursor: pointer;
+    width: 75%;
+}

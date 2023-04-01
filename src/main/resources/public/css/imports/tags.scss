@@ -1,0 +1,37 @@
+
+/* Need a way that we can set font sizes, on anchors but this actually messes up button styling because my buttons
+are sometimes using anchorz inside them like the main landing page button which enlarges when clicked if these font size
+alterations exist */
+a:visited {
+    color: #00bc8c !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+a:active {
+    color: #00bc8c !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+a {
+    color: #00bc8c !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* This is how the search terms get highlighted by wrapping them like this in 
+the markdown **_term_** */
+strong em {
+    font-style: normal;
+    font-weight: bold;
+    background-color: green;
+}
+
+em {
+    font-size: 110%;
+}
+
+strong {
+    font-size: 110%;
+}

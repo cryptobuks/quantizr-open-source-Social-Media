@@ -1,0 +1,17 @@
+.d3Graph {}
+
+.graphPopup {
+    background-color: $modal-content-bg;
+    border: 2px solid gray;
+    max-width: 30%;
+    margin: $smallGap !important;
+    padding: $smallGap !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.popupNodeLinks {
+    margin-top: $smallGap
+}
+

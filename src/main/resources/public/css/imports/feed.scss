@@ -26,6 +26,22 @@
     border-left: 2px solid $nodeBorderBottomColor;
 }
 
+.userFeedItem {
+    padding-top: 10px;
+    border-top: 1px solid $nodeBorderBottomColor;
+    padding-bottom: $tinyGap;
+}
+
+.userFeedItemHighlight {
+    padding-top: 10px;
+    border: 1px solid olivedrab;
+    padding-bottom: $tinyGap;
+}
+
+.userFeedParent {
+    border: 2px solid $nodeBorderBottomColor;
+}
+
 .inactiveFeedRowParent {
     border-bottom: 2px solid $nodeBorderBottomColor;
 }

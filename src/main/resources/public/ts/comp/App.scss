@@ -1,3 +1,7 @@
+body {
+    font-family: "QuantaCustomFont" !important;
+}
+
 .mobileHeaderBar {
     padding: 10px;
     position: absolute;
@@ -14,4 +18,305 @@
     margin-right: 0px !important;
     height: 100vh;
     overflow: hidden;
+}
+
+.smallLogoButton {
+    border: 1px solid gray;
+    cursor: pointer;
+    padding: 5px;
+    background-color: black;
+}
+
+.dragSource {
+    background: repeating-linear-gradient(-45deg,
+            orange,
+            orange 2px,
+            transparent 2px,
+            transparent 14px);
+}
+
+.dragTarget {
+    background: repeating-linear-gradient(-45deg,
+            green,
+            green 2px,
+            transparent 2px,
+            transparent 14px);
+}
+
+#app {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.progressSpinner {
+    width: 5rem;
+    margin: 0 auto;
+}
+
+.extraPagingComps {
+    margin: 0 0 4px 0;
+    display: inline-block;
+}
+
+.line {
+    width: 100%;
+    border-bottom: 2px solid gray;
+}
+
+.mainContainer {
+    padding: 0;
+    overflow: hidden;
+}
+
+.mainContainerMobile {
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.rightNavPanel {
+    padding-top: 15px;
+    padding-left: $smallGap;
+    height: 100%;
+    overflow-y: scroll;
+    padding-bottom: 40px;
+}
+
+.leftNavPanel {
+    height: 100%;
+    overflow-y: scroll;
+    padding-top: 12px;
+    padding-bottom: 20px;
+}
+
+.rightNavPanelInner {
+    min-width: 15rem;
+    margin-left: 10px;
+}
+
+.rightNavPanelInnerMobile {
+    min-width: 15rem;
+}
+
+.scrollY {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.scrollBorder {
+    border: 1px solid gray;
+}
+
+.selectKeyTypeDropDown {
+    margin-bottom: 12px;
+    max-width: 20rem;
+}
+
+.parentNodeContentStyle {
+    padding-right: 8px;
+    padding-top: 8px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.headerInfoDivExpanded {
+    display: block;
+    width: 100%;
+}
+
+.headerInfoDivCollapsed {
+    display: inline-block;
+}
+
+.headerInfoButton {
+    background-color: transparent;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+/* This positioning puts the plus buttion right outside the row to the right between rows
+   so it's intuitive where the insert goes 
+   
+   NOTE: We could've also used a 'translatle()' css function to do this.
+   */
+.plusButtonFloatRight {
+    position: absolute;
+    top: -1.3rem;
+    right: -3rem;
+}
+
+@keyframes fadeToHidden {
+
+    // from {
+    //     opacity: 1;
+    // }
+    to {
+        opacity: 0;
+    }
+}
+
+.compHidden {
+    visibility: hidden;
+
+    // animating the hiding part doesn't work well, because the effect gets interrupted by other parts of 
+    // our animation flow, so we have to set to hidden instantly without animation.
+    // animation-name: fadeToHidden;
+    // animation-duration: .2s;
+    // opacity: 0;
+
+    margin-bottom: 20px;
+}
+
+/* Note: visibility is not allowed to be animated. This is a rule of CSS engines, not our own limitation. Also we don't set the 
+'from' value becasue if it's already visibible 'opacity=1' we don't want to cause a screen flicker by setting invisible first for no reason.
+*/
+@keyframes fadeToVisible {
+    from {
+        opacity: hidden;
+    }
+
+    to {
+        visibility: visible;
+    }
+}
+
+.compVisible {
+    visibility: visible;
+
+    // this was an experiment, an may not even have been desirable
+    // so for now we just set to visible instantly which is better
+    // performance anyway, and may not be any less eye-strain
+    // than I had thought this animation might solve.
+    // animation-name: fadeToVisible;
+    // animation-duration: 1s; <-------this didn't work. Comes back to visible instantly (no amination).
+    margin-bottom: 20px;
+}
+
+// todo-1: once I'm certain about it I can remove these
+.contentNarrow {}
+
+.contentMedium {}
+
+.contentWide {}
+
+.mousePointer {
+    cursor: pointer;
+}
+
+.resultsNode {
+    // why relative here ? todo-1
+    position: relative;
+    cursor: pointer;
+}
+
+.widthSizerPanel {
+    margin-top: 8px;
+    display: inline-block;
+    background: $body-bg;
+}
+
+.main {
+    background-color: #eee;
+}
+
+.mobileRHSPanel {
+    font-size: 140%;
+}
+
+// WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
+.headingBar {
+    padding-top: 8px;
+    margin-bottom: 8px;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    background-color: $body-bg;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 4em;
+}
+
+.headingBarMobile {
+    padding-top: 8px;
+    margin-bottom: 8px;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    background-color: $body-bg;
+    min-height: 4em;
+}
+
+.rowHeaderSharingNames {
+    margin-right: $smallGap;
+}
+
+.tableRow {
+    display: table-row;
+}
+
+.displayTable {
+    display: table;
+    border-spacing: 10px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.stickyNote {
+    margin-top: 6px;
+    color: darkkhaki;
+}
+
+.rhsLink {
+    margin-top: 25px;
+    margin-right: 55px;
+    cursor: pointer;
+}
+
+.floatRightHeaderDiv {
+    margin-left: 10px;
+    margin-top: 2px;
+}
+
+.lockFont {
+    font-size: 90%;
+}
+
+.lastModifiedTime {
+    margin-right: $tinyGap;
+}
+
+.boost-header {
+    cursor: pointer;
+    margin-left: $smallGap;
+}
+
+.contentWidthSelection {
+    margin-bottom: 12px;
+    max-width: 20rem;
+}
+
+.nodeLink {
+    display: inline-block;
+    background-color: $primary;
+    border: 1px solid gray;
+    padding: 0 6px 0 6px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.linksPanel {
+    margin-left: $smallGap;
+}
+
+.systemNodeContent {
+    border: 1px solid gray;
+    padding: $tinyGap;
+    background-color: $secondary;
+    margin: $tinyGap 0 $smallGap $smallGap;
+    //width: 97%;
 }

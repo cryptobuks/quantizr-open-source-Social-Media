@@ -1,0 +1,18 @@
+.fieldDisplayPanel {
+    margin-left: 16px;
+    margin-bottom: $smallGap;
+    border-top: 1px dotted $nodeBorderBottomColor;
+    border-right: 1px dotted $nodeBorderBottomColor;
+}
+
+.fieldDisplayLabel {
+    margin-left: $smallGap;
+    margin-top: $tinyGap;
+}
+
+.fieldDisplayVal {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-size: 115%;
+    margin-left: $smallGap;
+    color: green;
+}

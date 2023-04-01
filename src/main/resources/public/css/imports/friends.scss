@@ -1,0 +1,32 @@
+.friendLhs {
+    width: 25%;
+}
+
+.friendRhs {
+    width: 75%;
+}
+
+.friendSearchField {
+    width: 50%;
+}
+
+.friendSearchButtonDiv {
+    padding-left: $tinyGap;
+    width: 10%;
+}
+
+.friendsTagPickerOnEditor {
+    width: 40%;
+    padding-left: $bigGap;
+}
+
+.friendsTagPickerOnView {
+    width: 15em;
+    padding-right: $smallGap;
+    display: inline-block;
+}
+
+.friendName {
+    font-size: 1rem;
+    font-weight: bold;
+}

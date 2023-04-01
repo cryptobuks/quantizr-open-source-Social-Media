@@ -1,0 +1,50 @@
+/* I was getting a crazy render flicker where the browser was apparently toggling scrollbar off and on 10 times per second
+it looked like and this wild ass guess at using 95% instead of 100% here as a fix solved the problem. 
+Will come back later and study this more. todo-3 */
+.videoContainer {
+    width: 98%;
+}
+
+.videoPlayerElement {
+    display: block;
+    width: 75%;
+    border: 2px solid gray;
+    margin: 0 auto;
+}
+
+.audioPlayer {
+    width: 100%;
+    padding: 0;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 10px;
+}
+
+//We use the default player except we have our own big play and pause buttons.
+
+audio::-webkit-media-controls-mute-button {
+    display: none !important;
+}
+
+audio::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+// NOTE: The way to center an element inside another element is user "text-align: center" on the parent 
+// element and then "display: inline-block" on the element to be centered in the parent.
+.playerButtonsContainer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.playerButton {
+    cursor: pointer;
+    display: inline-block;
+    padding: 12px;
+    border: 6px solid lightGray;
+}
+
+.timeRemainingEditField {
+    margin-left: 5px;
+}

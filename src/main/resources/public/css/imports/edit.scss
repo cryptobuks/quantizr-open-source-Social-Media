@@ -141,3 +141,212 @@ td {
     margin-right: .25rem;
     margin-top: 1rem;
 }
+
+.formGrpBorder {
+    border: 1px solid $gray-600;
+}
+
+.editPropsCont {
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+}
+
+.editPropsTable {
+    padding-left: $smallGap;
+    width: 100%;
+}
+
+.splitNodeRadioButtonGroup {
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.propsPanelExpanded {}
+
+.propsPanelCollapsed {}
+
+.scrollingPropsTable {
+    width: 100%;
+    overflow-x: auto;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.delAttachmentButton {
+    margin-top: $tinyGap;
+    margin-right: $tinyGap;
+}
+
+.delAttCheckbox {
+    margin-right: 0 !important;
+}
+
+.attachmentLinkGroup {
+    margin-left: 20px;
+}
+
+.selectOption {
+    font-size: 120%;
+}
+
+.formSelect {
+    border: 1px solid gray !important;
+    padding: 5px 5px 5px 10px;
+}
+
+.validationError {
+    color: #E74C3C;
+    margin-bottom: 0;
+}
+
+.validationErrorBorder {
+    border: 2px solid #E74C3C;
+}
+
+.editorTagsSection {
+    margin-top: $smallGap;
+}
+
+.tagsFlexContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.propsList {}
+
+.propsListItemCheckBox {
+    vertical-align: middle;
+    margin-left: $microGap;
+    margin-right: 0 !important;
+}
+
+.propertyTable {}
+
+.propTableRow {
+    width: 100%;
+}
+
+.propTableNameCol {
+    width: 25%;
+    background-color: darkolivegreen;
+}
+
+.propTableValCol {
+    width: 70%;
+}
+
+.binaryEditorSection {
+    border: 1px solid gray;
+    margin-bottom: $smallGap;
+    margin-top: $tinyGap;
+    padding: $smallGap;
+    background-color: #17202A;
+}
+
+.binaryEditorItem {
+    padding-bottom: $microGap;
+}
+
+.binaryEditorItem {
+    &:not(:last-child) {
+        border-bottom: 1px solid $gray-700;
+        margin-bottom: $tinyGap;
+    }
+}
+
+.dateField {
+    font-family: "monospace";
+}
+
+.timeField {
+    font-family: "monospace";
+}
+
+.tagsPrompt {
+    width: 4em;
+    margin-right: $smallGap;
+    text-align: right;
+}
+
+.linksPrompt {
+    width: 4em;
+    margin-right: $smallGap;
+    text-align: right;
+}
+
+.fieldDisplayCell {
+    border-left: 4px solid $nodeBorderBottomColor;
+    border-bottom: 1px dotted $nodeBorderBottomColor;
+}
+
+.contentEditor {
+    width: 100%;
+}
+
+.editTypesPanelHeader {
+    margin: $tinyGap 0 0 $smallGap;
+}
+
+.selectLabel {
+    margin-right: 6px;
+}
+
+.widthDropDown {
+    display: inline-block;
+    margin-right: $smallGap;
+    margin-left: $smallGap;
+    width: 6rem;
+}
+
+.positionDropDown {
+    display: inline-block;
+    margin-right: $smallGap;
+    width: 7rem;
+}
+
+.flexPropsEditPanel {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flexPropsDisplayPanel {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.linksPanelInEditor {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.durationTypeInput {
+    max-width: 5rem;
+    margin-left: $smallGap;
+}
+
+.layoutSelection {
+    max-width: 14rem;
+    margin-right: 1rem;
+}
+
+.sharingDisplayName {
+    display: inline-block;
+    padding: $smallGap;
+    cursor: pointer;
+}
+
+.propNameInList {
+    display: inline-block;
+    margin: $tinyGap;
+}
+
+.propRangesInList {
+    display: inline-block;
+    margin: $tinyGap;
+}
+
+.ipfsPinnedCheckbox {
+    margin-left: 24px;
+}
+

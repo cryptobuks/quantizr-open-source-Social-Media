@@ -1,0 +1,44 @@
+.threadNodeDivider {
+    width: 100%;
+}
+
+.threadFeedItemBase {
+    margin-top: 8px;
+    padding-top: 10px;
+    border-radius: $border-radius;
+}
+
+.threadFeedItem {
+    @extend .threadFeedItemBase;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.threadFeedItemTarget {
+    @extend .threadFeedItemBase;
+    border: 4px solid $nodeBorderBottomColor;
+}
+
+.threadFeedItemHighlight {
+    @extend .threadFeedItemBase;
+    border: 1px solid olivedrab;
+}
+
+.threadFeedItemHighlightTarget {
+    @extend .threadFeedItemBase;
+    border: 4px solid olivedrab;
+}
+
+.threadFeedSubItem {
+    padding-top: 10px;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid $nodeBorderBottomColor;
+    }
+
+    &:last-child {
+        margin-bottom: 16px;
+    }
+
+    border-left: 1px solid $nodeBorderBottomColor;
+    margin-left: 4rem;
+}

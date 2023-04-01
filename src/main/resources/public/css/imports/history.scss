@@ -1,0 +1,26 @@
+.histPanelExpanded {
+    margin-top: 35px;
+    margin-left: $smallGap;
+}
+
+.histPanelCollapsed {
+    margin-top: 35px;
+    margin-left: $smallGap;
+}
+
+.historyPanelTitle {
+    font-weight: bold;
+    margin-bottom: $smallGap;
+    display: inline-block;
+}
+
+.nodeHistoryPanel {
+    margin-left: 16px;
+    padding-top: 4px;
+    border-top: 1px dotted gray;
+}
+
+.nodeHistoryItem {
+    cursor: pointer;
+    margin: 0 $smallGap $microGap $smallGap;
+}

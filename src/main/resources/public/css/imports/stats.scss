@@ -1,0 +1,35 @@
+.statsWord {
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-right: 6px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: x-large;
+    border-radius: $border-radius-small;
+}
+
+.statsWord:hover {
+    background-color: $primary;
+}
+
+.statsWordMobile {
+    @extend .statsWord;
+    padding: 8px;
+}
+
+.wordStatsArea {
+    border: 1px solid $nodeBorderBottomColor;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: $baseBgColor;
+}
+
+.trendingWordStatsArea {
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+    background-color: $baseBgColor;
+    padding: 12px;
+}
