@@ -237,7 +237,7 @@ public class UserFeedService extends ServiceBase {
 		 */
 		blockedUserIds.add(auth.getAdminSession().getUserNodeId());
 
-		boolean allowNonEnglish = true;
+		boolean allowNonEnglish = false;
 
 		if (!bidirectional) {
 			/*
@@ -247,7 +247,6 @@ public class UserFeedService extends ServiceBase {
 			// Add ADMIN BLOCKS
 			if (req.getToPublic() && req.isApplyAdminBlocks()) {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-				allowNonEnglish = false;
 			}
 
 			// Add criteria for blocking users using the 'not in' list (nin)
