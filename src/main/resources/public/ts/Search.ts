@@ -3,6 +3,7 @@ import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
 import { Div } from "./comp/core/Div";
+import { Divc } from "./comp/core/Divc";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
@@ -625,7 +626,7 @@ export class Search {
             if (isFeed) {
                 allowBoostFooter = true;
             }
-            boostComp = new Div(null, {
+            boostComp = new Divc({
                 onClick: async () => {
                     S.util.updateNodeHistory(node.boostedNode, true);
 
@@ -655,7 +656,7 @@ export class Search {
         //         if (isFeed) {
         //             allowFooter = ast.showAllRowDetails.has(n.id);
         //         }
-        //         linkedNodesComp = new Div(null, { className: "boostRow" }, [
+        //         linkedNodesComp = new Divc({ className: "boostRow" }, [
         //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
         //             linkContent,
         //             allowFooter ? new NodeCompRowFooter(n) : null,
@@ -691,7 +692,7 @@ export class Search {
             allowHeader = false;
         }
 
-        const itemDiv = new Div(null, attrs, [
+        const itemDiv = new Divc(attrs, [
             S.render.renderBoostHeader(node, false),
             allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
             allowHeader && !node.boostedNode ? new Clearfix() : null,
@@ -704,7 +705,7 @@ export class Search {
 
         // if we have a parentItem wrap it and 'itemDiv' in a container Div
         if (parentItem) {
-            return new Div(null, {
+            return new Divc({
                 className: isParent ? "userFeedItemParent" : divClass,
                 // the "_p_" differentiates the parent from the 'div' which is just "_" delimeter (see above)
                 id: tabData.id + "_p_" + node.id

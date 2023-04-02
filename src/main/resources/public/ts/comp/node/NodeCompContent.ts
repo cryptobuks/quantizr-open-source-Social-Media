@@ -6,6 +6,7 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Anchor } from "../core/Anchor";
 import { Clearfix } from "../core/Clearfix";
+import { Divc } from "../core/Divc";
 import { Heading } from "../core/Heading";
 import { Img } from "../core/Img";
 import { PropDisplayLayout } from "../PropDisplayLayout";
@@ -78,7 +79,7 @@ export class NodeCompContent extends Div {
                     attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0));
                 }
             });
-            children.push(new Div(null, { className: "rowImageContainer" }, attComps));
+            children.push(new Divc({ className: "rowImageContainer" }, attComps));
         }
 
         this.renderActPubUrls(children, this.node);
@@ -96,8 +97,8 @@ export class NodeCompContent extends Div {
             urls.forEach(url => {
                 if (url.type === "Link") {
                     // lazy create div
-                    div = div || new Div(null, { className: "apObjLinksContainer float-end" });
-                    div.addChild(new Div(null, { className: "apUrlLink" }, [
+                    div = div || new Divc({ className: "apObjLinksContainer float-end" });
+                    div.addChild(new Divc({ className: "apUrlLink" }, [
                         new Anchor(url.href, url.mediaType, { target: "_blank" })
                     ]));
                 }
@@ -117,7 +118,7 @@ export class NodeCompContent extends Div {
             icons.forEach(icon => {
                 if (icon.type === "Icon") {
                     // lazy create div
-                    div = div || new Div(null, { className: "apObjIconContainer" });
+                    div = div || new Divc({ className: "apObjIconContainer" });
                     div.addChild(new Img({ src: icon.url, className: "apObjIcon" }));
                 }
             });

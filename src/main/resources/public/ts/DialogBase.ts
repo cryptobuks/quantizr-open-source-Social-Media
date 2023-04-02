@@ -3,6 +3,7 @@ import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
+import { Divc } from "./comp/core/Divc";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { S } from "./Singletons";
@@ -165,7 +166,7 @@ export abstract class DialogBase extends Comp {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            new Div(null, { className: "dlgModalTitleCloseIcon float-end" }, [
+            new Divc({ className: "dlgModalTitleCloseIcon float-end" }, [
                 new Icon({
                     className: "fa fa-times",
                     onClick: () => {
@@ -192,16 +193,16 @@ export abstract class DialogBase extends Comp {
 
         this.setChildren([
             // todo-1: it's tricky but 'closeByOutsideClick' means this is a "menu", so, no title.
-            this.title && !this.closeByOutsideClick ? (this.titleDiv = new Div(null, {
+            this.title && !this.closeByOutsideClick ? (this.titleDiv = new Divc({
                 className: (this.mode === DialogMode.POPUP ? "appModalTitlePopup " : "appModalTitleNormal ") +
                     extraTitleClass
             },
                 [
-                    new Div(null, { className: "dlgTitleContent" }, titleChildren),
-                    this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
+                    new Divc({ className: "dlgTitleContent" }, titleChildren),
+                    this.mode === DialogMode.POPUP ? new Divc({ className: "line" }) : null
                 ]
             )) : null,
-            new Div(null, {
+            new Divc({
                 className: contentAreaClass
             }, this.renderDlg())
         ]);
@@ -241,7 +242,7 @@ export abstract class DialogBase extends Comp {
                         }
                     }
                 }, [
-                    this.dlgFrame = new Div(null, {
+                    this.dlgFrame = new Divc({
                         id: this.getId(),
                         className: clazzName,
                         style: {

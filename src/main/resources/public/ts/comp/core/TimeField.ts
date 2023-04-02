@@ -1,6 +1,7 @@
 import * as I from "../../Interfaces";
 import { Validator } from "../../Validator";
 import { Div } from "./Div";
+import { Divc } from "./Divc";
 import { Input } from "./Input";
 
 export class TimeField extends Div implements I.ValueIntf {
@@ -25,7 +26,7 @@ export class TimeField extends Div implements I.ValueIntf {
 
     preRender(): boolean {
         this.setChildren([
-            new Div(null, {
+            new Divc({
                 className: this.extraClass + " timeField"
             }, [
                 this.input = new Input({

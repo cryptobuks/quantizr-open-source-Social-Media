@@ -6,6 +6,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Constants } from "../Constants";
@@ -59,7 +60,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 ]),
                 new Div("Click to Add Files (or Drag and Drop)"),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
-                this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
+                this.hiddenInputContainer = new Divc({ style: { display: "none" } }),
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {

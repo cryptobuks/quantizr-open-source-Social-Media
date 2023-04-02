@@ -1,6 +1,7 @@
 import { dispatch, getAs, promiseDispatch } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Span } from "../comp/core/Span";
 import { SymKeyDataPackage } from "../Crypto";
 import { DialogMode } from "../DialogBase";
@@ -561,7 +562,7 @@ an upload has been added or removed.
                 }));
             });
         }
-        return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
+        return hasLinks ? new Divc({ className: "linksPanelInEditor" }, linkComps) : null;
     }
 
     removeNodeLink = (nodeName: string): void => {

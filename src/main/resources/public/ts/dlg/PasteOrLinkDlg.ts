@@ -2,7 +2,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { TextField } from "../comp/core/TextField";
@@ -22,7 +22,7 @@ export class PasteOrLinkDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, { className: "dragTargetDlgSection" }, [
+            new Divc({ className: "dragTargetDlgSection" }, [
                 new Heading(4, "Paste"),
                 new ButtonBar([
                     new Button("Inside", () => {
@@ -35,7 +35,7 @@ export class PasteOrLinkDlg extends DialogBase {
                     })
                 ], "marginTop")
             ]),
-            new Div(null, { className: "dragTargetDlgSection" }, [
+            new Divc({ className: "dragTargetDlgSection" }, [
                 new Heading(4, "Link Nodes"),
                 new TextField({ label: "Link Name", val: this.nameState }),
                 new ButtonBar([

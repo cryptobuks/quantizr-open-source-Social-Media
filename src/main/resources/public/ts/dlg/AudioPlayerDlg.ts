@@ -5,6 +5,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { Icon } from "../comp/core/Icon";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -106,7 +107,7 @@ export class AudioPlayerDlg extends DialogBase {
                     preload: "auto",
                     controlsList: "nodownload"
                 }),
-                new Div(null, { className: "row" }, [
+                new Divc({ className: "row" }, [
                     new ButtonBar([
                         new Button("1x", () => {
                             this.speed(1);
@@ -134,7 +135,7 @@ export class AudioPlayerDlg extends DialogBase {
                     ], "col-3 float-end")
                 ]),
 
-                new Div(null, { className: "playerButtonsContainer" }, [
+                new Divc({ className: "playerButtonsContainer" }, [
                     this.playButton = new Icon({
                         className: "playerButton fa fa-play fa-3x",
                         style: { display: "none" },
@@ -151,13 +152,13 @@ export class AudioPlayerDlg extends DialogBase {
                         }
                     })
                 ]),
-                new Div(null, { className: "row" }, [
+                new Divc({ className: "row" }, [
                     new ButtonBar([
                         new Button("Copy", this.copyToClipboard),
                         !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
-                    new Div(null, { className: "col-3 float-end" }, [
+                    new Divc({ className: "col-3 float-end" }, [
                         this.timeLeftTextField = new TextField({
                             label: "Timer (mins.)",
                             inputClass: "timeRemainingEditField",

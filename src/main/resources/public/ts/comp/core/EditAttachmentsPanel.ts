@@ -1,4 +1,5 @@
 import { dispatch, getAs } from "../../AppContext";
+import { Diva } from "../../comp/core/Diva";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "../../dlg/EditNodeDlg";
@@ -6,11 +7,11 @@ import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Validator, ValidatorRuleName } from "../../Validator";
-import { Diva } from "../../comp/core/Diva";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
+import { Divc } from "./Divc";
 import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
@@ -159,7 +160,7 @@ export class EditAttachmentsPanel extends Div {
 
         let bottomBinRow = null;
         if (ipfsLink) {
-            bottomBinRow = new Div(null, { className: "marginLeft marginBottom" }, [
+            bottomBinRow = new Divc({ className: "marginLeft marginBottom" }, [
                 ipfsLink ? new Div(`CID: ${ipfsLink}`, {
                     className: "clickable",
                     title: "Click -> Copy to clipboard",
@@ -190,7 +191,7 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
-        return new Div(null, { className: "binaryEditorItem" }, [
+        return new Divc({ className: "binaryEditorItem" }, [
             topBinRow, fileNameTagTip, bottomBinRow
         ]);
     }

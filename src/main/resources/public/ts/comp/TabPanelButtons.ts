@@ -7,6 +7,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { Comp } from "./base/Comp";
+import { Divc } from "./core/Divc";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
 
@@ -18,7 +19,7 @@ export class TabPanelButtons extends Div {
 
     preRender(): boolean {
         this.setChildren([
-            new Div(null, {
+            new Divc({
                 className: "tabButtonsContainer"
             }, [
                 new Ul(null, {

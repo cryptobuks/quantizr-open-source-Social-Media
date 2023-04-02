@@ -3,6 +3,7 @@ import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
+import { Divc } from "../../comp/core/Divc";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
@@ -63,7 +64,7 @@ export class MainTab implements TabIntf<any> {
 
     getTabSubOptions = (): Div => {
         const ast = getAs();
-        return new Div(null, { className: "tabSubOptions" }, [
+        return new Divc({ className: "tabSubOptions" }, [
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav.navToMyAccntRoot) : null,
             !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home", false)) : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,

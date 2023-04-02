@@ -2,6 +2,7 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Selection } from "../comp/core/Selection";
@@ -34,17 +35,17 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 new Div("Settings", { className: "tabTitle" })
             ]),
 
-            new Div(null, { className: "accountSettingsPanel" }, [
+            new Divc({ className: "accountSettingsPanel" }, [
                 // -----------------------
                 this.sectionTitle("Account"),
                 new HorizontalLayout([
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Logout", S.user.userLogout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Storage Space", () => new ManageStorageDlg().open())
                     ]),
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),
                         this.settingsLink("Blocked Words", S.edit.editBlockedWords),
                         S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null
@@ -54,7 +55,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("View Options"),
                 new HorizontalLayout([
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         new Checkbox("Sensitive Content", { className: "bigMarginLeft" }, {
                             setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
                             getValue: (): boolean => ast.userPrefs.nsfw
@@ -73,7 +74,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         })
                     ]),
 
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         new Checkbox("Properties", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
@@ -109,11 +110,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Tools"),
                 new HorizontalLayout([
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Test Microphone", () => new MediaRecorderDlg(false, false).open()), //
                         this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
                     ]),
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("My GEO Location", S.nav.geoLocation), //
                         this.settingsLink("About Browser", S.util.showBrowserInfo)
                     ])
@@ -122,10 +123,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Danger Zone"),
                 new HorizontalLayout([
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Bulk Delete", S.edit.bulkDelete)
                     ]),
-                    new Div(null, { className: "accountSettingsCol" }, [
+                    new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Close Account", S.user.closeAccount)
                     ])
                 ], horzClass)

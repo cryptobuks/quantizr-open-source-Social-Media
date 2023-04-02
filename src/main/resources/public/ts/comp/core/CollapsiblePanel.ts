@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
-import { Div } from "./Div";
+import { Divc } from "./Divc";
 import { Span } from "./Span";
 
 interface LS { // Local State
@@ -43,7 +43,7 @@ export class CollapsiblePanel extends Comp {
                 className: this.extraDivStyleExpanded
             }, [
                 // This div and it's children holds the actual collapsible content.
-                new Div(null, {
+                new Divc({
                     className: collapseClass
                 }, [
                     // This span is the expande/collapse button itself
@@ -70,7 +70,7 @@ export class CollapsiblePanel extends Comp {
                 }),
 
                 // This div and it's children holds the actual collapsible content.
-                new Div(null, {
+                new Divc({
                     className: collapseClass
                 },
                     this.getChildren())

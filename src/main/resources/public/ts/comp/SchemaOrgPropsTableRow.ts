@@ -2,6 +2,7 @@ import { EditPropertyDlg, LS as EditPropertyDlgState } from "../dlg/EditProperty
 import { SchemaOrgProp } from "../JavaIntf";
 import { Checkbox } from "./core/Checkbox";
 import { Div } from "./core/Div";
+import { Divc } from "./core/Divc";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class SchemaOrgPropsTableRow extends ListBoxRow {
@@ -19,7 +20,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
             attr.title = this.prop.comment;
         }
         this.setChildren([
-            new Div(null, attr, [
+            new Divc(attr, [
                 new Checkbox(null, { className: "propsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: EditPropertyDlgState = this.dlg.getState();

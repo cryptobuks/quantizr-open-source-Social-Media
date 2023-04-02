@@ -1,6 +1,7 @@
 import { AppState } from "../../AppState";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
+import { Divc } from "../../comp/core/Divc";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
@@ -26,7 +27,7 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
     isVisible = () => true;
     constructView = (data: TabIntf) => new TrendingView(data);
     getTabSubOptions = (): Div => {
-        return new Div(null, { className: "tabSubOptions" }, [
+        return new Divc({ className: "tabSubOptions" }, [
             new AppNavLink("Hashtags", S.nav.showTrendingHashtags),
             new AppNavLink("Mentions", S.nav.showTrendingMentions),
             new AppNavLink("Words", S.nav.showTrendingWords)

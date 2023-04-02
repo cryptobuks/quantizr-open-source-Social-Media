@@ -8,6 +8,7 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Divc } from "../core/Divc";
 import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompVerticalRowLayout extends Div {
@@ -61,7 +62,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         lastNode = n;
                         let row: Comp = null;
                         if (n.children && !inVerticalSpace) {
-                            comps.push(new Div(null, { className: "verticalSpace" }));
+                            comps.push(new Divc({ className: "verticalSpace" }));
                         }
 
                         if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
@@ -76,7 +77,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     // This is the linline children
                     if (n.children) {
                         comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-                        comps.push(new Div(null, { className: "verticalSpace" }));
+                        comps.push(new Divc({ className: "verticalSpace" }));
                         inVerticalSpace = true;
                     }
                 }
@@ -99,7 +100,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root
                 // Note: this is the very last "+" button at the bottom, to insert below last child
-                comps.push(new Div(null, { className: (ast.userPrefs.editMode ? "nodeTableRowEdit" : "nodeTableRow") }, [
+                comps.push(new Divc({ className: (ast.userPrefs.editMode ? "nodeTableRowEdit" : "nodeTableRow") }, [
                     insertButton = new Button(null, () => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, ast);

@@ -1,6 +1,7 @@
 import { promiseDispatch } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { TabHeading } from "../comp/core/TabHeading";
 import { SignupDlg } from "../dlg/SignupDlg";
@@ -47,7 +48,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 new Div("Admin Console", { className: "tabTitle" })
             ]),
 
-            new Div(null, { className: "marginLeft" }, [
+            new Divc({ className: "marginLeft" }, [
                 this.sectionTitle("Analytics"),
 
                 // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //

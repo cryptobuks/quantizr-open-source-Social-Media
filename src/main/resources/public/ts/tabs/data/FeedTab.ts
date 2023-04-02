@@ -2,6 +2,7 @@ import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
+import { Divc } from "../../comp/core/Divc";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
@@ -45,13 +46,13 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         const ast = getAs();
         if (this.props?.feedFilterRootNode) {
             return !ast.isAnonUser
-                ? new Div(null, { className: "tabSubOptions" }, [
+                ? new Divc({ className: "tabSubOptions" }, [
                     // we close chat by swithing user back to the Fediverse view.
                     new AppNavLink("Close Chat", S.nav.messagesFediverse)
                 ]) : null;
         }
         else {
-            return new Div(null, { className: "tabSubOptions" }, [
+            return new Divc({ className: "tabSubOptions" }, [
                 ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
                 ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
                 ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),

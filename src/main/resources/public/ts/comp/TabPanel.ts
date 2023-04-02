@@ -3,6 +3,7 @@ import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { AppTab } from "./AppTab";
 import { CompIntf } from "./base/CompIntf";
+import { Divc } from "./core/Divc";
 
 export class TabPanel extends Div {
     static inst: TabPanel;
@@ -38,7 +39,7 @@ export class TabPanel extends Div {
 
         this.setChildren([
             this.customTopComp,
-            new Div(null, {
+            new Divc({
                 className: "row tabContent",
                 role: "main",
                 id: "tabPanelContentId"

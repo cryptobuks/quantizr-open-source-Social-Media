@@ -1,6 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { FriendsDlg } from "../dlg/FriendsDlg";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
@@ -23,7 +24,7 @@ export class FriendsListType extends TypeBase {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        return new Div(null, { className: "systemNodeContent" }, [
+        return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, "Friends"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
             new Button("Add New Friend", () => {

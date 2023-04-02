@@ -8,6 +8,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
@@ -147,7 +148,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         // }
 
         const children: Comp[] = [];
-        children.push(new Div(null, { className: "tinyMarginBottom" }, topChildren));
+        children.push(new Divc({ className: "tinyMarginBottom" }, topChildren));
         const childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
         // if we're editing an existing item determine that before starting to render rows.
@@ -164,7 +165,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Diva([
-                new Div(null, {
+                new Divc({
                     className: "progressSpinner"
                 }, [new Spinner()])
             ]));
@@ -275,14 +276,14 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,
-                ast.isAnonUser ? null : new Div(null, { className: "float-end" }, [
+                ast.isAnonUser ? null : new Divc({ className: "float-end" }, [
                     friendsTagDropDown,
                     new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "attentionButton")
                 ])
             ]),
-            new Div(null, { className: "feedView" }, children)
+            new Divc({ className: "feedView" }, children)
         ]);
         return true;
     }
@@ -344,7 +345,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
     // DO NOT DELETE - may be needed in the future.
     // makeFilterButtonsBar = (ast : AppState): Div => {
-    //     return new Div(null, { className: "marginTop" }, [
+    //     return new Divc({ className: "marginTop" }, [
     //         ast.isAnonUser ? null : new Checkbox("Friends", {
     //             title: "Include nodes posted by your friends"
     //         }, {

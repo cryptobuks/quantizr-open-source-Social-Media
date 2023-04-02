@@ -4,6 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
@@ -45,7 +46,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             //     });
             // }
 
-            contentDiv = new Div(null, {
+            contentDiv = new Divc({
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
@@ -56,7 +57,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 // if we have some parents to display...
                 ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
 
-                new Div(null, { className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
+                new Divc({ className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
                     new NodeCompMainNode(this.data),
                     new NodeCompMainList(this.data)
                 ])
@@ -68,7 +69,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
             ast.isAnonUser || !ast.node ? null : (this.headingBar = new TabHeading([
-                new Div(null, { className: "tinyMarginTop float-end" }, [
+                new Divc({ className: "tinyMarginTop float-end" }, [
                     !ast.isAnonUser ? new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
                         title: "Show Document View",

@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Icon } from "../comp/core/Icon";
 import { Constants as C } from "../Constants";
 import { DocumentRSInfo } from "../DocumentRSInfo";
@@ -69,7 +69,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
     }
 
     getFloatRightHeaderComp = (): Comp => {
-        return new Div(null, { className: "float-end" }, [
+        return new Divc({ className: "float-end" }, [
             new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search Subnodes",
@@ -87,7 +87,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
 
     extraPagingComps = (): Comp[] => {
         return [
-            new Div(null, { className: "extraPagingComps" }, [
+            new Divc({ className: "extraPagingComps" }, [
                 new Checkbox("Indent", {
                     className: "bigMarginLeft",
                     title: "Indent the Document based on content hierarchy"

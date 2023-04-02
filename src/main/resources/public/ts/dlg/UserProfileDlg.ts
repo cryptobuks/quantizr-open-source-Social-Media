@@ -6,6 +6,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
@@ -107,13 +108,13 @@ export class UserProfileDlg extends DialogBase {
 
                 new FlexRowLayout([
                     profileImg,
-                    new Div(null, { className: "userDisplayName" }, [
-                        new Div(null, { className: "marginLeft" }, [
+                    new Divc({ className: "userDisplayName" }, [
+                        new Divc({ className: "marginLeft" }, [
                             this.readOnly
                                 ? new Heading(4, state.userProfile.displayName || "")
                                 : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
                         ]),
-                        new Div(null, { className: "float-end" }, [
+                        new Divc({ className: "float-end" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
                                 className: "blockingText",
                                 onClick: this.unblockUser,

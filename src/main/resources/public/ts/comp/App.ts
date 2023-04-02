@@ -1,6 +1,5 @@
 import { getAs } from "../AppContext";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
@@ -10,6 +9,7 @@ import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Divc } from "./core/Divc";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
 import { Span } from "./core/Span";
@@ -65,7 +65,7 @@ export class App extends Main {
             }
 
             this.setChildren([
-                new Div(null, {
+                new Divc({
                     className: "row mainAppRow",
                     id: "appMainContainer"
                 }, [
@@ -135,7 +135,7 @@ export class App extends Main {
                 onClick: S.user.userSignup
             }) : null;
 
-            const floatRightDiv = new Div(null, { className: "float-end" }, [
+            const floatRightDiv = new Divc({ className: "float-end" }, [
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Span(ast.userName, {
                     className: "clickable",
@@ -150,7 +150,7 @@ export class App extends Main {
                 title: "Main application Landing Page"
             });
 
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
+            return new Divc({ className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
         }
         return null;
     }

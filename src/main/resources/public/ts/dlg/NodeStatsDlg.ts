@@ -2,7 +2,7 @@ import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
@@ -19,7 +19,7 @@ export class NodeStatsDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
-        const tagPanel = new Div(null, { className: "wordStatsArea" });
+        const tagPanel = new Divc({ className: "wordStatsArea" });
         const ast = getAs();
 
         if (this.res.topVotes?.length > 0) {
@@ -43,7 +43,7 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        const mentionPanel = new Div(null, { className: "wordStatsArea" });
+        const mentionPanel = new Divc({ className: "wordStatsArea" });
         if (this.res.topMentions?.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle alert alert-primary" }));
             this.res.topMentions.forEach(word => {
@@ -55,7 +55,7 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        const wordPanel = new Div(null, { className: "wordStatsArea" });
+        const wordPanel = new Divc({ className: "wordStatsArea" });
         if (this.res.topWords?.length > 0) {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle alert alert-primary" }));
             this.res.topWords.forEach(word => {

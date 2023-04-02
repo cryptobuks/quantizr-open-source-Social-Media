@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { getAs } from "../AppContext";
-import { Div } from "../comp/core/Div";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { Divc } from "./core/Divc";
 import { Main } from "./Main";
 
 // https://observablehq.com/@d3/force-directed-tree
@@ -15,7 +15,7 @@ export class FullScreenGraphViewer extends Main {
     isDragging: boolean;
 
     preRender(): boolean {
-        this.setChildren([new Div(null, { className: "d3Graph" })]);
+        this.setChildren([new Divc({ className: "d3Graph" })]);
         return true;
     }
 

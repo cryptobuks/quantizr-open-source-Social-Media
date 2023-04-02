@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
-import { Div } from "./Div";
+import { Divc } from "./Divc";
 
 // todo-1: finish converting all these to FlexRowLayout
 export class HorizontalLayout extends Comp {
@@ -27,6 +27,6 @@ export class HorizontalLayout extends Comp {
             }
         }
 
-        return this.tag("div", null, [new Div(null, { className: "displayRow" }, this.comps)]);
+        return this.tag("div", null, [new Divc({ className: "displayRow" }, this.comps)]);
     }
 }

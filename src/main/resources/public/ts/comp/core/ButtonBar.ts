@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
-import { Div } from "./Div";
+import { Divc } from "./Divc";
 
 export class ButtonBar extends Comp {
 
@@ -23,7 +23,7 @@ export class ButtonBar extends Comp {
             return this.tag("div", {
                 className: this.wrapperClass
             },
-                [new Div(null, props, this.getChildren())]);
+                [new Divc(props, this.getChildren())]);
         }
         else {
             return this.tag("div", props);

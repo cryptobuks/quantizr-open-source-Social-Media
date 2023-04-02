@@ -1,5 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
@@ -20,7 +21,7 @@ export class BookmarkListType extends TypeBase {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        return new Div(null, { className: "systemNodeContent" }, [
+        return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
             new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft" })
         ]);

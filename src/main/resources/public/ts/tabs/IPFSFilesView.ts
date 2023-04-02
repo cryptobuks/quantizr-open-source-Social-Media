@@ -5,6 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -46,7 +47,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         if (this.data.props.loading) {
             children.push(new Diva([
                 new Heading(4, "Loading Web3 Files..."),
-                new Div(null, {
+                new Divc({
                     className: "progressSpinner"
                 }, [new Spinner()])
             ]));
@@ -118,7 +119,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             // });
         }
 
-        this.setChildren([new Div(null, { className: "mfsFileView" }, children)]);
+        this.setChildren([new Divc({ className: "mfsFileView" }, children)]);
         return true;
     }
 

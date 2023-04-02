@@ -10,6 +10,7 @@ import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { Diva } from "./comp/core/Diva";
+import { Divc } from "./comp/core/Divc";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
 import { IconButton } from "./comp/core/IconButton";
@@ -367,9 +368,9 @@ export class Render {
                 attachmentComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
-                    attachmentComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true)]));
+                    attachmentComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true)]));
                     attachmentComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
-                    const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
+                    const linkGroup = new Divc({ className: "attachmentLinkGroup" });
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;
                     linkGroup.addChildren([
@@ -763,7 +764,7 @@ export class Render {
         if (!node || !node.tags) return null;
         const tags = node.tags.split(" ");
         const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
-        return new Div(null, {
+        return new Divc({
             title: "Click to copy to clipboard",
             onClick: () => {
                 S.util.copyToClipboard(node.tags);
@@ -787,12 +788,12 @@ export class Render {
         if (className) attribs.className = className;
         const tagsDiv = this.renderTagsDiv(node, "microMarginBottom");
 
-        return new Div(null, attribs, [
+        return new Divc(attribs, [
             new FlexRowLayout([
-                new Div(null, { className: "friendLhs" }, [
+                new Divc({ className: "friendLhs" }, [
                     img
                 ]),
-                new Div(null, { className: "friendRhs" }, [
+                new Divc({ className: "friendRhs" }, [
 
                     // I'm removing this becasue we can click on the image and to these thru the Profile Dialog of the user.
                     // new ButtonBar([
@@ -856,7 +857,7 @@ export class Render {
                 }));
             });
         }
-        return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
+        return linkComps.length > 0 ? new Divc({ className: "linksPanel" }, linkComps) : null;
     }
 
     buildCustomLinks = (configArray: any): CompIntf[] => {
@@ -924,8 +925,8 @@ export class Render {
                 },
                 title: "Select Hashtags"
             }, "marginRight"),
-            new Div(null, { className: "inlineBlock" }, [
-                new Div(null, {
+            new Divc({ className: "inlineBlock" }, [
+                new Divc({
                     className: "tagsFlexContainer"
                 }, spans)
             ])

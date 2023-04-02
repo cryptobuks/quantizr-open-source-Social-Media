@@ -1,5 +1,5 @@
 import { CompIntf } from "../comp/base/CompIntf";
-import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Spinner } from "../comp/core/Spinner";
 import { DialogBase } from "../DialogBase";
 
@@ -11,7 +11,7 @@ export class ProgressDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, { className: "progressSpinner" }, [new Spinner()])
+            new Divc({ className: "progressSpinner" }, [new Spinner()])
         ];
     }
 }

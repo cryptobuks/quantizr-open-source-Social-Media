@@ -11,6 +11,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { SettingsTab } from "../tabs/data/SettingsTab";
 import { CompIntf } from "./base/CompIntf";
+import { Divc } from "./core/Divc";
 import { HorizontalLayout } from "./core/HorizontalLayout";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
@@ -139,7 +140,7 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-end" }, [
+        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Divc({ className: "float-end" }, [
             // Not showing login on this panel in mobileMode, because it's shown at top of page instead
             new Span("Login", {
                 className: "signupLinkText",
@@ -159,11 +160,11 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         this.setChildren([
-            new Div(null, { className: "float-left" }, [
+            new Divc({ className: "float-left" }, [
                 new HorizontalLayout([
                     avatarImg,
                     new Diva([
-                        new Div(null, { className: "marginBottom" }, [
+                        new Divc({ className: "marginBottom" }, [
                             !ast.isAnonUser ? new Span(displayName, {
                                 className: "clickable marginRight",
                                 onClick: () => {
@@ -198,7 +199,7 @@ export class RightNavPanel extends Div {
                         }, "form-switch formCheckInlineNoMargin") : null
                     ])
                 ], "horizontalLayoutCompCompact fullWidth"),
-                // new Div(null, { className: "marginBottom" }, [
+                // new Divc({ className: "marginBottom" }, [
                 //     new ButtonBar([
                 //         clipboardPasteButton,
                 //         addNoteButton,

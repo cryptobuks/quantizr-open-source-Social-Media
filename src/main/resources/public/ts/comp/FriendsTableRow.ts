@@ -10,6 +10,7 @@ import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
+import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 
@@ -51,8 +52,8 @@ export class FriendsTableRow extends ListBoxRow {
                     },
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
                 }) : null,
-                new Div(null, { className: "friendListImgDivCont" }, [
-                    new Div(null, { className: "friendListImgDiv centerChild" }, [
+                new Divc({ className: "friendListImgDivCont" }, [
+                    new Divc({ className: "friendListImgDiv centerChild" }, [
                         src ? new Img({
                             className: "friendListImage",
                             src,
@@ -60,7 +61,7 @@ export class FriendsTableRow extends ListBoxRow {
                         }) : null
                     ])
                 ]),
-                new Div(null, {
+                new Divc({
                     className: "friendListText",
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [

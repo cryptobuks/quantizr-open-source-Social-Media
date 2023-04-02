@@ -7,6 +7,7 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Checkbox } from "./core/Checkbox";
+import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 
@@ -18,7 +19,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        const div = new Div(null, { className: "float-end tinyMarginAll" });
+        const div = new Divc({ className: "float-end tinyMarginAll" });
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
@@ -55,8 +56,8 @@ export class EditPrivsTableRow extends ListBoxRow {
         this.setChildren([
             new Diva([
                 this.renderAclPrivileges(this.aclEntry),
-                new Div(null, { className: "friendListImgDivCont" }, [
-                    !isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
+                new Divc({ className: "friendListImgDivCont" }, [
+                    !isPublic ? new Divc({ className: "friendListImgDiv centerChild" }, [
                         src ? new Img({
                             className: "friendListImage",
                             src,
@@ -65,14 +66,14 @@ export class EditPrivsTableRow extends ListBoxRow {
                             }
                         }) : null
                     ]) : null,
-                    isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
+                    isPublic ? new Divc({ className: "friendListImgDiv centerChild" }, [
                         new Icon({
                             className: "fa fa-globe fa-3x sharingIcon marginAll",
                             title: "Node is Public"
                         })
                     ]) : null
                 ]),
-                new Div(null, { className: "sharingDisplayName" }, [
+                new Divc({ className: "sharingDisplayName" }, [
                     isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
                         : new Div(displayName, {
                             className: "friendName",

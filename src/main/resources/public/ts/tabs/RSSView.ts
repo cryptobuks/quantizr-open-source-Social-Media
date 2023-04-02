@@ -10,6 +10,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
@@ -62,13 +63,13 @@ export class RSSView extends AppTab<any, RSSView> {
             }
             // if it's currently loading show the spinner
             else if (ast.rssFeedCache[feedSrcHash] === "loading") {
-                feedContent = new Div(null, { className: "bigMargin" }, [
+                feedContent = new Divc({ className: "bigMargin" }, [
                     new Heading(4, "Loading..."),
                     new Spinner()
                 ]);
             }
             else if (!ast.rssFeedCache[feedSrcHash]) {
-                feedContent = new Div(null, { className: "bigMargin" }, [
+                feedContent = new Divc({ className: "bigMargin" }, [
                     new Heading(4, "Refreshing..."),
                     new Spinner()
                 ]);
@@ -220,7 +221,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         if (feedOut.length > 0) {
-            const feedOutDiv = new Div(null, { className: "marginBottom marginLeft" }, feedOut);
+            const feedOutDiv = new Divc({ className: "marginBottom marginLeft" }, feedOut);
             feedList.addChild(feedOutDiv);
         }
 
@@ -306,7 +307,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
         let anchor: Anchor = null;
         if (entry.title) {
-            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+            headerDivChildren.push(new Divc({ className: "marginBottom" }, [
                 anchor = new Anchor(entry.link, null, {
                     className: "rssAnchor",
                     target: "_blank",
@@ -321,7 +322,7 @@ export class RSSView extends AppTab<any, RSSView> {
             }));
         }
 
-        children.push(entry.parentFeedTitle ? new Div(null, {
+        children.push(entry.parentFeedTitle ? new Divc({
             // className: "marginRight",
             dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
         }) : null);
@@ -344,7 +345,7 @@ export class RSSView extends AppTab<any, RSSView> {
             });
         }
 
-        children.push(new Div(null, { className: "clearBoth" }));
+        children.push(new Divc({ className: "clearBoth" }));
 
         if (entry.enclosures) {
             entry.enclosures.forEach(enc => {
@@ -441,7 +442,7 @@ export class RSSView extends AppTab<any, RSSView> {
             new Clearfix()
         ]));
 
-        return new Div(null, { className: "rssFeedItem" }, children);
+        return new Divc({ className: "rssFeedItem" }, children);
     }
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because

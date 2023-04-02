@@ -4,6 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
@@ -107,7 +108,7 @@ export class TTSView extends AppTab<any, TTSView> {
         let paraComps: CompIntf[];
         if (S.speech.queuedSpeech?.length > 0) {
             paraComps = [];
-            let curDiv = new Div(null, { className: "ttsPara" });
+            let curDiv = new Divc({ className: "ttsPara" });
 
             let idx = 0;
             // scan each utterance
@@ -117,7 +118,7 @@ export class TTSView extends AppTab<any, TTSView> {
                     if (curDiv.hasChildren()) {
                         paraComps.push(curDiv);
                     }
-                    curDiv = new Div(null, { className: "ttsPara" });
+                    curDiv = new Divc({ className: "ttsPara" });
                 }
                 else {
                     const utterTrim = utter.trim();
@@ -140,7 +141,7 @@ export class TTSView extends AppTab<any, TTSView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Text-to-Speech", { className: "tabTitle" }),
-                new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                new Divc({ className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
                 new Clearfix()
             ]),
             new FlexRowLayout([
@@ -161,7 +162,7 @@ export class TTSView extends AppTab<any, TTSView> {
                 rows: 3
             }, TTSView.textAreaState) : null,
             paraComps?.length > 0
-                ? new Div(null, { className: "speechTxtArea" }, [
+                ? new Divc({ className: "speechTxtArea" }, [
                     new Heading(4, heading, { className: "speechAreaTitle alert alert-primary" }),
                     ...paraComps
                 ]) : null

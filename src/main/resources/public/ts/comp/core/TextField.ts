@@ -1,7 +1,7 @@
 import * as I from "../../Interfaces";
 import { Validator } from "../../Validator";
 import { Anchor } from "./Anchor";
-import { Div } from "./Div";
+import { Divc } from "./Divc";
 import { ErrorDiv } from "./ErrorDiv";
 import { Input } from "./Input";
 import { Label } from "./Label";
@@ -115,7 +115,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
 
         this.setChildren([
             label,
-            new Div(null, {
+            new Divc({
                 className: "input-group textField"
             }, [
                 this.input,

@@ -8,6 +8,7 @@ import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Divc } from "./core/Divc";
 
 export class HistoryPanel extends Div {
 
@@ -55,7 +56,7 @@ export class HistoryPanel extends Div {
                 S.domUtil.setNodeDragHandler(dragProps, h.id);
             }
 
-            children.push(parentDropTarg = new Div(null, {
+            children.push(parentDropTarg = new Divc({
                 id: h.id + "_hist",
                 [C.NODE_ID_ATTR]: h.id,
                 onClick: this.jumpToId,

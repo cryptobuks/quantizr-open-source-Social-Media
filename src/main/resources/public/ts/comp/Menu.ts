@@ -7,6 +7,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
+import { Divc } from "./core/Divc";
 
 export class Menu extends Comp {
     static userClickedMenu: boolean = false;
@@ -33,11 +34,11 @@ export class Menu extends Comp {
             }
                 , [expanded ? this.floatRightComp : null]),
 
-            expanded ? new Div(null, {
+            expanded ? new Divc({
                 id: this.getId("itemsCont"),
                 className: "menuCardBody"
             }, [
-                new Div(null, {
+                new Divc({
                     id: this.getId("items"),
                     className: "menuPanelItems"
                 }, this.menuItems)]) : null

@@ -12,6 +12,7 @@ import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Button } from "../core/Button";
+import { Divc } from "../core/Divc";
 
 export class NodeCompRowHeader extends Div {
 
@@ -248,7 +249,7 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        const floatUpperRightDiv: Div = new Div(null, {
+        const floatUpperRightDiv: Div = new Divc({
             className: "float-end floatRightHeaderDiv"
         });
 

@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
+import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 import { TabPanelButtons } from "./TabPanelButtons";
 
@@ -62,7 +63,7 @@ export class LeftNavPanel extends Div {
         }
 
         this.setChildren([
-            new Div(null, { id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
+            new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                 !ast.isAnonUser || ast.anonShowLHSMenu ? new Img({
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",

@@ -6,6 +6,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
@@ -57,7 +58,7 @@ export class ExportDlg extends DialogBase {
     }
 
     makePdfOptions = (): Div => {
-        return new Div(null, { className: "bigMarginBottom" }, [
+        return new Divc({ className: "bigMarginBottom" }, [
             new Heading(5, "PDF Options"),
             new Checkbox("Include Table of Contents (using Markdown Headings)", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
@@ -67,7 +68,7 @@ export class ExportDlg extends DialogBase {
     }
 
     makeArchiveOptions = (): Div => {
-        return new Div(null, { className: "bigMarginLeft bigMarginBottom" }, [
+        return new Divc({ className: "bigMarginLeft bigMarginBottom" }, [
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
             new Checkbox("Full HTML File", null, {

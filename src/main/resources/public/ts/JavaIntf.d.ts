@@ -1218,7 +1218,7 @@ export const enum NodeProp {
     PRIORITY_FULL = "p.priority",
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
-    NO_EXPORT = "sn:noexport",
+    NO_EXPORT = "noexport",
     TYPE_LOCK = "sn:typLoc",
     DATE = "date",
     DATE_FULL = "p.date",

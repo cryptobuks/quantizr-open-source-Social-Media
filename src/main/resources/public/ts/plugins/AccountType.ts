@@ -1,5 +1,5 @@
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
@@ -31,7 +31,7 @@ export class AccountType extends TypeBase {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        return new Div(null, {
+        return new Divc({
             className: "systemNodeContent"
         }, [
             new Heading(4, "User: " + node.owner, {
