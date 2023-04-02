@@ -88,7 +88,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             htmlFor: this.getId("inputId_")
         }) : null;
 
-        const input = this.input = new Input({
+        this.input = new Input({
             placeholder: this.cfg.placeholder || "",
             className: "form-control preTextField " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
@@ -104,7 +104,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
                     this.mergeState<LS>({
                         inputType: state.inputType === "password" ? "text" : "password"
                     });
-                    this.icon._toggleClass();
+                    this.icon.toggleClass();
                 }
             }, [
                 this.icon = new ToggleIcon("fa-eye-slash", "fa-eye", {
@@ -118,7 +118,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             new Div(null, {
                 className: "input-group textField"
             }, [
-                input,
+                this.input,
                 passwordEye
             ]),
             new ErrorDiv(this.cfg.val.e)

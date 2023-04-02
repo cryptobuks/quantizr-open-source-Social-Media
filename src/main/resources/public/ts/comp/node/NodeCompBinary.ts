@@ -32,9 +32,7 @@ export class NodeCompBinary extends Div {
         if (!node) return null;
         const att = S.props.getAttachment(this.attName, node);
         if (!att) return null;
-
         const src: string = S.attachment.getUrlForNodeAttachment(node, this.attName, false);
-
         const style: any = {};
         let size = "";
         let rtMargin = true;

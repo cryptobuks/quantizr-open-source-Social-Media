@@ -23,9 +23,9 @@ export class FullScreenImgViewer extends Main {
 
         const isAnAccountNode = node?.ownerId && node.id === node.ownerId;
         const children = [];
-
-        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+        const list: J.Attachment[] = S.props.getOrderedAtts(node);
         let attName = null;
+
         list.forEach(att => {
             if (att.o === ast.fullScreenConfig.ordinal) {
                 attName = (att as any).key;

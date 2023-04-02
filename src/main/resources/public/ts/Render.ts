@@ -68,7 +68,7 @@ export class Render {
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
 
         if (node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            const list: J.Attachment[] = S.props.getOrderedAtts(node);
             let imgHtml = "";
 
             for (const a of list) {
@@ -360,7 +360,7 @@ export class Render {
 
         const attachmentComps: Comp[] = [];
         if (node.attachments) {
-            const atts: J.Attachment[] = S.props.getOrderedAttachments(node);
+            const atts: J.Attachment[] = S.props.getOrderedAtts(node);
             attachmentComps.push(new Heading(3, "Attachments"));
             for (const att of atts) {
                 attachmentComps.push(new Tag("hr"));

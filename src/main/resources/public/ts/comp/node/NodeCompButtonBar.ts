@@ -211,7 +211,6 @@ export class NodeCompButtonBar extends Div {
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;
-
         const isMine = S.props.isMine(this.node);
 
         // Note we only allow 'Up Level' on home node if we're the admin.

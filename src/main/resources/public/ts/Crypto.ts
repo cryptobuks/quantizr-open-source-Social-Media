@@ -823,7 +823,7 @@ export class Crypto {
         }
 
         if (node.attachments) {
-            S.props.getOrderedAttachments(node).forEach(att => {
+            S.props.getOrderedAtts(node).forEach(att => {
                 if (att.b) {
                     signData += "-" + att.b;
                 }

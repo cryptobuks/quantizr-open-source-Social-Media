@@ -421,7 +421,7 @@ export class Nav {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            const list: J.Attachment[] = S.props.getOrderedAtts(node);
             let selAtt: J.Attachment = list[0];
             let lastAtt: J.Attachment = null;
             list.forEach(att => {
@@ -441,7 +441,7 @@ export class Nav {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            const list: J.Attachment[] = S.props.getOrderedAtts(node);
             let selAtt: J.Attachment = list[list.length - 1];
             let takeNext = false;
             list.forEach(att => {

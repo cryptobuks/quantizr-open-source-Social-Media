@@ -36,7 +36,7 @@ export class NodeCompParentNodes extends Div {
             showCloseParentsIcon ? new Icon({
                 className: "fa fa-level-up fa-lg showParentsIcon float-end",
                 title: "Toggle: Show Parent on page",
-                onClick: () => S.edit.toggleShowParents()
+                onClick: S.edit.toggleShowParents
             }) : null,
 
             // hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,

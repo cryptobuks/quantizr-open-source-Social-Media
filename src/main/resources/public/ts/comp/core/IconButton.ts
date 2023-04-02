@@ -9,8 +9,6 @@ import { Spinner } from "./Spinner";
 interface LS { // Local State
     visible: boolean;
     disabled: boolean;
-
-    // infinite scrolling turns this on while querying
     waiting: boolean;
 }
 

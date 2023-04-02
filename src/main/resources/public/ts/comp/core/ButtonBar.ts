@@ -14,8 +14,6 @@ export class ButtonBar extends Comp {
     }
 
     compRender = (): ReactNode => {
-        // if (!this.hasChildren()) return null;
-
         const props = {
             className: "btn-group btnGroup flex-wrap " + this.extraClass,
             role: "group"

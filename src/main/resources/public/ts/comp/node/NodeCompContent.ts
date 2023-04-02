@@ -41,7 +41,6 @@ export class NodeCompContent extends Div {
         const children: CompIntf[] = [];
         let type = S.plugin.getType(this.node.type);
         type = type || S.plugin.getType(J.NodeType.NONE);
-
         this.domPreUpdateFunc = type.domPreUpdateFunction;
 
         const name: string = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_NAME, this.node);
@@ -68,7 +67,7 @@ export class NodeCompContent extends Div {
 
         if (S.props.hasBinary(this.node) && !isAccountNode) {
             const attComps: CompIntf[] = [];
-            const attachments = S.props.getOrderedAttachments(this.node);
+            const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
                 // so we break a bit of type safety here.

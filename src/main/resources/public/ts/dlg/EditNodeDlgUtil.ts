@@ -134,7 +134,7 @@ export class EditNodeDlgUtil {
     }
 
     saveAttFileNamesToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
-        const list: J.Attachment[] = S.props.getOrderedAttachments(editNode);
+        const list: J.Attachment[] = S.props.getOrderedAtts(editNode);
         for (const att of list) {
             const propState = dlg.attFileNames.get((att as any).key);
             if (propState) {

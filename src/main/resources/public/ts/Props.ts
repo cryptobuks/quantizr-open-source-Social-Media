@@ -131,7 +131,7 @@ export class Props {
         return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
-    getOrderedAttachments = (node: J.NodeInfo): J.Attachment[] => {
+    getOrderedAtts = (node: J.NodeInfo): J.Attachment[] => {
         const list: J.Attachment[] = [];
 
         // put all attachments in 'list', random order

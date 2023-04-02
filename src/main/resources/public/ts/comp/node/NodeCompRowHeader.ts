@@ -49,7 +49,6 @@ export class NodeCompRowHeader extends Div {
         const isMine = S.props.isMine(this.node);
         const children = [];
         let avatarImg: Img = null;
-
         const type = S.plugin.getType(this.node.type);
 
         // we always enable showInfo even on Tree Tab, so that we can have anonymous users comming to a shared tree link
@@ -96,11 +95,6 @@ export class NodeCompRowHeader extends Div {
                 title: "Node is Encrypted."
             }));
         }
-
-        /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
-        // if (ast.isAdminUser) {
-        //     children.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
-        // }
 
         const editInsertAllowed = S.props.isWritableByMe(this.node);
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);

@@ -31,16 +31,14 @@ export class TabPanelButtons extends Div {
     }
 
     buildTabButtons = (): Comp[] => {
-        const ast = getAs();
         const items: Comp[] = [];
-        for (const tab of ast.tabData) {
+        getAs().tabData.forEach(tab => {
             items.push(this.getTabButton(tab));
-
             const tabSubOpts = tab.getTabSubOptions();
             if (tabSubOpts) {
                 items.push(tabSubOpts);
             }
-        }
+        });
         return items;
     }
 

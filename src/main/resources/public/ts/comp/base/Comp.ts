@@ -8,9 +8,6 @@ import { CompIntf } from "./CompIntf";
 /**
  * Base class for all components which encapsulates a lot of React functionality so that our implementation
  * code can ignore those details.
- *
- * For component-local CSS styling see Button.ts. It's simple and involves just passing a 'scope' into this constructor
- * and then using the prefix '$$' in front of the classnames. That's all there is to it.
  */
 export abstract class Comp implements CompIntf {
     private parent: Comp = null; // only used for debug logging (can be deleted without impacting app)
@@ -47,7 +44,7 @@ export abstract class Comp implements CompIntf {
     static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
     public ordinal: number;
 
-    constructor(attribs?: any, private stateMgr?: State, public scope?: string) {
+    constructor(attribs?: any, private stateMgr?: State) {
         if (this.debug) {
             console.log("construct: " + this.constructor.name);
         }
@@ -195,14 +192,7 @@ export abstract class Comp implements CompIntf {
 
     create = (): ReactNode => {
         this.wrapClick(this.attribs);
-        this.scopeCss(this.attribs);
         return createElement(this.render, this.attribs);
-    }
-
-    scopeCss = (props: any) => {
-        if (this.scope && props?.className) {
-            props.className = props.className.replace("$$", this.scope);
-        }
     }
 
     wrapClick = (obj: any) => {
@@ -289,7 +279,6 @@ export abstract class Comp implements CompIntf {
             const children = this.createChildren(childrenArg);
 
             this.wrapClick(props);
-            this.scopeCss(props);
             if (children?.length > 0) {
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652

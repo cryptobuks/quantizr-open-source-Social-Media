@@ -17,7 +17,7 @@ import { TextField } from "./TextField";
 
 export class EditAttachmentsPanel extends Div {
 
-    constructor(private node: J.NodeInfo, private editorDlg: EditNodeDlg) {
+    constructor(private node: J.NodeInfo, private dlg: EditNodeDlg) {
         super(null, { className: "binaryEditorSection" });
     }
 
@@ -26,23 +26,23 @@ export class EditAttachmentsPanel extends Div {
         this.setChildren([]);
         let isFirst = true;
 
-        if (this.editorDlg.getState<EditNodeDlgState>().selectedAttachments?.size > 0) {
+        if (this.dlg.getState<EditNodeDlgState>().selectedAttachments?.size > 0) {
             this.addChild(new ButtonBar([
                 new IconButton("fa-trash fa-lg", "", {
-                    onClick: () => this.editorDlg.utl.deleteUploads(this.editorDlg),
+                    onClick: () => this.dlg.utl.deleteUploads(this.dlg),
                     title: "Delete selected Attachments"
                 }, "delAttachmentButton")
             ], "float-end"));
         }
 
-        S.props.getOrderedAttachments(this.node).forEach(att => {
-            this.addChild(this.makeAttachmentPanel(att, isFirst));
+        S.props.getOrderedAtts(this.node).forEach(att => {
+            this.addChild(this.makeAttPanel(att, isFirst));
             isFirst = false;
         });
         return true;
     }
 
-    makeAttachmentPanel = (att: J.Attachment, isFirst: boolean): Div => {
+    makeAttPanel = (att: J.Attachment, isFirst: boolean): Div => {
         const ast = getAs();
         if (!att) return null;
         const key = (att as any).key;
@@ -52,31 +52,23 @@ export class EditAttachmentsPanel extends Div {
         let pinCheckbox = null;
         if (ipfsLink) {
             pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
-                setValue: (checked: boolean) => {
-                    if (checked) {
-                        att.ir = null;
-                    }
-                    else {
-                        att.ir = "1";
-                    }
-                },
+                setValue: (checked: boolean) => { att.ir = checked ? null : "1" },
                 getValue: (): boolean => att.ir ? false : true
             });
         }
 
         const attCheckbox = new Checkbox(null, null, {
             setValue: (checked: boolean) => {
-                const state = this.editorDlg.getState<EditNodeDlgState>();
+                const state = this.dlg.getState<EditNodeDlgState>();
                 if (checked) {
                     state.selectedAttachments.add((att as any).key);
                 }
                 else {
                     state.selectedAttachments.delete((att as any).key);
                 }
-
-                this.editorDlg.mergeState<EditNodeDlgState>({});
+                this.dlg.mergeState<EditNodeDlgState>({});
             },
-            getValue: (): boolean => this.editorDlg.getState<EditNodeDlgState>().selectedAttachments.has((att as any).key)
+            getValue: (): boolean => this.dlg.getState<EditNodeDlgState>().selectedAttachments.has((att as any).key)
         }, "delAttCheckbox");
 
         const imgSizeSelection = S.props.hasImage(ast.editNode, key)
@@ -89,7 +81,7 @@ export class EditAttachmentsPanel extends Div {
                             if (isFirst) {
                                 this.askMakeAllSameSize(ast.editNode, val);
                             }
-                            this.editorDlg.binaryDirty = true;
+                            this.dlg.binaryDirty = true;
                         }
                     },
                     getValue: (): string => {
@@ -105,9 +97,9 @@ export class EditAttachmentsPanel extends Div {
                         const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
                             att.p = val === "auto" ? null : val;
-                            this.editorDlg.binaryDirty = true;
+                            this.dlg.binaryDirty = true;
                         }
-                        this.editorDlg.mergeState({});
+                        this.dlg.mergeState({});
                     },
                     getValue: (): string => {
                         const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
@@ -117,10 +109,10 @@ export class EditAttachmentsPanel extends Div {
                     }
                 }) : null;
 
-        let fileNameFieldState: Validator = this.editorDlg.attFileNames.get((att as any).key);
+        let fileNameFieldState: Validator = this.dlg.attFileNames.get((att as any).key);
         if (!fileNameFieldState) {
             fileNameFieldState = new Validator(att.f, [{ name: ValidatorRuleName.REQUIRED }]);
-            this.editorDlg.attFileNames.set((att as any).key, fileNameFieldState);
+            this.dlg.attFileNames.set((att as any).key, fileNameFieldState);
         }
 
         const fileNameField = new TextField({
@@ -130,7 +122,7 @@ export class EditAttachmentsPanel extends Div {
             val: fileNameFieldState
         });
 
-        const list: J.Attachment[] = S.props.getOrderedAttachments(ast.editNode);
+        const list: J.Attachment[] = S.props.getOrderedAtts(ast.editNode);
         const firstAttachment = list[0].o === att.o;
         const lastAttachment = list[list.length - 1].o === att.o;
 
@@ -151,12 +143,12 @@ export class EditAttachmentsPanel extends Div {
                 !firstAttachment ? new Icon({
                     className: "fa fa-lg fa-arrow-up clickable marginLeft",
                     title: "Move Attachment Up",
-                    onClick: () => this.moveAttachmentUp(att, ast.editNode)
+                    onClick: () => this.moveAttUp(att, ast.editNode)
                 }) : null,
                 !lastAttachment ? new Icon({
                     className: "fa fa-lg fa-arrow-down clickable marginLeft",
                     title: "Move Attachment Down",
-                    onClick: () => this.moveAttachmentDown(att, ast.editNode)
+                    onClick: () => this.moveAttDown(att, ast.editNode)
                 }) : null
             ])
 
@@ -181,7 +173,7 @@ export class EditAttachmentsPanel extends Div {
 
         let fileNameTagTip = null;
         if (att.p === "ft") {
-            const content = this.editorDlg?.contentEditor?.getValue() || ast.editNode.content;
+            const content = this.dlg?.contentEditor?.getValue() || ast.editNode.content;
             const fileName = fileNameFieldState.getValue();
 
             // if fileName tag not already in the content give the user help inserting it.
@@ -191,7 +183,7 @@ export class EditAttachmentsPanel extends Div {
                     title: "Click to insert File Tag",
                     className: "clickable smallMarginTop",
                     onClick: () => {
-                        this.editorDlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
+                        this.dlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
                     }
                 });
             }
@@ -204,7 +196,7 @@ export class EditAttachmentsPanel extends Div {
 
     askMakeAllSameSize = async (node: J.NodeInfo, val: string): Promise<void> => {
         setTimeout(async () => {
-            const attachments = S.props.getOrderedAttachments(node);
+            const attachments = S.props.getOrderedAtts(node);
             if (attachments?.length > 1) {
                 const dlg = new ConfirmDlg("Display all images at " + (val === "0" ? "their actual" : val) + " width?", "All Images?",
                     "btn-info", "alert alert-info");
@@ -213,15 +205,15 @@ export class EditAttachmentsPanel extends Div {
                     if (!this.node.attachments) return null;
                     attachments.forEach(att => { att.c = val; });
                     // trick to force screen render
-                    this.editorDlg.mergeState({});
+                    this.dlg.mergeState({});
                 }
             }
             return null;
         }, 250);
     }
 
-    moveAttachmentDown = (att: J.Attachment, node: J.NodeInfo) => {
-        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+    moveAttDown = (att: J.Attachment, node: J.NodeInfo) => {
+        const list: J.Attachment[] = S.props.getOrderedAtts(node);
         let idx: number = 0;
         let setNext: number = -1;
         for (const a of list) {
@@ -240,12 +232,12 @@ export class EditAttachmentsPanel extends Div {
             idx++;
         }
 
-        this.editorDlg.binaryDirty = true;
+        this.dlg.binaryDirty = true;
         dispatch("attachmentMoveUp", s => { });
     }
 
-    moveAttachmentUp = (att: J.Attachment, node: J.NodeInfo) => {
-        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+    moveAttUp = (att: J.Attachment, node: J.NodeInfo) => {
+        const list: J.Attachment[] = S.props.getOrderedAtts(node);
         let idx: number = 0;
         let lastA = null;
         for (const a of list) {
@@ -263,7 +255,7 @@ export class EditAttachmentsPanel extends Div {
             lastA = a;
         }
 
-        this.editorDlg.binaryDirty = true;
+        this.dlg.binaryDirty = true;
         dispatch("attachmentMoveUp", s => { });
     }
 
