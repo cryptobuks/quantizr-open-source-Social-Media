@@ -2,7 +2,7 @@ import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
@@ -21,7 +21,7 @@ export class MultiFollowDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextContent("Enter Fediverse Names (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([

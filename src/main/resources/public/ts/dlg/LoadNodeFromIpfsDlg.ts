@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -22,7 +22,7 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new HorizontalLayout([
                     new TextField({ label: "IPFS Path", enter: this.load, val: this.ipfsPathState })
                 ]),

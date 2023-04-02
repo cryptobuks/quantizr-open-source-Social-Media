@@ -2,6 +2,7 @@ import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
@@ -154,7 +155,7 @@ export class OpenGraphPanel extends Div {
 
             // if mobile portrait mode render image above (not beside) description
             if (ast.mobileMode && window.innerWidth < window.innerHeight) {
-                imgAndDesc = new Div(null, null, [
+                imgAndDesc = new Diva([
                     new Img({
                         className: "openGraphImageVert",
                         src: state.og.image

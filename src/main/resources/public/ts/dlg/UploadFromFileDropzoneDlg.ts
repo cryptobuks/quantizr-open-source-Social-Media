@@ -5,6 +5,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Constants } from "../Constants";
@@ -46,7 +47,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         const ast = getAs();
         const children = [
-            new Div(null, null, [
+            new Diva([
                 this.importMode || !ast.config.ipfsEnabled ? null : new HorizontalLayout([
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div

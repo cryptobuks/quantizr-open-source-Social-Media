@@ -5,6 +5,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
@@ -93,13 +94,13 @@ export class UserProfileDlg extends DialogBase {
                 }));
             }
 
-            web3Div = new Div(null, null, web3Comps);
+            web3Div = new Diva(web3Comps);
         }
 
         const children = [
-            new Div(null, null, [
-                profileHeaderImg ? new Div(null, null, [
-                    new Div(null, null, [
+            new Diva([
+                profileHeaderImg ? new Diva([
+                    new Diva([
                         profileHeaderImg
                     ])
                 ]) : null,

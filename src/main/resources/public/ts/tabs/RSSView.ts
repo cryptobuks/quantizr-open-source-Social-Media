@@ -9,6 +9,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
@@ -325,7 +326,7 @@ export class RSSView extends AppTab<any, RSSView> {
             dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
         }) : null);
 
-        children.push(new Div(null, null, headerDivChildren));
+        children.push(new Diva(headerDivChildren));
 
         // process audio enclosures
         let audioUrl: string = null;
@@ -432,7 +433,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
         const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
-        children.push(new Div(null, null, [
+        children.push(new Diva([
             new Span(null, { className: "float-end" }, [
                 footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),

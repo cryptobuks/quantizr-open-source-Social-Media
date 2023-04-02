@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -104,7 +105,7 @@ export class BlockedUsersDlg extends DialogBase {
         });
 
         return [
-            new Div(null, null, [
+            new Diva([
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",

@@ -6,6 +6,7 @@ import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Validator, ValidatorRuleName } from "../../Validator";
+import { Diva } from "../../comp/core/Diva";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
@@ -130,7 +131,7 @@ export class EditAttachmentsPanel extends Div {
             attCheckbox,
             new NodeCompBinary(ast.editNode, key, true, false, true),
 
-            new Div(null, null, [
+            new Diva([
                 ipfsLink ? new Div("IPFS", {
                     className: "smallHeading"
                 }) : null
@@ -139,7 +140,7 @@ export class EditAttachmentsPanel extends Div {
             imgPositionSelection,
             fileNameField,
             pinCheckbox,
-            new Div(null, null, [
+            new Diva([
                 !firstAttachment ? new Icon({
                     className: "fa fa-lg fa-arrow-up clickable marginLeft",
                     title: "Move Attachment Up",

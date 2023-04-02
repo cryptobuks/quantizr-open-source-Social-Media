@@ -1,5 +1,6 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "../dlg/SelectTagsDlg";
@@ -36,7 +37,7 @@ export class FriendsTableRow extends ListBoxRow {
         }
 
         this.setChildren([
-            new Div(null, null, [
+            new Diva([
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: FriendsDlgState = this.dlg.getState();
@@ -63,7 +64,7 @@ export class FriendsTableRow extends ListBoxRow {
                     className: "friendListText",
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
-                    new Div(null, null, [
+                    new Diva([
                         this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,
                         this.friend.userName ? new Div("@" + this.friend.userName) : null
                     ]),

@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -24,7 +24,7 @@ export class SearchByFediUrlDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 this.searchTextField = new TextField({ label: "URL", enter: this.search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),

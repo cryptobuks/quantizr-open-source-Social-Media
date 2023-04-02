@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { Validator, ValidatorRuleName } from "../Validator";
@@ -20,7 +20,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextField({ label: "Name", val: this.nameState })
             ]),
             new ButtonBar([

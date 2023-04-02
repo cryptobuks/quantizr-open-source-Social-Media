@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Img } from "../comp/core/Img";
 import { TextField } from "../comp/core/TextField";
@@ -40,7 +40,7 @@ export class SignupDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextField({ label: "User Name", val: this.userNameState }),
                 new TextField({ label: "Password", inputType: "password", val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),
@@ -50,7 +50,7 @@ export class SignupDlg extends DialogBase {
                         src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
                     }),
-                    new Div(null, null, [
+                    new Diva([
                         new TextField({ label: "Enter Numbers Displayed", val: this.captchaState })
                     ])
                 ]),

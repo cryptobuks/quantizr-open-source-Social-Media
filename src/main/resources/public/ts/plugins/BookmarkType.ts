@@ -1,6 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { TabIntf } from "../intf/TabIntf";
@@ -19,7 +19,7 @@ export class BookmarkType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
-        return new Div(null, null, [
+        return new Diva([
             new NodeCompMarkdown(node, null),
             audioUrl ? new Button("Play Audio", () => {
                 new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0).open();

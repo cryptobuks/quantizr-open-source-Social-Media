@@ -1,6 +1,7 @@
 import { getAs } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";
@@ -161,7 +162,7 @@ export class RightNavPanel extends Div {
             new Div(null, { className: "float-left" }, [
                 new HorizontalLayout([
                     avatarImg,
-                    new Div(null, null, [
+                    new Diva([
                         new Div(null, { className: "marginBottom" }, [
                             !ast.isAnonUser ? new Span(displayName, {
                                 className: "clickable marginRight",

@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Heading } from "../comp/core/Heading";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -86,7 +87,7 @@ export class SelectTagsDlg extends DialogBase {
         }
 
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextField({
                     label: "Tag",
                     outterClass: "noPaddingRight marginBottom",

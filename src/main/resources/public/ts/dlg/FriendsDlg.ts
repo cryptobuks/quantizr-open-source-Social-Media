@@ -5,6 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
@@ -136,7 +137,7 @@ export class FriendsDlg extends DialogBase {
         });
 
         const ret = [
-            new Div(null, null, [
+            new Diva([
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",

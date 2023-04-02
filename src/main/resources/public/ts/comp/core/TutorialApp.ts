@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { dispatch, getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
+import { Diva } from "../../comp/core/Diva";
 import { Comp } from "../base/Comp";
 import { Anchor } from "./Anchor";
 import { Button } from "./Button";
@@ -32,7 +33,7 @@ export class TutorialApp extends Comp {
         return this.tag("div", null, [
             this.getState<LS>().content,
             ast?.userName ? new Div("userName: " + ast.userName) : null,
-            new Div(null, null, [
+            new Diva([
                 new Anchor("https://someserver.com", "My Link")
             ]),
             new Span("Times[&times;]", null, null, true),

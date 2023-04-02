@@ -2,15 +2,15 @@ import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
-import { Div } from "../../comp/core/Div";
+import { Diva } from "../../comp/core/Diva";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
+import * as I from "../../Interfaces";
 import { ConfigProp, EditorOptions } from "../../Interfaces";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import * as I from "../../Interfaces";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
@@ -192,7 +192,7 @@ export class TypeBase implements TypeIntf {
         // and solve this later.
         //
         // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {
-        //     return new Div(null, null, [
+        //     return new Diva([
         //         markdownComp = new NodeCompMarkdown(node, state),
         //         new ButtonBar([
         //             new Button("Decrypt", () => {
@@ -224,14 +224,14 @@ export class TypeBase implements TypeIntf {
                     }
                 }
             });
-            return new Div(null, null, children);
+            return new Diva(children);
         }
         else {
             const isRoot = node.id === ast.node?.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
-                return new Div(null, null, [
+                return new Diva([
                     comp,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
                     new Clearfix()

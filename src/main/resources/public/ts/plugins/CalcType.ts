@@ -1,6 +1,7 @@
 import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Markdown } from "../comp/core/Markdown";
 import { Pre } from "../comp/core/Pre";
 import { TabIntf } from "../intf/TabIntf";
@@ -74,7 +75,7 @@ export class CalcType extends TypeBase {
             win.q = null;
         }
 
-        return new Div(null, null, [markdown ? new Markdown(markdown) : null, outputComp]);
+        return new Diva([markdown ? new Markdown(markdown) : null, outputComp]);
     }
 
     // Prints the values of all properts that were assigned to 'qc' during the running of the script, so that

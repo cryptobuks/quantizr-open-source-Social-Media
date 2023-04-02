@@ -2,7 +2,7 @@ import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
@@ -60,7 +60,7 @@ export class SearchUsersDlg extends DialogBase {
         ], "marginBottom marginTop");
 
         return [
-            new Div(null, null, [
+            new Diva([
                 this.searchTextField = new TextField({ label: "User Name", enter: this.search, val: this.searchTextState }),
                 adminOptions,
                 new ButtonBar([

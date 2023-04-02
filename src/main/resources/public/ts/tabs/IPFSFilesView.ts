@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -43,7 +44,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         const children = [];
 
         if (this.data.props.loading) {
-            children.push(new Div(null, null, [
+            children.push(new Diva([
                 new Heading(4, "Loading Web3 Files..."),
                 new Div(null, {
                     className: "progressSpinner"
@@ -58,7 +59,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             const isRoot = !mfsFolder || slashCount === 1;
             const showParentButton = mfsFolder && slashCount > 1;
 
-            children.push(new Div(null, null, [
+            children.push(new Diva([
                 new TextField({
                     label: "MFS Path or CID",
                     val: this.data.props.cidField,
@@ -89,7 +90,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             const mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
             children.push(new Heading(5, "Listing: " + (mfsMode ? "Mutable File System" : "Hierarchy (DAG)")))
 
-            children.push(new Div(null, null, [
+            children.push(new Diva([
                 new Span(null, { className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
                         setValue: (checked: boolean) => {
@@ -188,7 +189,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
                 new FilesTableCell(null, {
                     className: "filesTableNameCol"
                 }, [
-                    new Div(null, null, [
+                    new Diva([
                         new Div(entry.Name, {
                             onClick: async () => {
                                 // if it's a file use ipfs.io to view it
@@ -228,7 +229,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
                     className: "filesTableDelCol"
                     // onClick: () => { this.deleteItem(fullName); }
                 }, [
-                    !foldersOnly ? new Div(null, null, [
+                    !foldersOnly ? new Diva([
                         new Icon({
                             className: "fa fa-trash fa-lg clickable marginRight",
                             title: "Delete",

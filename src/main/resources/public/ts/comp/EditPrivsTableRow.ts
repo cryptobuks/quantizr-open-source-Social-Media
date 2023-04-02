@@ -1,6 +1,7 @@
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
@@ -21,7 +22,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
-                new Div(null, null, [
+                new Diva([
                     new ButtonBar([
                         new Checkbox("Allow Replies", { className: "marginRight" }, {
                             setValue: (checked: boolean) => this.shareNodeToUserFunc(this.aclEntry.principalName, checked),
@@ -52,7 +53,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
-            new Div(null, null, [
+            new Diva([
                 this.renderAclPrivileges(this.aclEntry),
                 new Div(null, { className: "friendListImgDivCont" }, [
                     !isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [

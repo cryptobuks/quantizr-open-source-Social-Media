@@ -2,7 +2,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -25,7 +25,7 @@ export class InboxNotifyDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextContent(this.text),
                 new ButtonBar([
                     this.nodeId ? new Button("Go to Node", () => {

@@ -3,6 +3,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
@@ -173,7 +174,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
 
         return [
-            new Div(null, null, [
+            new Diva([
                 this.status = new Heading(2, state.status),
                 new ButtonBar([
                     state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this.newRecording, null, "btn-primary"),

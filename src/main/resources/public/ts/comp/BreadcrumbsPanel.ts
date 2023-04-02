@@ -1,5 +1,6 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -55,6 +56,6 @@ export class BreadcrumbsPanel extends Div {
             }));
         }
 
-        return new Div(null, null, children);
+        return new Diva(children);
     }
 }

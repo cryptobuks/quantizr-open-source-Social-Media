@@ -3,6 +3,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -24,7 +25,7 @@ export class UploadFromUrlDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Diva([
                 new TextField({ label: "Upload from URL", val: this.urlState }),
                 new Div(null, { className: "marginTop" }, [
                     new Checkbox("Store a copy on this server", null, {

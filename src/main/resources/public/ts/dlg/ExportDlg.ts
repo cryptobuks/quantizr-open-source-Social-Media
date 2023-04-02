@@ -5,6 +5,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Heading } from "../comp/core/Heading";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
@@ -45,7 +46,7 @@ export class ExportDlg extends DialogBase {
             ], "radioButtonsBar marginTop"),
             exportType === "pdf" ? this.makePdfOptions() : null,
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
-            ast.config.ipfsEnabled ? new Div(null, null, [
+            ast.config.ipfsEnabled ? new Diva([
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
             new ButtonBar([

@@ -1,3 +1,4 @@
+import { Diva } from "../../comp/core/Diva";
 import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 
@@ -9,7 +10,7 @@ export class VerticalLayout extends Div {
 
         if (children) {
             children = children.map(child => {
-                return child ? new Div(null, null, [child]) : null;
+                return child ? new Diva([child]) : null;
             }).filter(c => !!c);
 
             this.setChildren(children);

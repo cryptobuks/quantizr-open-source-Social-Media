@@ -7,6 +7,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
@@ -83,7 +84,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         const topChildren: Comp[] = [
 
-            new Div(null, null, [
+            new Diva([
                 ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                     val: this.data.props.searchTextState,
                     placeholder: "Search for...",
@@ -162,7 +163,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
-            children.push(new Div(null, null, [
+            children.push(new Diva([
                 new Div(null, {
                     className: "progressSpinner"
                 }, [new Spinner()])

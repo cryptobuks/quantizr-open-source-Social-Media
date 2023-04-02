@@ -5,7 +5,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -66,8 +66,8 @@ export class SearchContentDlg extends DialogBase {
         }
 
         return [
-            new Div(null, null, [
-                new Div(null, null, [
+            new Diva([
+                new Diva([
                     this.searchTextField = new TextField({ enter: () => this.search(false), val: this.searchTextState })
                 ]),
                 this.createSearchFieldIconButtons(),
@@ -136,7 +136,7 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): string => this.getState<LS>().searchRoot
                     }),
-                    new Div(null, null, [
+                    new Diva([
                         new Selection(null, "Sort by", [
                             { key: "0", val: "Relevance" },
                             { key: "ctm", val: "Create Time" },
@@ -160,7 +160,7 @@ export class SearchContentDlg extends DialogBase {
                             getValue: (): string => this.getState<LS>().sortField
                         })
                     ]),
-                    new Div(null, null, [
+                    new Diva([
                         requirePriorityCheckbox
                     ])
                 ], "horizontalLayoutComp bigMarginBottom"),

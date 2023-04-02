@@ -1,6 +1,7 @@
 import { getAs } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
@@ -25,7 +26,7 @@ export class HistoryPanel extends Div {
             return;
         }
         const children = [];
-        children.push(new Div(null, null, [
+        children.push(new Diva([
             new Span("History", { className: "historyPanelTitle" }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean) => ast.nodeHistoryLocked = checked,

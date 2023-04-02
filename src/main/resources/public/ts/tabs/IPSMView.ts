@@ -2,6 +2,7 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { TabIntf } from "../intf/TabIntf";
 
 export class IPSMView extends AppTab<any, IPSMView> {
@@ -13,7 +14,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
     preRender(): boolean {
         const children: Comp[] = [];
 
-        children.push(new Div(null, null, [
+        children.push(new Diva([
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading()
             ]),

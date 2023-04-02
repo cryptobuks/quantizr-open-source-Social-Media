@@ -8,6 +8,7 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
 import { EditAttachmentsPanel } from "../comp/core/EditAttachmentsPanel";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -288,7 +289,7 @@ export class EditNodeDlg extends DialogBase {
         let propEditFieldContainer: Div = null;
         const children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
-            new Div(null, null, [
+            new Diva([
                 new Div(null, {
                 }, [
                     propEditFieldContainer = new Div("", {
@@ -483,7 +484,7 @@ export class EditNodeDlg extends DialogBase {
 
         // Note: for schema.org types we will have already created propsPanel and have no propsCollapsePanel.
         if (!propsPanel) {
-            propsPanel = new Div(null, null, [
+            propsPanel = new Diva([
                 propsCollapsePanel
             ]);
         }

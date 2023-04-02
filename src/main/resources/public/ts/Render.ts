@@ -9,6 +9,7 @@ import { AppNavLink } from "./comp/core/AppNavLink";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
+import { Diva } from "./comp/core/Diva";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
 import { IconButton } from "./comp/core/IconButton";
@@ -455,7 +456,7 @@ export class Render {
                 }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
+        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Diva(children), false, 0, null);
         dlgHolder.dlg.open();
     }
 
@@ -810,7 +811,7 @@ export class Render {
                     new Div(displayName, {
                         className: "userName"
                     }),
-                    new Div(null, null, [
+                    new Diva([
                         // we use a span because the div stretches across empty space and does a mouse click
                         // when you didn't intend to click the actual name sometimes.
                         new Span("@" + user, {
@@ -915,7 +916,7 @@ export class Render {
             })
         });
 
-        return new Div(null, null, [
+        return new Diva([
             new IconButton("fa-tag", "", {
                 onClick: (evt: Event) => {
                     evt.stopPropagation();
