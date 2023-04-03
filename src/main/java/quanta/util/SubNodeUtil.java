@@ -16,6 +16,7 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
+import quanta.util.val.Val;
 
 /**
  * Assorted general utility functions related to SubNodes.

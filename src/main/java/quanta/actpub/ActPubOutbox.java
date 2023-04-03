@@ -33,8 +33,8 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
 import quanta.util.DateUtil;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * AP Outbox

@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APOHashtag;
 import quanta.actpub.model.APOMention;
@@ -36,6 +35,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.types.TypeBase;
+import quanta.util.val.Val;
 
 /**
  * Converting objects from one type to another, and formatting.

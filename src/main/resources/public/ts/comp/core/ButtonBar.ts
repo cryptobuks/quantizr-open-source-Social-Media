@@ -8,14 +8,14 @@ export class ButtonBar extends Comp {
     /* WARNING: There's a flawed edge case where if you have only ONE button, and it happens to be 'float-end' then
      the button bar ends up taking up ZERO height, and breaks the layout. The solution is to add a "new Clearfix()"
      after the ButtonBar (below the ButtonBar) */
-    constructor(buttons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
+    constructor(buttons: Comp[] = null, private wrapperClass: string = null, private extraClass: string = null) {
         super(null);
         this.setChildren(buttons);
     }
 
     compRender = (): ReactNode => {
         const props = {
-            className: "btn-group btnGroup flex-wrap " + this.extraClass,
+            className: "btn-group btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
             role: "group"
         };
 

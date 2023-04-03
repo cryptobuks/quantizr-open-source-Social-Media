@@ -7,7 +7,7 @@ import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
-import quanta.util.Val;
+import quanta.util.val.Val;
 
 @Component
 @Slf4j 

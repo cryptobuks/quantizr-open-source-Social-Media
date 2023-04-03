@@ -32,8 +32,8 @@ import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB

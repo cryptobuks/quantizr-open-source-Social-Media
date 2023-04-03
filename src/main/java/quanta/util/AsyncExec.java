@@ -1,11 +1,10 @@
 package quanta.util;
 
 import java.util.concurrent.Executor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 /*

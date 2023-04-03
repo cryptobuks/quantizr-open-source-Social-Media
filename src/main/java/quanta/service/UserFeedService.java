@@ -31,8 +31,8 @@ import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 @Component
 @Slf4j

@@ -30,8 +30,8 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * Crypto functions for AP

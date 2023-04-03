@@ -78,7 +78,6 @@ public class FileIndexer extends ServiceBase {
 	private int filesAdded = 0;
 	private int filesUpdated = 0;
 	private int filesSkipped = 0;
-
 	private boolean initialized = false;
 	private HashSet<String> suffixSet = new HashSet<>();
 

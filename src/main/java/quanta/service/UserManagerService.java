@@ -80,11 +80,11 @@ import quanta.response.SignupResponse;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
-import quanta.util.LongVal;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.LongVal;
+import quanta.util.val.Val;
 
 /**
  * Service methods for processing user management functions. Login, logout, signup, user

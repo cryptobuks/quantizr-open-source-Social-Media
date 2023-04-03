@@ -57,7 +57,6 @@ public class AppFilter extends GenericFilterBean {
 		HttpServletResponse httpRes = null;
 		try {
 			int thisReqId = ++reqId;
-
 			HttpServletRequest httpReq = null;
 
 			if (req instanceof HttpServletRequest) {

@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,

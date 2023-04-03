@@ -34,13 +34,13 @@ import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
 import quanta.response.SignNodesResponse;
-import quanta.util.BooleanVal;
 import quanta.util.Const;
 import quanta.util.ExUtil;
-import quanta.util.IntVal;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
-import quanta.util.Val;
+import quanta.util.val.BooleanVal;
+import quanta.util.val.IntVal;
+import quanta.util.val.Val;
 
 @Component
 @Slf4j 

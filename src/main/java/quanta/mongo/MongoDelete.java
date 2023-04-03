@@ -30,11 +30,11 @@ import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
 import quanta.util.Const;
-import quanta.util.IntVal;
-import quanta.util.LongVal;
 import quanta.util.ThreadLocals;
-import quanta.util.Val;
 import quanta.util.XString;
+import quanta.util.val.IntVal;
+import quanta.util.val.LongVal;
+import quanta.util.val.Val;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB

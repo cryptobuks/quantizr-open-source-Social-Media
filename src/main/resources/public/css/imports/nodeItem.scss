@@ -168,7 +168,7 @@
     min-height: 2rem; // warning: don't make this less than 2em!
     border: 1px solid gray;
     background-color: darken($secondary, 10%);
-    padding: 4px;
+    padding: 4px 4px 4px $smallGap;
     margin-bottom: $tinyGap;
 }
 

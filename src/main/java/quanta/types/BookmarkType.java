@@ -5,7 +5,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
-import quanta.util.Val;
+import quanta.util.val.Val;
 
 @Component
 public class BookmarkType extends TypeBase {
