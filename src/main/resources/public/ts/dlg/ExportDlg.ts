@@ -87,6 +87,10 @@ export class ExportDlg extends DialogBase {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeMD = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeMD
             }),
+            new Checkbox("Jupyter Notebook", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.jupyterFile = checked; }),
+                getValue: (): boolean => getAs().exportSettings.jupyterFile
+            }),
 
             new Heading(5, "Other Options", { className: "bigMarginTop" }),
             new Checkbox("Attachments Folder", null, {
@@ -126,6 +130,7 @@ export class ExportDlg extends DialogBase {
             toIpfs: ast.exportSettings.toIpfs,
             includeToc: ast.exportSettings.includeToc,
             largeHtmlFile: ast.exportSettings.largeHtmlFile,
+            jupyterFile: ast.exportSettings.jupyterFile,
             attOneFolder: ast.exportSettings.attOneFolder,
             includeJSON: ast.exportSettings.includeJSON,
             includeMD: ast.exportSettings.includeMD,

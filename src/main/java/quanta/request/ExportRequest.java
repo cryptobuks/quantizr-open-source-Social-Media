@@ -15,6 +15,7 @@ public class ExportRequest extends RequestBase {
 	private boolean toIpfs;
 	private boolean includeToc;
 	private boolean largeHtmlFile;
+	private boolean jupyterFile;
 	private boolean attOneFolder;
 
 	private boolean includeJSON;

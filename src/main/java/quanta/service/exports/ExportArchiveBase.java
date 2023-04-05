@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -19,6 +21,12 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.jupyter.JupyterCell;
+import quanta.model.jupyter.JupyterCodeMirrorMode;
+import quanta.model.jupyter.JupyterLangInfo;
+import quanta.model.jupyter.JupyterMetadata;
+import quanta.model.jupyter.JupyterKernelSpec;
+import quanta.model.jupyter.JupyterNB;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -38,7 +46,7 @@ import quanta.util.val.Val;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
-@Slf4j 
+@Slf4j
 public abstract class ExportArchiveBase extends ServiceBase {
 	private String shortFileName;
 	private String fullFileName;
@@ -53,6 +61,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private MongoSession session;
 	private StringBuilder fullHtml = new StringBuilder();
+	private List<JupyterCell> jupyterCells = new LinkedList<>();
 
 	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
 		ms = ThreadLocals.ensure(ms);
@@ -72,7 +81,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		boolean success = false;
 		try {
 			openOutputStream(fullFileName);
-			writeRootFiles();
+
+			if (req.isLargeHtmlFile()) {
+				writeRootFiles();
+			}
+			
 			rootPathParent = node.getParentPath();
 			auth.ownerAuth(ms, node);
 			ArrayList<SubNode> nodeStack = new ArrayList<>();
@@ -88,6 +101,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				appendHtmlEnd("", fullHtml);
 				addFileEntry("all-content.html", fullHtml.toString().getBytes(StandardCharsets.UTF_8));
 			}
+
+			if (req.isJupyterFile()) {
+				addFileEntry("jupyter.ipynb", XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
+			}
+
 			res.setFileName(shortFileName);
 			success = true;
 		} catch (Exception ex) {
@@ -101,6 +119,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 
 		res.setSuccess(true);
+	}
+
+	private JupyterNB makeJupyterNotebook() {
+		return new JupyterNB(jupyterCells, //
+				new JupyterMetadata(//
+						new JupyterKernelSpec("Python 3", "python", "python3"), //
+						new JupyterLangInfo(//
+								new JupyterCodeMirrorMode("ipython", 3), ".py", //
+								"text/x-python", "python", "python", //
+								"ipython3", "3.10.6"),
+						4), //
+				4, 2);
 	}
 
 	private void writeRootFiles() {
@@ -158,7 +188,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
 		html.append("<div class='top-row'/>\n");
-		processNodeExport(session, req.isLargeHtmlFile(), parentFolder, "", node, html, true, fileName, true, 0, true);
+		processNodeExport(session, req.isLargeHtmlFile(), req.isJupyterFile(), parentFolder, "", node, html, true, fileName, true,
+				0, true);
 		html.append("</div>\n");
 		String folder = node.getIdStr();
 
@@ -174,7 +205,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 
-				processNodeExport(session, false, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
+				processNodeExport(session, false, false, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
 
 				if ("1".equals(inlineChildren)) {
 					String subFolder = n.getIdStr();
@@ -252,7 +283,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 				String folder = n.getIdStr();
 
-				processNodeExport(session, false, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level, false);
+				processNodeExport(session, false, false, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level,
+						false);
 
 				if ("1".equals(inlineChildren)) {
 					inlineChildren(html, n, parentFolder, deeperPath + folder + "/", level + 1);
@@ -269,9 +301,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the period and
 	 * extension.
 	 */
-	private void processNodeExport(MongoSession ms, boolean appendFullHtml, String parentFolder, String deeperPath, SubNode node,
-			StringBuilder html, boolean writeFile, Val<String> fileNameCont, boolean allowOpenButton, int level,
-			boolean isTopRow) {
+	private void processNodeExport(MongoSession ms, boolean appendFullHtml, boolean appendJupyterJson, String parentFolder,
+			String deeperPath, SubNode node, StringBuilder html, boolean writeFile, Val<String> fileNameCont,
+			boolean allowOpenButton, int level, boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
@@ -279,6 +311,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 			String rowClass = isTopRow ? "" : "class='row-div'";
+
+			JupyterCell cell = null;
+			if (appendJupyterJson) {
+				cell = new JupyterCell();
+				cell.setCellType("markdown");
+			}
 
 			String indenter = "";
 			if (level > 0) {
@@ -312,6 +350,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			content = content.trim();
 			appendNodeHtmlContent(node, html, content);
 
+			if (appendJupyterJson) {
+				cell.setSource(makeJupyterSource(content));
+				jupyterCells.add(cell);
+			}
+
 			if (appendFullHtml) {
 				appendNodeHtmlContent(node, fullHtml, content);
 			}
@@ -319,8 +362,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			List<Attachment> atts = node.getOrderedAttachments();
 			if (atts != null) {
 				for (Attachment att : atts) {
-					appendAttachmentHtml(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), html,
-							appendFullHtml, writeFile, nodeId, fileName, att);
+					appendAttachment(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), html,
+							appendFullHtml, cell, writeFile, nodeId, fileName, att);
 				}
 			}
 
@@ -335,6 +378,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
+	}
+
+	private List<String> makeJupyterSource(String content) {
+		StringTokenizer t = new StringTokenizer(content, "\n\r", false);
+		List<String> list = new LinkedList<>();
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken();
+			list.add(tok + "\n");
+		}
+		return list;
 	}
 
 	private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont, String fileName,
@@ -419,8 +472,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	private void appendAttachmentHtml(String deeperPath, String parentFolder, StringBuilder html, boolean appendFullHtml,
-			boolean writeFile, String nodeId, String fileName, Attachment att) {
+	private void appendAttachment(String deeperPath, String parentFolder, StringBuilder html, //
+			boolean appendFullHtml, JupyterCell cell, boolean writeFile, String nodeId, String fileName, Attachment att) {
 		String ext = null;
 		String binFileNameProp = att.getFileName();
 		if (binFileNameProp != null) {
@@ -453,14 +506,30 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			if (appendFullHtml) {
 				appendImgLink(fullHtml, nodeId, binFileNameStr, fullUrl);
 			}
+
+			if (cell != null) {
+				appendJupyterImgLink(cell, binFileNameStr, fullUrl);
+			}
 		} else {
 			appendNonImgLink(html, binFileNameStr, url);
 
 			if (appendFullHtml) {
 				appendNonImgLink(fullHtml, binFileNameStr, fullUrl);
 			}
+
+			if (cell != null) {
+				appendJupyterNonImgLink(cell, binFileNameStr, fullUrl);
+			}
 		}
 		appendContent(html, appendFullHtml, "</div>");
+	}
+
+	private void appendJupyterImgLink(JupyterCell cell, String binFileNameStr, String url) {
+		cell.getSource().add("\n![" + binFileNameStr + "](" + url + ")\n");
+	}
+
+	private void appendJupyterNonImgLink(JupyterCell cell, String binFileNameStr, String url) {
+		cell.getSource().add("\n[" + binFileNameStr + "](" + url + ")\n");
 	}
 
 	private void appendImgLink(StringBuilder html, String nodeId, String binFileNameStr, String url) {

@@ -235,6 +235,7 @@ export interface ExportRequest extends RequestBase {
     toIpfs: boolean;
     includeToc: boolean;
     largeHtmlFile: boolean;
+    jupyterFile: boolean;
     attOneFolder: boolean;
     includeJSON: boolean;
     includeMD: boolean;
