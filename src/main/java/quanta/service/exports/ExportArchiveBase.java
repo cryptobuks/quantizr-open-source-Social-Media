@@ -61,6 +61,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private MongoSession session;
 	private StringBuilder fullHtml = new StringBuilder();
+	private StringBuilder fullMd = new StringBuilder();
+
 	private List<JupyterCell> jupyterCells = new LinkedList<>();
 
 	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
@@ -70,6 +72,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + prop.getAdminDataFolder());
+		}
+
+		if (req.isUpdateHeadings()) {
+			edit.updateHeadings(ms, req.getNodeId());
 		}
 
 		String nodeId = req.getNodeId();
@@ -82,28 +88,32 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		try {
 			openOutputStream(fullFileName);
 
-			if (req.isLargeHtmlFile()) {
+			if (req.isIncludeHTML()) {
 				writeRootFiles();
 			}
-			
+
 			rootPathParent = node.getParentPath();
 			auth.ownerAuth(ms, node);
 			ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
 
-			if (req.isLargeHtmlFile()) {
+			if (req.isIncludeHTML()) {
 				appendHtmlBegin("", fullHtml);
 			}
 
-			recurseNode("../", "", node, nodeStack, 0, null, null);
+			recurseNode("../", "", node, nodeStack, 0, null);
 
-			if (req.isLargeHtmlFile()) {
+			if (req.isIncludeHTML()) {
 				appendHtmlEnd("", fullHtml);
-				addFileEntry("all-content.html", fullHtml.toString().getBytes(StandardCharsets.UTF_8));
+				addFileEntry("content.html", fullHtml.toString().getBytes(StandardCharsets.UTF_8));
+			}
+
+			if (req.isIncludeMD()) {
+				addFileEntry("content.md", fullMd.toString().getBytes(StandardCharsets.UTF_8));
 			}
 
 			if (req.isJupyterFile()) {
-				addFileEntry("jupyter.ipynb", XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
+				addFileEntry("content.ipynb", XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
 			}
 
 			res.setFileName(shortFileName);
@@ -156,7 +166,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	}
 
 	private void recurseNode(String rootPath, String parentFolder, SubNode node, ArrayList<SubNode> nodeStack, int level,
-			String parentHtmlFile, String parentId) {
+			String parentId) {
 		if (node == null)
 			return;
 
@@ -166,20 +176,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			return;
 		}
 
-		// log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
-		StringBuilder html = new StringBuilder();
-		appendHtmlBegin(rootPath, html);
-
-		// breadcrumbs at the top of each page.
-		if (nodeStack.size() > 1) {
-			appendBreadcrumbs(nodeStack, html);
-		}
-
-		if (parentHtmlFile != null) {
-			html.append("<a href='" + parentHtmlFile + (parentId != null ? "#" + parentId : "")
-					+ "'><button class='uplevel-button'>Up Level</button></a>");
-		}
-
 		/* process the current node */
 		Val<String> fileName = new Val<>();
 		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
@@ -187,10 +183,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		/*
 		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
-		html.append("<div class='top-row'/>\n");
-		processNodeExport(session, req.isLargeHtmlFile(), req.isJupyterFile(), parentFolder, "", node, html, true, fileName, true,
-				0, true);
-		html.append("</div>\n");
+		processNodeExport(session, true, req.isJupyterFile(), parentFolder, "", node, true, fileName, 0, true);
 		String folder = node.getIdStr();
 
 		if (iter != null) {
@@ -202,56 +195,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				if (noExp != null) {
 					continue;
 				}
-				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
-				boolean allowOpenButton = !"1".equals(inlineChildren);
 
-				processNodeExport(session, false, false, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
-
-				if ("1".equals(inlineChildren)) {
-					String subFolder = n.getIdStr();
-					// log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
-					inlineChildren(html, n, parentFolder, subFolder + "/", 1);
-				}
+				processNodeExport(session, false, false, parentFolder, //
+						"", n, false, null, 0, false);
 			}
 		}
-
-		appendHtmlEnd(rootPath, html);
-
-		String htmlFile = fileName.getVal() + ".html";
-		if (req.isIncludeHTML()) {
-			addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
-		}
-
-		String relParent = "../" + fileUtil.getShortFileName(htmlFile);
 
 		if (iter != null) {
 			/* Second pass over children is the actual recursion down into the tree */
 			for (SubNode n : iter) {
 				nodeStack.add(n);
-				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, relParent, n.getIdStr());
+				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, n.getIdStr());
 				nodeStack.remove(n);
 			}
 		}
-	}
-
-	private void appendBreadcrumbs(ArrayList<SubNode> nodeStack, StringBuilder html) {
-		StringBuilder sb = new StringBuilder();
-		int max = nodeStack.size() - 1;
-		int count = 0;
-		for (SubNode bcNode : nodeStack) {
-			if (sb.length() > 0) {
-				sb.append(" / ");
-			}
-			String friendlyName = generateFriendlyName(bcNode);
-			if (friendlyName != null) {
-				sb.append(friendlyName);
-			}
-			count++;
-			if (count >= max) {
-				break;
-			}
-		}
-		html.append("<div class='breadcrumbs'>" + sb.toString() + "</div>");
 	}
 
 	private void appendHtmlBegin(String rootPath, StringBuilder html) {
@@ -264,33 +221,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private void appendHtmlEnd(String rootPath, StringBuilder html) {
 		html.append("<script src='" + rootPath + "marked.min.js'></script>");
-
-		// this did work fine!
-		// html.append("<script src='https://cdn.jsdelivr.net/npm/marked/marked.min.js'></script>");
-
 		html.append("<script src='" + rootPath + "exported.js'></script>");
 		html.append("</body></html>");
-	}
-
-	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
-		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		if (iter != null) {
-			/*
-			 * First pass over children is to embed their content onto the child display on the current page
-			 */
-			for (SubNode n : iter) {
-				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
-				boolean allowOpenButton = !"1".equals(inlineChildren);
-				String folder = n.getIdStr();
-
-				processNodeExport(session, false, false, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level,
-						false);
-
-				if ("1".equals(inlineChildren)) {
-					inlineChildren(html, n, parentFolder, deeperPath + folder + "/", level + 1);
-				}
-			}
-		}
 	}
 
 	/*
@@ -301,16 +233,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the period and
 	 * extension.
 	 */
-	private void processNodeExport(MongoSession ms, boolean appendFullHtml, boolean appendJupyterJson, String parentFolder,
-			String deeperPath, SubNode node, StringBuilder html, boolean writeFile, Val<String> fileNameCont,
-			boolean allowOpenButton, int level, boolean isTopRow) {
+
+	private void processNodeExport(MongoSession ms, boolean allowAppend, boolean appendJupyterJson, String parentFolder,
+			String deeperPath, SubNode node, boolean writeFile, Val<String> fileNameCont, int level, boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
 
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
-			String rowClass = isTopRow ? "" : "class='row-div'";
 
 			JupyterCell cell = null;
 			if (appendJupyterJson) {
@@ -318,64 +249,46 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				cell.setCellType("markdown");
 			}
 
-			String indenter = "";
-			if (level > 0) {
-				indenter = " style='margin-left:" + String.valueOf(level * 30) + "px'";
-			}
-			appendContent(html, appendFullHtml,
-					"<div href='#" + nodeId + "' " + rowClass + " id='" + nodeId + "' " + indenter + ">\n");
-
-			if (req.isIncludeIDs()) {
-				appendContent(html, appendFullHtml, "<div class='meta-info'>" + nodeId + "</div>\n");
-			}
-
-			/*
-			 * If we aren't writing the file we know we need the text appended to include a link to open the
-			 * content
-			 */
-			if (!writeFile && allowOpenButton) {
-				/*
-				 * This is a slight ineffeciency for now, to call getChildCount, because eventually we will be
-				 * trying to get the children for all nodes we encounter, so this will be redundant, but I don't
-				 * want to refactor now to solve this yet. That's almost an optimization that should come later
-				 */
-				boolean hasChildren = read.hasChildren(ms, node, true, false);
-				if (hasChildren) {
-					String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
-					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");
-				}
-			}
-
 			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
-			appendNodeHtmlContent(node, html, content);
 
 			if (appendJupyterJson) {
 				cell.setSource(makeJupyterSource(content));
 				jupyterCells.add(cell);
 			}
 
-			if (appendFullHtml) {
-				appendNodeHtmlContent(node, fullHtml, content);
+			if (allowAppend) {
+				if (req.isIncludeHTML()) {
+					appendNodeHtmlContent(node, fullHtml, content);
+				}
+
+				if (req.isIncludeMD()) {
+					fullMd.append("\n" + content + "\n");
+				}
 			}
 
 			List<Attachment> atts = node.getOrderedAttachments();
 			if (atts != null) {
 				for (Attachment att : atts) {
-					appendAttachment(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), html,
-							appendFullHtml, cell, writeFile, nodeId, fileName, att);
+					appendAttachment(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), allowAppend, cell,
+							writeFile, nodeId, fileName, att);
 				}
 			}
 
-			appendContent(html, appendFullHtml, "</div>\n");
-			if (appendFullHtml && req.isDividerLine()) {
-				fullHtml.append("<hr>\n");
+			if (allowAppend && req.isIncludeHTML()) {
+				fullHtml.append("</div>\n");
+
+				if (req.isDividerLine()) {
+					fullHtml.append("<hr>\n");
+				}
 			}
 
 			if (writeFile) {
 				writeFilesForNode(ms, parentFolder, node, fileNameCont, fileName, content, atts);
 			}
-		} catch (Exception ex) {
+		} catch (
+
+		Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 	}
@@ -398,11 +311,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		if (req.isIncludeJSON()) {
 			addFileEntry(fileNameBase + ".json", json.getBytes(StandardCharsets.UTF_8));
-		}
-
-		/* If content property was found write it into separate file */
-		if (StringUtils.isNotEmpty(content) && req.isIncludeMD()) {
-			addFileEntry(fileNameBase + ".md", content.getBytes(StandardCharsets.UTF_8));
 		}
 
 		if (atts != null) {
@@ -472,8 +380,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	private void appendAttachment(String deeperPath, String parentFolder, StringBuilder html, //
-			boolean appendFullHtml, JupyterCell cell, boolean writeFile, String nodeId, String fileName, Attachment att) {
+	private void appendAttachment(String deeperPath, String parentFolder, boolean allowAppend, JupyterCell cell,
+			boolean writeFile, String nodeId, String fileName, Attachment att) {
 		String ext = null;
 		String binFileNameProp = att.getFileName();
 		if (binFileNameProp != null) {
@@ -498,38 +406,42 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		if (mimeType == null)
 			return;
 
-		appendContent(html, appendFullHtml, "<div class='attachment'>");
+		if (allowAppend && req.isIncludeHTML()) {
+			fullHtml.append("<div class='attachment'>");
+		}
 
 		if (mimeType.startsWith("image/")) {
-			appendImgLink(html, nodeId, binFileNameStr, url);
-
-			if (appendFullHtml) {
-				appendImgLink(fullHtml, nodeId, binFileNameStr, fullUrl);
+			String md = "\n![" + binFileNameStr + "](" + fullUrl + ")\n";
+			if (allowAppend) {
+				if (req.isIncludeHTML()) {
+					appendImgLink(fullHtml, nodeId, binFileNameStr, fullUrl);
+				}
+				if (req.isIncludeMD()) {
+					fullMd.append(md);
+				}
 			}
-
 			if (cell != null) {
-				appendJupyterImgLink(cell, binFileNameStr, fullUrl);
+				cell.getSource().add(md);
 			}
 		} else {
-			appendNonImgLink(html, binFileNameStr, url);
+			String md = "\n[" + binFileNameStr + "](" + fullUrl + ")\n";
+			if (allowAppend) {
+				if (req.isIncludeHTML()) {
+					appendNonImgLink(fullHtml, binFileNameStr, fullUrl);
+				}
 
-			if (appendFullHtml) {
-				appendNonImgLink(fullHtml, binFileNameStr, fullUrl);
+				if (req.isIncludeMD()) {
+					fullMd.append(md);
+				}
 			}
-
 			if (cell != null) {
-				appendJupyterNonImgLink(cell, binFileNameStr, fullUrl);
+				cell.getSource().add(md);
 			}
 		}
-		appendContent(html, appendFullHtml, "</div>");
-	}
 
-	private void appendJupyterImgLink(JupyterCell cell, String binFileNameStr, String url) {
-		cell.getSource().add("\n![" + binFileNameStr + "](" + url + ")\n");
-	}
-
-	private void appendJupyterNonImgLink(JupyterCell cell, String binFileNameStr, String url) {
-		cell.getSource().add("\n[" + binFileNameStr + "](" + url + ")\n");
+		if (allowAppend && req.isIncludeHTML()) {
+			fullHtml.append("</div>");
+		}
 	}
 
 	private void appendImgLink(StringBuilder html, String nodeId, String binFileNameStr, String url) {
@@ -539,14 +451,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	}
 
 	private void appendNonImgLink(StringBuilder html, String binFileNameStr, String url) {
-		html.append("<a class='link' target='_blank' href='" + url + "'>Attachment: " + binFileNameStr + "</a>");
-	}
-
-	private void appendContent(StringBuilder html, boolean appendFullHtml, String content) {
-		html.append(content);
-		if (appendFullHtml) {
-			fullHtml.append(content);
-		}
+		html.append("<a class='link' target='_blank' href='" + url + "'>" + binFileNameStr + "</a>");
 	}
 
 	private void appendNodeHtmlContent(SubNode node, StringBuilder html, String content) {
@@ -554,6 +459,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		if (node.isType(NodeType.PLAIN_TEXT)) {
 			html.append("\n<pre>" + escapedContent + "\n</pre>\n");
 		} else {
+			if (req.isIncludeIDs()) {
+				html.append("\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>");
+			}
 			html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>\n");
 		}
 	}

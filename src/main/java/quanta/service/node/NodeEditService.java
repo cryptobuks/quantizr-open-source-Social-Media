@@ -49,7 +49,6 @@ import quanta.request.SplitNodeRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateFriendNodeRequest;
-import quanta.request.UpdateHeadingsRequest;
 import quanta.response.AppDropResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.response.DeletePropertyResponse;
@@ -62,7 +61,6 @@ import quanta.response.SplitNodeResponse;
 import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateFriendNodeResponse;
-import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
 import quanta.types.TypeBase;
 import quanta.util.Convert;
@@ -1269,10 +1267,8 @@ public class NodeEditService extends ServiceBase {
 	 * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
 	 * passed in.
 	 */
-	public UpdateHeadingsResponse updateHeadings(MongoSession ms, UpdateHeadingsRequest req) {
-		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-
-		SubNode node = read.getNode(ms, req.getNodeId(), true, null);
+	public void updateHeadings(MongoSession ms, String nodeId) {
+		SubNode node = read.getNode(ms, nodeId, true, null);
 		auth.ownerAuth(ms, node);
 
 		String content = node.getContent();
@@ -1294,7 +1290,7 @@ public class NodeEditService extends ServiceBase {
 				}
 			}
 		}
-		return res;
+		update.saveSession(ms);
 	}
 
 	private void updateHeadingsForNode(MongoSession ms, SubNode node, int level) {

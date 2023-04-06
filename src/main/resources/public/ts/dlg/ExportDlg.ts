@@ -41,9 +41,7 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("ZIP", "zip"),
                 this.radioButton("TAR", "tar"),
                 this.radioButton("TAR.GZ", "tar.gz"),
-                this.radioButton("Markdown", "md"),
-                this.radioButton("PDF", "pdf"),
-                this.radioButton("HTML", "html")
+                this.radioButton("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
             exportType === "pdf" ? this.makePdfOptions() : null,
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
@@ -68,28 +66,25 @@ export class ExportDlg extends DialogBase {
     }
 
     makeArchiveOptions = (): Div => {
+        const ast = getAs();
         return new Divc({ className: "bigMarginLeft bigMarginBottom" }, [
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
-            new Checkbox("Full HTML File", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.largeHtmlFile = checked; }),
-                getValue: (): boolean => getAs().exportSettings.largeHtmlFile
-            }),
             new Checkbox("HTML", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeHTML = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeHTML
-            }),
-            new Checkbox("JSON", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJSON = checked; }),
-                getValue: (): boolean => getAs().exportSettings.includeJSON
             }),
             new Checkbox("Markdown", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeMD = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeMD
             }),
-            new Checkbox("Jupyter Notebook", null, {
+            new Checkbox("Jupyter", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.jupyterFile = checked; }),
                 getValue: (): boolean => getAs().exportSettings.jupyterFile
+            }),
+            new Checkbox("JSON", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJSON = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeJSON
             }),
 
             new Heading(5, "Other Options", { className: "bigMarginTop" }),
@@ -97,13 +92,17 @@ export class ExportDlg extends DialogBase {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
                 getValue: (): boolean => getAs().exportSettings.attOneFolder
             }),
-            new Checkbox("IDs", null, {
+            ast.exportSettings.includeHTML ? new Checkbox("IDs", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeIDs
-            }),
-            new Checkbox("Divider Line", null, {
+            }) : null,
+            ast.exportSettings.includeHTML ? new Checkbox("Divider Line", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
                 getValue: (): boolean => getAs().exportSettings.dividerLine
+            }) : null,
+            new Checkbox("Set Headings", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.updateHeadings = checked; }),
+                getValue: (): boolean => getAs().exportSettings.updateHeadings
             })
         ]);
     }
@@ -129,14 +128,14 @@ export class ExportDlg extends DialogBase {
             fileName: this.fileNameState.getValue(),
             toIpfs: ast.exportSettings.toIpfs,
             includeToc: ast.exportSettings.includeToc,
-            largeHtmlFile: ast.exportSettings.largeHtmlFile,
             jupyterFile: ast.exportSettings.jupyterFile,
             attOneFolder: ast.exportSettings.attOneFolder,
             includeJSON: ast.exportSettings.includeJSON,
             includeMD: ast.exportSettings.includeMD,
             includeHTML: ast.exportSettings.includeHTML,
             includeIDs: ast.exportSettings.includeIDs,
-            dividerLine: ast.exportSettings.dividerLine
+            dividerLine: ast.exportSettings.dividerLine,
+            updateHeadings: ast.exportSettings.updateHeadings
         });
         this.exportResponse(res);
         this.close();

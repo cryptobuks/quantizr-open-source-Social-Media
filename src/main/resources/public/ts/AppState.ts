@@ -11,7 +11,6 @@ export interface ExportSettings {
     exportType: string;
     toIpfs?: boolean;
     includeToc?: boolean;
-    largeHtmlFile?: boolean;
     jupyterFile?: boolean;
     attOneFolder?: boolean;
     includeJSON?: boolean;
@@ -19,6 +18,7 @@ export interface ExportSettings {
     includeHTML?: boolean;
     includeIDs?: boolean;
     dividerLine?: boolean;
+    updateHeadings?: boolean;
 }
 
 export class AppState {
@@ -120,14 +120,14 @@ export class AppState {
     exportSettings: ExportSettings = {
         exportType: "zip",
         includeToc: true,
-        largeHtmlFile: true,
         jupyterFile: true,
         attOneFolder: false,
         includeJSON: true,
         includeMD: true,
         includeHTML: true,
         includeIDs: true,
-        dividerLine: true
+        dividerLine: true,
+        updateHeadings: true
     };
 
     userProfile: J.UserProfile = null;

@@ -14,7 +14,6 @@ public class ExportRequest extends RequestBase {
 	private String fileName;
 	private boolean toIpfs;
 	private boolean includeToc;
-	private boolean largeHtmlFile;
 	private boolean jupyterFile;
 	private boolean attOneFolder;
 
@@ -23,4 +22,5 @@ public class ExportRequest extends RequestBase {
 	private boolean includeHTML;
 	private boolean includeIDs;
 	private boolean dividerLine;
+	private boolean updateHeadings;
 }

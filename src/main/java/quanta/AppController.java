@@ -149,11 +149,11 @@ import quanta.response.SendLogTextResponse;
 import quanta.response.SendTestEmailResponse;
 import quanta.response.SignNodesResponse;
 import quanta.response.SignSubGraphResponse;
+import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
 import quanta.service.RSSFeedService;
 import quanta.service.exports.ExportServiceFlexmark;
 import quanta.service.exports.ExportTarService;
-import quanta.service.exports.ExportTextService;
 import quanta.service.exports.ExportZipService;
 import quanta.util.CaptchaMaker;
 import quanta.util.Const;
@@ -751,18 +751,23 @@ public class AppController extends ServiceBase implements ErrorController {
 				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);
 			} //
-			else if ("html".equalsIgnoreCase(req.getExportExt())) {
-				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
-				svc.export(ms, "html", req, res);
-			} //
-			else if ("md".equalsIgnoreCase(req.getExportExt())) {
-				if (req.isToIpfs()) {
-					res.setMessage("Export of Markdown to IPFS not yet available.");
-					res.setSuccess(false);
-				}
-				ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
-				svc.export(ms, req, res);
-			} //
+			// ================================================
+			// DO NOT DELETE (YET)
+			// I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this 
+			// and we don't need these options, but I'm leaving the code in place for now.
+			// else if ("html".equalsIgnoreCase(req.getExportExt())) {
+			// 	ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
+			// 	svc.export(ms, "html", req, res);
+			// } //
+			// else if ("md".equalsIgnoreCase(req.getExportExt())) {
+			// 	if (req.isToIpfs()) {
+			// 		res.setMessage("Export of Markdown to IPFS not yet available.");
+			// 		res.setSuccess(false);
+			// 	}
+			// 	ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
+			// 	svc.export(ms, req, res);
+			// } //
+			// ================================================
 			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				if (req.isToIpfs()) {
 					res.setMessage("Export of ZIP to IPFS not yet available.");
@@ -915,7 +920,10 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
 
 		return callProc.run("updateHeadings", true, true, req, session, ms -> {
-			return edit.updateHeadings(ms, req);
+			edit.updateHeadings(ms, req.getNodeId());
+			UpdateHeadingsResponse res = new UpdateHeadingsResponse();
+			res.setSuccess(true);;
+			return res;
 		});
 	}
 

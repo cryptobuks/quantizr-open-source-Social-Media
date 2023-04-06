@@ -234,7 +234,6 @@ export interface ExportRequest extends RequestBase {
     fileName: string;
     toIpfs: boolean;
     includeToc: boolean;
-    largeHtmlFile: boolean;
     jupyterFile: boolean;
     attOneFolder: boolean;
     includeJSON: boolean;
@@ -242,6 +241,7 @@ export interface ExportRequest extends RequestBase {
     includeHTML: boolean;
     includeIDs: boolean;
     dividerLine: boolean;
+    updateHeadings: boolean;
 }
 
 export interface FileSearchRequest extends RequestBase {
