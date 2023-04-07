@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -44,7 +45,7 @@ import quanta.util.XString;
  */
 @Component
 @Scope("prototype")
-@Slf4j 
+@Slf4j
 public class ExportServiceFlexmark extends ServiceBase {
 	private MongoSession session;
 
@@ -56,6 +57,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 	private ExportRequest req;
 	private ExportResponse res;
+	int baseSlashCount = 0;
 
 	private List<ExportIpfsFile> files = new LinkedList<>();
 
@@ -99,6 +101,10 @@ public class ExportServiceFlexmark extends ServiceBase {
 		shortFileName = fileName + "." + format;
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
 		boolean wroteFile = false;
+
+		if (req.isUpdateHeadings()) {
+			baseSlashCount = StringUtils.countMatches(exportNode.getPath(), "/");
+		}
 
 		FileOutputStream out = null;
 		try {
@@ -261,7 +267,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 
-			// If a node has a property "sn:noexport" (added by power users) then this node will not be exported.
+			// If a node has a property "sn:noexport" (added by power users) then this node will not be
+			// exported.
 			String noExport = n.getStr(NodeProp.NO_EXPORT);
 			if (noExport != null) {
 				continue;
@@ -272,7 +279,18 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 	private void processNode(SubNode node) {
 		markdown.append("\n");
-		markdown.append(node.getContent());
+
+		String content = node.getContent();
+		if (content != null && req.isUpdateHeadings()) {
+			content = content.trim();
+			int slashCount = StringUtils.countMatches(node.getPath(), "/");
+			int lev = slashCount - baseSlashCount;
+			if (lev > 6)
+				lev = 6;
+			content = edit.translateHeadingForLevel(session, content, lev);
+		}
+
+		markdown.append(content);
 		markdown.append("\n");
 		writeImages(node);
 	}

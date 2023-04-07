@@ -52,6 +52,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private String fullFileName;
 	private String rootPathParent;
 	ExportRequest req;
+	int baseSlashCount = 0;
 
 	/*
 	 * It's possible that nodes recursively contained under a given node can have same name, so we have
@@ -74,15 +75,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + prop.getAdminDataFolder());
 		}
 
-		if (req.isUpdateHeadings()) {
-			edit.updateHeadings(ms, req.getNodeId());
-		}
-
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		String fileName = snUtil.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
+
+		if (req.isUpdateHeadings()) {
+			baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
+		}
 
 		boolean success = false;
 		try {
@@ -251,6 +252,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
+
+			if (req.isUpdateHeadings()) {
+				int slashCount = StringUtils.countMatches(node.getPath(), "/");
+				int lev = slashCount - baseSlashCount;
+				if (lev > 6)
+					lev = 6;
+				content = edit.translateHeadingForLevel(ms, content, lev);
+			}
 
 			if (appendJupyterJson) {
 				cell.setSource(makeJupyterSource(content));
@@ -512,28 +521,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		addEntry(fileName, is, length);
 	}
 
-	private String generateFriendlyName(SubNode node) {
-		String fileName = node.getName();
-
-		if (StringUtils.isEmpty(fileName)) {
-			fileName = node.getContent();
-			if (fileName != null) {
-				fileName = fileName.trim();
-				fileName = XString.truncAfterFirst(fileName, "\n");
-				fileName = XString.truncAfterFirst(fileName, "\r");
-			}
-		}
-
-		if (StringUtils.isEmpty(fileName)) {
-			fileName = node.getLastPathPart();
-		}
-
-		fileName = cleanupFileName(fileName);
-		// log.debug(" nodePath=[" + node.getPath() + "] fileName=[" + fileName + "]");
-
-		fileName = XString.trimToMaxLen(fileName, 40);
-		return fileName;
-	}
 
 	public abstract String getFileExtension();
 

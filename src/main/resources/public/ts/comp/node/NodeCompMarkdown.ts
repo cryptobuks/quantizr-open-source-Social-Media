@@ -143,7 +143,6 @@ export class NodeCompMarkdown extends Html {
         return true;
     }
 
-    // todo-0: need to decouple this away from this gui element
     decrypt = async () => {
         if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();

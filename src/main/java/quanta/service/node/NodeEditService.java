@@ -1282,7 +1282,10 @@ public class NodeEditService extends ServiceBase {
 				int level = baseLevel + (slashCount - baseSlashCount);
 				if (level > 6)
 					level = 6;
-				updateHeadingsForNode(ms, n, level);
+				String c = translateHeadingForLevel(ms, n.getContent(), level);
+				if (c != null && !c.equals(n.getContent())) {
+					n.setContent(c);
+				}
 
 				// only cache up to 100 dirty nodes at time time before saving/flushing changes.
 				if (ThreadLocals.getDirtyNodeCount() > 100) {
@@ -1293,14 +1296,11 @@ public class NodeEditService extends ServiceBase {
 		update.saveSession(ms);
 	}
 
-	private void updateHeadingsForNode(MongoSession ms, SubNode node, int level) {
-		if (node == null)
-			return;
+	public String translateHeadingForLevel(MongoSession ms, final String nodeContent, int level) {
+		if (nodeContent == null)
+			return null;
 
-		String nodeContent = node.getContent();
 		String content = nodeContent;
-		if (content == null)
-			return;
 
 		// if this node starts with a heading (hash marks)
 		if (content.startsWith("#") && content.indexOf(" ") < 7) {
@@ -1319,32 +1319,32 @@ public class NodeEditService extends ServiceBase {
 						break;
 					case 1:
 						if (!nodeContent.startsWith("# ")) {
-							node.setContent("# " + content);
+							return "# " + content;
 						}
 						break;
 					case 2:
 						if (!nodeContent.startsWith("## ")) {
-							node.setContent("## " + content);
+							return "## " + content;
 						}
 						break;
 					case 3:
 						if (!nodeContent.startsWith("### ")) {
-							node.setContent("### " + content);
+							return "### " + content;
 						}
 						break;
 					case 4:
 						if (!nodeContent.startsWith("#### ")) {
-							node.setContent("#### " + content);
+							return "#### " + content;
 						}
 						break;
 					case 5:
 						if (!nodeContent.startsWith("##### ")) {
-							node.setContent("##### " + content);
+							return "##### " + content;
 						}
 						break;
 					case 6:
 						if (!nodeContent.startsWith("###### ")) {
-							node.setContent("###### " + content);
+							return "###### " + content;
 						}
 						break;
 					default:
@@ -1352,6 +1352,7 @@ public class NodeEditService extends ServiceBase {
 				}
 			}
 		}
+		return nodeContent;
 	}
 
 	/* todo-1: we should be using a bulk update in here */
