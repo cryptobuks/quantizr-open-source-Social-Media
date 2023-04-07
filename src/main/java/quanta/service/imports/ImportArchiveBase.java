@@ -43,6 +43,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 
 		log.trace("Import FILE Entry: " + entry.getName());
 		try {
+			ThreadLocals.setParentCheckEnabled(false);
 			Val<Boolean> done = new Val<>(false);
 
 			// First try to attach the file as a binary which will fail gracefully and leave done=false if this
@@ -137,6 +138,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
+		}
+		finally {
+			ThreadLocals.setParentCheckEnabled(true);
 		}
 	}
 

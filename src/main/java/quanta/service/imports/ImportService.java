@@ -16,7 +16,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
 @Component
-@Slf4j 
+@Slf4j
 public class ImportService extends ServiceBase {
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
 		if (nodeId == null) {
@@ -33,8 +33,16 @@ public class ImportService extends ServiceBase {
 		// This is critical to be correct so we run the actual query based determination of 'hasChildren'
 		boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath(), false);
 		if (hasChildren) {
-			throw ExUtil.wrapEx("You can only import into an empty node.");
+			throw ExUtil
+					.wrapEx("You can only import into an empty node. There are direct children under path(a): " + node.getPath());
 		}
+
+		/*
+		 * It's important to be sure there are absolutely no orphans at any level under this branch of the
+		 * tree, so even though the check above told us there are no direct children we still need to run
+		 * this recursive delete.
+		 */
+		delete.deleteUnderPath(ms, node.getPath());
 
 		if (uploadFiles.length != 1) {
 			throw ExUtil.wrapEx("Multiple file import not allowed");

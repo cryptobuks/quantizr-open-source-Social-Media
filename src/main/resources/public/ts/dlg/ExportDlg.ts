@@ -83,15 +83,22 @@ export class ExportDlg extends DialogBase {
                 getValue: (): boolean => getAs().exportSettings.jupyterFile
             }),
             new Checkbox("JSON", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJSON = checked; }),
+                setValue: (checked: boolean) => dispatch("exportSetting", s => {
+                    s.exportSettings.includeJSON = checked;
+
+                    // our importer doesn't currently support having attachments in the 'attachments' folder so
+                    // if we're exporting a file that can be reimported turn off the attOneFolder option
+                    s.exportSettings.attOneFolder = false;
+                }),
                 getValue: (): boolean => getAs().exportSettings.includeJSON
             }),
 
             new Heading(5, "Other Options", { className: "bigMarginTop" }),
-            new Checkbox("Attachments Folder", null, {
+
+            !ast.exportSettings.includeJSON ? new Checkbox("Attachments Folder", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
                 getValue: (): boolean => getAs().exportSettings.attOneFolder
-            }),
+            }) : null,
             ast.exportSettings.includeHTML ? new Checkbox("IDs", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeIDs

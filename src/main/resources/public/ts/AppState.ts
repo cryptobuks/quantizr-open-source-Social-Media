@@ -122,7 +122,7 @@ export class AppState {
         includeToc: true,
         jupyterFile: true,
         attOneFolder: false,
-        includeJSON: true,
+        includeJSON: false,
         includeMD: true,
         includeHTML: true,
         includeIDs: true,
