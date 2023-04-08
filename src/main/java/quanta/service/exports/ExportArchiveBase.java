@@ -264,7 +264,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				int lev = slashCount - baseSlashCount;
 				if (lev > 6)
 					lev = 6;
-				content = edit.translateHeadingForLevel(ms, content, lev);
+				content = edit.translateHeadingsForLevel(ms, content, lev);
 			}
 
 			// add to table of contents

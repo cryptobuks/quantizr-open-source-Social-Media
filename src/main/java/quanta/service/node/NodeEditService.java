@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1282,7 +1283,7 @@ public class NodeEditService extends ServiceBase {
 				int level = baseLevel + (slashCount - baseSlashCount);
 				if (level > 6)
 					level = 6;
-				String c = translateHeadingForLevel(ms, n.getContent(), level);
+				String c = translateHeadingsForLevel(ms, n.getContent(), level);
 				if (c != null && !c.equals(n.getContent())) {
 					n.setContent(c);
 				}
@@ -1296,63 +1297,79 @@ public class NodeEditService extends ServiceBase {
 		update.saveSession(ms);
 	}
 
-	public String translateHeadingForLevel(MongoSession ms, final String nodeContent, int level) {
+	public String translateHeadingsForLevel(MongoSession ms, final String nodeContent, int level) {
 		if (nodeContent == null)
 			return null;
 
-		String content = nodeContent;
+		StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);
+		StringBuilder ret = new StringBuilder();
 
-		// if this node starts with a heading (hash marks)
-		if (content.startsWith("#") && content.indexOf(" ") < 7) {
-			int spaceIdx = content.indexOf(" ");
-			if (spaceIdx != -1) {
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken();
+			if (tok.equals("\n")) {
+				ret.append("\n");
+				continue;
+			}
+			String content = tok;
 
-				// strip the pre-existing hashes off
-				content = content.substring(spaceIdx + 1);
+			// if this node starts with a heading (hash marks)
+			if (content.startsWith("#") && content.indexOf(" ") < 7) {
+				int spaceIdx = content.indexOf(" ");
+				if (spaceIdx != -1) {
+					// strip the pre-existing hashes off
+					content = content.substring(spaceIdx + 1);
 
-				/*
-				 * These strings (pound sign headings) could be generated dynamically, but this switch with them
-				 * hardcoded is more performant
-				 */
-				switch (level) {
-					case 0: // this will be the root node (user selected node)
-						break;
-					case 1:
-						if (!nodeContent.startsWith("# ")) {
-							return "# " + content;
-						}
-						break;
-					case 2:
-						if (!nodeContent.startsWith("## ")) {
-							return "## " + content;
-						}
-						break;
-					case 3:
-						if (!nodeContent.startsWith("### ")) {
-							return "### " + content;
-						}
-						break;
-					case 4:
-						if (!nodeContent.startsWith("#### ")) {
-							return "#### " + content;
-						}
-						break;
-					case 5:
-						if (!nodeContent.startsWith("##### ")) {
-							return "##### " + content;
-						}
-						break;
-					case 6:
-						if (!nodeContent.startsWith("###### ")) {
-							return "###### " + content;
-						}
-						break;
-					default:
-						break;
+					/*
+					 * These strings (pound sign headings) could be generated dynamically, but this switch with them
+					 * hardcoded is more performant
+					 */
+					switch (level) {
+						case 0: // this will be the root node (user selected node)
+							break;
+						case 1:
+							if (!nodeContent.startsWith("# ")) {
+								ret.append("# " + content);
+								continue;
+							}
+							break;
+						case 2:
+							if (!nodeContent.startsWith("## ")) {
+								ret.append("## " + content);
+								continue;
+							}
+							break;
+						case 3:
+							if (!nodeContent.startsWith("### ")) {
+								ret.append("### " + content);
+								continue;
+							}
+							break;
+						case 4:
+							if (!nodeContent.startsWith("#### ")) {
+								ret.append("#### " + content);
+								continue;
+							}
+							break;
+						case 5:
+							if (!nodeContent.startsWith("##### ")) {
+								ret.append("##### " + content);
+								continue;
+							}
+							break;
+						case 6:
+							if (!nodeContent.startsWith("###### ")) {
+								ret.append("###### " + content);
+								continue;
+							}
+							break;
+						default:
+							break;
+					}
 				}
 			}
+			ret.append(tok);
 		}
-		return nodeContent;
+		return ret.toString().trim();
 	}
 
 	/* todo-1: we should be using a bulk update in here */

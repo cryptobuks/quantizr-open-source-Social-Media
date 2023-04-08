@@ -287,7 +287,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			int lev = slashCount - baseSlashCount;
 			if (lev > 6)
 				lev = 6;
-			content = edit.translateHeadingForLevel(session, content, lev);
+			content = edit.translateHeadingsForLevel(session, content, lev);
 		}
 
 		markdown.append(content);
