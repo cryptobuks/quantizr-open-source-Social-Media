@@ -11,7 +11,7 @@ export interface ExportSettings {
     exportType: string;
     toIpfs?: boolean;
     includeToc?: boolean;
-    jupyterFile?: boolean;
+    includeJypyter?: boolean;
     attOneFolder?: boolean;
     includeJSON?: boolean;
     includeMD?: boolean;
@@ -120,7 +120,7 @@ export class AppState {
     exportSettings: ExportSettings = {
         exportType: "zip",
         includeToc: true,
-        jupyterFile: true,
+        includeJypyter: true,
         attOneFolder: false,
         includeJSON: false,
         includeMD: true,

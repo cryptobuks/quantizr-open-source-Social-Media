@@ -234,11 +234,11 @@ export interface ExportRequest extends RequestBase {
     fileName: string;
     toIpfs: boolean;
     includeToc: boolean;
-    jupyterFile: boolean;
     attOneFolder: boolean;
     includeJSON: boolean;
     includeMD: boolean;
     includeHTML: boolean;
+    includeJypyter: boolean;
     includeIDs: boolean;
     dividerLine: boolean;
     updateHeadings: boolean;

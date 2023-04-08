@@ -14,12 +14,11 @@ public class ExportRequest extends RequestBase {
 	private String fileName;
 	private boolean toIpfs;
 	private boolean includeToc;
-	private boolean jupyterFile;
 	private boolean attOneFolder;
-
 	private boolean includeJSON;
 	private boolean includeMD;
 	private boolean includeHTML;
+	private boolean includeJypyter;
 	private boolean includeIDs;
 	private boolean dividerLine;
 	private boolean updateHeadings;

@@ -63,7 +63,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private MongoSession session;
 	private StringBuilder fullHtml = new StringBuilder();
 	private StringBuilder fullMd = new StringBuilder();
-	private StringBuilder toc = new StringBuilder();
+	private StringBuilder markdownToc = new StringBuilder();
 
 	private List<JupyterCell> jupyterCells = new LinkedList<>();
 
@@ -112,16 +112,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 			if (req.isIncludeMD()) {
 				StringBuilder out = new StringBuilder();
-				if (toc.length() > 0) {
+				if (markdownToc.length() > 0) {
 					out.append("Table of Contents\n\n");
-					out.append(toc);
+					out.append(markdownToc);
 					out.append("\n");
 				}
 				out.append(fullMd);
 				addFileEntry("content.md", out.toString().getBytes(StandardCharsets.UTF_8));
 			}
 
-			if (req.isJupyterFile()) {
+			if (req.isIncludeJypyter()) {
 				addFileEntry("content.ipynb", XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
 			}
 
@@ -187,32 +187,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		/* process the current node */
 		Val<String> fileName = new Val<>();
-		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 
 		/*
 		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
-		processNodeExport(session, true, req.isJupyterFile(), parentFolder, "", node, true, fileName, level, true);
+		processNodeExport(session, parentFolder, "", node, true, fileName, level, true);
 		String folder = node.getIdStr();
 
+		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 		if (iter != null) {
-			/*
-			 * First pass over children is to embed their content onto the child display on the current page
-			 */
 			for (SubNode n : iter) {
 				String noExp = n.getStr(NodeProp.NO_EXPORT);
 				if (noExp != null) {
 					continue;
 				}
-
-				processNodeExport(session, false, false, parentFolder, //
-						"", n, false, null, level, false);
-			}
-		}
-
-		if (iter != null) {
-			/* Second pass over children is the actual recursion down into the tree */
-			for (SubNode n : iter) {
 				nodeStack.add(n);
 				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, n.getIdStr());
 				nodeStack.remove(n);
@@ -235,27 +223,19 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	}
 
 	/*
-	 * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, becasue we let
+	 * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, because we let
 	 * exceptions bubble all the way up to abort and even cause the zip file itself (to be deleted)
 	 * since it was unable to be written to completely successfully.
 	 * 
 	 * fileNameCont is an output parameter that has the complete filename minus the period and
 	 * extension.
 	 */
-
-	private void processNodeExport(MongoSession ms, boolean allowAppend, boolean appendJupyterJson, String parentFolder,
-			String deeperPath, SubNode node, boolean writeFile, Val<String> fileNameCont, int level, boolean isTopRow) {
+	private void processNodeExport(MongoSession ms, String parentFolder, String deeperPath, SubNode node, boolean writeFile,
+			Val<String> fileNameCont, int level, boolean isTopRow) {
 		try {
 			// log.debug("NODE [LEV:" + level + " WRITE=" + writeFile + "]: " + node.getContent());
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
-
-			JupyterCell cell = null;
-			if (appendJupyterJson) {
-				cell = new JupyterCell();
-				cell.setCellType("markdown");
-			}
-
 			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
 
@@ -267,50 +247,69 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				content = edit.translateHeadingsForLevel(ms, content, lev);
 			}
 
-			// add to table of contents
-			if (req.isIncludeToc() && writeFile && content != null) {
-				String headerContent = content;
+			addToTableOfContents(writeFile, level, content);
+			List<Attachment> atts = node.getOrderedAttachments();
 
-				int newLineIdx = content.indexOf("\n");
-				if (newLineIdx != -1) {
-					headerContent = headerContent.substring(0, newLineIdx);
-				}
-				if (XString.isMarkdownHeading(headerContent)) {
-					int firstSpace = headerContent.indexOf(" ");
-					if (firstSpace != -1) {
-						String heading = headerContent.substring(firstSpace + 1);
-						String linkHeading = heading.replaceAll(" ", "-").toLowerCase();
-						level--;
-						String prefix = level > 0 ? "    ".repeat(level) : "";
-						toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
-					}
-				}
-			}
+			// we save off the 'content' into htmlContent, because we need a copy that doesn't have
+			// attachments inserted into it for the special case of inserting HTML attachments
+			Val<String> htmlContent = new Val<>(content);
+			Val<String> mdContent = new Val<>(content);
 
-			if (appendJupyterJson) {
-				cell.setSource(makeJupyterSource(content));
+			JupyterCell cell = null;
+			if (req.isIncludeJypyter()) {
+				cell = new JupyterCell();
+				cell.setCellType("markdown");
+				cell.setSource(makeJupyterSource(mdContent.getVal()));
 				jupyterCells.add(cell);
 			}
 
-			if (allowAppend) {
-				if (req.isIncludeHTML()) {
-					appendNodeHtmlContent(node, fullHtml, content);
-				}
-
-				if (req.isIncludeMD()) {
-					fullMd.append("\n" + content + "\n");
-				}
-			}
-
-			List<Attachment> atts = node.getOrderedAttachments();
+			// Process all attachments just to insert File Tags into content
 			if (atts != null) {
 				for (Attachment att : atts) {
-					appendAttachment(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), allowAppend, cell,
-							writeFile, nodeId, fileName, att);
+					// Process File Tag type attachments here first
+					if (!"ft".equals(att.getPosition())) {
+						continue;
+					}
+					handleAttachment(true, null, mdContent, deeperPath,
+							req.isAttOneFolder() ? "attachments" : ("." + parentFolder), cell, writeFile, nodeId, fileName, att);
 				}
 			}
 
-			if (allowAppend && req.isIncludeHTML()) {
+			if (req.isIncludeHTML()) {
+				htmlContent.setVal(formatContentToHtml(node, htmlContent.getVal()));
+
+				// special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
+				// and processing that's done in the line above
+				if (atts != null) {
+					for (Attachment att : atts) {
+						// Process File Tag type attachments here first
+						if (!"ft".equals(att.getPosition())) {
+							continue;
+						}
+						handleAttachment(true, htmlContent, null, deeperPath,
+								req.isAttOneFolder() ? "attachments" : ("." + parentFolder), null, writeFile, nodeId, fileName,
+								att);
+					}
+				}
+				fullHtml.append(htmlContent.getVal());
+			}
+
+			if (req.isIncludeMD()) {
+				fullMd.append("\n" + mdContent.getVal() + "\n");
+			}
+
+			if (atts != null) {
+				for (Attachment att : atts) {
+					// Skip File Tag type attachments because they'll already have been processed above
+					if ("ft".equals(att.getPosition())) {
+						continue;
+					}
+					handleAttachment(false, null, null, deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
+							cell, writeFile, nodeId, fileName, att);
+				}
+			}
+
+			if (req.isIncludeHTML()) {
 				fullHtml.append("</div>\n");
 
 				if (req.isDividerLine()) {
@@ -321,19 +320,55 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			if (writeFile) {
 				writeFilesForNode(ms, parentFolder, node, fileNameCont, fileName, content, atts);
 			}
-		} catch (
-
-		Exception ex) {
+		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 	}
 
+	private void addToTableOfContents(boolean writeFile, int level, String content) {
+		// add to table of contents
+		if (req.isIncludeToc() && writeFile && content != null) {
+			String headerContent = content;
+
+			int newLineIdx = content.indexOf("\n");
+			if (newLineIdx != -1) {
+				headerContent = headerContent.substring(0, newLineIdx);
+			}
+			if (XString.isMarkdownHeading(headerContent)) {
+				int firstSpace = headerContent.indexOf(" ");
+				if (firstSpace != -1) {
+					String heading = headerContent.substring(firstSpace + 1);
+					String linkHeading = heading.replace(" ", "-").toLowerCase();
+					level--;
+					String prefix = level > 0 ? "    ".repeat(level) : "";
+					markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+				}
+			}
+		}
+	}
+
+	/* Breaks up content into a Jupyter source array */
 	private List<String> makeJupyterSource(String content) {
-		StringTokenizer t = new StringTokenizer(content, "\n\r", false);
+		StringTokenizer t = new StringTokenizer(content, "\n", true);
 		List<String> list = new LinkedList<>();
+		String curLine = "";
+
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken();
-			list.add(tok + "\n");
+			if ("\n".equals(tok)) {
+				if (curLine.length() > 0) {
+					curLine += "\n";
+				}
+			} else {
+				if (curLine.length() > 0) {
+					list.add(curLine);
+				}
+				curLine = tok;
+			}
+		}
+
+		if (curLine.trim().length() > 0) {
+			list.add(curLine);
 		}
 		return list;
 	}
@@ -415,8 +450,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	private void appendAttachment(String deeperPath, String parentFolder, boolean allowAppend, JupyterCell cell,
-			boolean writeFile, String nodeId, String fileName, Attachment att) {
+	/*
+	 * If 'content' is passes as non-null then the ONLY thing we do is inject any File Tags onto that
+	 * content and return the content
+	 */
+	private void handleAttachment(boolean injectingTag, Val<String> htmlContent, Val<String> mdContent, String deeperPath,
+			String parentFolder, JupyterCell cell, boolean writeFile, String nodeId, String fileName, Attachment att) {
 		String ext = null;
 		String binFileNameProp = att.getFileName();
 		if (binFileNameProp != null) {
@@ -441,72 +480,107 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		if (mimeType == null)
 			return;
 
-		if (allowAppend && req.isIncludeHTML()) {
-			fullHtml.append("<div class='attachment'>");
-		}
-
 		if (mimeType.startsWith("image/")) {
-			String md = "\n![" + binFileNameStr + "](" + fullUrl + ")\n";
-			if (allowAppend) {
-				if (req.isIncludeHTML()) {
-					appendImgLink(fullHtml, nodeId, binFileNameStr, fullUrl);
-				}
-				if (req.isIncludeMD()) {
-					fullMd.append(md);
-				}
+			if (req.isIncludeHTML()) {
+				String htmlLink = appendImgLink(nodeId, binFileNameStr, fullUrl);
+				processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
 			}
-			if (cell != null) {
-				cell.getSource().add(md);
+
+			if (req.isIncludeMD() || cell != null) {
+				String mdLink = "\n![" + binFileNameStr + "](" + fullUrl + ")\n";
+				processMdAtt(injectingTag, mdContent, cell, att, mdLink);
 			}
 		} else {
-			String md = "\n[" + binFileNameStr + "](" + fullUrl + ")\n";
-			if (allowAppend) {
-				if (req.isIncludeHTML()) {
-					appendNonImgLink(fullHtml, binFileNameStr, fullUrl);
-				}
-
-				if (req.isIncludeMD()) {
-					fullMd.append(md);
-				}
+			if (req.isIncludeHTML()) {
+				String htmlLink = appendNonImgLink(binFileNameStr, fullUrl);
+				processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
 			}
-			if (cell != null) {
-				cell.getSource().add(md);
+
+			if (req.isIncludeMD() || cell != null) {
+				String mdLink = "\n[" + binFileNameStr + "](" + fullUrl + ")\n";
+				processMdAtt(injectingTag, mdContent, cell, att, mdLink);
+			}
+		}
+	}
+
+	private void processHtmlAtt(boolean injectingTag, Val<String> htmlContent, Attachment att, String imgLink) {
+		if (injectingTag) {
+			if (htmlContent != null) {
+				htmlContent.setVal(insertHtmlLink(htmlContent.getVal(), att, imgLink));
+			}
+		} else {
+			fullHtml.append(imgLink);
+		}
+	}
+
+	private void processMdAtt(boolean injectingTag, Val<String> mdContent, JupyterCell cell, Attachment att, String mdLink) {
+		if (injectingTag) {
+			if (mdContent != null) {
+				mdContent.setVal(insertMdLink(mdContent.getVal(), att, mdLink));
+			}
+		} else {
+			if (req.isIncludeMD()) {
+				fullMd.append(mdLink);
 			}
 		}
 
-		if (allowAppend && req.isIncludeHTML()) {
-			fullHtml.append("</div>");
+		if (cell != null) {
+			processAttachmentInCell(injectingTag, cell, att, mdLink);
 		}
 	}
 
-	private void appendImgLink(StringBuilder html, String nodeId, String binFileNameStr, String url) {
-		html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
-				+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId + "\").style.width=\"\"' src='" + url
-				+ "'/>");
+	private void processAttachmentInCell(boolean injectingTag, JupyterCell cell, Attachment att, String mdLink) {
+		if (injectingTag) {
+			List<String> newSource = new LinkedList<>();
+			for (String val : cell.getSource()) {
+				newSource.add(insertMdLink(val, att, mdLink));
+			}
+			cell.setSource(newSource);
+		} else {
+			cell.getSource().add(mdLink);
+		}
 	}
 
-	private void appendNonImgLink(StringBuilder html, String binFileNameStr, String url) {
-		html.append("<a class='link' target='_blank' href='" + url + "'>" + binFileNameStr + "</a>");
+	private String insertHtmlLink(String content, Attachment att, String imgLink) {
+		if ("ft".equals(att.getPosition())) {
+			// This replacement is kind of tricky because we have to close out the markdown div
+			// then inject our HTML, and then reopen a new div so keep the markdown separate from the
+			// RAW html "imgLink" we're inserting here.
+			content =
+					content.replace("{{" + att.getFileName() + "}}", "\n</div>" + imgLink + "<div class='markdown container'>\n");
+		}
+		return content;
 	}
 
-	private void appendNodeHtmlContent(SubNode node, StringBuilder html, String content) {
+	private String insertMdLink(String content, Attachment att, String mdLink) {
+		if ("ft".equals(att.getPosition())) {
+			content = content.replace("{{" + att.getFileName() + "}}", mdLink);
+		}
+
+		return content;
+	}
+
+	private String appendImgLink(String nodeId, String binFileNameStr, String url) {
+		return "<div class='attachment'><img title='" + binFileNameStr + "' id='img_" + nodeId
+				+ "' style='width:50%' onclick='document.getElementById(\"img_" + nodeId + "\").style.width=\"\"' src='" + url
+				+ "'/></div>";
+	}
+
+	private String appendNonImgLink(String binFileNameStr, String url) {
+		return "<div class='attachment'><a class='link' target='_blank' href='" + url + "'>" + binFileNameStr + "</a></div>";
+	}
+
+	private String formatContentToHtml(SubNode node, String content) {
 		String escapedContent = StringEscapeUtils.escapeHtml4(content);
 		if (node.isType(NodeType.PLAIN_TEXT)) {
-			html.append("\n<pre>" + escapedContent + "\n</pre>\n");
+			return "\n<pre>" + escapedContent + "\n</pre>\n";
 		} else {
+			String prefix = "";
 			if (req.isIncludeIDs()) {
-				html.append("\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>");
+				prefix = "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
 			}
-			html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>\n");
+			return prefix + "\n<div class='markdown container'>" + escapedContent + "\n</div>\n";
 		}
-	}
-
-	private String cleanupFileName(String fileName) {
-		fileName = fileName.trim();
-		fileName = FileUtils.ensureValidFileNameChars(fileName);
-		fileName = XString.stripIfStartsWith(fileName, "-");
-		fileName = XString.stripIfEndsWith(fileName, "-");
-		return fileName;
 	}
 
 	private void addFileEntry(String fileName, byte[] bytes) {

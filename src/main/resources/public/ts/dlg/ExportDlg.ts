@@ -74,8 +74,8 @@ export class ExportDlg extends DialogBase {
                 getValue: (): boolean => getAs().exportSettings.includeMD
             }),
             new Checkbox("Jupyter", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.jupyterFile = checked; }),
-                getValue: (): boolean => getAs().exportSettings.jupyterFile
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJypyter = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeJypyter
             }),
             new Checkbox("JSON", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => {
@@ -130,7 +130,7 @@ export class ExportDlg extends DialogBase {
             fileName: this.fileNameState.getValue(),
             toIpfs: ast.exportSettings.toIpfs,
             includeToc: ast.exportSettings.includeToc,
-            jupyterFile: ast.exportSettings.jupyterFile,
+            includeJypyter: ast.exportSettings.includeJypyter,
             attOneFolder: ast.exportSettings.attOneFolder,
             includeJSON: ast.exportSettings.includeJSON,
             includeMD: ast.exportSettings.includeMD,
