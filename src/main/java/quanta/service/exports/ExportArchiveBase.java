@@ -63,6 +63,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private MongoSession session;
 	private StringBuilder fullHtml = new StringBuilder();
 	private StringBuilder fullMd = new StringBuilder();
+	private StringBuilder toc = new StringBuilder();
 
 	private List<JupyterCell> jupyterCells = new LinkedList<>();
 
@@ -110,7 +111,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 
 			if (req.isIncludeMD()) {
-				addFileEntry("content.md", fullMd.toString().getBytes(StandardCharsets.UTF_8));
+				StringBuilder out = new StringBuilder();
+				if (toc.length() > 0) {
+					out.append("Table of Contents\n\n");
+					out.append(toc);
+					out.append("\n");
+				}
+				out.append(fullMd);
+				addFileEntry("content.md", out.toString().getBytes(StandardCharsets.UTF_8));
 			}
 
 			if (req.isJupyterFile()) {
@@ -184,7 +192,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		/*
 		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
-		processNodeExport(session, true, req.isJupyterFile(), parentFolder, "", node, true, fileName, 0, true);
+		processNodeExport(session, true, req.isJupyterFile(), parentFolder, "", node, true, fileName, level, true);
 		String folder = node.getIdStr();
 
 		if (iter != null) {
@@ -198,7 +206,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				}
 
 				processNodeExport(session, false, false, parentFolder, //
-						"", n, false, null, 0, false);
+						"", n, false, null, level, false);
 			}
 		}
 
@@ -238,9 +246,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private void processNodeExport(MongoSession ms, boolean allowAppend, boolean appendJupyterJson, String parentFolder,
 			String deeperPath, SubNode node, boolean writeFile, Val<String> fileNameCont, int level, boolean isTopRow) {
 		try {
-			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
-			// "+parentFolder);
-
+			// log.debug("NODE [LEV:" + level + " WRITE=" + writeFile + "]: " + node.getContent());
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 
@@ -259,6 +265,26 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				if (lev > 6)
 					lev = 6;
 				content = edit.translateHeadingForLevel(ms, content, lev);
+			}
+
+			// add to table of contents
+			if (req.isIncludeToc() && writeFile && content != null) {
+				String headerContent = content;
+
+				int newLineIdx = content.indexOf("\n");
+				if (newLineIdx != -1) {
+					headerContent = headerContent.substring(0, newLineIdx);
+				}
+				if (XString.isMarkdownHeading(headerContent)) {
+					int firstSpace = headerContent.indexOf(" ");
+					if (firstSpace != -1) {
+						String heading = headerContent.substring(firstSpace + 1);
+						String linkHeading = heading.replaceAll(" ", "-").toLowerCase();
+						level--;
+						String prefix = level > 0 ? "    ".repeat(level) : "";
+						toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+					}
+				}
 			}
 
 			if (appendJupyterJson) {

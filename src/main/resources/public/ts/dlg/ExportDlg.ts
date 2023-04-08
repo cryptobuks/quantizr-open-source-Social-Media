@@ -43,7 +43,12 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("TAR.GZ", "tar.gz"),
                 this.radioButton("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
-            exportType === "pdf" ? this.makePdfOptions() : null,
+
+            exportType === "pdf" || ast.exportSettings.includeMD ? new Checkbox("Table of Contents (via Markdown Headings)", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
+                getValue: (): boolean => getAs().exportSettings.includeToc
+            }) : null,
+
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
             ast.config.ipfsEnabled ? new Diva([
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
@@ -53,16 +58,6 @@ export class ExportDlg extends DialogBase {
                 new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];
-    }
-
-    makePdfOptions = (): Div => {
-        return new Divc({ className: "bigMarginBottom" }, [
-            new Heading(5, "PDF Options"),
-            new Checkbox("Include Table of Contents (using Markdown Headings)", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
-                getValue: (): boolean => getAs().exportSettings.includeToc
-            })
-        ]);
     }
 
     makeArchiveOptions = (): Div => {

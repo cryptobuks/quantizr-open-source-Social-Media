@@ -24,7 +24,7 @@ import quanta.exception.base.RuntimeEx;
  * todo-3: Look for ways to use this: Java 11 adds a few new methods to the String class: isBlank,
  * lines, strip, stripLeading, stripTrailing, and repeat.
  */
-@Slf4j 
+@Slf4j
 public class XString {
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	static {
@@ -152,6 +152,13 @@ public class XString {
 				break;
 		}
 		return idx;
+	}
+
+	// todo-0: this method is an unsafe hack but good for now
+	public static boolean isMarkdownHeading(String val) {
+		if (val == null)
+			return false;
+		return val.trim().startsWith("#");
 	}
 
 	public static String trimToMaxLen(String val, int maxLen) {
