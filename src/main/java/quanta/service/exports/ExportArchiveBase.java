@@ -64,6 +64,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private StringBuilder fullHtml = new StringBuilder();
 	private StringBuilder fullMd = new StringBuilder();
 	private StringBuilder markdownToc = new StringBuilder();
+	private StringBuilder htmlToc = new StringBuilder();
 
 	private List<JupyterCell> jupyterCells = new LinkedList<>();
 
@@ -99,15 +100,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
 
-			if (req.isIncludeHTML()) {
-				appendHtmlBegin("", fullHtml);
-			}
-
 			recurseNode("../", "", node, nodeStack, 0, null);
 
 			if (req.isIncludeHTML()) {
-				appendHtmlEnd("", fullHtml);
-				addFileEntry("content.html", fullHtml.toString().getBytes(StandardCharsets.UTF_8));
+				StringBuilder out = new StringBuilder();
+				appendHtmlBegin("", out);
+				if (htmlToc.length() > 0) {
+					out.append("<div class='toc'>Table of Contents</div>\n");
+					out.append(htmlToc);
+				}
+				out.append(fullHtml);
+				appendHtmlEnd("", out);
+				addFileEntry("content.html", out.toString().getBytes(StandardCharsets.UTF_8));
 			}
 
 			if (req.isIncludeMD()) {
@@ -247,7 +251,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				content = edit.translateHeadingsForLevel(ms, content, lev);
 			}
 
-			addToTableOfContents(writeFile, level, content);
+			if (writeFile && req.isIncludeToc()) {
+				addToTableOfContents(level, content, nodeId);
+			}
 			List<Attachment> atts = node.getOrderedAttachments();
 
 			// we save off the 'content' into htmlContent, because we need a copy that doesn't have
@@ -325,24 +331,29 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	private void addToTableOfContents(boolean writeFile, int level, String content) {
+	private void addToTableOfContents(int level, String content, String nodeId) {
 		// add to table of contents
-		if (req.isIncludeToc() && writeFile && content != null) {
-			String headerContent = content;
+		if (content == null)
+			return;
+		String headerContent = content.trim();
 
+		if (XString.isMarkdownHeading(headerContent)) {
+
+			// chop string at newline if there's a newline
 			int newLineIdx = content.indexOf("\n");
 			if (newLineIdx != -1) {
 				headerContent = headerContent.substring(0, newLineIdx);
 			}
-			if (XString.isMarkdownHeading(headerContent)) {
-				int firstSpace = headerContent.indexOf(" ");
-				if (firstSpace != -1) {
-					String heading = headerContent.substring(firstSpace + 1);
-					String linkHeading = heading.replace(" ", "-").toLowerCase();
-					level--;
-					String prefix = level > 0 ? "    ".repeat(level) : "";
-					markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
-				}
+
+			int firstSpace = headerContent.indexOf(" ");
+			if (firstSpace != -1) {
+				String heading = headerContent.substring(firstSpace + 1);
+				String linkHeading = heading.replace(" ", "-").toLowerCase();
+				level--;
+				String prefix = level > 0 ? "    ".repeat(level) : "";
+				markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+				htmlToc.append("<div style='margin-left: " + (25 + level * 25) + "px'><a href='#" + nodeId + "'>"
+						+ StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
 			}
 		}
 	}
@@ -579,7 +590,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			if (req.isIncludeIDs()) {
 				prefix = "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
 			}
-			return prefix + "\n<div class='markdown container'>" + escapedContent + "\n</div>\n";
+			return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent + "\n</div>\n";
 		}
 	}
 

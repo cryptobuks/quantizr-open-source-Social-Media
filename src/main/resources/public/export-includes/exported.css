@@ -3,6 +3,13 @@ body {
     color: white;
 }
 
+.toc {
+    margin-bottom: 25px;
+    margin-left: 25px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 .floatContainer {
     position: relative;
     width: 100%;
