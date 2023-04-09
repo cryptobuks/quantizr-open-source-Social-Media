@@ -317,10 +317,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 			if (req.isIncludeHTML()) {
 				fullHtml.append("</div>\n");
-
-				if (req.isDividerLine()) {
-					fullHtml.append("<hr>\n");
-				}
 			}
 
 			if (writeFile) {
@@ -353,7 +349,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				String prefix = level > 0 ? "    ".repeat(level) : "";
 				markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
 				String clazz = level == 0 ? "class='topLevelToc'" : "";
-				htmlToc.append("<div " + clazz + " style='margin-left: " + (25 + level * 25) + "px'><a href='#" + nodeId + "'>"
+				htmlToc.append("<div " + clazz + " style='margin-left: " + (25 + level * 25) + "px'><a class='tocLink' href='#" + nodeId + "'>"
 						+ StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
 			}
 		}
@@ -588,8 +584,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			return "\n<pre>" + escapedContent + "\n</pre>\n";
 		} else {
 			String prefix = "";
+			if (req.isDividerLine()) {
+				prefix += "<hr>";
+			}
 			if (req.isIncludeIDs()) {
-				prefix = "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
+				prefix += "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
 			}
 			return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent + "\n</div>\n";
 		}

@@ -1,11 +1,16 @@
 body {
     background-color: rgb(21, 32, 43);
     color: white;
+    margin: 25px 50px 50px 50px;
+}
+
+.tocLink {
+    text-decoration: none;
+    display: list-item;
 }
 
 .topLevelToc {
     font-weight: bold;
-    text-decoration: underline;
     margin-top: 8px;
     margin-bottom: 4px;
 }

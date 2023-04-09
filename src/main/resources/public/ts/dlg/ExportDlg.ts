@@ -44,7 +44,7 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
 
-            exportType === "pdf" || ast.exportSettings.includeMD ? new Checkbox("Table of Contents (via Markdown Headings)", null, {
+            exportType === "pdf" || ast.exportSettings.includeMD ? new Checkbox("Table of Contents", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
                 getValue: (): boolean => getAs().exportSettings.includeToc
             }) : null,
