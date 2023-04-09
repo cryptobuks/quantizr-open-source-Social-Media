@@ -3,11 +3,16 @@ body {
     color: white;
 }
 
-.toc {
-    margin-bottom: 25px;
-    margin-left: 25px;
-    text-decoration: underline;
+.topLevelToc {
     font-weight: bold;
+    text-decoration: underline;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.toc {
+    margin-bottom: 18px;
+    margin-left: 25px;
 }
 
 .floatContainer {

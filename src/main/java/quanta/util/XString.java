@@ -138,7 +138,8 @@ public class XString {
 
 	/*
 	 * Returns the heading level assuming 'val' contains text that starts with something like
-	 * "# My Heading", or "## My Heading", by returning the number of hash marks in the heading
+	 * "# My Heading" (reurns 1), or "## My Heading" (returns 2), by returning the number of hash marks
+	 * in the heading. Anything not a heading will return 0
 	 */
 	public static int getHeadingLevel(String val) {
 		if (!val.startsWith("#")) {
@@ -146,19 +147,32 @@ public class XString {
 		}
 		int len = val.length();
 		int idx = 0;
-		while (idx < len && val.charAt(idx) == '#') {
+		char c = 0;
+		/*
+		 * we have 'len-2' here becasue in an example like "## a" this is a heading "a", and we don't need
+		 * to try to iterate into the final " a" part so we know we should always iterate only out to two
+		 * chars from the end of the string
+		 */
+		while (idx < len - 2 && (c = val.charAt(idx)) == '#') {
 			idx++;
-			if (idx >= 6)
+
+			// if we've counted the max number of headings levels, just point 'c' to the next char 
+			// bail out of looping
+			if (idx >= 6) {
+				c = val.charAt(idx);
 				break;
+			}
 		}
+		if (c != ' ')
+			return 0;
 		return idx;
 	}
 
-	// todo-0: this method is an unsafe hack but good for now
 	public static boolean isMarkdownHeading(String val) {
 		if (val == null)
 			return false;
-		return val.trim().startsWith("#");
+		int level = getHeadingLevel(val);
+		return level >= 1 && level <= 6;
 	}
 
 	public static String trimToMaxLen(String val, int maxLen) {

@@ -352,7 +352,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				level--;
 				String prefix = level > 0 ? "    ".repeat(level) : "";
 				markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
-				htmlToc.append("<div style='margin-left: " + (25 + level * 25) + "px'><a href='#" + nodeId + "'>"
+				String clazz = level == 0 ? "class='topLevelToc'" : "";
+				htmlToc.append("<div " + clazz + " style='margin-left: " + (25 + level * 25) + "px'><a href='#" + nodeId + "'>"
 						+ StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
 			}
 		}
