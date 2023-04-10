@@ -37,7 +37,9 @@ export abstract class Comp implements CompIntf {
     public domPreUpdateEvent: React.EffectCallback = null;
     public domUpdateEvent: React.EffectCallback = null;
     public domRemoveEvent: React.EffectCallback = null;
-    public domAddEvent: React.EffectCallback = null;
+    public domAddEvent: () => void = null;
+
+    public preRenderRejected: boolean = false;
 
     // we have the 'target' here to make our purifier keep those rendered
     // see also: #onclick-security-note
@@ -77,7 +79,25 @@ export abstract class Comp implements CompIntf {
         return !!this.stateMgr;
     }
 
+    /* Not currently used, but let's keep this */
+    public getRefAsync = (warn: boolean = true): Promise<HTMLElement> => {
+        return new Promise<HTMLElement>((resolve, reject) => {
+            const elm = this.getRef();
+
+            // if we have element already, resolve with it, we're done
+            if (elm) {
+                resolve(elm);
+            }
+            else return S.domUtil.getElm(this.getId());
+        });
+    }
+
     public getRef = (warn: boolean = true): HTMLElement => {
+        if (this.preRenderRejected) {
+            console.error("getRef was called on id " + this.getId() + " which will return null because of preRenderRejected");
+            return null;
+        }
+
         let ret = null;
         if (this.attribs.ref) {
             // Not sure if isConnected is needed here.
@@ -383,7 +403,10 @@ export abstract class Comp implements CompIntf {
             // of our framework (i.e. this Comp class)
             this.attribs.ref = useRef();
 
-            if (!this.preRender()) return null;
+            if (!this.preRender()) {
+                this.preRenderRejected = true;
+                return null;
+            }
             const ret = this.compRender();
 
             if (this.debug) {
@@ -434,13 +457,13 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should be
-    just to set the children */
+    just to set the children. To indicate to NOT render the component at all return false from this method */
     preRender(): boolean {
         return true;
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
-    // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
+    // managemnt aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
     abstract compRender(): ReactNode;
 
     scrollDomAddEvent = () => {

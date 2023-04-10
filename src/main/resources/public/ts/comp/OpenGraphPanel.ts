@@ -125,13 +125,13 @@ export class OpenGraphPanel extends Div {
         const ast = getAs();
         if (state.loading || !state.og) {
             this.setChildren(null);
-            return;
+            return true;
         }
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */
         if (!state.og.description && !state.og.image) {
             this.setChildren(null);
-            return null;
+            return false;
         }
 
         if (!state.og.url) {

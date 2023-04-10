@@ -23,7 +23,10 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     preRender(): boolean {
         const ast = getAs();
         const results = this.data?.props?.results;
-        if (!results) return;
+        if (!results) {
+            this.setChildren([new Div("Nothing found.")]);
+            return true;
+        };
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the

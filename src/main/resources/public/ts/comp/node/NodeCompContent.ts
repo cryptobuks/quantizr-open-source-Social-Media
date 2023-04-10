@@ -36,7 +36,7 @@ export class NodeCompContent extends Div {
 
         if (!this.node) {
             this.setChildren(null);
-            return;
+            return false;
         }
 
         const children: CompIntf[] = [];

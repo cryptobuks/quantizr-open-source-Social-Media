@@ -25,7 +25,7 @@ export class NodeCompParentNodes extends Div {
 
         if (!node) {
             this.setChildren(null);
-            return;
+            return false;
         }
 
         this.attribs.className = "parentNodeContentStyle";

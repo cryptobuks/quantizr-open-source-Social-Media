@@ -60,7 +60,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
                 new Heading(4, "Generating statistics...", { className: "marginTop" }),
                 new Spinner()
             ]);
-            return;
+            return true;
         }
 
         const tagPanel = new Divc({ className: "trendingWordStatsArea" });

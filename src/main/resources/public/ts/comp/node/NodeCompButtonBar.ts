@@ -25,7 +25,7 @@ export class NodeCompButtonBar extends Div {
         const ast = getAs();
         if (!this.node) {
             this.setChildren(null);
-            return;
+            return false;
         }
 
         let sharedIcon: Icon;

@@ -33,7 +33,7 @@ export class App extends Main {
 
         if (!ast.appInitComplete) {
             this.setChildren([new Progress()]);
-            return;
+            return true;
         }
 
         /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
@@ -43,7 +43,7 @@ export class App extends Main {
             const dialog = ast.dialogStack[ast.dialogStack.length - 1];
             if (dialog && dialog.mode !== DialogMode.POPUP) {
                 this.setChildren([dialog]);
-                return;
+                return true;
             }
         }
 
@@ -61,7 +61,7 @@ export class App extends Main {
         else {
             if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
                 this.setChildren([new Heading(4, S.quanta.configRes.brandingAppName + " requires a browser with crypto features.")]);
-                return;
+                return true;
             }
 
             this.setChildren([

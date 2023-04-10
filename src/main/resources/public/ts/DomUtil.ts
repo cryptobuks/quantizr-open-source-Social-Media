@@ -68,12 +68,6 @@ export class DomUtil {
         return de.value;
     }
 
-    setInnerHTMLById = (id: string, val: string) => {
-        this.getElm(id, (elm: HTMLElement) => {
-            this.setInnerHTML(elm, val);
-        });
-    }
-
     setInnerHTML = (elm: HTMLElement, val: string) => {
         if (elm) {
             elm.innerHTML = val;
@@ -102,16 +96,13 @@ export class DomUtil {
 
     /* We return a promise that resolves to the element, but also support a callback function
     that can be used optionally whenver that's more convenient */
-    getElm = (id: string, exResolve: (elm: HTMLElement) => void = null): Promise<HTMLElement> => {
+    getElm = (id: string): Promise<HTMLElement> => {
         // Promise is used here instead of async/await because of the resolve being done inside the timer.
         return new Promise<HTMLElement>((resolve, reject) => {
 
             // First we immediately try to get the element.
             const e: HTMLElement = document.getElementById(id);
             if (e) {
-                if (exResolve) {
-                    exResolve(e);
-                }
                 resolve(e);
             }
             // If element not found we just go into a wait for it (polling)
@@ -120,8 +111,8 @@ export class DomUtil {
                 let accumWaitTime = 0;
                 const timeSlice = 100;
 
-                // don't hang the promise more than 5 seconds, before reporting error and continuing.
-                const maxWaitTime = 5000;
+                // don't hang the promise more than 3 seconds, before reporting error and continuing.
+                const maxWaitTime = 3000;
 
                 const interval = setInterval(() => {
                     accumWaitTime += timeSlice;
@@ -134,9 +125,6 @@ export class DomUtil {
                     const e: HTMLElement = document.getElementById(id);
                     if (e) {
                         clearInterval(interval);
-                        if (exResolve) {
-                            exResolve(e);
-                        }
                         resolve(e);
                     }
                 }, timeSlice);

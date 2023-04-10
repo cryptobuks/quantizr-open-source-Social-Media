@@ -84,7 +84,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         const topChildren: Comp[] = [
-
             new Diva([
                 ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                     val: this.data.props.searchTextState,

@@ -26,4 +26,5 @@ export interface CompIntf {
     create(): ReactNode;
     tag(type: any, props?: object, childrenArg?: any[]): ReactNode;
     ordinalSortChildren(): void;
+    preRender(): boolean;
 }

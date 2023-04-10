@@ -39,7 +39,7 @@ export class NodeCompMainNode extends Div {
 
         if (!node) {
             this.setChildren(null);
-            return;
+            return false;
         }
 
         if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && node.id === ast.editNode.id) {
