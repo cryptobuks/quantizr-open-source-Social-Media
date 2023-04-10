@@ -35,8 +35,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     preRender(): boolean {
         const ast = getAs();
         const results = this.data?.props?.results;
-
-        // todo-0: shouldn't we render 'nothing found' message here?
         if (!results) {
             this.setChildren([new Div("Nothing found.")]);
             return true;
