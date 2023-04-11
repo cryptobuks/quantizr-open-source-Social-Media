@@ -9,7 +9,7 @@ export class Tag extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag(this.tagName);
     }
 }

@@ -13,7 +13,7 @@ export class Selection extends Comp {
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const children = [];
 
         const select = new Select({

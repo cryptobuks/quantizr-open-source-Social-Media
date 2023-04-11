@@ -24,7 +24,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         data.inst = this;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;

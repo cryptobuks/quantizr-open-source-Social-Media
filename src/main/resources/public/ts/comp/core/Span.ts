@@ -8,7 +8,7 @@ export class Span extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         if (this.rawHtml) {
             this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
             return this.tag("span");

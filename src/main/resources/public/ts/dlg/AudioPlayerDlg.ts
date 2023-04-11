@@ -60,7 +60,7 @@ export class AudioPlayerDlg extends DialogBase {
         }, 750);
     }
 
-    preUnmount(): any {
+    override preUnmount(): any {
         S.quanta.audioPlaying = false;
         if (this.intervalTimer) {
             clearInterval(this.intervalTimer);

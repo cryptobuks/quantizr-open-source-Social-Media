@@ -91,7 +91,7 @@ export class SharingDlg extends DialogBase {
         this.reload();
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         await this.reload();
     }
 
@@ -120,7 +120,7 @@ export class SharingDlg extends DialogBase {
     }
 
     super_close = this.close;
-    close = () => {
+    override close = () => {
         this.super_close();
         if (this.dirty) {
             // console.log("Sharing dirty=true. Full refresh pending.");

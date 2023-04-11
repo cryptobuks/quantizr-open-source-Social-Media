@@ -10,7 +10,7 @@ export class FlexRowLayout extends Comp {
         this.attribs.className = "flexRowLayout " + moreClasses;
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("div", this.attribs, this.comps);
     }
 }

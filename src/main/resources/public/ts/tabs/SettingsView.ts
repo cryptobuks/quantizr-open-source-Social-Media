@@ -26,7 +26,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
         return new Heading(5, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const horzClass = "horizontalLayoutComp accountSettingsSection";
 

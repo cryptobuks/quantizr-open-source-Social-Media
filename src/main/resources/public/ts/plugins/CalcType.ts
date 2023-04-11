@@ -19,20 +19,20 @@ export class CalcType extends TypeBase {
         super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", true);
     }
 
-    getEditorHelp(): string {
+    override getEditorHelp(): string {
         const ast = getAs();
         return ast.config.help?.type?.calculator?.editor;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 
-    getAllowContentEdit(): boolean {
+    override getAllowContentEdit(): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         if (!S.props.isMine(node)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
@@ -93,7 +93,7 @@ export class CalcType extends TypeBase {
         `;
     }
 
-    ensureDefaultProperties(node: J.NodeInfo) {
+    override ensureDefaultProperties(node: J.NodeInfo) {
         // this has the unintended behavior of when the user tries to clear out the text it comes back in realtime.
         // if (!node.content) {
         //     node.content = "qc.a=23;\nqc.b=19;\n\nq.log('Answer=' + (qc.a + qc.b));";

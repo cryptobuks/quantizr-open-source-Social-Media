@@ -7,7 +7,7 @@ export class Anchor extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("a", null, this.getChildrenWithFirst(this.content || this.url));
     }
 }

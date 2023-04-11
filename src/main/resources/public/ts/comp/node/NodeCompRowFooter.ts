@@ -11,7 +11,7 @@ export class NodeCompRowFooter extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const children = [];
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link
          to the actual node because all that's internal. */

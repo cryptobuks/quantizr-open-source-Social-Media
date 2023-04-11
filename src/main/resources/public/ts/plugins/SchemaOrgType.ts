@@ -6,7 +6,7 @@ export class SchemaOrgType extends TypeBase {
         super(typeName, displayName, "fa-cube", true);
     }
 
-    getEditorOptions(): EditorOptions {
+    override getEditorOptions(): EditorOptions {
         return {
             tags: true,
             nodeName: true,

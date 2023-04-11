@@ -34,15 +34,15 @@ export class RightNavPanel extends Div {
         RightNavPanel.inst = this;
     }
 
-    getScrollPos = (): number => {
+    override getScrollPos = (): number => {
         return RightNavPanel.scrollPos;
     }
 
-    setScrollPos = (pos: number): void => {
+    override setScrollPos = (pos: number): void => {
         RightNavPanel.scrollPos = pos;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         if (!ast.mobileMode) {

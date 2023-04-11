@@ -7,7 +7,7 @@ export class Label extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("label", null, this.getChildrenWithFirst(this.content));
     }
 }

@@ -23,7 +23,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         this.pagingContainerClass = "float-end";
     }
 
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
+    override renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
 
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either

@@ -74,11 +74,11 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.mergeState<LS>({ wordWrap });
     }
 
-    focus(): void {
+    override focus(): void {
         this.onMount(() => this.input?.focus());
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const state = this.getState<LS>();
         const children = [new ErrorDiv(this.valState.e)];
 

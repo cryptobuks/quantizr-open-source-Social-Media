@@ -116,7 +116,7 @@ export class NodeCompMarkdown extends Html {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {

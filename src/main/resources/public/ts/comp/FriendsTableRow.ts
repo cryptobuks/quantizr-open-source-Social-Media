@@ -21,7 +21,7 @@ export class FriendsTableRow extends ListBoxRow {
         this.attribs.className = "personsListItem";
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         let src: string = null;
 

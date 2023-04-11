@@ -13,7 +13,7 @@ export class PropTable extends Comp {
         });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         this.setChildren([]);
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {

@@ -11,7 +11,7 @@ export class VideoPlayer extends Comp {
         return <HTMLVideoElement>this.getRef();
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("video");
     }
 }

@@ -193,7 +193,7 @@ export class EditNodeDlg extends DialogBase {
         ], null, "col-3", new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
     }
 
-    getTitleIconComp(): CompIntf {
+    override getTitleIconComp(): CompIntf {
         const ast = getAs();
         let span: Span = null;
 
@@ -246,7 +246,7 @@ export class EditNodeDlg extends DialogBase {
         return span;
     }
 
-    getExtraTitleBarComps(): CompIntf[] {
+    override getExtraTitleBarComps(): CompIntf[] {
         let comps: CompIntf[] = null;
 
         if (this.getState<LS>().signCheckboxVal) {
@@ -770,13 +770,13 @@ export class EditNodeDlg extends DialogBase {
     }
 
     super_closeByUser = this.closeByUser;
-    closeByUser = () => {
+    override closeByUser = () => {
         this.super_closeByUser();
         this.resetAutoSaver();
     }
 
     super_close = this.close;
-    close = () => {
+    override close = () => {
         this.super_close();
         S.speech.stopListening();
 

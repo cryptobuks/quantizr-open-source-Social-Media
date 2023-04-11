@@ -13,11 +13,11 @@ export class AccountType extends TypeBase {
         super(J.NodeType.ACCOUNT, "Account Root", "fa-database", false);
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.editNode:
                 return false;
@@ -26,11 +26,11 @@ export class AccountType extends TypeBase {
         }
     }
 
-    allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(propName: string): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({
             className: "systemNodeContent"
         }, [

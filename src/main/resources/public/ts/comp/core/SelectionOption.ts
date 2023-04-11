@@ -8,7 +8,7 @@ export class SelectionOption extends Comp {
         this.attribs.value = this.key;
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("option", { className: "selectOption" }, [this.val]);
     }
 }

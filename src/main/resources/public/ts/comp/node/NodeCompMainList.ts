@@ -13,7 +13,7 @@ export class NodeCompMainList extends Div {
         super(null, { key: "nodeCompMaiList" });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         const children: Comp[] = [];

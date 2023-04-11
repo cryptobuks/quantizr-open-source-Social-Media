@@ -63,7 +63,7 @@ export class EditBlockedWordsDlg extends DialogBase {
         this.close();
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         await this.reload();
     }
 }

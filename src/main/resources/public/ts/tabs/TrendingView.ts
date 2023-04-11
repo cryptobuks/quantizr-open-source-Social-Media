@@ -51,7 +51,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const res = this.data ? this.data.props.res : null;
 

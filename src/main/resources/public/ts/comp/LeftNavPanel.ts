@@ -39,15 +39,15 @@ export class LeftNavPanel extends Div {
         LeftNavPanel.inst = this;
     }
 
-    getScrollPos = (): number => {
+    override getScrollPos = (): number => {
         return LeftNavPanel.scrollPos;
     }
 
-    setScrollPos = (pos: number): void => {
+    override setScrollPos = (pos: number): void => {
         LeftNavPanel.scrollPos = pos;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         const s = ast.newMessageCount > 1 ? "s" : "";

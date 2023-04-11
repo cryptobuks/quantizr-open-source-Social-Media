@@ -42,7 +42,7 @@ export class LoginDlg extends DialogBase {
         ];
     }
 
-    preLoad = async () => {
+   override preLoad = async () => {
         const user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 

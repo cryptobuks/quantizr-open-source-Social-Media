@@ -19,7 +19,7 @@ export class HistoryPanel extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         if (ast.nodeHistory.length === 0) {

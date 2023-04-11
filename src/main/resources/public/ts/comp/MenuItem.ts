@@ -20,7 +20,7 @@ export class MenuItem extends Div {
         this.mergeState({ visible: true, enabled });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const state: LS = this.getState<LS>();
         const enablement = state.enabled ? {} : { disabled: "disabled" };
         const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";

@@ -13,12 +13,12 @@ export class CalendarType extends TypeBase {
         super(J.NodeType.CALENDAR, "Calendar", "fa-calendar", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Diva([
             baseComp,

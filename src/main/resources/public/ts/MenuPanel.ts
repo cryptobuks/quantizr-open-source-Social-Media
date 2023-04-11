@@ -162,7 +162,7 @@ export class MenuPanel extends Div {
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const state = this.getState<MenuPanelState>();
 

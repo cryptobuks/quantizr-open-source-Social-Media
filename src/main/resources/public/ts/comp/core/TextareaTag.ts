@@ -54,15 +54,15 @@ export class TextareaTag extends Comp {
         return rows;
     }
 
-    getScrollPos = (): number => {
+    override getScrollPos = (): number => {
         return this.scrollPos ? this.scrollPos.getVal() : null;
     }
 
-    setScrollPos = (pos: number): void => {
+    override setScrollPos = (pos: number): void => {
         this.scrollPos?.setVal(pos);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         this.attribs.value = this.getState<LS>().value;
         if (this.dynamicRows) {
             this.attribs.rows = "" + this.calcRows(this.attribs.value);

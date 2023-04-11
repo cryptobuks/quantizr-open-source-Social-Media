@@ -15,23 +15,23 @@ export class InboxNodeType extends TypeBase {
         super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return false;
     }
 
-    getAllowPropertyAdd(): boolean {
+    override getAllowPropertyAdd(): boolean {
         return false;
     }
 
-    getAllowContentEdit(): boolean {
+    override getAllowContentEdit(): boolean {
         return false;
     }
 
-    allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(propName: string): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([
@@ -41,11 +41,11 @@ export class InboxNodeType extends TypeBase {
         ], "displayTable systemNodeContent");
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    subOrdinal(): number {
+    override subOrdinal(): number {
         return 3;
     }
 }

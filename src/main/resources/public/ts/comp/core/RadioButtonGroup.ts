@@ -16,7 +16,7 @@ export class RadioButtonGroup extends Comp {
         });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("div");
     }
 }

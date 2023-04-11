@@ -13,7 +13,7 @@ export class ErrorDiv extends Comp {
         this.attribs.className = "validationError";
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("div", null, this.getChildrenWithFirst(this.getState<LS>().error));
     }
 }

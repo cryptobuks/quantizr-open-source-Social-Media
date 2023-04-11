@@ -14,7 +14,7 @@ export class RadioButton extends Comp {
         valueIntf = this.valueIntf || new Value<string>(this, "val");
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         let cbInput = null;
         return this.tag("span", {
             className: "form-check " + (this.layoutClass || "")

@@ -41,7 +41,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const children = [];
 
         if (this.data.props.loading) {

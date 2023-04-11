@@ -14,12 +14,12 @@ export class FullScreenGraphViewer extends Main {
     tooltip: any;
     isDragging: boolean;
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([new Divc({ className: "d3Graph" })]);
         return true;
     }
 
-    domPreUpdateEvent = () => {
+    override domPreUpdateEvent = () => {
         const ast = getAs();
         if (!ast.graphData) return;
         const customForceDirectedTree = this.forceDirectedTree();
@@ -295,12 +295,12 @@ export class FullScreenGraphViewer extends Main {
         this.tooltip.html(() => "<div>" + content + "</div>");
     }
 
-    domRemoveEvent = () => {
+    override domRemoveEvent = () => {
         console.log("Graph stopSim");
         this.stopSim();
     }
 
-    domUpdateEvent = () => {
+    override domUpdateEvent = () => {
         if (S.view.docElm) {
             // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
             // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'

@@ -31,21 +31,21 @@ class Animal {
 }
 
 class Dog extends Animal {
-    type: string = "DogType";
+    override type: string = "DogType";
 
-    constructor(public name: string) {
+    constructor(public override name: string) {
         super(name);
         console.log("Constructor: Dog");
         // this.askGoForWalk = this.askGoForWalk.bind(this);
     }
 
     // NON-arrow is required in order to call on 'super.printName'
-    printName() {
+    override printName() {
         super.printName();
         console.log("printName(Dog): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
     }
 
-    askGoForWalk = () => {
+    override askGoForWalk = () => {
          // NOTE: This fails. Super will not have askGoForWalk since it was created with fat arrow.
         // super.askGoForWalk();
         console.log("goForWalk(Dog): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
@@ -53,20 +53,20 @@ class Dog extends Animal {
 }
 
 class Labrador extends Dog {
-    type: string = "LabradorType";
+    override type: string = "LabradorType";
 
-    constructor(public name: string) {
+    constructor(public override name: string) {
         super(name);
         console.log("Constructor: Labrador");
         // this.askGoForWalk = this.askGoForWalk.bind(this);
     }
 
-    printName = () => {
+    override printName = () => {
         super.printName();
         console.log("printName(Labrador): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
     }
 
-    askGoForWalk = () => {
+    override askGoForWalk = () => {
         // NOTE: This fails. Super will not have askGoForWalk since it was created with fat arrow.
         // super.askGoForWalk();
         console.log("goForWalk(Labrador): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);

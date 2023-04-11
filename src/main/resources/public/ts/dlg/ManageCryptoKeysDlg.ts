@@ -84,7 +84,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
         }
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         const state: LS = this.getState<LS>();
         let keyJson: string = null;
         switch (state.keyType) {

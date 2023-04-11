@@ -30,11 +30,11 @@ export class AppTab<PT = any, TT = any> extends Div {
         return className;
     }
 
-    getScrollPos = (): number => {
+    override getScrollPos = (): number => {
         return this.data.scrollPos;
     }
 
-    setScrollPos = (pos: number): void => {
+    override setScrollPos = (pos: number): void => {
         this.data.scrollPos = pos;
     }
 

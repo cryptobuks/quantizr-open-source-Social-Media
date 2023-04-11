@@ -13,7 +13,7 @@ export class ButtonBar extends Comp {
         this.setChildren(buttons);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const props = {
             className: "btn-group btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
             role: "group"

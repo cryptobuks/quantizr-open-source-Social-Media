@@ -18,7 +18,7 @@ export class Checkbox extends Comp {
         this.layoutClass = this.layoutClass || "form-check-inline";
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         let cbInput = null;
         return this.tag("span", {
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right

@@ -19,7 +19,7 @@ export class FullScreenCalendar extends Main {
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const state = getAs();
         const nodeId = state.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
@@ -99,7 +99,7 @@ export class FullScreenCalendar extends Main {
         S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, false);
     }
 
-    domUpdateEvent = (): void => {
+    override domUpdateEvent = (): void => {
         // #DEBUG-SCROLLING
         S.view.docElm.scrollTop = 0;
     }

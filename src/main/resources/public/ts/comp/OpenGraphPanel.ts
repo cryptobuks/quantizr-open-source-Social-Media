@@ -35,7 +35,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    domAddEvent = () => {
+    override domAddEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         const og = S.quanta.openGraphData.get(this.url);
@@ -120,7 +120,7 @@ export class OpenGraphPanel extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {

@@ -13,7 +13,7 @@ export class CommentType extends TypeBase {
     //     return "commentMarkdownClass";
     // }
 
-    getEditorOptions(): EditorOptions {
+    override getEditorOptions(): EditorOptions {
         return {
             tags: true,
             nodeName: true,

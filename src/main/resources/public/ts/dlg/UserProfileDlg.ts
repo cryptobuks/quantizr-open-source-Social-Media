@@ -42,7 +42,7 @@ export class UserProfileDlg extends DialogBase {
         this.mergeState<LS>({ userProfile: null });
     }
 
-    getTitleText(): string {
+    override getTitleText(): string {
         return this.getUserName();
     }
 
@@ -353,7 +353,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     super_close = this.close;
-    close = () => {
+    override close = () => {
         this.super_close();
         if (!this.readOnly) {
             S.user.queryUserProfile(this.userNodeId);
@@ -478,7 +478,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
         await this.reload(this.userNodeId);
     }

@@ -15,25 +15,25 @@ export class RssType extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    getEditLabelForProp(propName: string): string {
+    override getEditLabelForProp(propName: string): string {
         if (propName === J.NodeProp.RSS_FEED_SRC) {
             return "RSS Feed URLs (one per line)";
         }
         return propName;
     }
 
-    getEditorRowsForProp(propName: string): number {
+    override getEditorRowsForProp(propName: string): number {
         if (propName === J.NodeProp.RSS_FEED_SRC) {
             return 10;
         }
         return 1;
     }
 
-    ensureDefaultProperties(node: J.NodeInfo) {
+    override ensureDefaultProperties(node: J.NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
-    getEditorOptions(): EditorOptions {
+    override getEditorOptions(): EditorOptions {
         return {
             tags: true,
             nodeName: true,
@@ -45,12 +45,12 @@ export class RssType extends TypeBase {
         };
     }
 
-    getAutoExpandProps(): boolean {
+    override getAutoExpandProps(): boolean {
         return true;
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Diva([
             new Button("View Feed", () => {

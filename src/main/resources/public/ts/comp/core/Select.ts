@@ -23,7 +23,7 @@ export class Select extends Comp {
         }));
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         this.attribs.value = this.getState<LS>().value;
         return this.tag("select");
     }

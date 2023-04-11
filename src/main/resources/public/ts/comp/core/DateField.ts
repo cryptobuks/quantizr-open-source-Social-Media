@@ -11,7 +11,7 @@ export class DateField extends Div implements I.ValueIntf {
         super(null);
     }
 
-    focus(): void {
+    override focus(): void {
         this.onMount(() => this.input?.focus());
     }
 
@@ -23,7 +23,7 @@ export class DateField extends Div implements I.ValueIntf {
         return this.valState.getValue();
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([
             new Divc({
                 className: "dateField"

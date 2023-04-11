@@ -16,16 +16,16 @@ export class FriendType extends TypeBase {
         super(J.NodeType.FRIEND, "User", "fa-user", false);
     }
 
-    getEditorHelp(): string {
+    override getEditorHelp(): string {
         const ast = getAs();
         return ast.config.help?.type?.friend?.editor;
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
             case NodeActionType.editNode:
@@ -35,28 +35,28 @@ export class FriendType extends TypeBase {
         }
     }
 
-    getAllowPropertyAdd(): boolean {
+    override getAllowPropertyAdd(): boolean {
         return false;
     }
 
-    getAllowContentEdit(): boolean {
+    override getAllowContentEdit(): boolean {
         return false;
     }
 
-    allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(propName: string): boolean {
         return false;
     }
 
-    ensureDefaultProperties(node: J.NodeInfo) {
+    override ensureDefaultProperties(node: J.NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    renderEditorSubPanel = (node: J.NodeInfo): Comp => {
+    override renderEditorSubPanel = (node: J.NodeInfo): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         return new Heading(3, user);
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
@@ -79,7 +79,7 @@ export class FriendType extends TypeBase {
             });
     }
 
-    getEditorOptions(): EditorOptions {
+    override getEditorOptions(): EditorOptions {
         return {
             tags: true
         };

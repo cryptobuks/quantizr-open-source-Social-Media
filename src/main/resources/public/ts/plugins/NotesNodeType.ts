@@ -10,11 +10,11 @@ export class NotesNodeType extends TypeBase {
         super(J.NodeType.NOTES, "Notes", "fa-sticky-note", false);
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, "Notes", { className: "noMargin" })
         ]);

@@ -12,7 +12,7 @@ export class PropDisplayLayout extends Div {
         });
     }
 
-    preRender = (): boolean => {
+    override preRender = (): boolean => {
         const children: CompIntf[] = [];
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {

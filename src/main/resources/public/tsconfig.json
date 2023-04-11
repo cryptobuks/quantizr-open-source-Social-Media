@@ -15,6 +15,7 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
+        "noImplicitOverride": true,
         "noEmitOnError": true,
         "allowJs": true,
         "noUnusedLocals": true

@@ -28,7 +28,7 @@ export class Button extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const text: string = this.getState<LS>().text;
 
         if (this.getState<LS>().enabled) {

@@ -14,7 +14,7 @@ export class Svg extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("svg", null, this.getChildrenWithFirst(this.getState<LS>().content));
     }
 }

@@ -55,7 +55,7 @@ export class MediaRecorderDlg extends DialogBase {
         });
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         try {
             await this.scanDevices();
             await this.resetStream();
@@ -272,7 +272,7 @@ export class MediaRecorderDlg extends DialogBase {
         document.getElementById(this.status.getId()).innerHTML = (this.videoMode ? "Recording Video: " : "Recording Audio: ") + (++this.recordingTime) + "s";
     }
 
-    preUnmount(): any {
+    override preUnmount(): any {
         this.cancelTimer();
     }
 

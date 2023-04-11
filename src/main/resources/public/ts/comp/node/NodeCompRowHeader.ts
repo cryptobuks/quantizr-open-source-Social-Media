@@ -27,7 +27,7 @@ export class NodeCompRowHeader extends Div {
         this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? "rowHeaderEdit" : "row-header";
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         let displayName = null;

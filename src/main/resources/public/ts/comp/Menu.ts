@@ -16,7 +16,7 @@ export class Menu extends Comp {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const ast = getAs();
         const expanded = this.menuPanelState.expanded.has(this.name);
 

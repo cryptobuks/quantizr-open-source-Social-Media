@@ -146,7 +146,7 @@ export abstract class DialogBase extends Comp {
         return null;
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const ast = getAs();
         const isTopmost = this.isTopmost();
         let ret: ReactNode = null;

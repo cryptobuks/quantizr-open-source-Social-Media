@@ -8,12 +8,12 @@ export class PieChart extends Div {
         super(null, { className: "marginBottom" });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([new Svg(null, { className: this.className })]);
         return true;
     }
 
-    domPreUpdateEvent = () => {
+    override domPreUpdateEvent = () => {
         const svg = d3.select("." + this.className);
 
         // width/height must match d3PieChart scss class

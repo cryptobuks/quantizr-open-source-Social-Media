@@ -7,7 +7,7 @@ export class Para extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("p", null, [this.content]);
     }
 }

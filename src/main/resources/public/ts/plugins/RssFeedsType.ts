@@ -16,11 +16,11 @@ export class RssFeedsType extends TypeBase {
         super(J.NodeType.RSS_FEEDS, "RSS Feeds", "fa-rss", false);
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
                 return true;
@@ -29,7 +29,7 @@ export class RssFeedsType extends TypeBase {
         }
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new ButtonBar([
                 new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null, null), {

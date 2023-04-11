@@ -121,7 +121,7 @@ export class NodeCompBinary extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);

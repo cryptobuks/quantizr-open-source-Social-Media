@@ -12,7 +12,7 @@ export class TimeField extends Div implements I.ValueIntf {
     }
 
     // Overriding base class so we can focus the correct part of this composite component.
-    focus(): void {
+    override focus(): void {
         this.onMount(() => this.input?.focus());
     }
 
@@ -24,7 +24,7 @@ export class TimeField extends Div implements I.ValueIntf {
         return this.valState.getValue();
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([
             new Divc({
                 className: this.extraClass + " timeField"

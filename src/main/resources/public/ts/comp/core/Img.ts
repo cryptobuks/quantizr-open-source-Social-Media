@@ -10,7 +10,7 @@ export class Img extends Comp {
 
     // The brokenImages code is needed to make sure once we know an image is broken we remove it and NEVER
     // try rendering it again, or else we get flicker when it renders over and over.
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         if (S.quanta.brokenImages.has(this.attribs.src)) {
             return null;
         }

@@ -13,7 +13,7 @@ export class FullScreenImgViewer extends Main {
         this.attribs.className = "fullScreenViewer customScrollBar"
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
@@ -40,7 +40,7 @@ export class FullScreenImgViewer extends Main {
         return true;
     }
 
-    domUpdateEvent = () => {
+    override domUpdateEvent = () => {
         if (C.DEBUG_SCROLLING) {
             console.log("domUpdateEvent scroll top");
         }

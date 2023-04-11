@@ -17,7 +17,7 @@ export class TextContent extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const state = this.getState<LS>();
 
         // todo-2: Not sure I want to keep detecting HTML this way, because we can just use

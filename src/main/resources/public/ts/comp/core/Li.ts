@@ -8,7 +8,7 @@ export class Li extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("li", null, this.getChildrenWithFirst(this.content));
     }
 }

@@ -57,7 +57,7 @@ export class Html extends Comp {
         // return <div>{parseEmojisAndHtml(this.getState<LS>().content)}</div>;
     }
 
-    domPreUpdateEvent = (): void => {
+    override domPreUpdateEvent = (): void => {
         const elm = this.getRef();
         if (!elm) return;
 

@@ -15,7 +15,7 @@ export class NodeCompParentNodes extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element

@@ -14,7 +14,7 @@ export class SchemaOrgPropsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         if (this.props) {
             const comps = this.props.map(prop => {
                 if (!prop) return null;
@@ -31,11 +31,11 @@ export class SchemaOrgPropsTable extends ListBox {
         return true;
     }
 
-    getScrollPos = (): number => {
+    override getScrollPos = (): number => {
         return SchemaOrgPropsTable.scrollPos;
     }
 
-    setScrollPos = (pos: number): void => {
+    override setScrollPos = (pos: number): void => {
         SchemaOrgPropsTable.scrollPos = pos;
     }
 }

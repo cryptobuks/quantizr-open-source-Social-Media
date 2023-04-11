@@ -15,12 +15,12 @@ export class RoomType extends TypeBase {
         super(J.NodeType.ROOM, "Chat Room", "fa-comments", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Diva([
             baseComp,

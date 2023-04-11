@@ -33,7 +33,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         data.inst = this;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         /*

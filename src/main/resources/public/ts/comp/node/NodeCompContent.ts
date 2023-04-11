@@ -31,7 +31,7 @@ export class NodeCompContent extends Div {
         });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         if (!this.node) {
@@ -165,7 +165,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    domPreUpdateEvent = () => {
+    override domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }

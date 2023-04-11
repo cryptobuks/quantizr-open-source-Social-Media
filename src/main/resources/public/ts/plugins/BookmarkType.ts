@@ -13,11 +13,11 @@ export class BookmarkType extends TypeBase {
         super(J.NodeType.BOOKMARK, "Bookmark", "fa-bookmark", false);
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Diva([
             new NodeCompMarkdown(node, null),

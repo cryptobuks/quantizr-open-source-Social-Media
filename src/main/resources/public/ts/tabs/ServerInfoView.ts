@@ -14,7 +14,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
         data.inst = this;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         this.setChildren([

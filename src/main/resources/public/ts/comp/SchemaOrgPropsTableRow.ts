@@ -14,7 +14,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
         this.attribs.className = "propListItem";
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const attr: any = {};
         if (this.prop.comment) {
             attr.title = this.prop.comment;

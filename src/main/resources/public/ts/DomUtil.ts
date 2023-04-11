@@ -74,11 +74,11 @@ export class DomUtil {
         }
     }
 
-    domElmObjCss = (elm: HTMLElement, prop: string, val: string) => {
-        if (elm) {
-            elm.style[prop] = val;
-        }
-    }
+    // domElmObjCss = (elm: HTMLElement, prop: string, val: string) => {
+    //     if (elm) {
+    //         elm.style[prop] = val;
+    //     }
+    // }
 
     // This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
     domElmObjRemove = (elm: Element) => {

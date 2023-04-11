@@ -15,7 +15,7 @@ export class NavPanelDlg extends DialogBase {
         return [new RightNavPanel()];
     }
 
-    domRemoveEvent = () => {
+    override domRemoveEvent = () => {
         NavPanelDlg.inst = null;
     }
 }

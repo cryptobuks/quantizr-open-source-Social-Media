@@ -7,7 +7,7 @@ export class FilesTable extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("table");
     }
 }

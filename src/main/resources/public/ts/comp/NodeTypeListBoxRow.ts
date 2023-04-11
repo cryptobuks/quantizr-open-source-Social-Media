@@ -10,7 +10,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
         super(null, onClickFunc);
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const iconClass = this.type.getIconClass();
 
         this.setChildren([

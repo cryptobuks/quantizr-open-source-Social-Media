@@ -11,20 +11,20 @@ export class ExportsType extends TypeBase {
         super(J.NodeType.EXPORTS, "Exports", "fa-briefcase", false);
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    getEditorHelp(): string {
+    override getEditorHelp(): string {
         const ast = getAs();
         return ast.config.help?.editor?.dialog;
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, "Exports", { className: "noMargin" })
         ]);

@@ -12,7 +12,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
         data.inst = this;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const children: Comp[] = [];
 
         children.push(new Diva([

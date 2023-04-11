@@ -7,7 +7,7 @@ export class Italic extends Comp {
         super(attribs);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("i");
     }
 }

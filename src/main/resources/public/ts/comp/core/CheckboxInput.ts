@@ -20,7 +20,7 @@ export class CheckboxInput extends Comp {
         }
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         this.attribs.checked = this.getState<LS>().checked;
         return this.tag("input");
     }

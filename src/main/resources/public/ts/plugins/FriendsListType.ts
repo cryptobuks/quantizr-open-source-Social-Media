@@ -15,15 +15,15 @@ export class FriendsListType extends TypeBase {
         super(J.NodeType.FRIEND_LIST, "Friends", "fa-users", false);
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, "Friends"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
@@ -37,11 +37,11 @@ export class FriendsListType extends TypeBase {
         ]);
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    subOrdinal(): number {
+    override subOrdinal(): number {
         return 2;
     }
 }

@@ -14,7 +14,7 @@ export class AppNavLink extends Comp {
         }
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("div", null, this.getChildrenWithFirst(this.content));
     }
 }

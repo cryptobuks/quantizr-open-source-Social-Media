@@ -8,7 +8,7 @@ export class Pre extends Comp {
         this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("pre");
     }
 }

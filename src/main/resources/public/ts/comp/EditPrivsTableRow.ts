@@ -39,7 +39,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         return div;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         let src: string = null;
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);

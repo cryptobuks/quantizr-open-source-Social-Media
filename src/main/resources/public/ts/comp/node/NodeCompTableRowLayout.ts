@@ -15,7 +15,7 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: "nodeGridTable" });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const nodesToMove = ast.nodesToMove;
         let curRow = new Divc({ className: "nodeGridRow" });

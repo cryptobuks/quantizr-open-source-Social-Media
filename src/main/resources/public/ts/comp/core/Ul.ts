@@ -8,7 +8,7 @@ export class Ul extends Comp {
         this.setChildren(children);
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("ul", null, this.getChildrenWithFirst(this.content));
     }
 }

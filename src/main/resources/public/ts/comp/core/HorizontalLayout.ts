@@ -11,7 +11,7 @@ export class HorizontalLayout extends Comp {
         this.attribs.className = classes;
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         if (this.comps) {
             for (const comp of this.comps) {
                 if (!comp) continue;

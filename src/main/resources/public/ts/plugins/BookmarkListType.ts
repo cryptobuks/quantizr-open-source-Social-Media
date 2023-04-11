@@ -12,26 +12,26 @@ export class BookmarkListType extends TypeBase {
         super(J.NodeType.BOOKMARK_LIST, "Bookmarks", "fa-bookmark", false);
     }
 
-    getAllowRowHeader(): boolean {
+    override getAllowRowHeader(): boolean {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
             new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft" })
         ]);
     }
 
-    isSpecialAccountNode(): boolean {
+    override isSpecialAccountNode(): boolean {
         return true;
     }
 
-    subOrdinal(): number {
+    override subOrdinal(): number {
         return 1;
     }
 }

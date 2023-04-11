@@ -51,7 +51,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
     }
 
     // Overriding base class so we can focus the correct part of this composite component.
-    focus(): void {
+    override focus(): void {
         this.onMount(() => this.input?.focus());
     }
 
@@ -79,7 +79,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         return this.cfg.val.getValue();
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const state = this.getState<LS>();
 
         const label = this.cfg.label ? new Label(this.cfg.label, {

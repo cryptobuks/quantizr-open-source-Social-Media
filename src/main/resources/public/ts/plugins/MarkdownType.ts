@@ -10,12 +10,12 @@ export class MarkdownType extends TypeBase {
         super(J.NodeType.NONE, "Markdown", "fa-align-left", true);
     }
 
-    getEditorHelp(): string {
+    override getEditorHelp(): string {
         const ast = getAs();
         return ast.config.help?.editor?.dialog;
     }
 
-    getEditorOptions(): EditorOptions {
+    override getEditorOptions(): EditorOptions {
         return {
             tags: true,
             nodeName: true,

@@ -27,7 +27,7 @@ export class TutorialApp extends Comp {
         this.mergeState<LS>({ content: "Quanta GUI Framework works!" });
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         const ast = getAs();
 
         return this.tag("div", null, [

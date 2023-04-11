@@ -75,7 +75,7 @@ export class DateTimeField extends Span {
         this.timeState.setValue(timeStr);
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([
             new DateField(this.dateState),
             this.showTime ? new TimeField(this.timeState, "marginLeft") : null,

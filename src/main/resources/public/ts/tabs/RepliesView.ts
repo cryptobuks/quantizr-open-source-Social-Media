@@ -18,7 +18,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         data.inst = this;
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return false;

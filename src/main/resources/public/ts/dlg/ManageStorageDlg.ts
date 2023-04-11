@@ -20,7 +20,7 @@ export class ManageStorageDlg extends DialogBase {
         super("Storage Space", "appModalContNarrowWidth");
     }
 
-    getTitleText(): string {
+    override getTitleText(): string {
         const state: any = this.getState<LS>();
         return state.title || "Storage Space";
     }
@@ -48,7 +48,7 @@ export class ManageStorageDlg extends DialogBase {
         ];
     }
 
-    async preLoad(): Promise<void> {
+    override async preLoad(): Promise<void> {
         const res = await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
 
         let used = "";

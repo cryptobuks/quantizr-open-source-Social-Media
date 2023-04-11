@@ -9,7 +9,7 @@ export class Icon extends Comp {
         this.attribs.className += getAs().mobileMode ? " mobileIcon" : "";
     }
 
-    compRender = (): ReactNode => {
+    override compRender = (): ReactNode => {
         return this.tag("i", null, [this.label]);
     }
 }

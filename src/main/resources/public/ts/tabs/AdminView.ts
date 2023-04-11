@@ -42,7 +42,7 @@ export class AdminView extends AppTab<any, AdminView> {
         return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Admin Console", { className: "tabTitle" })

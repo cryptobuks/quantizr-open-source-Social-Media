@@ -41,7 +41,7 @@ export class NodeCompRow extends Div {
         }
     }
 
-    preRender(): boolean {
+    override preRender(): boolean {
         const ast = getAs();
 
         if (this.allowHeaders) {
