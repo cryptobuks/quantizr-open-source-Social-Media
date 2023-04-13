@@ -116,7 +116,7 @@ public class EnglishDictionary extends ServiceBase {
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 
-			if (XString.isChinaRussia(token)) {
+			if (XString.containsNonEnglish(token)) {
 				unknownCount++;
 				continue;
 			}

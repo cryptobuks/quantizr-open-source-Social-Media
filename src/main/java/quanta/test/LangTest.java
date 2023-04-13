@@ -6,7 +6,7 @@ import quanta.config.ServiceBase;
 import quanta.util.XString;
 
 @Component("LangTest")
-@Slf4j 
+@Slf4j
 public class LangTest extends ServiceBase implements TestIntf {
 	@Override
 	public void test() throws Exception {
@@ -14,8 +14,10 @@ public class LangTest extends ServiceBase implements TestIntf {
 		log.debug("Contains Asian: " + XString.containsChinese("xxx已下架xxx"));
 		log.debug("Contains Russian: " + XString.containsRussian("xxкиилxxx"));
 
+		log.debug("Contains nonEnglish: "+XString.containsNonEnglish("なるほど，これはむずいわ．どうしようかなー"));
+
 		// both false
-		log.debug("Contains Asian: " + XString.containsChinese("xxкиилxxx"));
-		log.debug("Contains Russian: " + XString.containsRussian("xxx已下架xxx"));
+		// log.debug("Contains Asian: " + XString.containsChinese("xxкиилxxx"));
+		// log.debug("Contains Russian: " + XString.containsRussian("xxx已下架xxx"));
 	}
 }

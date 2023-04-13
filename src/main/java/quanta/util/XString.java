@@ -156,7 +156,7 @@ public class XString {
 		while (idx < len - 2 && (c = val.charAt(idx)) == '#') {
 			idx++;
 
-			// if we've counted the max number of headings levels, just point 'c' to the next char 
+			// if we've counted the max number of headings levels, just point 'c' to the next char
 			// bail out of looping
 			if (idx >= 6) {
 				c = val.charAt(idx);
@@ -319,8 +319,14 @@ public class XString {
 		return pathPart;
 	}
 
-	public static boolean isChinaRussia(String s) {
-		return containsChinese(s) || containsRussian(s);
+	public static boolean containsNonEnglish(String s) {
+		if (s == null || s.length() == 0)
+			return false;
+		for (int i = 0; i < s.length(); i++) {
+			if ((int) s.charAt(i) >= 128)
+				return true;
+		}
+		return false;
 	}
 
 	public static boolean containsChinese(String s) {
