@@ -988,6 +988,7 @@ public class NodeEditService extends ServiceBase {
 				SubNode newNode =
 						create.createNode(ms, parentForNewNodes, null, firstOrdinal + idx, CreateNodeLocation.ORDINAL, false);
 				newNode.setContent(part);
+				newNode.setAc(node.getAc());
 				newNode.touch();
 				update.save(ms, newNode);
 			}
