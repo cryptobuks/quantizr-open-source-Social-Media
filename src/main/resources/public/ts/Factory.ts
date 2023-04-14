@@ -28,6 +28,7 @@ import { SpeechEngine } from "./SpeechEngine";
 import { TabUtil } from "./TabUtil";
 import { User } from "./User";
 import { Util } from "./Util";
+import { Nostr } from "./Nostr";
 import { View } from "./View";
 
 console.log("Factory.ts imports complete");
@@ -60,6 +61,7 @@ export class Factory {
             S.view = new View();
             S.localDB = new LocalDB();
             S.speech = new SpeechEngine();
+            S.nostr = new Nostr();
 
             console.log("Factory.ts instances ready.");
         }

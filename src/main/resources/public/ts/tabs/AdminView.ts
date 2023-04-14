@@ -117,7 +117,10 @@ export class AdminView extends AppTab<any, AdminView> {
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
                     const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                     tts.speak(sayThis);
-                })
+                }),
+
+                this.sectionTitle("Nostr Prototype"),
+                this.settingsLink("Run Nostr Test", S.nostr.test) //
             ])
         ]);
         return true;

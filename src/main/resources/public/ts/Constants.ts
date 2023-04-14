@@ -89,6 +89,7 @@ export class Constants {
 
     static readonly LOCALDB_AUDIO_SOURCE: string = "audioSource";
     static readonly LOCALDB_VIDEO_SOURCE: string = "videoSource";
+    static readonly LOCALDB_NOSTR_PRIVATE_KEY: string = "nostrKey";
 
     static readonly STORE_EDITOR_DATA: string = "editObj"; // holds {nodeId: "xxxxx", content: "stuff that never got saved"}
 
