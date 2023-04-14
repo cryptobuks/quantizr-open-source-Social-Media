@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import quanta.model.client.PrincipalName;
 import quanta.util.DateUtil;
+import quanta.util.ThreadLocals;
 
 @Slf4j 
 public class PerformanceReport {
@@ -13,6 +14,7 @@ public class PerformanceReport {
 	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
 	public static String getReport() {
+		ThreadLocals.requireAdmin();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><head>" + htmlStyle() + "</head><body>");
 		sb.append(htmlH(2, "Performance Report"));

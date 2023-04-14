@@ -164,21 +164,7 @@ import quanta.util.Util;
 import quanta.util.val.Val;
 
 /**
- * Primary Spring MVC controller. All application logic (at least for core funtionality) from the
- * browser connects directly to this controller which is the only controller. Importantly the main
- * SPA page is retrieved thru this controller, and the binary attachments are also served up thru
- * this interface.
- *
- * This class has no documentation on the methods because it's a wrapper around the service methods
- * which is where the documentation can be found for each operation in here. It's a better
- * architecture to have all the AOP for any given aspect be in one particular layer, because of how
- * Spring AOP uses Proxies. Things can get pretty ugly when you have various proxied objects calling
- * other proxies objects, so we have all the AOP for a service call in this controller and then all
- * the services are pure and simple Spring Singletons.
- * 
- * There's a lot of boiler-plate code in here, but it's just required. This is probably the only
- * code in the system that looks 'redundant' (non-DRY), but this is because we want certain things
- * in certain layers (abstraction related and for loose-coupling).
+ * Primary Spring MVC controller.
  */
 @Slf4j
 @Controller
@@ -365,14 +351,12 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String fediverseUsers() {
-		ThreadLocals.requireAdmin();
 		return apub.dumpFediverseUsers();
 	}
 
 	// NOPE! No performance monitor for this. @PerfMon
 	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String performanceReport() {
-		ThreadLocals.requireAdmin();
 		return PerformanceReport.getReport();
 	}
 
@@ -751,23 +735,23 @@ public class AppController extends ServiceBase implements ErrorController {
 				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);
 			} //
-			// ================================================
-			// DO NOT DELETE (YET)
-			// I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this 
-			// and we don't need these options, but I'm leaving the code in place for now.
-			// else if ("html".equalsIgnoreCase(req.getExportExt())) {
-			// 	ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
-			// 	svc.export(ms, "html", req, res);
-			// } //
-			// else if ("md".equalsIgnoreCase(req.getExportExt())) {
-			// 	if (req.isToIpfs()) {
-			// 		res.setMessage("Export of Markdown to IPFS not yet available.");
-			// 		res.setSuccess(false);
-			// 	}
-			// 	ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
-			// 	svc.export(ms, req, res);
-			// } //
-			// ================================================
+				// ================================================
+				// DO NOT DELETE (YET)
+				// I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this
+				// and we don't need these options, but I'm leaving the code in place for now.
+				// else if ("html".equalsIgnoreCase(req.getExportExt())) {
+				// ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
+				// svc.export(ms, "html", req, res);
+				// } //
+				// else if ("md".equalsIgnoreCase(req.getExportExt())) {
+				// if (req.isToIpfs()) {
+				// res.setMessage("Export of Markdown to IPFS not yet available.");
+				// res.setSuccess(false);
+				// }
+				// ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
+				// svc.export(ms, req, res);
+				// } //
+				// ================================================
 			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
 				if (req.isToIpfs()) {
 					res.setMessage("Export of ZIP to IPFS not yet available.");

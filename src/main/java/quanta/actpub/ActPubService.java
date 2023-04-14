@@ -2006,6 +2006,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public String dumpFediverseUsers() {
+        ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
         Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
         int count = 0;
