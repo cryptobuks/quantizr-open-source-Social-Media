@@ -400,7 +400,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public void initNewUser(MongoSession ms, String userName, String password, String email, boolean automated) {
-		SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated);
+		SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated, null, false);
 		if (userNode != null) {
 			log.debug("Successful signup complete.");
 		}
@@ -492,7 +492,7 @@ public class UserManagerService extends ServiceBase {
 			throw new RuntimeEx("User already exists.");
 		}
 
-		SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false);
+		SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false, null, false);
 
 		/*
 		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
@@ -680,7 +680,7 @@ public class UserManagerService extends ServiceBase {
 	public String processBlockedWords(String blockedWords) {
 		if (blockedWords == null)
 			return null;
-	
+
 		HashSet<String> wordsSet = new HashSet<>();
 		StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
 		while (t.hasMoreTokens()) {
@@ -1012,7 +1012,12 @@ public class UserManagerService extends ServiceBase {
 					userProfile.setHeaderImageVer(headerAtt.getBin());
 				}
 				userProfile.setUserNodeId(userNode.getIdStr());
-				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+
+				String iconUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+				if (iconUrl == null) {
+					iconUrl = userNode.getStr(NodeProp.USER_IMG_URL);
+				}
+				userProfile.setApIconUrl(iconUrl);
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 				userProfile.setActorId(actorId);

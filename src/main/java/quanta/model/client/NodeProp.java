@@ -3,6 +3,8 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
+    NOSTR_ID("sn:nosid"),
+
     // Activity Pub Properties
     ACT_PUB_ID("apid"), // todo-2: should rename to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType"), //
@@ -90,6 +92,7 @@ public enum NodeProp {
      * nodes reference their OWNER as an OwnerId that points to these nodes.
      */
     USER("sn:user"), //
+    USER_IMG_URL("sn:imgUrl"),
     DISPLAY_NAME("sn:displayName"), //
     MFS_ENABLE("sn:mfsEnable"), // Mutable File System enabled (user can set this, independend of their admin authorization)
     USER_BIO("sn:userBio"), //

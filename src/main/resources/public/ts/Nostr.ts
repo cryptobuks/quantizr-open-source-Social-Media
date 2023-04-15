@@ -1,13 +1,24 @@
-import { S } from "./Singletons";
-import { Constants as C } from "./Constants";
 import {
-    generatePrivateKey, getPublicKey, validateEvent, verifySignature, signEvent, getEventHash, relayInit, Relay
+    Event,
+    Kind,
+    Relay,
+    generatePrivateKey,
+    getEventHash,
+    getPublicKey,
+    nip05,
+    relayInit,
+    signEvent,
+    validateEvent, verifySignature
 } from "nostr-tools";
+import { Constants as C } from "./Constants";
+import * as J from "./JavaIntf";
+import { S } from "./Singletons";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method */
 export class Nostr {
     TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
+    TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
 
     sk: string = null; // secret key, hex string
     pk: string = null; // public key, hex string
@@ -15,6 +26,12 @@ export class Nostr {
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
+        // await this.readPosts(this.TEST_USER_KEY);
+        // await this.updateProfile();
+        await this.readUserMetadata(this.TEST_USER_KEY);
+
+        // this.saveEvent();
+
         // this.createEvent();
 
         // Object from original examples:
@@ -51,7 +68,7 @@ export class Nostr {
     // Creates a test event (Social Media post) that we can send to a relay
     createEvent = (): any => {
         const event: any = {
-            kind: 1,
+            kind: Kind.Text,
             created_at: Math.floor(Date.now() / 1000),
             tags: [],
             content: "test from Quanta.wiki",
@@ -98,7 +115,7 @@ export class Nostr {
         });
     }
 
-    // Opens a and only completes the promis when it's fully connected
+    // Opens a relay and only completes the promise when it's fully connected
     openRelay = async (rurl: string): Promise<Relay> => {
         const relay = relayInit(rurl);
 
@@ -135,5 +152,81 @@ export class Nostr {
                 resolve();
             });
         });
+    }
+
+    readUserMetadata = async (userKey: string): Promise<void> => {
+        const relay = await this.openRelay(this.TEST_RELAY_URL);
+        const events = await relay.list([{
+            authors: [userKey],
+            kinds: [Kind.Metadata],
+            limit: 1
+        }]);
+        this.persistEvents(events);
+    }
+
+    readPosts = async (userKey: string): Promise<void> => {
+        const relay = await this.openRelay(this.TEST_RELAY_URL);
+        const events = await relay.list([{
+            authors: [userKey],
+            kinds: [Kind.Metadata],
+            limit: 2
+        }]);
+        this.persistEvents(events);
+    }
+
+    persistEvents = async (events: Event[]) => {
+        if (!events || events.length === 0) return;
+
+        let idx = 0;
+        events.forEach(event => {
+            console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
+        });
+
+        // Push the events up to the server for storage
+        await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
+            events: this.makeEventsList(events)
+        });
+    }
+
+    makeEventsList = (events: any[]): J.NostrEvent[] => {
+        const ret: J.NostrEvent[] = [];
+        for (const event of events) {
+            ret.push({
+                id: event.id,
+                sig: event.sig,
+                pk: event.pubkey,
+                kind: event.kind,
+                content: event.content,
+                timestamp: event.created_at
+            });
+        }
+        return ret;
+    }
+
+    saveEvent = async () => {
+        // Push the events up to the server for storage
+        await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
+            events: [{
+                id: "123456789",
+                sig: "fake-sig",
+                pk: "fake-public-key",
+                kind: Kind.Text,
+                content: "this is some content",
+                timestamp: 0
+            }]
+        });
+    }
+
+    updateProfile = async () => {
+        let profile = await nip05.queryProfile("jb55.com");
+        console.log("PROFILE: " + S.util.prettyPrint(profile));
+
+        profile = await nip05.queryProfile("jb55@jb55.com");
+        console.log("PROFILE: " + S.util.prettyPrint(profile));
+
+        // console.log(profile.pubkey)
+        // // prints: 32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245
+        // console.log(profile.relays)
+        // // prints: [wss://relay.damus.io]
     }
 }

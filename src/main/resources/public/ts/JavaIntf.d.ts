@@ -68,6 +68,23 @@ export interface NodeLink {
     n: string;
 }
 
+export interface NostrEvent {
+    id: string;
+    sig: string;
+    pk: string;
+    kind: number;
+    content: string;
+    timestamp: number;
+}
+
+export interface NostrMetadata {
+    name: string;
+    username: string;
+    displayName: string;
+    about: string;
+    picture: string;
+}
+
 export interface OpenGraph {
     url: string;
     title: string;
@@ -508,6 +525,10 @@ export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
 }
 
+export interface SaveNostrEventRequest extends RequestBase {
+    events: NostrEvent[];
+}
+
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
@@ -938,6 +959,9 @@ export interface SaveNodeResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
 }
 
+export interface SaveNostrEventResponse extends ResponseBase {
+}
+
 export interface SavePublicKeyResponse extends ResponseBase {
 }
 
@@ -1053,7 +1077,7 @@ export interface NodeInfo {
     ownerId: string;
     transferFromId: string;
     avatarVer: string;
-    apAvatar: string;
+    apAvatar: string; // todo-0: rename this to avatarUrl
     apImage: string;
     boostedNode: NodeInfo;
 }
@@ -1138,6 +1162,7 @@ export const enum ErrorType {
 }
 
 export const enum NodeProp {
+    NOSTR_ID = "sn:nosid",
     ACT_PUB_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
@@ -1180,6 +1205,7 @@ export const enum NodeProp {
     EMAIL_SUBJECT = "sn:subject",
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
+    USER_IMG_URL = "sn:imgUrl",
     DISPLAY_NAME = "sn:displayName",
     MFS_ENABLE = "sn:mfsEnable",
     USER_BIO = "sn:userBio",

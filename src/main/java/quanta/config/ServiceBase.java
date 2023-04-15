@@ -34,6 +34,7 @@ import quanta.service.AttachmentService;
 import quanta.service.CryptoService;
 import quanta.service.GraphNodesService;
 import quanta.service.LuceneService;
+import quanta.service.NostrService;
 import quanta.service.OpenGraphService;
 import quanta.service.PushService;
 import quanta.service.RSSFeedService;
@@ -88,16 +89,17 @@ import quanta.util.Validator;
  * other using a simple "object.property" syntax.
  * 
  * Another reason this class is good is that it gives every object a way to call methods on itself
- * AND have AOP methods (like @PerfMon-driven ones) be capable of working. If you don't call a method thru
- * it's proxy object then Spring AOP does NOT work, and this is a problem becasue in Spring normally when you
- * call a method in the same object you're calling from Spring WILL NOT go thru the proxy. As an example
- * if we called a method in UserFeedService from inside that same service, then unless we call like this:
- * userFeed.myMethod(), then the proxy-based AOP stuff will not execute, becuase it won't ge called thru a proxy.
+ * AND have AOP methods (like @PerfMon-driven ones) be capable of working. If you don't call a
+ * method thru it's proxy object then Spring AOP does NOT work, and this is a problem becasue in
+ * Spring normally when you call a method in the same object you're calling from Spring WILL NOT go
+ * thru the proxy. As an example if we called a method in UserFeedService from inside that same
+ * service, then unless we call like this: userFeed.myMethod(), then the proxy-based AOP stuff will
+ * not execute, becuase it won't ge called thru a proxy.
  */
-@Slf4j 
+@Slf4j
 public class ServiceBase {
 	@Autowired
-    public AppProp prop;
+	public AppProp prop;
 
 	@Autowired
 	public ApplicationContext context;
@@ -157,6 +159,7 @@ public class ServiceBase {
 	public static SimpleMongoClientDatabaseFactory mdbf;
 	public static CryptoService crypto;
 	public static SchemaOrgService schema;
+	public static NostrService nostr;
 
 	public static IPFSService ipfs;
 	public static IPFSCat ipfsCat;
@@ -243,6 +246,7 @@ public class ServiceBase {
 			mongoRepo = getBean(ctx, MongoRepository.class);
 			crypto = getBean(ctx, CryptoService.class);
 			schema = getBean(ctx, SchemaOrgService.class);
+			nostr = getBean(ctx, NostrService.class);
 
 			ipfs = getBean(ctx, IPFSService.class);
 			ipfsCat = getBean(ctx, IPFSCat.class);

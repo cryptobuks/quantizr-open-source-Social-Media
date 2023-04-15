@@ -635,7 +635,7 @@ public class ActPubService extends ServiceBase {
              * If we don't have this user in our system, create them.
              */
             if (userNode == null) {
-                userNode = mongoUtil.createUser(ms, apUserName, null, null, true);
+                userNode = mongoUtil.createUser(ms, apUserName, null, null, true, null, false);
             }
         }
 

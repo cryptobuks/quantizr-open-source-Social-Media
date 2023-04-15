@@ -369,7 +369,7 @@ export class UserProfileDlg extends DialogBase {
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {
         let src: string = null;
-        const state: any = this.getState<LS>();
+        const state: LS = this.getState<LS>();
 
         // if ActivityPub icon exists, we know that's the one to use.
         if (state.userProfile.apIconUrl) {

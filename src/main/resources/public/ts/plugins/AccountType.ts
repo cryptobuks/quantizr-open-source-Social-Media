@@ -31,6 +31,8 @@ export class AccountType extends TypeBase {
     }
 
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+        // console.log("node: " + S.util.prettyPrint(node));
+
         return new Divc({
             className: "systemNodeContent"
         }, [

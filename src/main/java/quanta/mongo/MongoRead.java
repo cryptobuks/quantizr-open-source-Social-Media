@@ -1130,7 +1130,8 @@ public class MongoRead extends ServiceBase {
         // character, so that ONLY foreign names will have any '@' in the string.
         user = convertIfLocalName(user);
 
-        String pathToQuery = user.contains("@") ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
+        // todo-0: review this "nostr-" check here and remember it may be missing in other similar places in the code
+        String pathToQuery = user.contains("@") || user.startsWith("nostr-") ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
 
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB

@@ -49,7 +49,7 @@ import quanta.util.val.Val;
  * Verious utilities related to MongoDB persistence
  */
 @Component
-@Slf4j 
+@Slf4j
 public class MongoUtil extends ServiceBase {
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static final Random rand = new Random();
@@ -673,7 +673,9 @@ public class MongoUtil extends ServiceBase {
 		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
 		// account)
 
+		// todo-0: add NOSTR_ID partial index.
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
+		createPartialUniqueIndex(ms, "unique-nostrid", SubNode.class, SubNode.PROPS + "." + NodeProp.NOSTR_ID.s());
 
 		createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
 
@@ -1015,7 +1017,8 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	@PerfMon(category = "mongoUtil")
-	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated) {
+	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated,
+			Val<SubNode> postsNodeVal, boolean forceRemoteUser) {
 		SubNode userNode = read.getUserNodeByUserName(ms, newUserName);
 		if (userNode != null) {
 			throw new RuntimeException("User already existed: " + newUserName);
@@ -1029,7 +1032,7 @@ public class MongoUtil extends ServiceBase {
 		auth.requireAdmin(ms);
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
-		SubNode parentNode = newUserName.contains("@") ? remoteUsersNode : localUsersNode;
+		SubNode parentNode = newUserName.contains("@") || forceRemoteUser ? remoteUsersNode : localUsersNode;
 		userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true);
 
 		ObjectId id = new ObjectId();
@@ -1052,11 +1055,14 @@ public class MongoUtil extends ServiceBase {
 		if (!automated) {
 			userNode.set(NodeProp.SIGNUP_PENDING, true);
 		}
+		update.save(ms, userNode);
 
 		// ensure we've pre-created this node.
-		SubNode postsNode = read.getUserNodeByType(ms, newUserName, null, "### Posts", NodeType.POSTS.s(),
+		SubNode postsNode = read.getUserNodeByType(ms, null, userNode, "### Posts", NodeType.POSTS.s(),
 				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-
+		if (postsNodeVal != null) {
+			postsNodeVal.setVal(postsNode);
+		}
 		user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "'s Node", NodeType.NONE.s(), NodeName.HOME);
 
 		update.save(ms, userNode);
