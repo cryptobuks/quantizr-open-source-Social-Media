@@ -1,6 +1,8 @@
-package quanta.service;
+package quanta.service.nostr;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -10,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.config.NodeName;
-import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -23,7 +24,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.SaveNostrEventRequest;
 import quanta.response.SaveNostrEventResponse;
-import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -33,38 +33,41 @@ public class NostrService extends ServiceBase {
 
 	public static final ObjectMapper mapper = new ObjectMapper();
 	{
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
 
-	// todo-0: put in enum
+	// todo-1: put in enum
 	static final int KIND_Metadata = 0;
 	static final int KIND_Text = 1;
 
 	public SaveNostrEventResponse saveNostrEvent(SaveNostrEventRequest req) {
-		ThreadLocals.requireAdmin();
-
 		SaveNostrEventResponse res = new SaveNostrEventResponse();
 		if (req.getEvents() == null)
 			return res;
+		HashSet<String> accountNodeIds = new HashSet<>();
 		arun.run(as -> {
-			// todo-0: we need to check the signature on the event before saving into DB.
 			for (NostrEvent event : req.getEvents()) {
+				if (!NostrCrypto.verifyEvent(event)) {
+					log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
+					continue;
+				}
+
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event);
+				saveEvent(as, event, accountNodeIds, req.getRelays());
 			}
 			return null;
 		});
+		res.setAccntNodeIds(new LinkedList<String>(accountNodeIds));
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event) {
-		// todo-0: need to check signatures on all.
+	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
-				saveNostrMetadataEvent(as, event);
+				saveNostrMetadataEvent(as, event, accountNodeIds, relays);
 				break;
 			case KIND_Text:
-				saveNostrTextEvent(as, event);
+				saveNostrTextEvent(as, event, accountNodeIds);
 				break;
 			default:
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
@@ -72,27 +75,24 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event) {
-		log.debug("METADATA:" + XString.prettyPrint(event));
+	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays) {
+		// log.debug("METADATA:" + XString.prettyPrint(event));
 		try {
-			// HashMap<String, Object> metadata =
-			// mapper.readValue(event.getContent(), new TypeReference<HashMap<String, Object>>() {});
 			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
-			log.debug("METADATA OBJ: " + XString.prettyPrint(metadata));
+			// log.debug("METADATA OBJ: " + XString.prettyPrint(metadata));
 
 			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null);
 			if (nostrAccnt == null)
 				return;
 
+			accountNodeIds.add(nostrAccnt.getIdStr());
+
 			// get the best display name we can find.
 			String displayName = getBestDisplayName(metadata);
 			nostrAccnt.set(NodeProp.DISPLAY_NAME, displayName);
-			nostrAccnt.set(NodeProp.USER_IMG_URL, metadata.getPicture());
+			nostrAccnt.set(NodeProp.ACT_PUB_USER_ICON_URL, metadata.getPicture());
 			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
-			
-			// todo-0: we should be able to remove this line. Will only save if dirty, then.
-			update.save(as, nostrAccnt, false);
-
+			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -109,16 +109,21 @@ public class NostrService extends ServiceBase {
 		return displayName;
 	}
 
-	private void saveNostrTextEvent(MongoSession as, NostrEvent event) {
-		// todo-0: replace this with an "exists()" call that doesn't get the actual object
+	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds) {
 		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
 		if (nostrNode != null) {
-			// log.debug("Node Existed: " + XString.prettyPrint(nostrNode));
+			log.debug("Nostr ID Existed: " + event.getId());
 			return;
 		}
 
 		Val<SubNode> postsNode = new Val<>();
 		SubNode nostrAccnt = getNostrAccount(as, event.getPk(), postsNode);
+		if (nostrAccnt == null) {
+			log.debug("Unable to get account: " + event.getPk());
+			return;
+		}
+
+		accountNodeIds.add(nostrAccnt.getIdStr());
 
 		if (postsNode.getVal() == null) {
 			throw new RuntimeException("Unable to get Posts node.");
@@ -130,21 +135,19 @@ public class NostrService extends ServiceBase {
 
 		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		newNode.setContent(event.getContent());
-		newNode.set(NodeProp.NOSTR_ID, event.getId());
+		newNode.set(NodeProp.ACT_PUB_ID, event.getId());
 		newNode.touch();
 		update.save(as, newNode, false);
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
 	private SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode) {
-		SubNode nostrAccnt;
-		nostrAccnt = getUserNodeByNostrId(as, userKey, false);
+		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
-			nostrAccnt = mongoUtil.createUser(as, "nostr-" + System.currentTimeMillis(), "", "", true, postsNode, true);
+			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);
 			}
-			nostrAccnt.set(NodeProp.NOSTR_ID, userKey);
 		} else {
 			if (postsNode != null) {
 				SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
@@ -158,7 +161,7 @@ public class NostrService extends ServiceBase {
 	public SubNode getNodeByNostrId(MongoSession ms, String id, boolean allowAuth) {
 		// Otherwise for ordinary users root is based off their username
 		Query q = new Query();
-		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.NOSTR_ID).is(id);
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).is(id);
 		q.addCriteria(crit);
 
 		SubNode ret = mongoUtil.findOne(q);
@@ -173,26 +176,14 @@ public class NostrService extends ServiceBase {
 		return ret;
 	}
 
-	public SubNode getUserNodeByNostrId(MongoSession ms, String pubKey, boolean allowAuth) {
-		// Otherwise for ordinary users root is based off their username
-		Query q = new Query();
-		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)) //
-				// case-insensitive lookup of username:
-				.and(SubNode.PROPS + "." + NodeProp.NOSTR_ID).is(pubKey) //
-				.and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
-
-		q.addCriteria(crit);
-
-		SubNode ret = mongoUtil.findOne(q);
-		if (allowAuth) {
-			SubNode _ret = ret;
-			// we run with 'ms' if it's non-null, or with admin if ms is null
-			arun.run(ms, as -> {
-				auth.auth(as, _ret, PrivilegeType.READ);
-				return null;
-			});
-		}
-		return ret;
+	/*
+	 * Our username is a string that is the sha256 hash of the user's PublicKey hex string prefixed by a
+	 * ".". We use the dot to make sure no users can squat on it, by simply having the rule that local
+	 * Quanta users are not allwed to use a dot in their username.
+	 */
+	public boolean isNostrUserName(String userName) {
+		if (userName == null)
+			return false;
+		return userName.startsWith(".") && !userName.contains("@");
 	}
-
 }

@@ -136,9 +136,6 @@ public class Convert extends ServiceBase {
 			}
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
 			apAvatar = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
-			if (apAvatar == null) {
-				apAvatar = userNode.getStr(NodeProp.USER_IMG_URL);
-			}
 			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
 			owner = nameProp;
 

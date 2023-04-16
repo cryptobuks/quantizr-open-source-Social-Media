@@ -527,6 +527,7 @@ export interface SaveNodeRequest extends RequestBase {
 
 export interface SaveNostrEventRequest extends RequestBase {
     events: NostrEvent[];
+    relays: string;
 }
 
 export interface SavePublicKeyRequest extends RequestBase {
@@ -960,6 +961,7 @@ export interface SaveNodeResponse extends ResponseBase {
 }
 
 export interface SaveNostrEventResponse extends ResponseBase {
+    accntNodeIds: string[];
 }
 
 export interface SavePublicKeyResponse extends ResponseBase {
@@ -1077,7 +1079,7 @@ export interface NodeInfo {
     ownerId: string;
     transferFromId: string;
     avatarVer: string;
-    apAvatar: string; // todo-0: rename this to avatarUrl
+    apAvatar: string;
     apImage: string;
     boostedNode: NodeInfo;
 }
@@ -1136,6 +1138,7 @@ export const enum Constant {
     SEARCH_TYPE_USER_LOCAL = "userLocal",
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
+    SEARCH_TYPE_USER_NOSTR = "userNostr",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
     FEED_PUB = "publicFediverse",
@@ -1163,6 +1166,7 @@ export const enum ErrorType {
 
 export const enum NodeProp {
     NOSTR_ID = "sn:nosid",
+    NOSTR_RELAYS = "sn:relays",
     ACT_PUB_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
@@ -1205,7 +1209,6 @@ export const enum NodeProp {
     EMAIL_SUBJECT = "sn:subject",
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
-    USER_IMG_URL = "sn:imgUrl",
     DISPLAY_NAME = "sn:displayName",
     MFS_ENABLE = "sn:mfsEnable",
     USER_BIO = "sn:userBio",

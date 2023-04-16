@@ -26,9 +26,9 @@ export class Nostr {
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
-        // await this.readPosts(this.TEST_USER_KEY);
+        // await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL);
         // await this.updateProfile();
-        await this.readUserMetadata(this.TEST_USER_KEY);
+        await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
 
         // this.saveEvent();
 
@@ -117,6 +117,9 @@ export class Nostr {
 
     // Opens a relay and only completes the promise when it's fully connected
     openRelay = async (rurl: string): Promise<Relay> => {
+        if (!rurl.startsWith("wss://")) {
+            rurl = "wss://" + rurl;
+        }
         const relay = relayInit(rurl);
 
         relay.on("connect", () => {
@@ -154,27 +157,27 @@ export class Nostr {
         });
     }
 
-    readUserMetadata = async (userKey: string): Promise<void> => {
-        const relay = await this.openRelay(this.TEST_RELAY_URL);
+    readUserMetadata = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+        const relay = await this.openRelay(relayUrl);
         const events = await relay.list([{
             authors: [userKey],
             kinds: [Kind.Metadata],
             limit: 1
         }]);
-        this.persistEvents(events);
+        return await this.persistEvents(events, relayUrl);
     }
 
-    readPosts = async (userKey: string): Promise<void> => {
-        const relay = await this.openRelay(this.TEST_RELAY_URL);
+    readPosts = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+        const relay = await this.openRelay(relayUrl);
         const events = await relay.list([{
             authors: [userKey],
             kinds: [Kind.Metadata],
             limit: 2
         }]);
-        this.persistEvents(events);
+        return await this.persistEvents(events, relayUrl);
     }
 
-    persistEvents = async (events: Event[]) => {
+    persistEvents = async (events: Event[], relays: string): Promise<J.SaveNostrEventResponse> => {
         if (!events || events.length === 0) return;
 
         let idx = 0;
@@ -183,8 +186,9 @@ export class Nostr {
         });
 
         // Push the events up to the server for storage
-        await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
-            events: this.makeEventsList(events)
+        return await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
+            events: this.makeEventsList(events),
+            relays
         });
     }
 
@@ -201,20 +205,6 @@ export class Nostr {
             });
         }
         return ret;
-    }
-
-    saveEvent = async () => {
-        // Push the events up to the server for storage
-        await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
-            events: [{
-                id: "123456789",
-                sig: "fake-sig",
-                pk: "fake-public-key",
-                kind: Kind.Text,
-                content: "this is some content",
-                timestamp: 0
-            }]
-        });
     }
 
     updateProfile = async () => {

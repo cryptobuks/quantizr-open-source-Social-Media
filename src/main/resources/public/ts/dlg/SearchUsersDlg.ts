@@ -10,6 +10,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { UserProfileDlg } from "./UserProfileDlg";
 
 interface LS { // Local State
     searchType?: string;
@@ -18,8 +19,11 @@ interface LS { // Local State
 export class SearchUsersDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
+    static defaultNostrRelay: string = "";
     searchTextField: TextField;
+    nostrRelayTextField: TextField;
     searchTextState: Validator = new Validator();
+    nostrRelayState: Validator = new Validator();
 
     constructor() {
         super("Search Users", "appModalContMediumWidth");
@@ -29,9 +33,12 @@ export class SearchUsersDlg extends DialogBase {
             searchType: J.Constant.SEARCH_TYPE_USER_LOCAL
         });
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
+        this.nostrRelayState.setValue(SearchUsersDlg.defaultNostrRelay);
     }
 
     renderDlg(): CompIntf[] {
+        const isNostr = this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_NOSTR;
+
         const adminOptions = new RadioButtonGroup([
             getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
@@ -56,12 +63,21 @@ export class SearchUsersDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
+            }),
+            new RadioButton("Nostr User", false, "optionsGroup", null, {
+                setValue: (checked: boolean) => {
+                    if (checked) {
+                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_NOSTR });
+                    }
+                },
+                getValue: (): boolean => isNostr
             })
         ], "marginBottom marginTop");
 
         return [
             new Diva([
-                this.searchTextField = new TextField({ label: "User Name", enter: this.search, val: this.searchTextState }),
+                this.searchTextField = new TextField({ label: isNostr ? "User's Public Key" : "User Name", enter: this.search, val: this.searchTextState }),
+                isNostr ? (this.nostrRelayTextField = new TextField({ label: "Nostr Relay", enter: this.search, val: this.nostrRelayState })) : null,
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -82,16 +98,32 @@ export class SearchUsersDlg extends DialogBase {
         }
 
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
+        SearchUsersDlg.defaultNostrRelay = this.nostrRelayState.getValue();
 
-        const desc = "User " + SearchUsersDlg.defaultSearchText;
-        const success = await S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
-            this.getState<LS>().searchType,
-            desc,
-            null,
-            false,
-            false, 0, true, "mtm", "DESC", false, false, false);
-        if (success) {
+        const searchType = this.getState<LS>().searchType;
+        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR) {
+            if (!SearchUsersDlg.defaultNostrRelay) {
+                S.util.showMessage("Nostr needs a relay.", "Warning");
+                return;
+            }
+            const ret: J.SaveNostrEventResponse = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText, SearchUsersDlg.defaultNostrRelay);
+            // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
             this.close();
+            if (ret.accntNodeIds?.length > 0) {
+                new UserProfileDlg(ret.accntNodeIds[0]).open();
+            }
+        }
+        else {
+            const desc = "User " + SearchUsersDlg.defaultSearchText;
+            const success = await S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
+                searchType,
+                desc,
+                null,
+                false,
+                false, 0, true, "mtm", "DESC", false, false, false);
+            if (success) {
+                this.close();
+            }
         }
     }
 }

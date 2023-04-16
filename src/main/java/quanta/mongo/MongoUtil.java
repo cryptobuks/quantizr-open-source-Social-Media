@@ -673,9 +673,7 @@ public class MongoUtil extends ServiceBase {
 		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
 		// account)
 
-		// todo-0: add NOSTR_ID partial index.
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
-		createPartialUniqueIndex(ms, "unique-nostrid", SubNode.class, SubNode.PROPS + "." + NodeProp.NOSTR_ID.s());
 
 		createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
 
@@ -1034,6 +1032,7 @@ public class MongoUtil extends ServiceBase {
 		// flowpaths tested?)
 		SubNode parentNode = newUserName.contains("@") || forceRemoteUser ? remoteUsersNode : localUsersNode;
 		userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true);
+		parentNode.setHasChildren(true);
 
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
@@ -1063,7 +1062,10 @@ public class MongoUtil extends ServiceBase {
 		if (postsNodeVal != null) {
 			postsNodeVal.setVal(postsNode);
 		}
-		user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "'s Node", NodeType.NONE.s(), NodeName.HOME);
+
+		if (!nostr.isNostrUserName(newUserName)) {
+			user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "'s Node", NodeType.NONE.s(), NodeName.HOME);
+		}
 
 		update.save(ms, userNode);
 		return userNode;

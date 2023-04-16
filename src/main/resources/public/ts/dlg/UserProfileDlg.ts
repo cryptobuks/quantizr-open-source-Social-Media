@@ -43,13 +43,17 @@ export class UserProfileDlg extends DialogBase {
     }
 
     override getTitleText(): string {
-        return this.getUserName();
+        return this.getUserName(true);
     }
 
-    getUserName = (): string => {
+    getUserName = (displayOnly: boolean): string => {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
+        if (userName?.startsWith(".") && userName.indexOf("@") === -1) {
+            userName = userName.substring(0, 17);
+            return "Nostr Account";
+        }
         if (userName.indexOf("@") === -1) {
             userName = userName + "@" + window.location.hostname;
         }
@@ -97,6 +101,8 @@ export class UserProfileDlg extends DialogBase {
 
             web3Div = new Diva(web3Comps);
         }
+
+        const isNostr: boolean = state.userProfile.userName.startsWith(".") && state.userProfile.userName.indexOf("@") === -1;
 
         const children = [
             new Diva([
@@ -169,6 +175,9 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
+                isNostr ? new Div("Nostr Public Key: ") : null,
+                isNostr ? new Div(state.userProfile.userName.substring(1)) : null,
+
                 web3Div,
 
                 new ButtonBar([
@@ -193,7 +202,7 @@ export class UserProfileDlg extends DialogBase {
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
-                        ? new Button("Mentions", () => this.searchMentions(this.getUserName()), { title: "Find all Public Mentions of this person" }) : null,
+                        ? new Button("Mentions", () => this.searchMentions(this.getUserName(false)), { title: "Find all Public Mentions of this person" }) : null,
 
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Follow", this.addFriend) : null,

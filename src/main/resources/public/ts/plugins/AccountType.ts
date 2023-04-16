@@ -33,10 +33,13 @@ export class AccountType extends TypeBase {
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // console.log("node: " + S.util.prettyPrint(node));
 
+        // Note: Nostr names start with '.'
+        const name = node.owner.startsWith(".") ? S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) : node.owner;
+
         return new Divc({
             className: "systemNodeContent"
         }, [
-            new Heading(4, "User: " + node.owner, {
+            new Heading(4, "User: " + name, {
                 className: "clickable noMargin",
                 onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing

@@ -1013,11 +1013,7 @@ public class UserManagerService extends ServiceBase {
 				}
 				userProfile.setUserNodeId(userNode.getIdStr());
 
-				String iconUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
-				if (iconUrl == null) {
-					iconUrl = userNode.getStr(NodeProp.USER_IMG_URL);
-				}
-				userProfile.setApIconUrl(iconUrl);
+				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 				userProfile.setActorId(actorId);
@@ -1374,16 +1370,13 @@ public class UserManagerService extends ServiceBase {
 		fi.setUserName(userName);
 		fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 		fi.setUserNodeId(userNode.getIdStr());
+		fi.setForeignAvatarUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 
 		if (userName.indexOf("@") == -1) {
 			Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 			if (att != null) {
 				fi.setAvatarVer(att.getBin());
 			}
-		}
-		// Otherwise the avatar will be specified as a remote user's Icon.
-		else {
-			fi.setForeignAvatarUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 		}
 
 		return fi;
@@ -1424,6 +1417,7 @@ public class UserManagerService extends ServiceBase {
 			fi.setFriendNodeId(friendNode.getIdStr());
 			fi.setUserName(userName);
 			fi.setTags(friendNode.getTags());
+			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
 			if (userNode != null) {
@@ -1443,7 +1437,11 @@ public class UserManagerService extends ServiceBase {
 				}
 				// Otherwise the avatar will be specified as a remote user's Icon.
 				else {
-					fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+					// set avatar here only if we didn't set it above already
+					if (fi.getForeignAvatarUrl() == null) {
+						fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+					}
+
 				}
 			}
 			fi.setUserNodeId(userNodeId);

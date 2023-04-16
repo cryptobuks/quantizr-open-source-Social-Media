@@ -12,6 +12,8 @@ public class Validator extends ServiceBase {
 	 * 
 	 * Note that part of our requirement is that it must also be a valid substring inside node path
 	 * names, that are used or looking up things about this user.
+	 * 
+	 * todo-1: fix inconsistency here. Either always return an error string or always throw when error
 	 */
 	public String checkUserName(String userName) {
 		if (!auth.isAllowedUserName(userName)) {
@@ -28,6 +30,7 @@ public class Validator extends ServiceBase {
 
 		for (int i = 0; i < len; i++) {
 			char c = userName.charAt(i);
+			// WARNING: Never allow '.' in here because by convention we know names starting with '.' are nostr users
 			if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_' || c == ' ')) {
 				return "Username can contain only letters, digits, dashes, underscores, and spaces. invalid[" + userName + "]";
 			}

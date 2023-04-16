@@ -361,6 +361,21 @@ public class NodeEditService extends ServiceBase {
 			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
+			String userImgUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+			if (!StringUtils.isEmpty(userImgUrl)) {
+				properties.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userImgUrl));
+			}
+		
+			String nostrId = userNode.getStr(NodeProp.ACT_PUB_ID);
+			if (!StringUtils.isEmpty(nostrId)) {
+				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));
+			}
+
+			String nostrRelays = userNode.getStr(NodeProp.NOSTR_RELAYS);
+			if (!StringUtils.isEmpty(nostrRelays)) {
+				properties.add(new PropertyInfo(NodeProp.NOSTR_RELAYS.s(), nostrRelays));
+			}
+
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
 					properties, parentFriendsList.getOwner(), true, true);
 			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
