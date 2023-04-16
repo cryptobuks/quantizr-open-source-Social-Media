@@ -74,6 +74,7 @@ export interface NostrEvent {
     pk: string;
     kind: number;
     content: string;
+    tags: string[][];
     timestamp: number;
 }
 
@@ -326,6 +327,7 @@ export interface GetOpenGraphRequest extends RequestBase {
 export interface GetPeopleRequest extends RequestBase {
     nodeId: string;
     type: string;
+    subType: string;
 }
 
 export interface GetRepliesViewRequest extends RequestBase {
@@ -718,6 +720,7 @@ export interface FileSystemReindexResponse extends ResponseBase {
 export interface FriendInfo {
     displayName: string;
     userName: string;
+    relays: string;
     avatarVer: string;
     userNodeId: string;
     friendNodeId: string;

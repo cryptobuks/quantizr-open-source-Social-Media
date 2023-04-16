@@ -1,4 +1,6 @@
 package quanta.model.client;
+
+import java.util.ArrayList;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,5 +12,6 @@ public class NostrEvent {
     private String pk;
     private Integer kind;
     private String content;
+    private ArrayList<ArrayList<String>> tags;
     private Long timestamp;
 }

@@ -167,12 +167,14 @@ export class Nostr {
         return await this.persistEvents(events, relayUrl);
     }
 
+    // todo-0: need to allow relayUrl to be multiple newline delimited URLs
     readPosts = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+        console.log("readPosts for userKey: " + userKey);
         const relay = await this.openRelay(relayUrl);
         const events = await relay.list([{
             authors: [userKey],
-            kinds: [Kind.Metadata],
-            limit: 2
+            kinds: [Kind.Text],
+            limit: 4
         }]);
         return await this.persistEvents(events, relayUrl);
     }
@@ -201,6 +203,7 @@ export class Nostr {
                 pk: event.pubkey,
                 kind: event.kind,
                 content: event.content,
+                tags: event.tags,
                 timestamp: event.created_at
             });
         }
@@ -218,5 +221,25 @@ export class Nostr {
         // // prints: 32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245
         // console.log(profile.relays)
         // // prints: [wss://relay.damus.io]
+    }
+
+    getFriends = async (): Promise<void> => {
+        const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
+            nodeId: null,
+            type: "friends",
+            subType: "nostr"
+        });
+
+        if (!res.people) return;
+        for (const person of res.people) {
+            debugger;
+            let userName = person.userName;
+            if (!userName.startsWith(".")) return;
+            userName = userName.substring(1);
+
+            // todo-0: for now, run each person individually. We will eventually optimize into efficient batch
+            // queries to do this all it once, as optimally as possible and transmit up to server efficiently
+            await this.readPosts(userName, person.relays);
+        }
     }
 }

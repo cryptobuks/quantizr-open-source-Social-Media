@@ -658,7 +658,9 @@ export class Nav {
         });
     }
 
-    messagesFromFriends = () => {
+    messagesFromFriends = async () => {
+        await S.nostr.getFriends();
+
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }

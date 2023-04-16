@@ -37,7 +37,8 @@ export class BlockedUsersDlg extends DialogBase {
    override preLoad = async () => {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,
-            type: "blocks"
+            type: "blocks",
+            subType: null
         });
 
         let friends: J.FriendInfo[] = [];

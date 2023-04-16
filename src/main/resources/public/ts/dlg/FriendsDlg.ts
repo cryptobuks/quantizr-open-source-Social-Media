@@ -60,7 +60,8 @@ export class FriendsDlg extends DialogBase {
    override preLoad = async () => {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: this.nodeId,
-            type: "friends"
+            type: "friends",
+            subType: null
         });
 
         await promiseDispatch("SetFriendHashTags", s => { s.friendHashTags = res.friendHashTags; });

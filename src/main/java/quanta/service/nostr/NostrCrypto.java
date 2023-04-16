@@ -3,6 +3,7 @@ package quanta.service.nostr;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import quanta.model.client.NostrEvent;
@@ -19,18 +20,18 @@ public class NostrCrypto {
 
     public static boolean verifyEvent(NostrEvent event) {
         return verifyEventProps(event.getId(), event.getPk(), event.getTimestamp(), event.getKind(), event.getContent(),
-                event.getSig());
+                event.getTags(), event.getSig());
     }
 
-    public static boolean verifyEventProps(String id, String pubKey, Long createdAt, Integer kind, String content, String sig) {
+    public static boolean verifyEventProps(String id, String pubKey, Long createdAt, Integer kind, String content,
+            ArrayList<ArrayList<String>> tags, String sig) {
         StringBuilder serialized = new StringBuilder();
         serialized.append("[");
         serialized.append("0").append(",\"");
         serialized.append(pubKey).append("\",");
         serialized.append(createdAt).append(",");
         serialized.append(kind).append(",");
-        // todo-0: some example code I'm seeing looks like tags are recursive? How to include tags here?
-        serialized.append("[]"); // new TagListMarshaller(tags, null).marshall());
+        serialized.append(serializeTags(tags));
         serialized.append(",\"");
         serialized.append(content.replace("\"", "\\\""));
         serialized.append("\"]");
@@ -44,8 +45,33 @@ public class NostrCrypto {
         }
 
         boolean verified = verify(sha256, hexToBytes(pubKey), hexToBytes(sig));
-        log.debug("Verified = " + verified);
+        // log.debug("Verified=" + verified + " ID=" + id);
         return verified;
+    }
+
+    public static String serializeTags(ArrayList<ArrayList<String>> tags) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        if (tags != null) {
+            int i = 0;
+            for (ArrayList<String> t : tags) {
+                if (i++ > 0) {
+                    sb.append(",");
+                }
+
+                sb.append("[");
+                int ii = 0;
+                for (String tag : t) {
+                    if (ii++ > 0) {
+                        sb.append(",");
+                    }
+                    sb.append("\"").append(tag.replace("\"", "\\\"")).append("\"");
+                }
+                sb.append("]");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public static String bytesToHex(byte[] b) {

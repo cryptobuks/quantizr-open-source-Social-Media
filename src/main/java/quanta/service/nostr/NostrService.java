@@ -1,6 +1,7 @@
 package quanta.service.nostr;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;
@@ -93,6 +94,10 @@ public class NostrService extends ServiceBase {
 			nostrAccnt.set(NodeProp.ACT_PUB_USER_ICON_URL, metadata.getPicture());
 			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
 			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
+
+			Date timestamp = new Date(event.getTimestamp() * 1000);
+			nostrAccnt.setCreateTime(timestamp);
+			nostrAccnt.setModifyTime(timestamp);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -136,7 +141,11 @@ public class NostrService extends ServiceBase {
 		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		newNode.setContent(event.getContent());
 		newNode.set(NodeProp.ACT_PUB_ID, event.getId());
-		newNode.touch();
+
+		Date timestamp = new Date(event.getTimestamp() * 1000);
+		newNode.setCreateTime(timestamp);
+		newNode.setModifyTime(timestamp);
+		
 		update.save(as, newNode, false);
 	}
 

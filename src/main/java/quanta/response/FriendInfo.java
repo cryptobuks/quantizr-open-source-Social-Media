@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 public class FriendInfo {
     private String displayName;
     private String userName;
+    private String relays;
     private String avatarVer;
     private String userNodeId;
     private String friendNodeId;

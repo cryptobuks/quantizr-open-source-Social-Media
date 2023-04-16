@@ -652,7 +652,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			if (req.getNodeId() != null) {
 				ret = user.getPeopleOnNode(ms, req.getNodeId());
 			} else {
-				ret = user.getPeople(ms, req.getType());
+				ret = user.getPeople(ms, req.getType(), req.getSubType());
 			}
 			ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
 			return ret;

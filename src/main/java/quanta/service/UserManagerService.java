@@ -1382,18 +1382,24 @@ public class UserManagerService extends ServiceBase {
 		return fi;
 	}
 
-	public GetPeopleResponse getPeople(MongoSession ms, String type) {
+	// NOTE: subType = null | "nostr"
+	public GetPeopleResponse getPeople(MongoSession ms, String type, String subType) {
 		GetPeopleResponse res = new GetPeopleResponse();
 
 		String nodeType = null;
+		Criteria moreCriteria = null;
 		if ("friends".equals(type)) {
 			nodeType = NodeType.FRIEND_LIST.s();
-		} else if ("blocks".equals(type)) {
+			if ("nostr".equals(subType)) {
+				moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
+			}
+		} //
+		else if ("blocks".equals(type)) {
 			nodeType = NodeType.BLOCKED_USERS.s();
 		} else {
 			throw new RuntimeException("Invalid type: " + type);
 		}
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, null, true, null);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, null, true, moreCriteria);
 
 		if (friendNodes != null) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -1418,6 +1424,7 @@ public class UserManagerService extends ServiceBase {
 			fi.setUserName(userName);
 			fi.setTags(friendNode.getTags());
 			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+			fi.setRelays(friendNode.getStr(NodeProp.NOSTR_RELAYS));
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
 			if (userNode != null) {

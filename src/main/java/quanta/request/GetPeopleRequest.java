@@ -12,4 +12,5 @@ public class GetPeopleRequest extends RequestBase {
     // means everyone mentioned in the text plus, everyone in the shares.
     private String nodeId;
     private String type; // friends | blocks
+    private String subType; // null | nostr
 }
