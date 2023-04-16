@@ -15,7 +15,11 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
-link on the Admin Console that can run the "test()" method */
+link on the Admin Console that can run the "test()" method
+
+References:
+https://github.com/nostr-protocol/nips/blob/master/01.md
+*/
 export class Nostr {
     TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
     TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
@@ -26,9 +30,11 @@ export class Nostr {
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
-        // await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL);
+        const res = await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
+
         // await this.updateProfile();
-        await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
+        // const res = await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
+        console.log("SaveCount: " + res.saveCount);
 
         // this.saveEvent();
 
@@ -167,15 +173,33 @@ export class Nostr {
         return await this.persistEvents(events, relayUrl);
     }
 
+    // Possible Filter Params
+    // "ids": <a list of event ids or prefixes>,
+    // "authors": <a list of pubkeys or prefixes, the pubkey of an event must be one of these>,
+    // "kinds": <a list of a kind numbers>,
+    // "#e": <a list of event ids that are referenced in an "e" tag>,
+    // "#p": <a list of pubkeys that are referenced in a "p" tag>,
+    // "since": <an integer unix timestamp, events must be newer than this to pass>,
+    // "until": <an integer unix timestamp, events must be older than this to pass>,
+    // "limit": <maximum number of events to be returned in the initial query>
+    //
+    // NOTE: We can set a limit and the relay is supposed to send the most *recent* ones up to around
+    // that value.
+    //
     // todo-0: need to allow relayUrl to be multiple newline delimited URLs
-    readPosts = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+    //
+    readPosts = async (userKey: string, relayUrl: string, since: number): Promise<J.SaveNostrEventResponse> => {
         console.log("readPosts for userKey: " + userKey);
         const relay = await this.openRelay(relayUrl);
-        const events = await relay.list([{
+        const query: any = {
             authors: [userKey],
             kinds: [Kind.Text],
-            limit: 4
-        }]);
+            limit: 25
+        };
+        if (since !== -1) {
+            query.since = since;
+        }
+        const events = await relay.list([query]);
         return await this.persistEvents(events, relayUrl);
     }
 
@@ -216,11 +240,6 @@ export class Nostr {
 
         profile = await nip05.queryProfile("jb55@jb55.com");
         console.log("PROFILE: " + S.util.prettyPrint(profile));
-
-        // console.log(profile.pubkey)
-        // // prints: 32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245
-        // console.log(profile.relays)
-        // // prints: [wss://relay.damus.io]
     }
 
     getFriends = async (): Promise<void> => {
@@ -239,7 +258,12 @@ export class Nostr {
 
             // todo-0: for now, run each person individually. We will eventually optimize into efficient batch
             // queries to do this all it once, as optimally as possible and transmit up to server efficiently
-            await this.readPosts(userName, person.relays);
+            await this.readPosts(userName, person.relays, -1);
         }
+    }
+
+    isNostrNode = (node: J.NodeInfo) => {
+        const id = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
+        return id?.startsWith(".");
     }
 }

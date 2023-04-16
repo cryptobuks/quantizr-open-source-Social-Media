@@ -11,4 +11,5 @@ public class SaveNostrEventResponse extends ResponseBase {
 
     // any accounts related to the request will be sent back as the MongoDB of the node created node
     private List<String> accntNodeIds;
+    private Integer saveCount;
 }

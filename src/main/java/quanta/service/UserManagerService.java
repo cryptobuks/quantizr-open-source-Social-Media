@@ -1001,6 +1001,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
 				userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
 				userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
+				userProfile.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (att != null) {

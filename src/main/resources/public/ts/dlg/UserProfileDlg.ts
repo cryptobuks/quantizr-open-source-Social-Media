@@ -175,8 +175,11 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
+                // make a "panel" for these (todo-0)
                 isNostr ? new Div("Nostr Public Key: ") : null,
                 isNostr ? new Div(state.userProfile.userName.substring(1)) : null,
+                isNostr ? new Div("Relays: ") : null,
+                isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
 
                 web3Div,
 

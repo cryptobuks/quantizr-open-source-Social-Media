@@ -47,4 +47,6 @@ public class UserProfile {
 	 */
 	private boolean following;
 	private boolean blocked;
+
+	private String relays;
 }

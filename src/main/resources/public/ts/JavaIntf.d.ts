@@ -166,6 +166,7 @@ export interface UserProfile {
     followingCount: number;
     following: boolean;
     blocked: boolean;
+    relays: string;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -965,6 +966,7 @@ export interface SaveNodeResponse extends ResponseBase {
 
 export interface SaveNostrEventResponse extends ResponseBase {
     accntNodeIds: string[];
+    saveCount: number;
 }
 
 export interface SavePublicKeyResponse extends ResponseBase {

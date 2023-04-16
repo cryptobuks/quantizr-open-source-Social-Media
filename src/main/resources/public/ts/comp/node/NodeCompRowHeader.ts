@@ -113,6 +113,10 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
+                        if (S.nostr.isNostrNode(this.node)) {
+                            S.util.showMessage("Replying not yet available for Nostr Nodes", "Warning");
+                            return;
+                        }
                         // when replying to a boost, we want to be able to additionally add to the sharing the person
                         // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
                         S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
@@ -132,6 +136,10 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
+                            if (S.nostr.isNostrNode(this.node)) {
+                                S.util.showMessage("Boosting not yet available for Nostr Nodes", "Warning");
+                                return;
+                            }
                             S.edit.addNode(null, null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
                         }
                     }
@@ -166,6 +174,10 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to like and create content.", "Login!");
                         }
                         else {
+                            if (S.nostr.isNostrNode(this.node)) {
+                                S.util.showMessage("Likes not yet available for Nostr Nodes", "Warning");
+                                return;
+                            }
                             S.edit.likeNode(this.node, !youLiked);
                         }
                     }

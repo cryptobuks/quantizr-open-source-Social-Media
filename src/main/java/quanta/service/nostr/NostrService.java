@@ -26,6 +26,7 @@ import quanta.mongo.model.SubNode;
 import quanta.request.SaveNostrEventRequest;
 import quanta.response.SaveNostrEventResponse;
 import quanta.util.XString;
+import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
 @Component
@@ -43,6 +44,7 @@ public class NostrService extends ServiceBase {
 
 	public SaveNostrEventResponse saveNostrEvent(SaveNostrEventRequest req) {
 		SaveNostrEventResponse res = new SaveNostrEventResponse();
+		IntVal saveCount = new IntVal(0);
 		if (req.getEvents() == null)
 			return res;
 		HashSet<String> accountNodeIds = new HashSet<>();
@@ -54,21 +56,22 @@ public class NostrService extends ServiceBase {
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event, accountNodeIds, req.getRelays());
+				saveEvent(as, event, accountNodeIds, req.getRelays(), saveCount);
 			}
 			return null;
 		});
 		res.setAccntNodeIds(new LinkedList<String>(accountNodeIds));
+		res.setSaveCount(saveCount.getVal());
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays) {
+	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays, IntVal saveCount) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
-				saveNostrMetadataEvent(as, event, accountNodeIds, relays);
+				saveNostrMetadataEvent(as, event, accountNodeIds, relays, saveCount);
 				break;
 			case KIND_Text:
-				saveNostrTextEvent(as, event, accountNodeIds);
+				saveNostrTextEvent(as, event, accountNodeIds, saveCount);
 				break;
 			default:
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
@@ -76,13 +79,14 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays) {
+	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays,
+			IntVal saveCount) {
 		// log.debug("METADATA:" + XString.prettyPrint(event));
 		try {
 			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
 			// log.debug("METADATA OBJ: " + XString.prettyPrint(metadata));
 
-			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null);
+			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
 
@@ -114,7 +118,7 @@ public class NostrService extends ServiceBase {
 		return displayName;
 	}
 
-	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds) {
+	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
 		if (nostrNode != null) {
 			log.debug("Nostr ID Existed: " + event.getId());
@@ -122,7 +126,7 @@ public class NostrService extends ServiceBase {
 		}
 
 		Val<SubNode> postsNode = new Val<>();
-		SubNode nostrAccnt = getNostrAccount(as, event.getPk(), postsNode);
+		SubNode nostrAccnt = getNostrAccount(as, event.getPk(), postsNode, saveCount);
 		if (nostrAccnt == null) {
 			log.debug("Unable to get account: " + event.getPk());
 			return;
@@ -140,23 +144,25 @@ public class NostrService extends ServiceBase {
 
 		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		newNode.setContent(event.getContent());
-		newNode.set(NodeProp.ACT_PUB_ID, event.getId());
+		newNode.set(NodeProp.ACT_PUB_ID, "." + event.getId());
 
 		Date timestamp = new Date(event.getTimestamp() * 1000);
 		newNode.setCreateTime(timestamp);
 		newNode.setModifyTime(timestamp);
-		
+
 		update.save(as, newNode, false);
+		saveCount.inc();
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	private SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode) {
+	private SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);
 			}
+			saveCount.inc();
 		} else {
 			if (postsNode != null) {
 				SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),

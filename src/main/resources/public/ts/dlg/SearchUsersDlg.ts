@@ -5,6 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
+import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -21,7 +22,7 @@ export class SearchUsersDlg extends DialogBase {
     static defaultSearchText: string = "";
     static defaultNostrRelay: string = "";
     searchTextField: TextField;
-    nostrRelayTextField: TextField;
+    nostrRelayTextField: TextArea;
     searchTextState: Validator = new Validator();
     nostrRelayState: Validator = new Validator();
 
@@ -77,7 +78,7 @@ export class SearchUsersDlg extends DialogBase {
         return [
             new Diva([
                 this.searchTextField = new TextField({ label: isNostr ? "User's Public Key" : "User Name", enter: this.search, val: this.searchTextState }),
-                isNostr ? (this.nostrRelayTextField = new TextField({ label: "Nostr Relay", enter: this.search, val: this.nostrRelayState })) : null,
+                isNostr ? (this.nostrRelayTextField = new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5)) : null,
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
