@@ -77,7 +77,7 @@ export class SearchUsersDlg extends DialogBase {
 
         return [
             new Diva([
-                this.searchTextField = new TextField({ label: isNostr ? "User's Public Key" : "User Name", enter: this.search, val: this.searchTextState }),
+                this.searchTextField = new TextField({ label: isNostr ? "Nostr User (npub or hex)" : "User Name", enter: this.search, val: this.searchTextState }),
                 isNostr ? (this.nostrRelayTextField = new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5)) : null,
                 adminOptions,
                 new ButtonBar([

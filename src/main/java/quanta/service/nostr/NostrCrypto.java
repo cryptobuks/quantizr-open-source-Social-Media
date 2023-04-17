@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.extern.slf4j.Slf4j;
 import quanta.model.client.NostrEvent;
 
@@ -16,6 +18,8 @@ import quanta.model.client.NostrEvent;
 
 @Slf4j
 public class NostrCrypto {
+    public static final ObjectMapper jsonMapper = new ObjectMapper();
+    private static ObjectWriter jsonWriter = jsonMapper.writer();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     public static boolean verifyEvent(NostrEvent event) {
@@ -25,53 +29,41 @@ public class NostrCrypto {
 
     public static boolean verifyEventProps(String id, String pubKey, Long createdAt, Integer kind, String content,
             ArrayList<ArrayList<String>> tags, String sig) {
-        StringBuilder serialized = new StringBuilder();
-        serialized.append("[");
-        serialized.append("0").append(",\"");
-        serialized.append(pubKey).append("\",");
-        serialized.append(createdAt).append(",");
-        serialized.append(kind).append(",");
-        serialized.append(serializeTags(tags));
-        serialized.append(",\"");
-        serialized.append(content.replace("\"", "\\\""));
-        serialized.append("\"]");
+        Integer zero = 0;
+
+        // we create tags if none exists so it seralizes to "[]", and not "null"
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        if (content == null) {
+            content = "";
+        }
+        ArrayList<Object> obj = new ArrayList<>();
+        obj.add(zero);
+        obj.add(pubKey);
+        obj.add(createdAt);
+        obj.add(kind);
+        obj.add(tags);
+        obj.add(content);
+        String serialized;
+        try {
+            serialized = jsonWriter.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        // log.debug("SERIALIZED:(" + serialized.toString() + ")");
 
         byte[] serBytes = serialized.toString().getBytes(StandardCharsets.UTF_8);
         byte[] sha256 = sha256(serBytes);
         String genId = bytesToHex(sha256);
         if (!id.equals(genId)) {
-            log.debug("ID does not match object.");
+            log.debug("ID does not match object: \n" + id + "\n" + genId);
             return false;
         }
 
-        boolean verified = verify(sha256, hexToBytes(pubKey), hexToBytes(sig));
+        boolean verified = verify(sha256, hexToBytes(pubKey), hexToBytes(sig));        
         // log.debug("Verified=" + verified + " ID=" + id);
         return verified;
-    }
-
-    public static String serializeTags(ArrayList<ArrayList<String>> tags) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        if (tags != null) {
-            int i = 0;
-            for (ArrayList<String> t : tags) {
-                if (i++ > 0) {
-                    sb.append(",");
-                }
-
-                sb.append("[");
-                int ii = 0;
-                for (String tag : t) {
-                    if (ii++ > 0) {
-                        sb.append(",");
-                    }
-                    sb.append("\"").append(tag.replace("\"", "\\\"")).append("\"");
-                }
-                sb.append("]");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
     }
 
     public static String bytesToHex(byte[] b) {

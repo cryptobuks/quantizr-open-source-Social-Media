@@ -6,6 +6,7 @@ import {
     getEventHash,
     getPublicKey,
     nip05,
+    nip19,
     relayInit,
     signEvent,
     validateEvent, verifySignature
@@ -30,11 +31,13 @@ export class Nostr {
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
-        const res = await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
+        this.testNpub();
+
+        // const res = await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
 
         // await this.updateProfile();
         // const res = await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
-        console.log("SaveCount: " + res.saveCount);
+        // console.log("SaveCount: " + res.saveCount);
 
         // this.saveEvent();
 
@@ -46,6 +49,11 @@ export class Nostr {
         // Object posted from Quanta
         // await this.getEvent(this.TEST_RELAY_URL, "fec9091d99d8aa4dc1d544563cecb587fea5c3ccb744ca668c8b4021daced097");
         // await this.publishEvent();
+    }
+
+    testNpub = () => {
+        const npub = nip19.decode("npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s"); // relay: wss://nos.lol
+        console.log("npub as hex: " + S.util.prettyPrint(npub));
     }
 
     // Logs keys to JS console
@@ -83,14 +91,24 @@ export class Nostr {
 
         event.id = getEventHash(event);
         event.sig = signEvent(event, this.sk);
-
-        const ok = validateEvent(event);
-        console.log("Event Status: ok=" + ok);
-        const veryOk = verifySignature(event);
-        console.log("Sig Status: ok=" + veryOk);
-
-        console.log("NEW EVENT: " + S.util.prettyPrint(event));
+        // console.log("NEW EVENT: " + S.util.prettyPrint(event));
         return event;
+    }
+
+    checkEvent = (event: Event): boolean => {
+        const ok = validateEvent(event);
+        const verifyOk = verifySignature(event);
+        // console.log("Event: " + event.id + " StatusOk=" + ok + " SigOk=" + verifyOk);
+        // console.log("SERIALIZED(" + JSON.stringify([
+        //     0,
+        //     event.pubkey,
+        //     event.created_at,
+        //     event.kind,
+        //     event.tags,
+        //     event.content
+        // ]) + ")");
+
+        return ok && verifyOk;
     }
 
     /* Opens a relay, retrieves a single event from the relay, and then shuts down the relay.
@@ -123,7 +141,7 @@ export class Nostr {
 
     // Opens a relay and only completes the promise when it's fully connected
     openRelay = async (rurl: string): Promise<Relay> => {
-        if (!rurl.startsWith("wss://")) {
+        if (!rurl.startsWith("wss://") && !rurl.startsWith("ws://")) {
             rurl = "wss://" + rurl;
         }
         const relay = relayInit(rurl);
@@ -163,10 +181,21 @@ export class Nostr {
         });
     }
 
-    readUserMetadata = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+    // user can be the hex or the npub of the identity
+    readUserMetadata = async (user: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
+        if (user.startsWith("npub")) {
+            const npub = nip19.decode(user);
+            if (npub.type === "npub") {
+                user = npub.data as string;
+            }
+            else {
+                console.log("Unhandled npub type: " + S.util.prettyPrint(npub));
+                return null;
+            }
+        }
         const relay = await this.openRelay(relayUrl);
         const events = await relay.list([{
-            authors: [userKey],
+            authors: [user],
             kinds: [Kind.Metadata],
             limit: 1
         }]);
@@ -209,6 +238,9 @@ export class Nostr {
         let idx = 0;
         events.forEach(event => {
             console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
+            if (!this.checkEvent(event)) {
+                console.log("eventCheck Failed.");
+            }
         });
 
         // Push the events up to the server for storage

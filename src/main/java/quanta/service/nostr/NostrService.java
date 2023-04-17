@@ -79,6 +79,10 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
+	/*
+	 * todo-0: need to have the smarts to know that when we encounter a newer (by timestamp) dated set
+	 * of metadata for a user that the new data should overwrite the outdated data.
+	 */
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays,
 			IntVal saveCount) {
 		// log.debug("METADATA:" + XString.prettyPrint(event));
@@ -174,6 +178,9 @@ public class NostrService extends ServiceBase {
 	}
 
 	public SubNode getNodeByNostrId(MongoSession ms, String id, boolean allowAuth) {
+		if (!id.startsWith(".")) {
+			id = "." + id;
+		}
 		// Otherwise for ordinary users root is based off their username
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).is(id);
