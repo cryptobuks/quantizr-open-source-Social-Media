@@ -8,6 +8,7 @@ import {
     nip05,
     nip19,
     SimplePool,
+    parseReferences,
     relayInit,
     signEvent,
     validateEvent, verifySignature
@@ -39,7 +40,7 @@ export class Nostr {
         await this.initKeys();
 
         // this.testNpub();
-        // await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
+        await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
 
         // await this.updateProfile();
         // await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
@@ -286,6 +287,8 @@ export class Nostr {
             if (!this.checkEvent(event)) {
                 console.log("eventCheck Failed.");
             }
+
+            this.dumpEventRefs(event);
         });
 
         // Push the events up to the server for storage
@@ -293,6 +296,28 @@ export class Nostr {
             events: this.makeEventsList(events),
             relays
         });
+    }
+
+    /* References are basically 'mentions', but can point to other things besides people too I think. But
+    we're not supporting this yet.
+    */
+    dumpEventRefs = (event: Event): void => {
+        const references = parseReferences(event);
+        console.log("REFS=" + S.util.prettyPrint(references));
+
+        // DO NOT DELETE
+        // let simpleAugmentedContent = event.content
+        // for (let i = 0; i < references.length; i++) {
+        // let { text, profile, event, address } = references[i];
+        // let augmentedReference = profile
+        //     ? `<strong>@${profilesCache[profile.pubkey].name}</strong>`
+        //     : event
+        //         ? `<em>${eventsCache[event.id].content.slice(0, 5)}</em>`
+        //         : address
+        //             ? `<a href="${text}">[link]</a>`
+        //             : text
+        // simpleAugmentedContent.replaceAll(text, augmentedReference)
+        // }
     }
 
     makeEventsList = (events: any[]): J.NostrEvent[] => {
