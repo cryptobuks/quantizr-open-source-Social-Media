@@ -79,10 +79,6 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	/*
-	 * todo-0: need to have the smarts to know that when we encounter a newer (by timestamp) dated set
-	 * of metadata for a user that the new data should overwrite the outdated data.
-	 */
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays,
 			IntVal saveCount) {
 		// log.debug("METADATA:" + XString.prettyPrint(event));

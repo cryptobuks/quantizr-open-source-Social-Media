@@ -103,6 +103,7 @@ export class UserProfileDlg extends DialogBase {
         }
 
         const isNostr: boolean = state.userProfile.userName.startsWith(".") && state.userProfile.userName.indexOf("@") === -1;
+        const nostrId = isNostr ? S.nostr.encodeToNpub(state.userProfile.userName.substring(1)) : "";
 
         const children = [
             new Diva([
@@ -175,11 +176,11 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                // make a "panel" for these (todo-0)
-                isNostr ? new Div("Nostr Public Key: ") : null,
-                isNostr ? new Div(state.userProfile.userName.substring(1)) : null,
-                isNostr ? new Div("Relays: ") : null,
-                isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
+                isNostr ? new Div("Identity: " + nostrId, { className: "marginLeft" }) : null,
+
+                // todo-0: oops relays need to be user-specific
+                // isNostr ? new Div("Relays: ") : null,
+                // isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
 
                 web3Div,
 
