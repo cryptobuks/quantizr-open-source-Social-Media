@@ -43,7 +43,7 @@ export class Nostr {
         await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
 
         // await this.updateProfile();
-        // await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL);
+        // await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false);
         // console.log("SaveCount: " + res.saveCount);
 
         // this.saveEvent();
@@ -213,13 +213,29 @@ export class Nostr {
         return user;
     }
 
-    // user can be the hex or the npub of the identity
-    readUserMetadata = async (userKey: string, relayUrl: string): Promise<J.SaveNostrEventResponse> => {
-        const relays: string[] = this.getRelays(relayUrl);
-        userKey = this.translateUserKey(userKey);
+    // user can be the hex, npub, or NIP05 address of the identity.
+    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean): Promise<J.SaveNostrEventResponse> => {
+        let relays = this.getRelays(relayUrl);
+        if (isNip05) {
+            const profile = await nip05.queryProfile(user);
+            if (!profile) return null;
+            // console.log("NIP05: " + S.util.prettyPrint(profile));
+            user = profile.pubkey;
+
+            if (profile.relays) {
+                relays = relays.concat(profile.relays);
+            }
+        }
+
+        if (relays.length === 0) {
+            console.warn("No relays. Can't lookup user: " + user);
+            return null;
+        }
+
+        user = this.translateUserKey(user);
 
         const query: any = {
-            authors: [userKey],
+            authors: [user],
             kinds: [Kind.Metadata],
             limit: 1
         };
@@ -270,7 +286,7 @@ export class Nostr {
     }
 
     getRelays = (relayUrls: string): string[] => {
-        if (!relayUrls) return null;
+        if (!relayUrls) return [];
         let relays: string[] = relayUrls.split("\n");
         if (relays) {
             relays = relays.map(r => r ? r.trim() : null).filter(r => !!r);

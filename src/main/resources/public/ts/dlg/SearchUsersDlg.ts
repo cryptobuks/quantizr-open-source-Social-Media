@@ -22,7 +22,6 @@ export class SearchUsersDlg extends DialogBase {
     static defaultSearchText: string = "";
     static defaultNostrRelay: string = "";
     searchTextField: TextField;
-    nostrRelayTextField: TextArea;
     searchTextState: Validator = new Validator();
     nostrRelayState: Validator = new Validator();
 
@@ -39,6 +38,7 @@ export class SearchUsersDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const isNostr = this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_NOSTR;
+        const isNostrNip05 = this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05;
 
         const adminOptions = new RadioButtonGroup([
             getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
@@ -72,13 +72,33 @@ export class SearchUsersDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => isNostr
+            }),
+            new RadioButton("Nostr User (NIP-05)", false, "optionsGroup", null, {
+                setValue: (checked: boolean) => {
+                    if (checked) {
+                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05 });
+                    }
+                },
+                getValue: (): boolean => isNostrNip05
             })
+
         ], "marginBottom marginTop");
+
+        let userLabel;
+        if (isNostr) {
+            userLabel = "Nostr User (npub or hex)";
+        }
+        else if (isNostrNip05) {
+            userLabel = "Nostr NIP-05";
+        }
+        else {
+            userLabel = "User Name";
+        }
 
         return [
             new Diva([
-                this.searchTextField = new TextField({ label: isNostr ? "Nostr User (npub or hex)" : "User Name", enter: this.search, val: this.searchTextState }),
-                isNostr ? (this.nostrRelayTextField = new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5)) : null,
+                this.searchTextField = new TextField({ label: userLabel, enter: this.search, val: this.searchTextState }),
+                isNostr || isNostrNip05 ? new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5) : null,
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -100,14 +120,18 @@ export class SearchUsersDlg extends DialogBase {
 
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
         SearchUsersDlg.defaultNostrRelay = this.nostrRelayState.getValue();
-
         const searchType = this.getState<LS>().searchType;
+
         if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR) {
             if (!SearchUsersDlg.defaultNostrRelay) {
                 S.util.showMessage("Nostr needs a relay.", "Warning");
                 return;
             }
-            const ret: J.SaveNostrEventResponse = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText, SearchUsersDlg.defaultNostrRelay);
+        }
+
+        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
+            const ret: J.SaveNostrEventResponse = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText,
+                SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
             // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
             this.close();
             if (ret.accntNodeIds?.length > 0) {

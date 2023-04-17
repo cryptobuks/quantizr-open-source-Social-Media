@@ -1144,6 +1144,7 @@ export const enum Constant {
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
     SEARCH_TYPE_USER_NOSTR = "userNostr",
+    SEARCH_TYPE_USER_NOSTR_NIP05 = "userNostrNip05",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
     FEED_PUB = "publicFediverse",
