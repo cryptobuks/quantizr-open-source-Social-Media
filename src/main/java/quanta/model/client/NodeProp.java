@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NodeProp {
     NOSTR_ID("sn:nosid"),    
     NOSTR_RELAYS("sn:relays"),
+    NOSTR_USER_NPUB("sn:npub"),
 
     // Activity Pub Properties
     OBJECT_ID("apid"), // todo-2: should rename to "ap:id"

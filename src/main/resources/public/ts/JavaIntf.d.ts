@@ -76,6 +76,7 @@ export interface NostrEvent {
     content: string;
     tags: string[][];
     timestamp: number;
+    npub: string;
 }
 
 export interface NostrMetadata {
@@ -1173,6 +1174,7 @@ export const enum ErrorType {
 export const enum NodeProp {
     NOSTR_ID = "sn:nosid",
     NOSTR_RELAYS = "sn:relays",
+    NOSTR_USER_NPUB = "sn:npub",
     OBJECT_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",

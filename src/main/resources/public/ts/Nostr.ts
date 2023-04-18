@@ -213,10 +213,12 @@ export class Nostr {
         return user;
     }
 
-    // user can be the hex, npub, or NIP05 address of the identity.
+    // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean): Promise<J.SaveNostrEventResponse> => {
         let relays = this.getRelays(relayUrl);
+        let npub = null;
         if (isNip05) {
+            npub = user;
             const profile = await nip05.queryProfile(user);
             if (!profile) return null;
             // console.log("NIP05: " + S.util.prettyPrint(profile));
@@ -233,6 +235,7 @@ export class Nostr {
         }
 
         user = this.translateUserKey(user);
+        // NOTE: By the time we get here 'user' will be a PublicKey (not npub or nip05)
 
         const query: any = {
             authors: [user],
@@ -241,6 +244,18 @@ export class Nostr {
         };
 
         const events = await this.queryRelays(relays, query);
+
+        if (events && events.length === 1) {
+            // save the npub onto the object, just to infomr server of it.
+            // todo-1: add type-safety here.
+            if (npub) {
+                (events[0] as any).npub = npub;
+            }
+            else {
+                (events[0] as any).npub = nip19.npubEncode(user);
+            }
+        }
+
         return await this.persistEvents(events, relayUrl);
     }
 
@@ -346,7 +361,10 @@ export class Nostr {
                 kind: event.kind,
                 content: event.content,
                 tags: event.tags,
-                timestamp: event.created_at
+                timestamp: event.created_at,
+
+                // note: npub on this Event is Quanta-specific
+                npub: event.npub
             });
         }
         return ret;

@@ -50,9 +50,19 @@ public class NostrService extends ServiceBase {
 		HashSet<String> accountNodeIds = new HashSet<>();
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-				if (!NostrCrypto.verifyEvent(event)) {
-					log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
-					continue;
+
+				/*
+				 * NOTE: todo-0: For performance, I'm removing this server-side verification for now (for anything
+				 * other than user metadata), but in the future we can do this in an async worker thread, such that
+				 * it will retro-actively delete the node from the DB if it does happen to be a bad signature. Since
+				 * we do veify on client, this server-side verify is basically just protection against hackers
+				 * (hostile actors)
+				 */
+				if (event.getKind() != KIND_Metadata) {
+					if (!NostrCrypto.verifyEvent(event)) {
+						log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
+						continue;
+					}
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
@@ -86,22 +96,33 @@ public class NostrService extends ServiceBase {
 			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
 			// log.debug("METADATA OBJ: " + XString.prettyPrint(metadata));
 
+			int beforeSaveCount = saveCount.getVal();
 			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
-
-			accountNodeIds.add(nostrAccnt.getIdStr());
-
-			// get the best display name we can find.
-			String displayName = getBestDisplayName(metadata);
-			nostrAccnt.set(NodeProp.DISPLAY_NAME, displayName);
-			nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
-			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
-			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
+			boolean isNew = saveCount.getVal() > beforeSaveCount;
 
 			Date timestamp = new Date(event.getTimestamp() * 1000);
-			nostrAccnt.setCreateTime(timestamp);
-			nostrAccnt.setModifyTime(timestamp);
+
+			// if this nostr object is a brand new one or newer data than our current info
+			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
+				accountNodeIds.add(nostrAccnt.getIdStr());
+
+				// get the best display name we can find.
+				String displayName = getBestDisplayName(metadata);
+				nostrAccnt.set(NodeProp.DISPLAY_NAME, displayName);
+				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
+				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
+
+				nostrAccnt.setCreateTime(timestamp);
+				nostrAccnt.setModifyTime(timestamp);
+			}
+
+			// todo-0: we need to have the logic here to append any NEW relays to existing list of relays.
+			// will need to parse to array, sort array, add new things, and resave
+			// todo-0: need to strip "wss://" from all relays because that's the default
+			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
