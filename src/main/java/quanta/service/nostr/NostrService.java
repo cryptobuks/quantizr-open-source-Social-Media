@@ -95,7 +95,7 @@ public class NostrService extends ServiceBase {
 			// get the best display name we can find.
 			String displayName = getBestDisplayName(metadata);
 			nostrAccnt.set(NodeProp.DISPLAY_NAME, displayName);
-			nostrAccnt.set(NodeProp.ACT_PUB_USER_ICON_URL, metadata.getPicture());
+			nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
 			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
 			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 
@@ -144,7 +144,7 @@ public class NostrService extends ServiceBase {
 
 		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		newNode.setContent(event.getContent());
-		newNode.set(NodeProp.ACT_PUB_ID, "." + event.getId());
+		newNode.set(NodeProp.OBJECT_ID, "." + event.getId());
 
 		Date timestamp = new Date(event.getTimestamp() * 1000);
 		newNode.setCreateTime(timestamp);
@@ -179,7 +179,7 @@ public class NostrService extends ServiceBase {
 		}
 		// Otherwise for ordinary users root is based off their username
 		Query q = new Query();
-		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).is(id);
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(id);
 		q.addCriteria(crit);
 
 		SubNode ret = mongoUtil.findOne(q);

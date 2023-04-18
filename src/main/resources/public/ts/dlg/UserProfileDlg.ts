@@ -177,8 +177,6 @@ export class UserProfileDlg extends DialogBase {
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
                 isNostr ? new Div("Identity: " + nostrId, { className: "marginLeft" }) : null,
-
-                // todo-0: oops relays need to be user-specific
                 // isNostr ? new Div("Relays: ") : null,
                 // isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
 

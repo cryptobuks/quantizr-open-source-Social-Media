@@ -90,7 +90,7 @@ public class ActPubOutbox extends ServiceBase {
              */
             HashSet<String> apIdSet = new HashSet<>();
             for (SubNode n : outboxItems) {
-                String apId = n.getStr(NodeProp.ACT_PUB_ID);
+                String apId = n.getStr(NodeProp.OBJECT_ID);
                 if (apId != null) {
                     apIdSet.add(apId);
                 }
@@ -350,7 +350,7 @@ public class ActPubOutbox extends ServiceBase {
                             // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
                             SubNode boostTargetNode = read.getNode(as, boostTarget);
                             if (boostTargetNode != null) {
-                                String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
+                                String boostedId = boostTargetNode.getStr(NodeProp.OBJECT_ID);
 
                                 if (boostedId == null) {
                                     boostedId = host + "?id=" + boostTarget;

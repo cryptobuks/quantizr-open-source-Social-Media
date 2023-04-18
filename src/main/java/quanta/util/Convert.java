@@ -135,7 +135,7 @@ public class Convert extends ServiceBase {
 				avatarVer = userAtt.getBin();
 			}
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-			apAvatar = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
 			owner = nameProp;
 
@@ -297,7 +297,7 @@ public class Convert extends ServiceBase {
 	public static String replaceTagsWithHtml(SubNode node, boolean includeHashtags) {
 
 		// don't process foreign-created nodes!
-		if (node.getStr(NodeProp.ACT_PUB_ID) != null) {
+		if (node.getStr(NodeProp.OBJECT_ID) != null) {
 			return null;
 		}
 

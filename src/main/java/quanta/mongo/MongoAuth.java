@@ -523,7 +523,7 @@ public class MongoAuth extends ServiceBase {
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 
 			// This will be null if it's a local node, and this is fine
-			foreignAvatarUrl = principalNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+			foreignAvatarUrl = principalNode.getStr(NodeProp.USER_ICON_URL);
 
 			if (foreignAvatarUrl == null) {
 				Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);

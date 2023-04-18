@@ -1014,7 +1014,7 @@ public class UserManagerService extends ServiceBase {
 				}
 				userProfile.setUserNodeId(userNode.getIdStr());
 
-				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+				userProfile.setApIconUrl(userNode.getStr(NodeProp.USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 				userProfile.setActorId(actorId);
@@ -1371,7 +1371,7 @@ public class UserManagerService extends ServiceBase {
 		fi.setUserName(userName);
 		fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 		fi.setUserNodeId(userNode.getIdStr());
-		fi.setForeignAvatarUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+		fi.setForeignAvatarUrl(userNode.getStr(NodeProp.USER_ICON_URL));
 
 		if (userName.indexOf("@") == -1) {
 			Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -1424,7 +1424,7 @@ public class UserManagerService extends ServiceBase {
 			fi.setFriendNodeId(friendNode.getIdStr());
 			fi.setUserName(userName);
 			fi.setTags(friendNode.getTags());
-			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.USER_ICON_URL));
 			fi.setRelays(friendNode.getStr(NodeProp.NOSTR_RELAYS));
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
@@ -1447,7 +1447,7 @@ public class UserManagerService extends ServiceBase {
 				else {
 					// set avatar here only if we didn't set it above already
 					if (fi.getForeignAvatarUrl() == null) {
-						fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+						fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.USER_ICON_URL));
 					}
 
 				}

@@ -44,7 +44,7 @@ export class NodeCompButtonBar extends Div {
         const specialAccountNode = type?.isSpecialAccountNode();
         if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
-        const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
+        const actPubId = S.props.getPropStr(J.NodeProp.OBJECT_ID, this.node);
         let deleteAllowed = false;
         let editableNode = true;
 

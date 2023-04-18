@@ -55,7 +55,7 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
         if (!accntUser) {
             return null;
         }
-        let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        let imgSrc = S.props.getClientPropStr(J.NodeProp.USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
         if (!imgSrc) {

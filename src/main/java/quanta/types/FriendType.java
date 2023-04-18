@@ -76,9 +76,9 @@ public class FriendType extends TypeBase {
                  * the live URL of their account avatar as it was found in their Actor object
                  */
 
-                String userIconUrl = accountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+                String userIconUrl = accountNode.getStr(NodeProp.USER_ICON_URL);
                 if (userIconUrl != null) {
-                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
+                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userIconUrl));
                 }
             }
         }

@@ -1173,7 +1173,7 @@ export const enum ErrorType {
 export const enum NodeProp {
     NOSTR_ID = "sn:nosid",
     NOSTR_RELAYS = "sn:relays",
-    ACT_PUB_ID = "apid",
+    OBJECT_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
     INREPLYTO = "ap:objInReplyTo",
@@ -1182,7 +1182,7 @@ export const enum NodeProp {
     ACT_PUB_OBJ_ICONS = "ap:objIcons",
     ACT_PUB_OBJ_NAME = "ap:objName",
     ACT_PUB_OBJ_ATTRIBUTED_TO = "ap:objAttributedTo",
-    ACT_PUB_USER_ICON_URL = "ap:userIcon",
+    USER_ICON_URL = "ap:userIcon",
     ACT_PUB_SHARED_INBOX = "ap:sharedInbox",
     ACT_PUB_USER_IMAGE_URL = "ap:userImage",
     ACT_PUB_ACTOR_ID = "ap:actorId",

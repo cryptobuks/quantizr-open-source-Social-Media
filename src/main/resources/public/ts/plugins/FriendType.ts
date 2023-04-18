@@ -62,7 +62,7 @@ export class FriendType extends TypeBase {
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
         const actorUrl = S.props.getClientPropStr(J.NodeProp.ACT_PUB_ACTOR_URL, node);
         const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
-        let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        let imgSrc = S.props.getClientPropStr(J.NodeProp.USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
         if (!imgSrc) {

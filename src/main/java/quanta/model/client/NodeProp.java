@@ -7,8 +7,7 @@ public enum NodeProp {
     NOSTR_RELAYS("sn:relays"),
 
     // Activity Pub Properties
-    // todo-0: Rename this to OBJECT_ID, because it's no longer specific to ActPub
-    ACT_PUB_ID("apid"), // todo-2: should rename to "ap:id"
+    OBJECT_ID("apid"), // todo-2: should rename to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent"), //
@@ -31,8 +30,7 @@ public enum NodeProp {
 
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo"), //
 
-    // todo-0: Rename this to remove ACT_PUB prefix, because it's not AP specific any longer.
-    ACT_PUB_USER_ICON_URL("ap:userIcon"), //
+    USER_ICON_URL("ap:userIcon"), //
 
     ACT_PUB_SHARED_INBOX("ap:sharedInbox"), //
     ACT_PUB_USER_IMAGE_URL("ap:userImage"), //

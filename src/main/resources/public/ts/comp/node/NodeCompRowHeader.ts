@@ -98,7 +98,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         const editInsertAllowed = S.props.isWritableByMe(this.node);
-        const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
+        const actPubId = S.props.getPropStr(J.NodeProp.OBJECT_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         // Also we don't allow admin user to do any replies

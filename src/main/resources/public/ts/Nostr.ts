@@ -381,7 +381,7 @@ export class Nostr {
     }
 
     isNostrNode = (node: J.NodeInfo) => {
-        const id = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
+        const id = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
         return id?.startsWith(".");
     }
 

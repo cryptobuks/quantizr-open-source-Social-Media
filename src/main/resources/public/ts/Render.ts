@@ -688,7 +688,7 @@ export class Render {
     }
 
     getAvatarImgUrlByNode = (node: J.NodeInfo): string => {
-        const avatarUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        const avatarUrl = S.props.getPropStr(J.NodeProp.USER_ICON_URL, node);
         if (avatarUrl) {
             return avatarUrl;
         }

@@ -543,7 +543,7 @@ public class MongoUtil extends ServiceBase {
 
 		// for (SubNode node : nodes) {
 		// // essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
-		// if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
+		// if (ok(node.getStr(NodeProp.OBJECT_ID)) && AclService.isPublic(ms, node)) {
 		// acl.makePublicAppendable(ms, node);
 		// }
 
@@ -673,7 +673,7 @@ public class MongoUtil extends ServiceBase {
 		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
 		// account)
 
-		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
+		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.OBJECT_ID.s());
 
 		createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
 

@@ -788,7 +788,7 @@ public class ActPubUtil extends ServiceBase {
             return null;
 
         // try this property first.
-        String replyTo = node.getStr(NodeProp.ACT_PUB_ID);
+        String replyTo = node.getStr(NodeProp.OBJECT_ID);
 
         // fall back to this...
         if (replyTo == null) {
@@ -835,7 +835,7 @@ public class ActPubUtil extends ServiceBase {
 
     // todo-1: method is part of a work in progress and is not complete
     public void readForeignReplies(MongoSession ms, SubNode node, LinkedList<NodeInfo> replyNodes) {
-        String apId = node.getStr(NodeProp.ACT_PUB_ID);
+        String apId = node.getStr(NodeProp.OBJECT_ID);
         if (apId == null) {
             // if no apId exists this isn't a foreign node, nothing to do here.
             return;
@@ -965,10 +965,10 @@ public class ActPubUtil extends ServiceBase {
                         }
 
                         /*
-                         * if this node has a NodeProp.ACT_PUB_ID property, we also add in all nodes that have a
+                         * if this node has a NodeProp.OBJECT_ID property, we also add in all nodes that have a
                          * NodeProp.INREPLYTO pointing to it, because they are also replies
                          */
-                        String replyTargetId = node.getStr(NodeProp.ACT_PUB_ID);
+                        String replyTargetId = node.getStr(NodeProp.OBJECT_ID);
 
                         // if node was an ActivityPub one we will have a replyTargetId here that's non null,
                         // and it will be a full URL to the replyTo, BUT if not then this node might point to
@@ -1105,7 +1105,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // Try to look up the node first from the DB.
-        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
+        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.OBJECT_ID.s(), url);
         if (nodeFound != null) {
             log.debug("loadObject(): Node found by ID: " + url);
             return nodeFound;
@@ -1124,7 +1124,7 @@ public class ActPubUtil extends ServiceBase {
     public SubNode loadObjectFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         String id = apStr(obj, APObj.id);
 
-        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), id);
+        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.OBJECT_ID.s(), id);
         if (nodeFound != null) {
             log.debug("loadObjectFromObj(): Node found by ID: " + id);
             return nodeFound;
@@ -1183,9 +1183,9 @@ public class ActPubUtil extends ServiceBase {
         if (icon != null) {
             String iconUrl = apStr(icon, APObj.url);
             if (iconUrl != null) {
-                String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+                String curIconUrl = node.getStr(NodeProp.USER_ICON_URL);
                 if (!iconUrl.equals(curIconUrl)) {
-                    if (node.set(NodeProp.ACT_PUB_USER_ICON_URL, iconUrl)) {
+                    if (node.set(NodeProp.USER_ICON_URL, iconUrl)) {
                         changed = true;
                     }
                 }

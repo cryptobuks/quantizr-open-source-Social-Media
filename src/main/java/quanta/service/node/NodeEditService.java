@@ -361,12 +361,12 @@ public class NodeEditService extends ServiceBase {
 			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
-			String userImgUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+			String userImgUrl = userNode.getStr(NodeProp.USER_ICON_URL);
 			if (!StringUtils.isEmpty(userImgUrl)) {
-				properties.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userImgUrl));
+				properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
 			}
 		
-			String nostrId = userNode.getStr(NodeProp.ACT_PUB_ID);
+			String nostrId = userNode.getStr(NodeProp.OBJECT_ID);
 			if (!StringUtils.isEmpty(nostrId)) {
 				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));
 			}
@@ -457,7 +457,7 @@ public class NodeEditService extends ServiceBase {
 						ThreadLocals.dirty(node);
 
 						// if this is a foreign post send message out to fediverse
-						if (node.getStr(NodeProp.ACT_PUB_ID) != null) {
+						if (node.getStr(NodeProp.OBJECT_ID) != null) {
 							apub.sendLikeMessage(as, ms.getUserName(), node);
 						}
 					}

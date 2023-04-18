@@ -106,7 +106,7 @@ public class ActPubService extends ServiceBase {
             apCache.inboxesByUserName.put(likedAccount.getStr(NodeProp.USER), inbox);
 
             // foreign ID of node being liked
-            String apId = node.getStr(NodeProp.ACT_PUB_ID);
+            String apId = node.getStr(NodeProp.OBJECT_ID);
 
             // the like needs to go out at least to this actorId
             String toActorId = node.getStr(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
@@ -173,7 +173,7 @@ public class ActPubService extends ServiceBase {
                     }
                 }
 
-                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
+                // String apId = parent.getStringProp(NodeProp.OBJECT_ID.s());
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
@@ -196,7 +196,7 @@ public class ActPubService extends ServiceBase {
                     if (!StringUtils.isEmpty(boostTarget)) {
                         SubNode boostTargetNode = read.getNode(ms, boostTarget);
                         if (boostTargetNode != null) {
-                            String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
+                            String boostedId = boostTargetNode.getStr(NodeProp.OBJECT_ID);
 
                             // What we're doing here is if this is not a foreign node being boosted we return
                             // a URL pointing to our local node.
@@ -296,7 +296,7 @@ public class ActPubService extends ServiceBase {
                     }
                 }
 
-                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
+                // String apId = parent.getStringProp(NodeProp.OBJECT_ID.s());
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
@@ -841,7 +841,7 @@ public class ActPubService extends ServiceBase {
 
             // if this is an undo operation we just delete the node and we're done.
             if (undo) {
-                delete.deleteByPropVal(as, NodeProp.ACT_PUB_ID.s(), activity.getId());
+                delete.deleteByPropVal(as, NodeProp.OBJECT_ID.s(), activity.getId());
                 return null;
             }
 
@@ -900,7 +900,7 @@ public class ActPubService extends ServiceBase {
             }
 
             // find node user wants to delete
-            SubNode delNode = read.findNodeByProp(as, NodeProp.ACT_PUB_ID.s(), id);
+            SubNode delNode = read.findNodeByProp(as, NodeProp.OBJECT_ID.s(), id);
             if (delNode == null)
                 return null;
 
@@ -1041,7 +1041,7 @@ public class ActPubService extends ServiceBase {
          * 
          * note: partial index "unique-apid", is what makes this lookup fast.
          */
-        SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), obj.getId());
+        SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.OBJECT_ID.s(), obj.getId());
 
         if (dupNode != null) {
             // If we found this node by ID and we aren't going to be updating it, return it as is.
@@ -1185,7 +1185,7 @@ public class ActPubService extends ServiceBase {
             newNode.set(NodeProp.ACT_PUB_SENSITIVE, "y");
         }
 
-        newNode.set(NodeProp.ACT_PUB_ID, obj.getId());
+        newNode.set(NodeProp.OBJECT_ID, obj.getId());
 
         if (objUrl != null) {
             newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
