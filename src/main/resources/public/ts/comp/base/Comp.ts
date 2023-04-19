@@ -94,7 +94,7 @@ export abstract class Comp implements CompIntf {
 
     public getRef = (warn: boolean = true): HTMLElement => {
         if (this.preRenderRejected) {
-            console.error("getRef was called on id " + this.getId() + " which will return null because of preRenderRejected");
+            // console.warn("getRef was called on id " + this.getId() + " (class: " + this.getCompClass() + ") which will return null because of preRenderRejected");
             return null;
         }
 
