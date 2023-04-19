@@ -287,11 +287,10 @@ export class Props {
     }
 
     isSystemProp = (prop: string): boolean => {
-        if (prop.indexOf(":") !== -1) return true;
-
-        // todo-1: It's kind of a shame we don't have a colon in each of these system
-        // properties so we have to list them here explicitly here to detect them.
         switch (prop) {
+            case J.NodeProp.RSS_FEED_SRC:
+                return false;
+
             case J.NodeProp.OBJECT_ID:
             case J.NodeProp.INLINE_CHILDREN:
             case J.NodeProp.PRIORITY:
@@ -303,9 +302,10 @@ export class Props {
             case J.NodeProp.IN_PENDING_PATH:
             case J.NodeProp.TRUNCATED:
                 return true;
-            default: break;
+
+            default:
+                return prop.indexOf(":") !== -1;
         }
-        return false;
     }
 
     /* This is kind of a hard-coded hack for the one particular type name

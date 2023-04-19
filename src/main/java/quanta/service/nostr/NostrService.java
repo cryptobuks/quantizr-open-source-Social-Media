@@ -50,7 +50,6 @@ public class NostrService extends ServiceBase {
 		HashSet<String> accountNodeIds = new HashSet<>();
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-
 				/*
 				 * NOTE: todo-0: For performance, I'm removing this server-side verification for now (for anything
 				 * other than user metadata), but in the future we can do this in an async worker thread, such that
@@ -121,7 +120,6 @@ public class NostrService extends ServiceBase {
 
 			// todo-0: we need to have the logic here to append any NEW relays to existing list of relays.
 			// will need to parse to array, sort array, add new things, and resave
-			// todo-0: need to strip "wss://" from all relays because that's the default
 			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
