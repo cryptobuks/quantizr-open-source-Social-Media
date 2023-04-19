@@ -93,13 +93,15 @@ export class User {
                 if (S.crypto.avail) {
                     await S.crypto.initKeys(callUsr, false, false, false, "all");
                 }
+                const nostrNpub = await S.nostr.initKeys();
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
                     dst: S.util.daylightSavingsTime,
                     sigKey: S.quanta.sigKey,
-                    asymEncKey: S.quanta.asymEncKey
+                    asymEncKey: S.quanta.asymEncKey,
+                    nostrNpub
                 }, false, true);
                 S.quanta.authToken = res.authToken;
 

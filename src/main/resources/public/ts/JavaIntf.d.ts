@@ -168,6 +168,7 @@ export interface UserProfile {
     following: boolean;
     blocked: boolean;
     relays: string;
+    nostrNpub: string;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -419,6 +420,7 @@ export interface LoginRequest extends RequestBase {
     password: string;
     asymEncKey: string;
     sigKey: string;
+    nostrNpub: string;
     tzOffset?: number;
     dst?: boolean;
 }

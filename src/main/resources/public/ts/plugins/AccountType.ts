@@ -34,7 +34,7 @@ export class AccountType extends TypeBase {
         // console.log("node: " + S.util.prettyPrint(node));
 
         // Note: Nostr names start with '.'
-        const name = node.owner.startsWith(".") ? S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) : node.owner;
+        const name = S.nostr.isNostrUserName(node.owner) ? S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) : node.owner;
 
         return new Divc({
             className: "systemNodeContent"

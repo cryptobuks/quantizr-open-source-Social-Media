@@ -71,8 +71,8 @@ export class Nostr {
         console.log("    npub: " + this.npub);
     }
 
-    // Initializes our keys
-    initKeys = async () => {
+    // Initializes our keys, and returns the npub key
+    initKeys = async (): Promise<string> => {
         // if already initialized do nothing.
         if (this.pk) return;
 
@@ -92,6 +92,7 @@ export class Nostr {
         }
 
         this.printKeys();
+        return this.npub;
     }
 
     encodeToNpub = (hex: string): string => {
@@ -387,9 +388,8 @@ export class Nostr {
 
         if (!res.people) return;
         for (const person of res.people) {
-            debugger;
             let userName = person.userName;
-            if (!userName.startsWith(".")) return;
+            if (!S.nostr.isNostrUserName(userName)) return;
             userName = userName.substring(1);
 
             // todo-0: for now, run each person individually. We will eventually optimize into efficient batch
@@ -401,6 +401,10 @@ export class Nostr {
     isNostrNode = (node: J.NodeInfo) => {
         const id = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
         return id?.startsWith(".");
+    }
+
+    isNostrUserName = (userName: string) => {
+        return userName?.startsWith(".") && userName.indexOf("@") === -1;
     }
 
     private async singleRelayQuery(relayUrl: string, query: any) {

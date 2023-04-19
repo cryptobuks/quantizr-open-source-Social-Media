@@ -49,4 +49,5 @@ public class UserProfile {
 	private boolean blocked;
 
 	private String relays;
+	private String nostrNpub;
 }

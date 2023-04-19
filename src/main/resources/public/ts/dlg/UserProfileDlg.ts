@@ -50,7 +50,7 @@ export class UserProfileDlg extends DialogBase {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
-        if (userName?.startsWith(".") && userName.indexOf("@") === -1) {
+        if (S.nostr.isNostrUserName(userName)) {
             userName = userName.substring(0, 17);
             return "Nostr Account";
         }
@@ -102,8 +102,14 @@ export class UserProfileDlg extends DialogBase {
             web3Div = new Diva(web3Comps);
         }
 
-        const isNostr: boolean = state.userProfile.userName.startsWith(".") && state.userProfile.userName.indexOf("@") === -1;
-        const nostrId = isNostr ? S.nostr.encodeToNpub(state.userProfile.userName.substring(1)) : "";
+        const isForeignNostr: boolean = S.nostr.isNostrUserName(state.userProfile.userName);
+        let nostrId: string = null;
+        if (isForeignNostr) {
+            nostrId = isForeignNostr ? S.nostr.encodeToNpub(state.userProfile.userName.substring(1)) : "";
+        }
+        else {
+            nostrId = state.userProfile.nostrNpub;
+        }
 
         const children = [
             new Diva([
@@ -176,7 +182,7 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                isNostr ? new Div("Identity: " + nostrId, { className: "marginLeft" }) : null,
+                nostrId ? new Div("Identity: " + nostrId, { className: "marginLeft" }) : null,
                 // isNostr ? new Div("Relays: ") : null,
                 // isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
 
