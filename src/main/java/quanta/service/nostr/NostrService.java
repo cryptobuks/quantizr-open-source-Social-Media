@@ -63,7 +63,7 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	public SaveNostrEventResponse saveNostrEvent(SaveNostrEventRequest req) {
+	public SaveNostrEventResponse saveNostrEvents(SaveNostrEventRequest req) {
 		SaveNostrEventResponse res = new SaveNostrEventResponse();
 		IntVal saveCount = new IntVal(0);
 		if (req.getEvents() == null)

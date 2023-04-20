@@ -957,7 +957,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object saveNode(@RequestBody SaveNostrEventRequest req, HttpSession session) {
 		log.debug("saveNostrEvent()");
 		return callProc.run("saveNostrEvent", true, true, req, session, ms -> {
-			return nostr.saveNostrEvent(req);
+			return nostr.saveNostrEvents(req);
 		});
 	}
 

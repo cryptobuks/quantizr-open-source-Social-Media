@@ -11,7 +11,7 @@ import {
     parseReferences,
     relayInit,
     signEvent,
-    validateEvent, verifySignature
+    validateEvent, verifySignature, Pub
 } from "nostr-tools";
 import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
@@ -74,7 +74,7 @@ export class Nostr {
     // Logs keys to JS console
     printKeys = () => {
         console.log("Nostr Keys:");
-        console.log("  Priv: " + this.sk);
+        // console.log("  Priv: " + this.sk); // keep this one secret by default
         console.log("  PubKey: " + this.pk);
         console.log("  npub: " + this.npub);
     }
@@ -188,7 +188,7 @@ export class Nostr {
     // todo-1: handle reject case.
     // Creates a test event and publishes it to our test relay. We can then call 'getEvent()' to verify
     // that we can read it back from the relay.
-    publishEvent = async (): Promise<void> => {
+    publishEvent_originalTest = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             const event = this.createEvent();
             const relay = await this.openRelay(this.TEST_RELAY_URL);
@@ -282,13 +282,12 @@ export class Nostr {
     // NOTE: We can set a limit and the relay is supposed to send the most *recent* ones up to around
     // that value.
     //
-    readPosts = async (userKey: string, relayUrl: string, since: number): Promise<J.SaveNostrEventResponse> => {
+    readPosts = async (userKeys: string[], relays: string[], since: number): Promise<J.SaveNostrEventResponse> => {
         // console.log("readPosts for userKey: " + userKey);
-        const relays: string[] = this.getRelays(relayUrl);
-        userKey = this.translateUserKey(userKey);
+        userKeys = userKeys.map(u => this.translateUserKey(u));
 
         const query: any = {
-            authors: [userKey],
+            authors: userKeys,
             kinds: [Kind.Text],
             limit: 25
         };
@@ -296,17 +295,24 @@ export class Nostr {
             query.since = since;
         }
 
-        const events = await this.queryRelays(relays, query);
-        return await this.persistEvents(events, relayUrl);
+        let ret = null;
+        try {
+            S.rpcUtil.incRpcCounter();
+            const events = await this.queryRelays(relays, query);
+            ret = await this.persistEvents(events, null);
+        }
+        finally {
+            S.rpcUtil.decRpcCounter();
+        }
+
+        return ret;
     }
 
     // Note: timestamp is assumed to be in milliseconds here.
     sendMessageToUser = async (content: string, timestamp: number, relaysStr: string, recipient: string): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
-            debugger;
             await this.initKeys();
             const relays = this.getRelays(relaysStr);
-
             recipient = this.translateUserKey(recipient);
 
             const event: any = {
@@ -318,24 +324,46 @@ export class Nostr {
             };
             event.id = getEventHash(event);
             event.sig = signEvent(event, this.sk);
-            let pub = null;
 
-            console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+            // console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+            let pub: Pub = null;
+            let relay: Relay = null;
+            let pool: SimplePool = null;
+            let poolRemainder = 0;
 
             if (relays.length === 1) {
-                const relay = await this.openRelay(relays[0]);
+                relay = await this.openRelay(relays[0]);
                 pub = await relay.publish(event);
             } else {
-                const pool = new SimplePool();
+                pool = new SimplePool();
                 pub = await pool.publish(relays, event);
+                poolRemainder = relays.length;
             }
+
             pub.on("ok", () => {
                 console.log("relay accepted event");
+                if (relay) {
+                    relay.close();
+                    relay = null;
+                }
+
+                if (pool && --poolRemainder === 0) {
+                    pool.close(relays);
+                    pool = null;
+                }
                 resolve(true);
             });
 
             pub.on("failed", (reason: any) => {
                 console.log(`relay failed: ${reason}`);
+                if (relay) {
+                    relay.close();
+                    relay = null;
+                }
+                if (pool && --poolRemainder === 0) {
+                    pool.close(relays);
+                    pool = null;
+                }
                 resolve(false);
             });
         });
@@ -354,7 +382,13 @@ export class Nostr {
         if (!relayUrls) return [];
         let relays: string[] = relayUrls.split("\n");
         if (relays) {
-            relays = relays.map(r => r ? r.trim() : null).filter(r => !!r);
+            relays = relays.map(r => {
+                if (!r) return r;
+                if (!r.startsWith("wss://")) {
+                    r = "wss://" + r;
+                }
+                return r;
+            }).filter(r => !!r);
         }
         return relays;
     }
@@ -373,10 +407,13 @@ export class Nostr {
         });
 
         // Push the events up to the server for storage
-        return await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
+        const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
             events: this.makeEventsList(events),
             relays
         });
+        console.log("Save Count: " + res.saveCount);
+        return res;
+
     }
 
     /* References are basically 'mentions', but can point to other things besides people too I think. But
@@ -428,7 +465,7 @@ export class Nostr {
         console.log("PROFILE: " + S.util.prettyPrint(profile));
     }
 
-    getFriends = async (): Promise<void> => {
+    readPostsFromFriends = async (): Promise<void> => {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,
             type: "friends",
@@ -436,15 +473,26 @@ export class Nostr {
         });
 
         if (!res.people) return;
-        for (const person of res.people) {
-            let userName = person.userName;
-            if (!S.nostr.isNostrUserName(userName)) return;
-            userName = userName.substring(1);
+        const userNames: string[] = [];
+        const relaysSet: Set<String> = new Set<String>();
 
-            // todo-0: for now, run each person individually. We will eventually optimize into efficient batch
-            // queries to do this all it once, as optimally as possible and transmit up to server efficiently
-            await this.readPosts(userName, person.relays, -1);
+        // scan all people to build list of users and relays to read from
+        for (const person of res.people) {
+            if (!S.nostr.isNostrUserName(person.userName)) continue;
+            userNames.push(person.userName.substring(1));
+            const personRelays = this.getRelays(person.relays);
+            if (personRelays) {
+                personRelays.forEach(r => relaysSet.add(r));
+            }
         }
+
+        const relaysArray: string[] = [];
+        relaysSet.forEach((r: any) => relaysArray.push(r));
+
+        if (userNames.length > 0 && relaysArray.length > 0) {
+            console.log("Reading " + userNames.length + " users from " + relaysArray.length + " relays.");
+        }
+        await this.readPosts(userNames, relaysArray, -1);
     }
 
     isNostrNode = (node: J.NodeInfo) => {
@@ -452,16 +500,23 @@ export class Nostr {
         return id?.startsWith(".");
     }
 
+    isActPubNode = (node: J.NodeInfo) => {
+        const id = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
+        return id && !id.startsWith(".");
+    }
+
     isNostrUserName = (userName: string) => {
         return userName?.startsWith(".") && userName.indexOf("@") === -1;
     }
 
-    private async singleRelayQuery(relayUrl: string, query: any) {
+    private async singleRelayQuery(relayUrl: string, query: any): Promise<Event[]> {
         const relay = await this.openRelay(relayUrl);
-        return await relay.list([query]);
+        const ret = await relay.list([query]);
+        relay.close();
+        return ret;
     }
 
-    private async multiRelayQuery(relays: string[], query: any) {
+    private async multiRelayQuery(relays: string[], query: any): Promise<Event[]> {
         const pool = new SimplePool();
 
         // DO NOT DELETE
@@ -481,6 +536,8 @@ export class Nostr {
         //     // ...
         // })
 
-        return await pool.list(relays, [query]);
+        const ret = await pool.list(relays, [query]);
+        pool.close(relays);
+        return ret;
     }
 }

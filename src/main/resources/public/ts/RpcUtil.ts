@@ -232,6 +232,18 @@ export class RpcUtil {
         // window.location.href = window.location.origin;
     }
 
+    incRpcCounter = () => {
+        this.rpcCounter++;
+    }
+
+    decRpcCounter = () => {
+        this.rpcCounter--;
+        if (this.rpcCounter < 0) {
+            this.rpcCounter = 0;
+        }
+        this.progressInterval();
+    }
+
     isRpcWaiting = (): boolean => {
         return this.rpcCounter > 0;
     }

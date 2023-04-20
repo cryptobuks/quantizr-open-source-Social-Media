@@ -659,7 +659,7 @@ export class Nav {
     }
 
     messagesFromFriends = async () => {
-        await S.nostr.getFriends();
+        await S.nostr.readPostsFromFriends();
 
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
