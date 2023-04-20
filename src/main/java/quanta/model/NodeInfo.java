@@ -34,7 +34,7 @@ public class NodeInfo {
 
 	private String tags;
 
-	private Date lastModified;
+	private Long lastModified;
 	private String timeAgo;
 
 	// This is the 0-offset position (index) of the node within the resultset that
@@ -109,7 +109,7 @@ public class NodeInfo {
 		this.content = content;
 		this.renderContent = renderContent;
 		this.tags = tags;
-		this.lastModified = lastModified;
+		this.lastModified = lastModified.getTime();
 		if (lastModified != null) {
 			this.timeAgo = DateUtil.formatDurationMillis(System.currentTimeMillis() - lastModified.getTime(), false);
 		}

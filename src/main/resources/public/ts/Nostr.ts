@@ -40,7 +40,13 @@ export class Nostr {
         await this.initKeys();
 
         // this.testNpub();
-        await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
+
+        // await this.getEvent("wss://relay.snort.social", "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2");
+
+        // this.sendMessageToUser("Hi Clay!", ["wss://relay.snort.social"], "npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
+
+        // this.testNpub();
+        // await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
 
         // await this.updateProfile();
         // await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false);
@@ -59,16 +65,18 @@ export class Nostr {
     }
 
     testNpub = () => {
-        const npub = nip19.decode("npub1xtscya34g58tk0z605fvr788k263gsu6cy9x0mhnm87echrgufzsevkk5s"); // relay: wss://nos.lol
+        // "content": "Hi nostr:npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7",
+
+        const npub = nip19.decode("npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
         console.log("npub as hex: " + S.util.prettyPrint(npub));
     }
 
     // Logs keys to JS console
     printKeys = () => {
         console.log("Nostr Keys:");
-        console.log("    Priv: " + this.sk);
-        console.log("    PubKey: " + this.pk);
-        console.log("    npub: " + this.npub);
+        console.log("  Priv: " + this.sk);
+        console.log("  PubKey: " + this.pk);
+        console.log("  npub: " + this.npub);
     }
 
     // Initializes our keys, and returns the npub key
@@ -292,6 +300,47 @@ export class Nostr {
         return await this.persistEvents(events, relayUrl);
     }
 
+    // Note: timestamp is assumed to be in milliseconds here.
+    sendMessageToUser = async (content: string, timestamp: number, relaysStr: string, recipient: string): Promise<boolean> => {
+        return new Promise<boolean>(async (resolve, reject) => {
+            debugger;
+            await this.initKeys();
+            const relays = this.getRelays(relaysStr);
+
+            recipient = this.translateUserKey(recipient);
+
+            const event: any = {
+                kind: 1,
+                pubkey: this.pk,
+                created_at: Math.floor(timestamp / 1000),
+                tags: [["p", recipient]],
+                content
+            };
+            event.id = getEventHash(event);
+            event.sig = signEvent(event, this.sk);
+            let pub = null;
+
+            console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+
+            if (relays.length === 1) {
+                const relay = await this.openRelay(relays[0]);
+                pub = await relay.publish(event);
+            } else {
+                const pool = new SimplePool();
+                pub = await pool.publish(relays, event);
+            }
+            pub.on("ok", () => {
+                console.log("relay accepted event");
+                resolve(true);
+            });
+
+            pub.on("failed", (reason: any) => {
+                console.log(`relay failed: ${reason}`);
+                resolve(false);
+            });
+        });
+    }
+
     queryRelays = async (relays: string[], query: any): Promise<Event[]> => {
         if (relays.length === 1) {
             return await this.singleRelayQuery(relays[0], query);
@@ -413,7 +462,7 @@ export class Nostr {
     }
 
     private async multiRelayQuery(relays: string[], query: any) {
-        const pool = new SimplePool()
+        const pool = new SimplePool();
 
         // DO NOT DELETE
         // -------------

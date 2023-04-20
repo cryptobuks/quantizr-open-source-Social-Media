@@ -159,6 +159,11 @@ export class AppState {
 
     bookmarks: J.Bookmark[];
     editNode: J.NodeInfo;
+
+    // during editing we hold the nostr recipients and relays to send the message to when the user saves
+    nostrRecips: string;
+    nostrRecipRelays: string;
+
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'
     editNodeReplyToId: string;
     editShowJumpButton: boolean;

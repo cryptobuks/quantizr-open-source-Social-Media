@@ -783,6 +783,8 @@ export class EditNodeDlg extends DialogBase {
         EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {
             s.editNode = null;
+            s.nostrRecipRelays = null;
+            s.nostrRecips = null;
             s.editNodeOnTab = null;
             s.editNodeReplyToId = null;
             S.quanta.newNodeTargetId = null;

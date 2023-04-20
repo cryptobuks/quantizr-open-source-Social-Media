@@ -686,6 +686,8 @@ export interface CopySharingResponse extends ResponseBase {
 export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
     encrypt: boolean;
+    nostrRecips: string;
+    nostrRecipRelays: string;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {
@@ -1063,7 +1065,7 @@ export interface NodeInfo {
     content: string;
     renderContent: string;
     tags: string;
-    lastModified: Date;
+    lastModified: number;
     timeAgo: string;
     logicalOrdinal: number;
     ordinal: number;

@@ -90,7 +90,7 @@ export class Edit {
     }
 
     public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string) => {
+        showJumpButton: boolean, replyToId: string, nostrRecips: string, nostrRecipRelays: string) => {
         const ast = getAs();
         if (S.util.checkSuccess("Editing node", res)) {
             if (ast.mobileMode) forceUsePopup = true;
@@ -120,6 +120,8 @@ export class Edit {
                         s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editNode = res.nodeInfo;
+                        s.nostrRecips = nostrRecips;
+                        s.nostrRecipRelays = nostrRecipRelays;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                     });
@@ -129,12 +131,16 @@ export class Edit {
                 else if (editInPopup) {
                     await promiseDispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
+                        s.nostrRecips = nostrRecips;
+                        s.nostrRecipRelays = nostrRecipRelays;
                     });
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
+                        s.nostrRecips = nostrRecips;
+                        s.nostrRecipRelays = nostrRecipRelays;
                         s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
@@ -251,7 +257,6 @@ export class Edit {
                     boosterUserId: null,
                     reply: false
                 });
-
                 if (blob) {
                     this.createSubNodeResponse(res, false, null);
                 }
@@ -296,7 +301,7 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, getAs());
-            this.runEditNode(null, res.newNode.id, false, false, false, null, false);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, false, null, null);
         }
     }
 
@@ -306,7 +311,7 @@ export class Edit {
                 S.quanta.refresh();
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, false);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, false, res.nostrRecips, res.nostrRecipRelays);
             }
         }
     }
@@ -708,7 +713,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, false);
+        this.runEditNode(null, id, false, false, false, null, false, null, null);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -717,7 +722,9 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
+    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean,
+        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean,
+        nostrRecips: string, nostrRecipRelays: string) => {
         if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -744,7 +751,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, nostrRecips, nostrRecipRelays);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, ast?: AppState) => {
@@ -1206,8 +1213,6 @@ export class Edit {
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
         boostTarget: string, fediSend: boolean) => {
-
-        console.log("boosterUserId: " + boosterUserId);
 
         // auto-enable edit mode
         if (!boostTarget && !getAs().userPrefs.editMode) {

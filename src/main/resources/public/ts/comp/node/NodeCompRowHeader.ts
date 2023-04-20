@@ -32,6 +32,7 @@ export class NodeCompRowHeader extends Div {
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
+        const isNostr = S.nostr.isNostrNode(this.node);
 
         // if user has set their displayName
         if (this.node.displayName) {
@@ -103,7 +104,7 @@ export class NodeCompRowHeader extends Div {
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         // Also we don't allow admin user to do any replies
         // WARNING: Mastodon can't cope with the concept of replying to the actual booster node but only the booseted node,
-        // do don'w allow replying to boosts.
+        // do don't allow replying to boosts.
         if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
@@ -113,10 +114,6 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        if (S.nostr.isNostrNode(this.node)) {
-                            S.util.showMessage("Replying not yet available for Nostr Nodes", "Warning");
-                            return;
-                        }
                         // when replying to a boost, we want to be able to additionally add to the sharing the person
                         // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
                         S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
@@ -127,7 +124,7 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo) {
             // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
-            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
+            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode && !isNostr) {
                 children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg rowHeaderIcon",
@@ -136,10 +133,6 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            if (S.nostr.isNostrNode(this.node)) {
-                                S.util.showMessage("Boosting not yet available for Nostr Nodes", "Warning");
-                                return;
-                            }
                             S.edit.addNode(null, null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
                         }
                     }
@@ -160,7 +153,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
-            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
+            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser && !isNostr) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
                     className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
@@ -174,10 +167,6 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to like and create content.", "Login!");
                         }
                         else {
-                            if (S.nostr.isNostrNode(this.node)) {
-                                S.util.showMessage("Likes not yet available for Nostr Nodes", "Warning");
-                                return;
-                            }
                             S.edit.likeNode(this.node, !youLiked);
                         }
                     }
@@ -361,7 +350,7 @@ export class NodeCompRowHeader extends Div {
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
+        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode && !isNostr) {
             if (editingAllowed && editableNode) {
                 editButton = new Icon({
                     className: "fa fa-edit fa-lg buttonBarIcon",

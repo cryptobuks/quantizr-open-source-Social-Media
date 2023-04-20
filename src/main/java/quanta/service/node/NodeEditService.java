@@ -163,6 +163,7 @@ public class NodeEditService extends ServiceBase {
 
 		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
+			// todo-0: should nostr be closely integrated here? as an INREPLYTO??
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
 
@@ -196,6 +197,19 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (allowSharing) {
+			// if replying to a Nostr foreign Node, we get the npub and relays of who we're replying to
+			// and put then in the response so the client can send the message.
+			if (nodeBeingRepliedTo != null) {
+				String objId = nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID);
+				if (objId != null && objId.startsWith(".")) {
+					SubNode replyToNostrAccnt = read.getNode(ms, nodeBeingRepliedTo.getOwner(), false);
+					if (replyToNostrAccnt != null) {
+						res.setNostrRecips(replyToNostrAccnt.getStr(NodeProp.NOSTR_USER_NPUB));
+						res.setNostrRecipRelays(replyToNostrAccnt.getStr(NodeProp.NOSTR_RELAYS));
+					}
+				}
+			}
+
 			// if a user to share to (a Direct Message) is provided, add it.
 			if (req.getShareToUserId() != null) {
 				HashMap<String, AccessControl> ac = new HashMap<>();
@@ -365,7 +379,7 @@ public class NodeEditService extends ServiceBase {
 			if (!StringUtils.isEmpty(userImgUrl)) {
 				properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
 			}
-		
+
 			String nostrId = userNode.getStr(NodeProp.OBJECT_ID);
 			if (!StringUtils.isEmpty(nostrId)) {
 				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));

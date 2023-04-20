@@ -96,6 +96,12 @@ export class EditNodeDlgUtil {
         if (!res?.success) {
             return false;
         }
+
+        // console.log("NEW OBJ: "+S.util.prettyPrint(res.node));
+        if (ast.nostrRecips) {
+            S.nostr.sendMessageToUser(editNode.content, res.node.lastModified, ast.nostrRecipRelays, ast.nostrRecips);
+        }
+
         dlg.resetAutoSaver();
 
         S.render.fadeInId = editNode.id;
