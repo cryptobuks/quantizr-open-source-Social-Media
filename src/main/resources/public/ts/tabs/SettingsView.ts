@@ -8,6 +8,7 @@ import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
+import { EditNostrKeyAndRelaysDlg } from "../dlg/EditNostrKeyAndRelaysDlg";
 import { ManageCryptoKeysDlg } from "../dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "../dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
@@ -42,6 +43,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Logout", S.user.userLogout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
+                        this.settingsLink("Nostr Settings", () => new EditNostrKeyAndRelaysDlg().open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Storage Space", () => new ManageStorageDlg().open())
                     ]),

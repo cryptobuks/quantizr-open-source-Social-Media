@@ -37,6 +37,9 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
+        const isNostr = S.nostr.isNostrUserName(this.friend.userName);
+        const nameSuffix = isNostr ? " (Nostr)" : "";
+
         this.setChildren([
             new Diva([
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
@@ -66,8 +69,8 @@ export class FriendsTableRow extends ListBoxRow {
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
                     new Diva([
-                        this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,
-                        this.friend.userName ? new Div("@" + this.friend.userName) : null
+                        this.friend.displayName ? new Div(this.friend.displayName + nameSuffix, { className: "friendName" }) : null,
+                        this.friend.userName && !isNostr ? new Div("@" + this.friend.userName) : null
                     ]),
 
                     // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,

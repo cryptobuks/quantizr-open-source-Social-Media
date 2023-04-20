@@ -24,7 +24,10 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.SaveNostrEventRequest;
+import quanta.request.SaveNostrSettingsRequest;
 import quanta.response.SaveNostrEventResponse;
+import quanta.response.SaveNostrSettingsResponse;
+import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
@@ -41,6 +44,24 @@ public class NostrService extends ServiceBase {
 	// todo-1: put in enum
 	static final int KIND_Metadata = 0;
 	static final int KIND_Text = 1;
+
+	public SaveNostrSettingsResponse saveNostrSettings(SaveNostrSettingsRequest req) {
+		SaveNostrSettingsResponse res = new SaveNostrSettingsResponse();
+		String userName = ThreadLocals.getSC().getUserName();
+
+		arun.run(as -> {
+			boolean failed = false;
+			SubNode userNode = read.getUserNodeByUserName(as, userName);
+
+			if (!failed) {
+				userNode.set(NodeProp.NOSTR_RELAYS, req.getRelays());
+				update.save(as, userNode);
+				res.setSuccess(true);
+			}
+			return null;
+		});
+		return res;
+	}
 
 	public SaveNostrEventResponse saveNostrEvent(SaveNostrEventRequest req) {
 		SaveNostrEventResponse res = new SaveNostrEventResponse();

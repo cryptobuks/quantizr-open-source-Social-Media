@@ -109,6 +109,7 @@ import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SaveNostrEventRequest;
+import quanta.request.SaveNostrSettingsRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
@@ -941,6 +942,14 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		return callProc.run("updateFriendNode", true, true, req, session, ms -> {
 			return edit.updateFriendNode(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/saveNostrSettings", method = RequestMethod.POST)
+	public @ResponseBody Object saveNode(@RequestBody SaveNostrSettingsRequest req, HttpSession session) {
+		log.debug("saveNostrSettings()");
+		return callProc.run("saveNostrSettings", true, true, req, session, ms -> {
+			return nostr.saveNostrSettings(req);
 		});
 	}
 

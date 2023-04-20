@@ -536,6 +536,12 @@ export interface SaveNostrEventRequest extends RequestBase {
     relays: string;
 }
 
+export interface SaveNostrSettingsRequest extends RequestBase {
+    target: string;
+    key: string;
+    relays: string;
+}
+
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
@@ -972,6 +978,9 @@ export interface SaveNodeResponse extends ResponseBase {
 export interface SaveNostrEventResponse extends ResponseBase {
     accntNodeIds: string[];
     saveCount: number;
+}
+
+export interface SaveNostrSettingsResponse extends ResponseBase {
 }
 
 export interface SavePublicKeyResponse extends ResponseBase {
