@@ -915,6 +915,12 @@ export class EditNodeDlg extends DialogBase {
     async initContent(): Promise<void> {
         const ast = getAs();
         const value = ast.editNode.content || "";
+
+        // this is 'per spec' but mentions are not required and we're not supporting this yet.
+        // if (ast.nostrRecips) {
+        //     value = "nostr:" + ast.nostrRecips + value;
+        // }
+
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
         if (!encrypted) {
             this.contentEditorState.setValue(value);

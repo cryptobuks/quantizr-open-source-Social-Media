@@ -202,6 +202,8 @@ public class NodeEditService extends ServiceBase {
 			if (nodeBeingRepliedTo != null) {
 				String objId = nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID);
 				if (objId != null && objId.startsWith(".")) {
+
+					// If we're replying to a Nostr user, send back the nostr info
 					SubNode replyToNostrAccnt = read.getNode(ms, nodeBeingRepliedTo.getOwner(), false);
 					if (replyToNostrAccnt != null) {
 						res.setNostrRecips(replyToNostrAccnt.getStr(NodeProp.NOSTR_USER_NPUB));
@@ -212,6 +214,14 @@ public class NodeEditService extends ServiceBase {
 
 			// if a user to share to (a Direct Message) is provided, add it.
 			if (req.getShareToUserId() != null) {
+
+				// If we're sharing to a Nostr user, send back the nostr info
+				SubNode shareToNostrAccnt = read.getNode(ms, req.getShareToUserId(), false);
+				if (shareToNostrAccnt != null && nostr.isNostrUserName(shareToNostrAccnt.getStr(NodeProp.USER))) {
+					res.setNostrRecips(shareToNostrAccnt.getStr(NodeProp.NOSTR_USER_NPUB));
+					res.setNostrRecipRelays(shareToNostrAccnt.getStr(NodeProp.NOSTR_RELAYS));
+				}
+
 				HashMap<String, AccessControl> ac = new HashMap<>();
 				ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
 				newNode.setAc(ac);
