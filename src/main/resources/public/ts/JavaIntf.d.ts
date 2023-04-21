@@ -82,9 +82,12 @@ export interface NostrEvent {
 export interface NostrMetadata {
     name: string;
     username: string;
-    displayName: string;
     about: string;
     picture: string;
+    banner: string;
+    website: string;
+    nip05: string;
+    display_name: string;
 }
 
 export interface OpenGraph {
@@ -356,6 +359,7 @@ export interface GetSharedNodesRequest extends RequestBase {
 export interface GetThreadViewRequest extends RequestBase {
     nodeId: string;
     loadOthers: boolean;
+    nostrNodeIds: string[];
 }
 
 export interface GetUserAccountInfoRequest extends RequestBase {
@@ -976,6 +980,7 @@ export interface SaveNodeResponse extends ResponseBase {
 }
 
 export interface SaveNostrEventResponse extends ResponseBase {
+    eventNodeIds: string[];
     accntNodeIds: string[];
     saveCount: number;
 }
@@ -1188,6 +1193,11 @@ export const enum NodeProp {
     NOSTR_ID = "sn:nosid",
     NOSTR_RELAYS = "sn:relays",
     NOSTR_USER_NPUB = "sn:npub",
+    NOSTR_TAGS = "sn:ntags",
+    NOSTR_NAME = "sn:nosName",
+    NOSTR_USER_NAME = "sn:nosUserName",
+    NOSTR_NIP05 = "sn:nosNip05",
+    NOSTR_USER_WEBSITE = "sn:nosWebsite",
     OBJECT_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",

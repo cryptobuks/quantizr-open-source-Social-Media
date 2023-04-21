@@ -907,8 +907,12 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
      * towards the root of the tree.
+     * 
+     * NOTE: If nostrNodeIds is provided (non-null) we use it to completely determine the thread
+     * content, rather than looking at tree parents or IN_REPLY_TO.
      */
-    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
+    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, List<String> nostrNodeIds,
+            boolean loadOthers) {
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
 
@@ -928,7 +932,7 @@ public class ActPubUtil extends ServiceBase {
         // }
 
         // iterate up the parent chain or chain of inReplyTo for ActivityPub
-        while (node != null && nodes.size() < MAX_THREAD_NODES) {
+        while (node != null && (nodes.size() < MAX_THREAD_NODES || (nostrNodeIds != null && nostrNodeIds.size() > 0))) {
             try {
                 NodeInfo info = null;
 
@@ -1006,12 +1010,31 @@ public class ActPubUtil extends ServiceBase {
 
                 // if topNode, set parent to null, to trigger the only path up to have to
                 // go thru an inReplyTo, rather than be based on tree structure.
-                SubNode parent = topNode ? null : read.getParent(ms, node);
+                // SubNode parent = topNode ? null : read.getParent(ms, node);
+                SubNode parent = null;
+                if (topNode) {
+                    // leave parent == null;
+                } else {
+                    // if Nostr is contolling out thread content
+                    if (nostrNodeIds != null && nostrNodeIds.size() > 0) {
+
+                        // grap the current topmost nostrIdId and then remove it from the array.
+                        parent = read.getNode(ms, nostrNodeIds.get(0));
+                        if (parent != null) {
+                            // log.debug("Got Nostr ThreadItem: " + parent.getIdStr());
+                        }
+                        nostrNodeIds.remove(0);
+                    }
+                    // else non-nostr way here...
+                    else {
+                        parent = read.getParent(ms, node);
+                    }
+                }
                 boolean top = parent != null && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
 
                 // if we didn't get a usable (non root) parent from the tree structure, try using the 'inReplyTo'
                 // value
-                if (parent == null || top) {
+                if (nostrNodeIds == null && (parent == null || top)) {
                     String inReplyTo = node.getStr(NodeProp.INREPLYTO);
                     // if node has an inReplyTo...
                     if (inReplyTo != null) {

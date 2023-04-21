@@ -528,7 +528,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
 		return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
-			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
+			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.getNostrNodeIds(), req.isLoadOthers());
 			return res;
 		});
 	}
@@ -953,10 +953,10 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/saveNostrEvent", method = RequestMethod.POST)
+	@RequestMapping(value = API_PATH + "/saveNostrEvents", method = RequestMethod.POST)
 	public @ResponseBody Object saveNode(@RequestBody SaveNostrEventRequest req, HttpSession session) {
-		log.debug("saveNostrEvent()");
-		return callProc.run("saveNostrEvent", true, true, req, session, ms -> {
+		log.debug("saveNostrEvents()");
+		return callProc.run("saveNostrEvents", true, true, req, session, ms -> {
 			return nostr.saveNostrEvents(req);
 		});
 	}

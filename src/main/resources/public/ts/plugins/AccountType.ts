@@ -34,8 +34,16 @@ export class AccountType extends TypeBase {
         // console.log("node: " + S.util.prettyPrint(node));
 
         // Note: Nostr names start with '.'
-        const name = S.nostr.isNostrUserName(node.owner) ? S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) : node.owner;
-
+        const isNostr = S.nostr.isNostrUserName(node.owner);
+        let name = null;
+        if (isNostr) {
+            name = S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) ||
+                S.props.getPropStr(J.NodeProp.NOSTR_NAME, node) ||
+                S.props.getPropStr(J.NodeProp.NOSTR_USER_NAME, node);
+        }
+        else {
+            name = node.owner;
+        }
         return new Divc({
             className: "systemNodeContent"
         }, [

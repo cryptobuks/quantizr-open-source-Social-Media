@@ -6,6 +6,11 @@ public enum NodeProp {
     NOSTR_ID("sn:nosid"),    
     NOSTR_RELAYS("sn:relays"),
     NOSTR_USER_NPUB("sn:npub"),
+    NOSTR_TAGS("sn:ntags"), 
+    NOSTR_NAME("sn:nosName"),
+    NOSTR_USER_NAME("sn:nosUserName"),
+    NOSTR_NIP05("sn:nosNip05"),
+    NOSTR_USER_WEBSITE("sn:nosWebsite"),
 
     // Activity Pub Properties
     OBJECT_ID("apid"), // todo-2: should rename to "ap:id"
@@ -34,7 +39,10 @@ public enum NodeProp {
     USER_ICON_URL("ap:userIcon"), //
 
     ACT_PUB_SHARED_INBOX("ap:sharedInbox"), //
+
+    // todo-0: rename this to remove ACT_PUB (because nostr uses this)
     ACT_PUB_USER_IMAGE_URL("ap:userImage"), //
+
     ACT_PUB_ACTOR_ID("ap:actorId"), //
 
     // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)

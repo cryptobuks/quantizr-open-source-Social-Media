@@ -59,10 +59,12 @@ export class Search {
         }
     }
 
+    // todo-0: currently we load ALL thread content for Nost threads, but we can change that easily
     showThreadAddMore = async (nodeId: string) => {
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
-            loadOthers: true
+            loadOthers: true,
+            nostrNodeIds: null
         });
 
         if (res.nodes && res.nodes.length > 0) {
@@ -92,9 +94,17 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
+        // todo-0: Theoretically we could just call the server first, because it MIGHT be the case
+        // that the server will already HAVE all the nodes required to build the Thread using just the
+        // server-side Tags array, but for now we're doing the client-side traiversal from scratch
+        // to gather up all the nodes thru the client, then push them up to the server, which will then
+        // result in us getting here with eventNodeIds populated in the chainInfo.
+        const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(node);
+
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
-            loadOthers: true
+            loadOthers: true,
+            nostrNodeIds: chainInfo?.eventNodeIds
         });
 
         if (res.nodes && res.nodes.length > 0) {

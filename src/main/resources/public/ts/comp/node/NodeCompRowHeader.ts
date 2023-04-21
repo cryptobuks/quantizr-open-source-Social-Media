@@ -213,8 +213,10 @@ export class NodeCompRowHeader extends Div {
             // L = Local Users, then: [UserNode]/[PostsNode]/[ActualNode]
             // Also if we have 'inReplyTo' that will also enable the button.
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
+            const inReplToNostr: string[] = S.nostr.getRepliedToItem(this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
-            if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
+
+            if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo || Array.isArray(inReplToNostr))) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",

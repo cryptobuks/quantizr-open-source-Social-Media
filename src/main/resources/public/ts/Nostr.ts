@@ -24,6 +24,7 @@ References:
 https://github.com/nostr-protocol/nips/blob/master/01.md
 https://github.com/nbd-wtf/nostr-tools
 */
+
 export class Nostr {
     // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
     // TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
@@ -35,13 +36,18 @@ export class Nostr {
     pk: string = null; // public key, hex string
     npub: string = null; // npub (of public key)
 
+    // We maintain this set of all encountered relays as they're found so that if we ever need to look
+    // up something and have no known relay we can at least try these. Potentially we could save these
+    // on the server maybe specific to the given user? Or should we hold ONLY in local/browser storage?
+    knownRelays: Set<string> = new Set<string>();
+
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
 
         // this.testNpub();
 
-        // await this.getEvent("wss://relay.snort.social", "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2");
+        await this.getEvent(["wss://relay.snort.social"], "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2", false);
 
         // this.sendMessageToUser("Hi Clay!", ["wss://relay.snort.social"], "npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
 
@@ -103,6 +109,169 @@ export class Nostr {
         return this.npub;
     }
 
+    // returns true if this is a nostr reply chain (whose chain was just now uploaded to server?)
+    // todo-0: It's probably more efficient to create a RelayPool and just keep adding to it as we go
+    // along if that's possible, so we can just keep retrieving stuff thru the same poll as we go along.
+    loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
+        const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
+        if (!Array.isArray(tags)) return null;
+
+        try {
+            S.rpcUtil.incRpcCounter();
+
+            // query user profile of owner of the node, to get their relays to bootstrap our traversal from
+            const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                userId: node.ownerId
+            });
+
+            if (!res.success) {
+                console.log("Unable to query user profile for userId: " + node.ownerId);
+                return null;
+            }
+            debugger;
+            console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
+
+            const events: Event[] = [];
+            const preferredRelays: Set<string> = new Set<string>();
+            const threadUsers: Set<string> = new Set<string>();
+
+            const relays: string[] = this.getRelays(res.userProfile.relays);
+            if (!relays) {
+                console.log("No relays known for userId: " + node.ownerId);
+                return;
+            }
+            relays.forEach(r => preferredRelays.add(r));
+
+            await this.traverseUpReplyChain(events, tags, preferredRelays, threadUsers);
+
+            // before we persist events, we need to prefix all the events with
+            // the event metadata for all users involved so that when the server processes
+            // the "persistEvents" it will encounter the users ahead of all the data which is
+            // required or else it would fail trying to save data but not having a user accuont
+            // to put something under.
+            //
+            // todo-0: we should be caching users metadata locally so we can avoid querying for known users.
+            const userMetadata = await this.readMultiUserMetadata(this.toUserArray(threadUsers), relays);
+            // console.log("metadataForUsers: " + S.util.prettyPrint(userMetadata));
+
+            if (!events || !userMetadata) return;
+            console.log("PERSISTING THREAD EVENTS: ");
+            const ret = await this.persistEvents([...userMetadata, ...events], null);
+            return ret;
+        }
+        finally {
+            S.rpcUtil.decRpcCounter();
+        }
+    }
+
+    // As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
+    // be only looking at the relays we will find parts of this thread on.
+    traverseUpReplyChain = async (events: Event[], tags: string[][], preferredRelays: Set<string>,
+        threadUsers: Set<string>): Promise<void> => {
+        // if we have an array of "e" tags
+        let eventRepliedTo: string = null;
+        let relayRepliedTo: string = null;
+
+        // iterate all tags and whatever the right most (last) values arefor the *RepliedTo vars will be what we want
+        // becasue according to spec that's what is being replied to.
+        for (const ta of tags) {
+            if (Array.isArray(ta)) {
+                if (ta[0] === "e") {
+                    // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
+                    if (ta.length < 4) {
+                        eventRepliedTo = ta[1];
+                        relayRepliedTo = ta[2];
+                    }
+                    // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
+                    else if (ta.length === 4 && ta[3] === "reply") {
+                        eventRepliedTo = ta[1];
+                        relayRepliedTo = ta[2];
+                    }
+                }
+            }
+        }
+
+        // todo-0: Need to make getEvent able to accept an array of relays so that we can send
+        // this.knownRelays set to in case we get here in the code and have eventRepliedTo!==null
+        // and relayRepliedTo===null;
+        if (eventRepliedTo) {
+            if (!relayRepliedTo) {
+                if (preferredRelays.size === 0) {
+                    console.log("Failed to traverse thread because eventId " + eventRepliedTo + " didn't have a relay in tag array.")
+                    return null;
+                }
+            }
+            else {
+                preferredRelays.add(relayRepliedTo);
+            }
+
+            console.log("LOADING ThreadItem: " + eventRepliedTo);
+            const event = await this.getEvent(this.toRelayArray(preferredRelays), eventRepliedTo, false);
+            if (event) {
+                threadUsers.add(event.pubkey);
+                console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
+                // add to front of array so the chronological ordering is top down.
+                events.unshift(event);
+
+                // halt at suspicious event list size for now (todo-0)
+                if (events.length > 20) {
+                    console.log("enough events: " + events.length);
+                    return;
+                }
+                if (Array.isArray(event.tags)) {
+                    await this.traverseUpReplyChain(events, event.tags, preferredRelays, threadUsers);
+                }
+            }
+        }
+    }
+
+    toUserArray = (usersSet: Set<string>): string[] => {
+        const users: string[] = [];
+        if (usersSet) {
+            usersSet.forEach(r => {
+                users.push(r);
+            });
+        }
+        return users;
+    }
+
+    toRelayArray = (relaySet: Set<string>): string[] => {
+        const relays: string[] = [];
+        if (relaySet) {
+            relaySet.forEach(r => {
+                relays.push(r);
+                this.knownRelays.add(r);
+            });
+        }
+        return relays;
+    }
+
+    /* Returns the Nostr ID of whatever the node is a reply to if it's a reply or else null
+    ref: https://github.com/nostr-protocol/nips/blob/master/10.md
+    */
+    getRepliedToItem = (node: J.NodeInfo): string[] => {
+        const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
+        if (!Array.isArray(tags)) return null;
+
+        // if we have an array of "e" tags
+        for (const ta of tags) {
+            if (Array.isArray(ta)) {
+                if (ta[0] === "e") {
+                    // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
+                    if (ta.length < 4) {
+                        return ta;
+                    }
+
+                    // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
+                    if (ta.length === 4 && ta[3] === "reply") {
+                        return ta;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     encodeToNpub = (hex: string): string => {
         if (!hex || hex.startsWith("npub")) return hex;
         return nip19.npubEncode(hex);
@@ -142,12 +311,39 @@ export class Nostr {
         return ok && verifyOk;
     }
 
+    getEvent = async (relays: string[], id: string, persist: boolean): Promise<Event> => {
+        const query: any = {
+            ids: [id]
+        };
+
+        try {
+            S.rpcUtil.incRpcCounter();
+            const events = await this.queryRelays(relays, query);
+            // console.log("getEvent: " + S.util.prettyPrint(events));
+            if (events?.length > 0) {
+                if (persist) {
+                    await this.persistEvents(events, relays.join("\n"));
+                }
+                return events[0];
+            }
+        }
+        finally {
+            S.rpcUtil.decRpcCounter();
+        }
+
+        return null;
+    }
+
     /* Opens a relay, retrieves a single event from the relay, and then shuts down the relay.
     todo-1: call 'reject' if any error happens.
+
+    todo-0: I think I've conflated retrival and subscriptions in here. I think the "list" call is
+    the better way to get a specific thing, rather than doing a subscribe like we do here.
     */
-    getEvent = async (rurl: string, id: string): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
+    getEvent_subscriptionBased = async (rurl: string, id: string): Promise<Event> => {
+        return new Promise<Event>(async (resolve, reject) => {
             const relay = await this.openRelay(rurl);
+            let resolved = false;
 
             // subscribe to the relay to pull up just the one ID we're interested in.
             const sub = relay.sub([{ ids: [id] }]);
@@ -155,13 +351,15 @@ export class Nostr {
             console.log("Waiting for some events...");
             sub.on("event", event => {
                 console.log("event received: ", S.util.prettyPrint(event));
+                resolved = true;
+                resolve(event);
             });
 
             sub.on("eose", () => {
                 console.log("eose event. Closing relay.");
                 sub.unsub();
                 relay.close();
-                resolve();
+                if (!resolved) resolve(null);
             });
         });
     }
@@ -174,10 +372,11 @@ export class Nostr {
         const relay = relayInit(rurl);
 
         relay.on("connect", () => {
-            console.log(`connected to ${relay.url}`)
+            console.log(`connected to ${relay.url}`);
+            this.knownRelays.add(rurl);
         })
         relay.on("error", () => {
-            console.log(`failed to connect to ${relay.url}`)
+            console.log(`failed to connect to ${relay.url}`);
         })
 
         console.log("Opening Relay: " + rurl);
@@ -220,6 +419,45 @@ export class Nostr {
             }
         }
         return user;
+    }
+
+    readMultiUserMetadata = async (users: string[], relays: string[]): Promise<Event[]> => {
+        if (relays.length === 0) {
+            console.warn("No relays. Can't lookup users");
+            return null;
+        }
+
+        users = users.map(u => this.translateUserKey(u));
+        // NOTE: By the time we get here 'user' will be a PublicKey (not npub or nip05)
+
+        const query: any = {
+            authors: users,
+            kinds: [Kind.Metadata]
+            // limit: users.length * 3 // <== this is a WAG to try to get only what we need
+        };
+
+        const events = await this.queryRelays(relays, query);
+
+        if (events) {
+            events.forEach(e => (e as any).npub = nip19.npubEncode(e.pubkey));
+        }
+
+        // sort rev chron
+        events.sort((a, b) => b.created_at - a.created_at);
+        const retEvents: Event[] = [];
+        const usersFound = new Set<string>();
+        events.forEach(e => {
+            if (!usersFound.has(e.pubkey)) {
+                usersFound.add(e.pubkey);
+                retEvents.push(e);
+            }
+        });
+
+        if (usersFound.size < users.length) {
+            console.warn("NOT ALL USER METADATA WAS FOUND: missing " + (users.length - usersFound.size));
+        }
+
+        return retEvents;
     }
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
@@ -387,6 +625,7 @@ export class Nostr {
                 if (!r.startsWith("wss://")) {
                     r = "wss://" + r;
                 }
+                this.knownRelays.add(r);
                 return r;
             }).filter(r => !!r);
         }
@@ -407,13 +646,12 @@ export class Nostr {
         });
 
         // Push the events up to the server for storage
-        const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvent", {
+        const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
             events: this.makeEventsList(events),
             relays
         });
-        console.log("Save Count: " + res.saveCount);
+        // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
-
     }
 
     /* References are basically 'mentions', but can point to other things besides people too I think. But
@@ -421,7 +659,9 @@ export class Nostr {
     */
     dumpEventRefs = (event: Event): void => {
         const references = parseReferences(event);
-        console.log("REFS=" + S.util.prettyPrint(references));
+        if (references?.length > 0) {
+            console.log("REFS=" + S.util.prettyPrint(references));
+        }
 
         // DO NOT DELETE
         // let simpleAugmentedContent = event.content
@@ -517,6 +757,8 @@ export class Nostr {
     }
 
     private async multiRelayQuery(relays: string[], query: any): Promise<Event[]> {
+        if (!relays) return null;
+        relays.forEach(r => this.knownRelays.add(r));
         const pool = new SimplePool();
 
         // DO NOT DELETE

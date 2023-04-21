@@ -1,10 +1,11 @@
 package quanta.service.nostr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -68,7 +69,10 @@ public class NostrService extends ServiceBase {
 		IntVal saveCount = new IntVal(0);
 		if (req.getEvents() == null)
 			return res;
+
 		HashSet<String> accountNodeIds = new HashSet<>();
+		List<String> eventNodeIds = new ArrayList<>();
+
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
 				/*
@@ -86,22 +90,24 @@ public class NostrService extends ServiceBase {
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event, accountNodeIds, req.getRelays(), saveCount);
+				saveEvent(as, event, accountNodeIds, eventNodeIds, req.getRelays(), saveCount);
 			}
 			return null;
 		});
 		res.setAccntNodeIds(new LinkedList<String>(accountNodeIds));
+		res.setEventNodeIds(eventNodeIds);
 		res.setSaveCount(saveCount.getVal());
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays, IntVal saveCount) {
+	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+			String relays, IntVal saveCount) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, relays, saveCount);
 				break;
 			case KIND_Text:
-				saveNostrTextEvent(as, event, accountNodeIds, saveCount);
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 				break;
 			default:
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
@@ -111,10 +117,10 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays,
 			IntVal saveCount) {
-		// log.debug("METADATA:" + XString.prettyPrint(event));
+		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
 			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
-			// log.debug("METADATA OBJ: " + XString.prettyPrint(metadata));
+			// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
 
 			int beforeSaveCount = saveCount.getVal();
 			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null, saveCount);
@@ -128,12 +134,16 @@ public class NostrService extends ServiceBase {
 			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
 
-				// get the best display name we can find.
-				String displayName = getBestDisplayName(metadata);
-				nostrAccnt.set(NodeProp.DISPLAY_NAME, displayName);
+				// todo-0: add support for metadata.getBanner() as URL.
+				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
+				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
+				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
+				nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
 				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
+				nostrAccnt.set(NodeProp.ACT_PUB_USER_IMAGE_URL, metadata.getBanner());
 				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
 				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
+				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 
 				nostrAccnt.setCreateTime(timestamp);
 				nostrAccnt.setModifyTime(timestamp);
@@ -147,20 +157,11 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private String getBestDisplayName(NostrMetadata metadata) {
-		String displayName = metadata.getDisplayName();
-		if (StringUtils.isEmpty(displayName)) {
-			displayName = metadata.getName();
-		}
-		if (StringUtils.isEmpty(displayName)) {
-			displayName = metadata.getUsername();
-		}
-		return displayName;
-	}
-
-	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
+	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+			IntVal saveCount) {
 		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
 		if (nostrNode != null) {
+			eventNodeIds.add(nostrNode.getIdStr());
 			log.debug("Nostr ID Existed: " + event.getId());
 			return;
 		}
@@ -186,11 +187,16 @@ public class NostrService extends ServiceBase {
 		newNode.setContent(event.getContent());
 		newNode.set(NodeProp.OBJECT_ID, "." + event.getId());
 
+		if (event.getTags() != null) {
+			newNode.set(NodeProp.NOSTR_TAGS, event.getTags());
+		}
+
 		Date timestamp = new Date(event.getTimestamp() * 1000);
 		newNode.setCreateTime(timestamp);
 		newNode.setModifyTime(timestamp);
 
 		update.save(as, newNode, false);
+		eventNodeIds.add(newNode.getIdStr());
 		saveCount.inc();
 	}
 
