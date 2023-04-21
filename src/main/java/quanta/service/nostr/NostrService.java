@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
+import org.apache.cxf.common.util.StringUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -149,12 +151,35 @@ public class NostrService extends ServiceBase {
 				nostrAccnt.setModifyTime(timestamp);
 			}
 
-			// todo-0: we need to have the logic here to append any NEW relays to existing list of relays.
-			// will need to parse to array, sort array, add new things, and resave
-			nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
+			if (!StringUtils.isEmpty(relays)) {
+				String existingRelays = nostrAccnt.getStr(NodeProp.NOSTR_RELAYS);
+				if (!StringUtils.isEmpty(existingRelays)) {
+					relays += "\n" + existingRelays;
+				}
+				relays = removeDuplicateRelays(relays);
+				nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	// parses the new-line delimited string of relays, and returns a string with the same ones
+	// but guarantees no duplicates.
+	private String removeDuplicateRelays(String relays) {
+		StringBuilder sb = new StringBuilder();
+		StringTokenizer t = new StringTokenizer(relays, "\n\r\t ", false);
+		HashSet<String> relaySet = new HashSet<>();
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken();
+			if (relaySet.add(tok)) {
+				if (sb.length() > 0) {
+					sb.append("\n");
+				}
+				sb.append(tok);
+			}
+		}
+		return sb.toString();
 	}
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,

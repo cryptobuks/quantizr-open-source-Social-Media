@@ -994,7 +994,14 @@ public class UserManagerService extends ServiceBase {
 			if (userNode != null) {
 				userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER);
+				
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+				if (StringUtils.isEmpty(displayName)) {
+					displayName = userNode.getStr(NodeProp.NOSTR_NAME);
+				}
+				if (StringUtils.isEmpty(displayName)) {
+					displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
+				}
 
 				userProfile.setUserName(nodeUserName);
 				userProfile.setDisplayName(displayName);

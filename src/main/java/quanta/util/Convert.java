@@ -134,7 +134,16 @@ public class Convert extends ServiceBase {
 			if (userAtt != null) {
 				avatarVer = userAtt.getBin();
 			}
+
+			// try 3 ways to get a displayName and take the first one that's available
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+			if (StringUtils.isEmpty(displayName)) {
+				displayName = userNode.getStr(NodeProp.NOSTR_NAME);
+			}
+			if (StringUtils.isEmpty(displayName)) {
+				displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
+			}
+			
 			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
 			owner = nameProp;
