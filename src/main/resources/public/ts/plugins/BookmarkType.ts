@@ -20,7 +20,7 @@ export class BookmarkType extends TypeBase {
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Diva([
-            new NodeCompMarkdown(node, null),
+            new NodeCompMarkdown(node, null, tabData),
             audioUrl ? new Button("Play Audio", () => {
                 new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0).open();
             }, null, "btn-primary marginLeft") : null

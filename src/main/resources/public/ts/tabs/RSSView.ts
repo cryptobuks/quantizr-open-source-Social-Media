@@ -95,7 +95,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 console.error("unknown state in feed runner");
             }
 
-            comp = ast.rssNode ? new NodeCompMarkdown(ast.rssNode, null) : null;
+            comp = ast.rssNode ? new NodeCompMarkdown(ast.rssNode, null, this.data) : null;
         }
 
         this.setChildren([

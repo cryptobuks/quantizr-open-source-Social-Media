@@ -1,5 +1,6 @@
 import { getAs } from "../../AppContext";
 import { Html } from "../../comp/core/Html";
+import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
@@ -9,6 +10,8 @@ interface LS {
 }
 
 export class NodeCompMarkdown extends Html {
+    // detects URLs in a string (from Stack Overflow, not fully vetted yet)
+    static urlRegex = /(https?:\/\/[^\s]+)/g;
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
@@ -21,7 +24,7 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, private tabData: TabIntf<any>) {
         super(null, { key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
 
@@ -78,12 +81,27 @@ export class NodeCompMarkdown extends Html {
         // can replace that URL in this content with an empty string (remove it)
 
         val = S.render.injectSubstitutions(node, content);
+
+        // removign image names is a low priority. Will come back to this later (todo-0)
+        // val = this.replaceOgImgFileNames(val);
+
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
 
         /* parse tags, to build OpenGraph */
         this.parseAnchorTags(val, content);
         return val;
+    }
+
+    // This method is part of a work in progress to make it where
+    // IMAGE urls can be included right in content and it renders without
+    // showing the URL. OpenGraph-type logic alrelady *is* wokring however
+    // to make the actual images display when IMG links are in the content.
+    replaceOgImgFileNames = (val: string): string => {
+        if (!this.tabData.openGraphComps) return val;
+        return val.replace(NodeCompMarkdown.urlRegex, function (url: string) {
+            return "(( " + url + " ))";
+        });
     }
 
     parseAnchorTags = (val: string, content: string) => {
@@ -104,7 +122,7 @@ export class NodeCompMarkdown extends Html {
             href = S.util.replaceAll(href, "/?", "?");
 
             /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
-            trying to process those for OpenGraph we detect using the 'mention' and 'hashtag' classes */
+            trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
             if (e.classList.contains("mention") ||
                 e.classList.contains("hashtag") ||
                 e.classList.contains("u-url")) return;
