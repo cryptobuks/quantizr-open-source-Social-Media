@@ -73,6 +73,10 @@ export class NodeCompMarkdown extends Html {
         //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
         // }
 
+        // todo-0: we need to pass into this method the set of OpenGraph items that's active (will be different
+        // for each type of application view), so we can scan thru all those and for any that are mime="image/?" we
+        // can replace that URL in this content with an empty string (remove it)
+
         val = S.render.injectSubstitutions(node, content);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);

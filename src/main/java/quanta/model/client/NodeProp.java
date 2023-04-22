@@ -12,8 +12,10 @@ public enum NodeProp {
     NOSTR_NIP05("sn:nosNip05"),
     NOSTR_USER_WEBSITE("sn:nosWebsite"),
 
-    // Activity Pub Properties
-    OBJECT_ID("apid"), // todo-2: should rename to "ap:id"
+    // If this property is non-null on a node it means the node originated (was posted by) some other forgien server.
+    // If the value starts with "." that indicated "Nostr" and otherwise "ActPub" is assumed.
+    OBJECT_ID("apid"),
+
     ACT_PUB_OBJ_TYPE("ap:objType"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent"), //
@@ -40,8 +42,7 @@ public enum NodeProp {
 
     ACT_PUB_SHARED_INBOX("ap:sharedInbox"), //
 
-    // todo-0: rename this to remove ACT_PUB (because nostr uses this)
-    ACT_PUB_USER_IMAGE_URL("ap:userImage"), //
+    USER_BANNER_URL("ap:userImage"), //
 
     ACT_PUB_ACTOR_ID("ap:actorId"), //
 

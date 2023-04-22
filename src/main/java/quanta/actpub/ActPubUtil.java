@@ -1232,9 +1232,9 @@ public class ActPubUtil extends ServiceBase {
         if (image != null) {
             String imageUrl = apStr(image, APObj.url);
             if (imageUrl != null) {
-                String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
+                String curImageUrl = node.getStr(NodeProp.USER_BANNER_URL);
                 if (!imageUrl.equals(curImageUrl)) {
-                    if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL, imageUrl)) {
+                    if (node.set(NodeProp.USER_BANNER_URL, imageUrl)) {
                         changed = true;
                     }
                 }

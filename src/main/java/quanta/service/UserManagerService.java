@@ -1030,7 +1030,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserNodeId(userNode.getIdStr());
 
 				userProfile.setApIconUrl(userNode.getStr(NodeProp.USER_ICON_URL));
-				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
+				userProfile.setApImageUrl(userNode.getStr(NodeProp.USER_BANNER_URL));
 				userProfile.setActorUrl(actorUrl);
 				userProfile.setActorId(actorId);
 
@@ -1407,6 +1407,7 @@ public class UserManagerService extends ServiceBase {
 		if ("friends".equals(type)) {
 			nodeType = NodeType.FRIEND_LIST.s();
 			if ("nostr".equals(subType)) {
+				// this regex simly is "Starts with a period"
 				moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
 			}
 		} //

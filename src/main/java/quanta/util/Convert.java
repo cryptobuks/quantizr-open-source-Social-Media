@@ -145,7 +145,7 @@ public class Convert extends ServiceBase {
 			}
 			
 			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
-			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
+			apImage = userNode.getStr(NodeProp.USER_BANNER_URL);
 			owner = nameProp;
 
 			/*

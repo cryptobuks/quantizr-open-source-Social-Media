@@ -136,13 +136,12 @@ public class NostrService extends ServiceBase {
 			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
 
-				// todo-0: add support for metadata.getBanner() as URL.
 				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
 				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
 				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
 				nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
 				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
-				nostrAccnt.set(NodeProp.ACT_PUB_USER_IMAGE_URL, metadata.getBanner());
+				nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
 				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
 				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
 				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());

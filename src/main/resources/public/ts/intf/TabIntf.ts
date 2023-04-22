@@ -4,6 +4,10 @@ import { Div } from "../comp/core/Div";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import * as J from "../JavaIntf";
 
+// todo-0: we should make this a base class instead of interface so that the classes that
+// derive from it won't have to create their own instances of all data members but can
+// inheret default ones (especially scrollPos, openGraphComps, etc)
+//
 // PT=PropsType, TT=TabType
 export interface TabIntf<PT = any, TT = any> {
     // display name shown on the tab

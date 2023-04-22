@@ -59,7 +59,8 @@ export class Search {
         }
     }
 
-    // todo-0: currently we load ALL thread content for Nost threads, but we can change that easily
+    // todo-0: currently we load ALL thread content for Nost threads, but we can change that easily, and do the same
+    // thing we're doing on ActivityPub which is only grab 6 at a time from the server.
     showThreadAddMore = async (nodeId: string) => {
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
@@ -96,7 +97,7 @@ export class Search {
     showThread = async (node: J.NodeInfo) => {
         // todo-0: Theoretically we could just call the server first, because it MIGHT be the case
         // that the server will already HAVE all the nodes required to build the Thread using just the
-        // server-side Tags array, but for now we're doing the client-side traiversal from scratch
+        // server-side Tags array, but for now we're doing the client-side traversal from scratch (every time)
         // to gather up all the nodes thru the client, then push them up to the server, which will then
         // result in us getting here with eventNodeIds populated in the chainInfo.
         const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(node);
@@ -456,7 +457,8 @@ export class Search {
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,
-            applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks
+            applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks,
+            protocol: FeedTab.inst.props.protocolFilter
         });
 
         dispatch("RenderFeedResults", s => {

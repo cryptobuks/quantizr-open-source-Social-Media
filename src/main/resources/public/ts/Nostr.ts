@@ -109,9 +109,8 @@ export class Nostr {
         return this.npub;
     }
 
-    // returns true if this is a nostr reply chain (whose chain was just now uploaded to server?)
     // todo-0: It's probably more efficient to create a RelayPool and just keep adding to it as we go
-    // along if that's possible, so we can just keep retrieving stuff thru the same poll as we go along.
+    // along if that's possible, so we can just keep retrieving stuff thru the same pool as we go along.
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) return null;
@@ -191,9 +190,6 @@ export class Nostr {
             }
         }
 
-        // todo-0: Need to make getEvent able to accept an array of relays so that we can send
-        // this.knownRelays set to in case we get here in the code and have eventRepliedTo!==null
-        // and relayRepliedTo===null;
         if (eventRepliedTo) {
             if (!relayRepliedTo) {
                 if (preferredRelays.size === 0) {
@@ -213,7 +209,7 @@ export class Nostr {
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
-                // halt at suspicious event list size for now (todo-0)
+                // #todo-0: what should this limit here be?
                 if (events.length > 20) {
                     console.log("enough events: " + events.length);
                     return;

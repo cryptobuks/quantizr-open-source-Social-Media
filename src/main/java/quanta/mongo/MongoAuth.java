@@ -280,7 +280,7 @@ public class MongoAuth extends ServiceBase {
 			if (crit == null) {
 				crit = new Criteria();
 			}
-			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+			crit = crit.orOperator(orCriteria);
 		}
 		return crit;
 	}
@@ -590,7 +590,7 @@ public class MongoAuth extends ServiceBase {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
 			}
 
-			crit = crit.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			crit = crit.andOperator(new Criteria().orOperator(orCriteria));
 		}
 
 		if (ownerIdMatch != null) {

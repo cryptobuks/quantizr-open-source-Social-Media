@@ -210,6 +210,26 @@ public class UserFeedService extends ServiceBase {
 		// IMPORTANT: see long comment above where we have similar type filtering.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
+		if (req.getProtocol().equals("nostr")) {
+			// this regex simly is "Starts with a period"
+			// todo-0: for this to work, and display any local nodes, we would need to have a way to know when
+			// a user is posting something with their "Nostr Outbound" (some kind of option) on, and then 
+			// add the OBJECT_ID to all outbound Nostr objects, BUT be careful that this will not introduce
+			// bugs in any places where the mere existence of an OBJECT_ID is currently indicating it's ActivityPub
+			// or at least a "Foreign Node"
+			List<Criteria> orCrit = new LinkedList<>();
+			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
+			crit = crit.andOperator(new Criteria().orOperator(orCriteria));
+		}
+		else if (req.getProtocol().equals("ap")) {
+			// this regex simly is "Starts with a period"
+			List<Criteria> orCrit = new LinkedList<>();
+			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
+			crit = crit.andOperator(new Criteria().orOperator(orCriteria));
+		}
+
 		boolean allowBadWords = true;
 
 		// add the criteria for sensitive flag
@@ -378,7 +398,7 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (orCriteria.size() > 0) {
-			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+			crit = crit.orOperator(orCriteria);
 		}
 
 		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get

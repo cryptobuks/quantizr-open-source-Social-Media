@@ -465,6 +465,7 @@ export interface NodeFeedRequest extends RequestBase {
     loadFriendsTags: boolean;
     applyAdminBlocks: boolean;
     name: string;
+    protocol: string;
 }
 
 export interface NodeSearchRequest extends RequestBase {
@@ -1210,7 +1211,7 @@ export const enum NodeProp {
     ACT_PUB_OBJ_ATTRIBUTED_TO = "ap:objAttributedTo",
     USER_ICON_URL = "ap:userIcon",
     ACT_PUB_SHARED_INBOX = "ap:sharedInbox",
-    ACT_PUB_USER_IMAGE_URL = "ap:userImage",
+    USER_BANNER_URL = "ap:userImage",
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_KEYPEM = "ap:keyPem",
