@@ -91,6 +91,7 @@ export interface NostrMetadata {
 }
 
 export interface OpenGraph {
+    mime: string;
     url: string;
     title: string;
     description: string;

@@ -61,7 +61,8 @@ export class OpenGraphPanel extends Div {
                         title: null,
                         description: null,
                         image: null,
-                        url: null
+                        url: null,
+                        mime: null
                     };
                     // observer.disconnect();
                     S.quanta.openGraphData.set(this.url, og);
@@ -100,7 +101,8 @@ export class OpenGraphPanel extends Div {
                                         title: null,
                                         description: null,
                                         image: null,
-                                        url: null
+                                        url: null,
+                                        mime: null
                                     };
                                 }
                                 S.quanta.openGraphData.set(o.url, og);
@@ -125,6 +127,12 @@ export class OpenGraphPanel extends Div {
         const ast = getAs();
         if (state.loading || !state.og) {
             this.setChildren(null);
+            return true;
+        }
+
+        // console.log("MIME: " + state.og.mime);
+        if (state.og.mime?.startsWith("image/")) {
+            this.setChildren([new Img({ src: this.url, className: "imgInRow marginBottom marginLeft" })]);
             return true;
         }
 

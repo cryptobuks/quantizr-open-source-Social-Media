@@ -13,7 +13,7 @@ import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
 
 @Component
-@Slf4j 
+@Slf4j
 public class OpenGraphService extends ServiceBase {
 	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
 
@@ -36,10 +36,11 @@ public class OpenGraphService extends ServiceBase {
 		try {
 			openGraph = parseOpenGraph(ogReq.getUrl());
 		} catch (Exception e) {
-			// ignore this error, for now (todo-2)
-			// ExUtil.error(log, "failed parsing OpenGraph", e);
+			String mime = attach.getMimeTypeFromUrl(ogReq.getUrl());
+			openGraph = new OpenGraph();
+			openGraph.setMime(mime);
 		}
-		
+
 		// we allow storing a null if we got back a null. Cache it so we don't try again.
 		synchronized (ogCache) {
 			ogCache.put(ogReq.getUrl(), openGraph);
@@ -50,7 +51,7 @@ public class OpenGraphService extends ServiceBase {
 	}
 
 	public OpenGraph parseOpenGraph(String urlStr) throws Exception {
-		// log.debug("JSoup parsing Images from URL: " + urlStr);
+		// log.debug("JSoup parsing URL: " + urlStr);
 		OpenGraph openGraph = new OpenGraph();
 		Connection con = Jsoup.connect(urlStr);
 
