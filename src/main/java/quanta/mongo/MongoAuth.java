@@ -280,7 +280,8 @@ public class MongoAuth extends ServiceBase {
 			if (crit == null) {
 				crit = new Criteria();
 			}
-			crit = crit.orOperator(orCriteria);
+			// crit = crit.orOperator(orCriteria);
+			crit = crit.andOperator(new Criteria().orOperator(orCriteria));
 		}
 		return crit;
 	}

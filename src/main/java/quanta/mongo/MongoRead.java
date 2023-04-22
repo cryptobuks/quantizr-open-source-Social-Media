@@ -1382,6 +1382,7 @@ public class MongoRead extends ServiceBase {
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
+        
         q.addCriteria(crit.orOperator(critList));
 
         if (limit != null && limit.intValue() > 0) {

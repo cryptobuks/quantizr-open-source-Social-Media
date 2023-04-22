@@ -224,7 +224,8 @@ public class MongoUtil extends ServiceBase {
 		 * as an orphan (which can definitely happen) then this path it not available. So even orphaned
 		 * nodes can keep us from being able to consider a path 'available for use'
 		 */
-		orCriteria.orOperator(Criteria.where(SubNode.PATH).is(path), //
+		orCriteria.orOperator(//
+				Criteria.where(SubNode.PATH).is(path), //
 				Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
 		Query q = new Query(orCriteria);
