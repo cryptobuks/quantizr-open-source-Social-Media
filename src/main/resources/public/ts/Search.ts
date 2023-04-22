@@ -95,20 +95,29 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
-        // todo-0: Theoretically we could just call the server first, because it MIGHT be the case
-        // that the server will already HAVE all the nodes required to build the Thread using just the
-        // server-side Tags array, but for now we're doing the client-side traversal from scratch (every time)
-        // to gather up all the nodes thru the client, then push them up to the server, which will then
-        // result in us getting here with eventNodeIds populated in the chainInfo.
-        const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(node);
-
-        const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        // First call the server in case it has enough data already to render the Thread, in which case
+        // we don't need to load any events from relays via client
+        let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true,
-            nostrNodeIds: chainInfo?.eventNodeIds
+            nostrNodeIds: null
         });
 
-        if (res.nodes && res.nodes.length > 0) {
+        // if we dead-ended on a nostr item we didn't have on server...load the data, and then attempt 'getNodeThreadView' again.
+        if (res.nostrDeadEnd) {
+            // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
+            // we resume from the actual 'node' we're trying to get Thread of.
+            const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
+            const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(resumeFromNode);
+
+            res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+                nodeId: node.id,
+                loadOthers: true,
+                nostrNodeIds: chainInfo?.eventNodeIds
+            });
+        }
+
+        if (res.nodes?.length > 0) {
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;
 

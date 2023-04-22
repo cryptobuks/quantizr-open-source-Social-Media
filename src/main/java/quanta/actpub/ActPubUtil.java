@@ -55,6 +55,7 @@ import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * AP-related utilities
@@ -913,8 +914,14 @@ public class ActPubUtil extends ServiceBase {
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, List<String> nostrNodeIds,
             boolean loadOthers) {
+        boolean debug = false;
+
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
+
+        if (debug) {
+            log.debug("getNodeThreadView() " + nodeId);
+        }
 
         // get node that's going to have it's ancestors gathered
         SubNode node = read.getNode(ms, nodeId);
@@ -1015,7 +1022,7 @@ public class ActPubUtil extends ServiceBase {
                 if (topNode) {
                     // leave parent == null;
                 } else {
-                    // if Nostr is contolling out thread content
+                    // if Nostr is contolling our thread content
                     if (nostrNodeIds != null && nostrNodeIds.size() > 0) {
 
                         // grap the current topmost nostrIdId and then remove it from the array.
@@ -1036,12 +1043,13 @@ public class ActPubUtil extends ServiceBase {
                 // value
                 if (nostrNodeIds == null && (parent == null || top)) {
                     String inReplyTo = node.getStr(NodeProp.INREPLYTO);
+
                     // if node has an inReplyTo...
                     if (inReplyTo != null) {
 
-                        // we distinguish a URL from a nodeId by the fact that only URLs can contain "/"
+                        // we distinguish a URL from a nodeId by the fact that only URLs can contain ":"
                         if (inReplyTo.contains(":")) {
-                            // then loadObject will get it from DB or else resort to getting it from internet
+                            // then loadObject will get it from DB or else resort to getting it from network
                             parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
                         }
                         // if inReplyTo not a URL, treat it as a nodeId
@@ -1049,11 +1057,29 @@ public class ActPubUtil extends ServiceBase {
                             parent = read.getNode(ms, inReplyTo);
                         }
                     }
+                    // else try to get the node being replied to as if this is a NostrNode
+                    else {
+                        Val<Boolean> nodeMissing = new Val<Boolean>(false);
+                        parent = nostr.getNodeBeingRepliedTo(ms, node, nodeMissing);
+                        if (nodeMissing.getVal()) {
+                            res.setNostrDeadEnd(true);
+                        }
+
+                        if (debug) {
+                            if (parent != null) {
+                                log.debug("NOSTR REPLY PARENT of " + node.getIdStr() + "=" + XString.prettyPrint(parent));
+                            } else {
+                                log.debug("NOSTR couldn't find reply parent.");
+                            }
+                        }
+                    }
                 }
 
                 node = parent;
-                if (blockedUserIds.contains(node.getOwner())) {
-                    node = null;
+                if (node != null) {
+                    if (blockedUserIds.contains(node.getOwner())) {
+                        node = null;
+                    }
                 }
 
                 if (node == null) {
@@ -1087,6 +1113,10 @@ public class ActPubUtil extends ServiceBase {
             }
 
             res.setSuccess(true);
+        }
+
+        if (debug) {
+            log.debug("getNodeThreadView() RESP: " + XString.prettyPrint(res));
         }
         return res;
     }

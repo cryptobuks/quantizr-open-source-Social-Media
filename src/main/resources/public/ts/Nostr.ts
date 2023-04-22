@@ -114,7 +114,7 @@ export class Nostr {
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) return null;
-
+        // console.log("loadReplyChain of nodeId: " + node.id);
         try {
             S.rpcUtil.incRpcCounter();
 
@@ -127,8 +127,8 @@ export class Nostr {
                 console.log("Unable to query user profile for userId: " + node.ownerId);
                 return null;
             }
-            debugger;
-            console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
+
+            // console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
 
             const events: Event[] = [];
             const preferredRelays: Set<string> = new Set<string>();
@@ -182,7 +182,7 @@ export class Nostr {
                         relayRepliedTo = ta[2];
                     }
                     // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
-                    else if (ta.length === 4 && ta[3] === "reply") {
+                    else if (ta[3] === "reply") {
                         eventRepliedTo = ta[1];
                         relayRepliedTo = ta[2];
                     }
@@ -332,9 +332,6 @@ export class Nostr {
 
     /* Opens a relay, retrieves a single event from the relay, and then shuts down the relay.
     todo-1: call 'reject' if any error happens.
-
-    todo-0: I think I've conflated retrival and subscriptions in here. I think the "list" call is
-    the better way to get a specific thing, rather than doing a subscribe like we do here.
     */
     getEvent_subscriptionBased = async (rurl: string, id: string): Promise<Event> => {
         return new Promise<Event>(async (resolve, reject) => {

@@ -243,10 +243,64 @@ public class NostrService extends ServiceBase {
 		return nostrAccnt;
 	}
 
+	// nodeMissing sends back 'true' if we did attemp to find a NostrNode and failed to find it in the DB
+	public SubNode getNodeBeingRepliedTo(MongoSession ms, SubNode node, Val<Boolean> nodeMissing) {
+		if (!isNostrNode(node))
+			return null;
+
+		Val<String> eventRepliedTo = new Val<String>();
+		Val<String> relayRepliedTo = new Val<String>();
+		getReplyInfo(node, eventRepliedTo, relayRepliedTo);
+
+		if (eventRepliedTo.getVal() != null) {
+			SubNode nodeFound = getNodeByNostrId(ms, eventRepliedTo.getVal(), true);
+			if (nodeFound == null) {
+				nodeMissing.setVal(true);
+			}
+			return nodeFound;
+		}
+		return null;
+	}
+
+	// get info about node this node is a reply to
+	public void getReplyInfo(SubNode node, Val<String> event, Val<String> relay) {
+
+		ArrayList<ArrayList<String>> tags = (ArrayList) node.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
+		for (ArrayList<String> subList : tags) {
+			int len = subList.size();
+
+			if ("e".equals(subList.get(0))) {
+				boolean accept = false;
+
+				// deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
+				if (len < 4) {
+					accept = true;
+				}
+				// Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
+				else if ("reply".equals(subList.get(3))) {
+					accept = true;
+				}
+
+				if (accept) {
+					if (len > 1) {
+						event.setVal(subList.get(1));
+						relay.setVal("");
+					}
+
+					if (len > 2) {
+						relay.setVal(subList.get(2));
+					}
+				}
+			}
+		}
+	}
+
 	public SubNode getNodeByNostrId(MongoSession ms, String id, boolean allowAuth) {
 		if (!id.startsWith(".")) {
 			id = "." + id;
 		}
+		// log.debug("Looking up OBJECT_ID: " + id);
+
 		// Otherwise for ordinary users root is based off their username
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(id);
@@ -262,6 +316,11 @@ public class NostrService extends ServiceBase {
 			});
 		}
 		return ret;
+	}
+
+	public boolean isNostrNode(SubNode node) {
+		String objId = node.getStr(NodeProp.OBJECT_ID);
+		return objId != null && objId.startsWith(".");
 	}
 
 	/*

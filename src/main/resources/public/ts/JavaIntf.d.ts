@@ -833,6 +833,7 @@ export interface GetSharedNodesResponse extends ResponseBase {
 export interface GetThreadViewResponse extends ResponseBase {
     nodes: NodeInfo[];
     topReached: boolean;
+    nostrDeadEnd: boolean;
 }
 
 export interface GetUserAccountInfoResponse extends ResponseBase {
