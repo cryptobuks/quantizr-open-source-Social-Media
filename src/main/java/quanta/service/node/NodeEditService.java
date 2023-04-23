@@ -389,7 +389,6 @@ public class NodeEditService extends ServiceBase {
 				properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
 			}
 
-			// todo-0: review this. We're checking for an OBJECT_ID on a userNode?
 			String nostrId = userNode.getStr(NodeProp.OBJECT_ID);
 			if (!StringUtils.isEmpty(nostrId)) {
 				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));
@@ -481,8 +480,6 @@ public class NodeEditService extends ServiceBase {
 						ThreadLocals.dirty(node);
 
 						// if this is a foreign post send message out to fediverse
-						// todo-0: this would be different logic if the OBJECT_ID starts with "." indicating
-						// it's a nostr node.
 						if (node.getStr(NodeProp.OBJECT_ID) != null) {
 							apub.sendLikeMessage(as, ms.getUserName(), node);
 						}

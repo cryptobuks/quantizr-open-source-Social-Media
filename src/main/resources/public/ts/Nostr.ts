@@ -41,6 +41,11 @@ export class Nostr {
     // on the server maybe specific to the given user? Or should we hold ONLY in local/browser storage?
     knownRelays: Set<string> = new Set<string>();
 
+    // hold any data we've already encountered so we can avoid looking in relays when possible
+    metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==event id)
+    textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==user's pubkey)
+    userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
+
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
@@ -68,6 +73,26 @@ export class Nostr {
         // Object posted from Quanta
         // await this.getEvent(this.TEST_RELAY_URL, "fec9091d99d8aa4dc1d544563cecb587fea5c3ccb744ca668c8b4021daced097");
         // await this.publishEvent();
+    }
+
+    cacheEvent = (event: Event): void => {
+        switch (event.kind) {
+            case Kind.Text:
+                if (this.textCache.size > 1000) {
+                    this.textCache.clear();
+                }
+                this.textCache.set(event.id, event);
+                break;
+            case Kind.Metadata:
+                if (this.metadataCache.size > 1000) {
+                    this.metadataCache.clear();
+                }
+                this.metadataCache.set(event.pubkey, event);
+                break;
+            default:
+                console.warn("Event not cached: " + event.id + " kind=" + event.kind);
+                break;
+        }
     }
 
     testNpub = () => {
@@ -118,27 +143,39 @@ export class Nostr {
         try {
             S.rpcUtil.incRpcCounter();
 
-            // query user profile of owner of the node, to get their relays to bootstrap our traversal from
-            const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                userId: node.ownerId
-            });
+            // try to get userRelays from local cache
+            let relays: string[] = this.userRelaysCache.get(node.ownerId);
 
-            if (!res.success) {
-                console.log("Unable to query user profile for userId: " + node.ownerId);
-                return null;
+            // if not found in cache get from server
+            if (!relays) {
+                // todo-0: need to cache the UserProfile the same way we're caching other things
+                // query user profile of owner of the node, to get their relays to bootstrap our traversal from
+                // todo-0: need a server call just for 'getUserRelays' so this is slightly more efficient.
+                const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    userId: node.ownerId
+                });
+
+                if (!res.success) {
+                    console.log("Unable to query user profile for userId: " + node.ownerId);
+                    return null;
+                }
+                // console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
+
+                relays = this.getRelays(res.userProfile.relays);
+
+                // save relays in cache
+                this.userRelaysCache.set(node.ownerId, relays);
             }
 
-            // console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
+            if (!relays) {
+                console.log("No relays known for userId: " + node.ownerId);
+                return;
+            }
 
             const events: Event[] = [];
             const preferredRelays: Set<string> = new Set<string>();
             const threadUsers: Set<string> = new Set<string>();
 
-            const relays: string[] = this.getRelays(res.userProfile.relays);
-            if (!relays) {
-                console.log("No relays known for userId: " + node.ownerId);
-                return;
-            }
             relays.forEach(r => preferredRelays.add(r));
 
             await this.traverseUpReplyChain(events, tags, preferredRelays, threadUsers);
@@ -149,7 +186,6 @@ export class Nostr {
             // required or else it would fail trying to save data but not having a user accuont
             // to put something under.
             //
-            // todo-0: we should be caching users metadata locally so we can avoid querying for known users.
             const userMetadata = await this.readMultiUserMetadata(this.toUserArray(threadUsers), relays);
             // console.log("metadataForUsers: " + S.util.prettyPrint(userMetadata));
 
@@ -285,6 +321,7 @@ export class Nostr {
 
         event.id = getEventHash(event);
         event.sig = signEvent(event, this.sk);
+        this.cacheEvent(event);
         // console.log("NEW EVENT: " + S.util.prettyPrint(event));
         return event;
     }
@@ -308,6 +345,13 @@ export class Nostr {
     }
 
     getEvent = async (relays: string[], id: string, persist: boolean): Promise<Event> => {
+
+        // return the cached event if we have it.
+        const cachedEvent = this.textCache.get(id);
+        if (cachedEvent) {
+            return cachedEvent;
+        }
+
         const query: any = {
             ids: [id]
         };
@@ -430,7 +474,6 @@ export class Nostr {
         };
 
         const events = await this.queryRelays(relays, query);
-
         if (events) {
             events.forEach(e => (e as any).npub = nip19.npubEncode(e.pubkey));
         }
@@ -555,6 +598,7 @@ export class Nostr {
             };
             event.id = getEventHash(event);
             event.sig = signEvent(event, this.sk);
+            this.cacheEvent(event);
 
             // console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
             let pub: Pub = null;
@@ -630,6 +674,7 @@ export class Nostr {
 
         let idx = 0;
         events.forEach(event => {
+            this.cacheEvent(event);
             console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
             if (!this.checkEvent(event)) {
                 console.log("eventCheck Failed.");
