@@ -59,23 +59,37 @@ export class Search {
         }
     }
 
-    // todo-0: currently we load ALL thread content for Nost threads, but we can change that easily, and do the same
-    // thing we're doing on ActivityPub which is only grab 6 at a time from the server.
-    showThreadAddMore = async (nodeId: string) => {
-        const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId,
+    showThreadAddMore = async (node: J.NodeInfo) => {
+        let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+            nodeId: node.id,
             loadOthers: true,
             nostrNodeIds: null
         });
 
-        if (res.nodes && res.nodes.length > 0) {
+        // if we dead-ended on a nostr item we didn't have on server...load the data, and then attempt 'getNodeThreadView' again.
+        // todo-0: I added this code path for the "load more" of Nostr threads, but I need to test it a bit more
+        // bacause I only ran it on one thread, and it appeared to work.
+        if (res.nostrDeadEnd) {
+            // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
+            // we resume from the actual 'node' we're trying to get Thread of.
+            const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
+            const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(resumeFromNode);
+
+            res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+                nodeId: node.id,
+                loadOthers: true,
+                nostrNodeIds: chainInfo?.eventNodeIds
+            });
+        }
+
+        if (res.nodes?.length > 0) {
             dispatch("RenderThreadResults", s => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(C.TAB_THREAD, 0);
                 const data = ThreadTab.inst;
                 if (!data) return;
 
-                s.threadViewNodeId = nodeId;
+                s.threadViewNodeId = node.id;
                 data.openGraphComps = [];
 
                 // remove the last element, which will be a duplicate.

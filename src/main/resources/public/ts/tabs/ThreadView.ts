@@ -95,7 +95,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     moreHistory = () => {
         const results = this.data?.props?.results;
         if (!results || results.length === 0) return;
-        S.srch.showThreadAddMore(results[0].id);
+        S.srch.showThreadAddMore(results[0]);
     }
 
     /* overridable (don't use arrow function) */
