@@ -24,7 +24,7 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, private tabData: TabIntf<any>) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
         super(null, { key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
 
@@ -67,6 +67,7 @@ export class NodeCompMarkdown extends Html {
     renderRawMarkdown(node: J.NodeInfo, content: string = null): string {
         content = content || this.cont || "";
         let val = "";
+        this.urls = null;
 
         // todo-2: put some more thought into this...
         // turning this off because when it appears in a url, blows up the link. Need to find some better way.
@@ -77,10 +78,7 @@ export class NodeCompMarkdown extends Html {
         // }
 
         val = S.render.injectSubstitutions(node, content);
-
-        // removign image names is a low priority. Will come back to this later (todo-0)
-        // val = this.replaceOgImgFileNames(val);
-
+        val = this.replaceOgImgFileNames(val);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
 
@@ -94,9 +92,15 @@ export class NodeCompMarkdown extends Html {
     // showing the URL. OpenGraph-type logic alrelady *is* wokring however
     // to make the actual images display when IMG links are in the content.
     replaceOgImgFileNames = (val: string): string => {
-        if (!this.tabData.openGraphComps) return val;
-        return val.replace(NodeCompMarkdown.urlRegex, function (url: string) {
-            return "(( " + url + " ))";
+        // find all the urls in the val, and remove the ones that we know are doing go
+        // be rendered as plain Images when OpenGraph rendering is complete.
+        return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
+            if (S.quanta.imageUrls.has(url)) {
+                return `<img src='${url}' class='insImgInRow'>`;
+            }
+            else {
+                return url;
+            }
         });
     }
 
@@ -104,7 +108,6 @@ export class NodeCompMarkdown extends Html {
         if (val.indexOf("<") === -1 ||
             val.indexOf(">") === -1) return;
 
-        this.urls = null;
         const elm = document.createElement("html");
         elm.innerHTML = val;
 

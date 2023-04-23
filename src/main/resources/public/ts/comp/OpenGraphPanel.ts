@@ -1,4 +1,4 @@
-import { getAs } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
@@ -66,15 +66,26 @@ export class OpenGraphPanel extends Div {
                     };
                     // observer.disconnect();
                     S.quanta.openGraphData.set(this.url, og);
+                    this.processOgImage(this.url, og);
                     if (!elm.isConnected) return;
                     this.mergeState<LS>({ og });
                 });
             }
         }
         else {
+            this.processOgImage(this.url, og);
             this.mergeState<LS>({ og });
         }
         this.loadNext();
+    }
+
+    processOgImage = (url: string, og: J.OpenGraph) => {
+        if (og.mime?.startsWith("image/")) {
+            if (!S.quanta.imageUrls.has(url)) {
+                S.quanta.imageUrls.add(url);
+                setTimeout(() => dispatch("renderOgImg", s => { }), 250);
+            }
+        }
     }
 
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
@@ -106,12 +117,14 @@ export class OpenGraphPanel extends Div {
                                     };
                                 }
                                 S.quanta.openGraphData.set(o.url, og);
+                                this.processOgImage(o.url, og);
                                 if (!o.getRef()) return;
                                 o.mergeState({ og });
                             });
                         }
                     }
                     else {
+                        this.processOgImage(o.url, og);
                         o.mergeState({ og });
                     }
                 }
@@ -132,8 +145,8 @@ export class OpenGraphPanel extends Div {
 
         // console.log("MIME: " + state.og.mime);
         if (state.og.mime?.startsWith("image/")) {
-            this.setChildren([new Img({ src: this.url, className: "imgInRow marginBottom marginLeft" })]);
-            return true;
+            // images are rendered by inserting <img> tag directly into markdown
+            return null;
         }
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */

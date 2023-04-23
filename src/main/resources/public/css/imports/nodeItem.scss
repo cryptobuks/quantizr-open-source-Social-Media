@@ -67,6 +67,16 @@
     width: 100%;
 }
 
+.insImgInRow {
+    cursor: pointer;
+    vertical-align: top;
+    border-radius: $border-radius;
+
+    border: 1px solid $gray-700;
+    margin: $smallGap $smallGap $smallGap 0;
+    width: 100%;
+}
+
 .attachmentLinksPanel {
     border: 1px solid $nodeBorderBottomColor;
     padding-left: $smallGap;
