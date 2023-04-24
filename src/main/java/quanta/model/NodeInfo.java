@@ -89,6 +89,7 @@ public class NodeInfo {
 	private String displayName;
 	private String owner;
 	private String ownerId;
+	private String nostrPubKey;
 	private String transferFromId;
 
 	private String avatarVer;
@@ -99,7 +100,7 @@ public class NodeInfo {
 	private NodeInfo boostedNode;
 
 	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName,
-			String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
+			String owner, String ownerId, String nostrPubKey, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
 			HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links, List<AccessControlInfo> ac,
 			List<String> likes, boolean hasChildren, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
 			String avatarVer, String apAvatar, String apImage) {
@@ -116,6 +117,7 @@ public class NodeInfo {
 		this.displayName = displayName;
 		this.owner = owner;
 		this.ownerId = ownerId;
+		this.nostrPubKey = nostrPubKey;
 		this.transferFromId = transferFromId;
 		this.ordinal = ordinal;
 		this.logicalOrdinal = logicalOrdinal;

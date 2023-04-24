@@ -115,6 +115,7 @@ public class Convert extends ServiceBase {
 		String avatarVer = null;
 		String nameProp = null;
 		String displayName = null;
+		String nostrPubKey = null;
 		String apAvatar = null;
 		String apImage = null;
 		String owner = PrincipalName.ADMIN.s();
@@ -143,7 +144,8 @@ public class Convert extends ServiceBase {
 			if (StringUtils.isEmpty(displayName)) {
 				displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
 			}
-			
+
+			nostrPubKey = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
 			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.USER_BANNER_URL);
 			owner = nameProp;
@@ -192,7 +194,7 @@ public class Convert extends ServiceBase {
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
-				owner, ownerId, //
+				owner, ownerId, nostrPubKey, //
 				node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, //

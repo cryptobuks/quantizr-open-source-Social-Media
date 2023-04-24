@@ -130,8 +130,11 @@ export class SearchUsersDlg extends DialogBase {
         }
 
         if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
+
+            const userRelays = getAs().userProfile?.relays || "";
+
             const ret: J.SaveNostrEventResponse = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText,
-                SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
+                SearchUsersDlg.defaultNostrRelay + "\n" + userRelays, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
             // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
             this.close();
             if (ret?.accntNodeIds?.length > 0) {

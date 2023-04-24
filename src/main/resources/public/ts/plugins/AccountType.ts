@@ -1,12 +1,11 @@
-import { nip19 } from "nostr-tools";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 export class AccountType extends TypeBase {
@@ -32,24 +31,7 @@ export class AccountType extends TypeBase {
     }
 
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        // Note: Nostr names start with '.'
-        const isNostr = S.nostr.isNostrUserName(node.owner);
-        let name = null;
-        if (isNostr) {
-            name = S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) ||
-                S.props.getPropStr(J.NodeProp.NOSTR_NAME, node) ||
-                S.props.getPropStr(J.NodeProp.NOSTR_USER_NAME, node);
-
-            if (!name) {
-                name = nip19.npubEncode(node.owner.substring(1));
-                if (name) {
-                    name = name.substring(0, 15) + "...";
-                }
-            }
-        }
-        else {
-            name = node.owner;
-        }
+        const name = S.nodeUtil.getDisplayName(node);
         return new Divc({
             className: "systemNodeContent"
         }, [

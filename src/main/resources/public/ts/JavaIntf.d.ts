@@ -368,6 +368,7 @@ export interface GetUserAccountInfoRequest extends RequestBase {
 
 export interface GetUserProfileRequest extends RequestBase {
     userId: string;
+    nostrPubKey: string;
 }
 
 export interface GraphRequest extends RequestBase {
@@ -1106,6 +1107,7 @@ export interface NodeInfo {
     displayName: string;
     owner: string;
     ownerId: string;
+    nostrPubKey: string;
     transferFromId: string;
     avatarVer: string;
     apAvatar: string;

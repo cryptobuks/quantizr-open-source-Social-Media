@@ -34,11 +34,11 @@ export class UserProfileDlg extends DialogBase {
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
-    constructor(private userNodeId: string) {
+    constructor(private userNodeId: string, private lookupByNostrPubKey: string = null) {
         super("User Profile", "appModalCont");
         const ast = getAs();
-        userNodeId = userNodeId || ast.userProfile.userNodeId;
-        this.readOnly = !ast.userProfile || ast.userProfile.userNodeId !== userNodeId;
+        userNodeId = lookupByNostrPubKey ? null : (userNodeId || ast.userProfile.userNodeId);
+        this.readOnly = lookupByNostrPubKey ? true : (!ast.userProfile || ast.userProfile.userNodeId !== userNodeId);
         this.mergeState<LS>({ userProfile: null });
     }
 
@@ -236,17 +236,19 @@ export class UserProfileDlg extends DialogBase {
     }
 
     deleteFriend = async () => {
+        if (!this.userNodeId) return;
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
-        this.reload(this.userNodeId);
+        this.reload();
     }
 
     unblockUser = async () => {
+        if (!this.userNodeId) return;
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
-        this.reload(this.userNodeId);
+        this.reload();
     }
 
     /**
@@ -260,13 +262,15 @@ export class UserProfileDlg extends DialogBase {
         setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName, false), 250);
     }
 
-    reload = async (userNodeId: string) => {
+    reload = async () => {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId: userNodeId
+            userId: this.userNodeId,
+            nostrPubKey: this.lookupByNostrPubKey
         });
 
         // console.log("UserProfile Response: " + S.util.prettyPrint(res));
         if (res?.userProfile) {
+            this.userNodeId = res.userProfile.userNodeId;
             this.bioState.setValue(res.userProfile.userBio);
             this.displayNameState.setValue(res.userProfile.displayName);
             this.mergeState<LS>({
@@ -402,7 +406,8 @@ export class UserProfileDlg extends DialogBase {
 
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_PRIMARY, false, null, false, false, async () => {
                 const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: state.userProfile.userNodeId
+                    userId: state.userProfile.userNodeId,
+                    nostrPubKey: null
                 });
 
                 if (res?.userProfile) {
@@ -460,7 +465,8 @@ export class UserProfileDlg extends DialogBase {
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, false, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                        userId: state.userProfile.userNodeId
+                        userId: state.userProfile.userNodeId,
+                        nostrPubKey: null
                     });
 
                     if (res?.userProfile) {
@@ -497,6 +503,6 @@ export class UserProfileDlg extends DialogBase {
 
     override async preLoad(): Promise<void> {
         await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
-        await this.reload(this.userNodeId);
+        await this.reload();
     }
 }

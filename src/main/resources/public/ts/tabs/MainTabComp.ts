@@ -8,6 +8,7 @@ import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
+import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
@@ -28,9 +29,10 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;
-
-        // todo-0: if loadNostrId set, show a progress indicator here
-        if (S.quanta.configRes.urlIdFailMsg) {
+        if (S.quanta.configRes.loadNostrId) {
+            contentDiv = new Progress();
+        }
+        else if (S.quanta.configRes.urlIdFailMsg) {
             contentDiv = new Heading(4, S.quanta.configRes.urlIdFailMsg);
         }
         else if (!ast.node) {

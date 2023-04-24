@@ -264,7 +264,7 @@ public class UserManagerService extends ServiceBase {
 			}
 		}
 
-		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
+		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
 
 		ensureValidCryptoKeys(userNode);
 		// log.debug("SAVING USER NODE: "+XString.prettyPrint(userNode));
@@ -975,14 +975,16 @@ public class UserManagerService extends ServiceBase {
 	 * 
 	 * caller should pass in 'userNode' if it's available or else userId will be used to get it.
 	 */
-	public UserProfile getUserProfile(String userId, SubNode _userNode, boolean abbreviated) {
+	public UserProfile getUserProfile(String userId, String nostrPubKey, SubNode _userNode, boolean abbreviated) {
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
 		return (UserProfile) arun.run(as -> {
 			UserProfile userProfile = null;
 			SubNode userNode = null;
 			if (_userNode == null) {
-				if (userId == null) {
+				if (nostrPubKey != null) {
+					userNode = read.getUserNodeByUserName(as, "." + nostrPubKey);
+				} else if (userId == null) {
 					userNode = read.getUserNodeByUserName(as, sessionUserName);
 				} else {
 					userNode = read.getNode(as, userId, false, null);
@@ -994,7 +996,7 @@ public class UserManagerService extends ServiceBase {
 			if (userNode != null) {
 				userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER);
-				
+
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
 				if (StringUtils.isEmpty(displayName)) {
 					displayName = userNode.getStr(NodeProp.NOSTR_NAME);

@@ -72,7 +72,11 @@ export abstract class Comp implements CompIntf {
 
         /* If an ID was specifically provided, then use it, or else generate one. We prefix with 'c' only because
         IDs can't start with a number. */
-        this.setId(this.attribs.id || ("c" + (++Comp.guid).toString(36)));
+        this.setId(this.attribs.id || Comp.getNextId());
+    }
+
+    public static getNextId(): string {
+        return "c" + (++Comp.guid).toString(36);
     }
 
     public managesState = (): boolean => {

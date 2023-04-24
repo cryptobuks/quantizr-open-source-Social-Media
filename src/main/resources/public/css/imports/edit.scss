@@ -55,6 +55,16 @@ td {
     // unicode-bidi: bidi-override;
 }
 
+.nostrLink {
+    cursor: pointer;
+    color: white;
+    background-color: purple;
+    border: 1px solid gray;
+    padding: 1px;
+    font-size: 115%;
+    text-decoration: none;
+}
+
 .preTextarea {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.

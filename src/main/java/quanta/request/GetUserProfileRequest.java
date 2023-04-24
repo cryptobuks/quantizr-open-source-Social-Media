@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetUserProfileRequest extends RequestBase {
     public String userId;
+    public String nostrPubKey;
 }

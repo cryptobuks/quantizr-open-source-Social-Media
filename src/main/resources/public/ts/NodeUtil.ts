@@ -1,3 +1,4 @@
+import { nip19 } from "nostr-tools";
 import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
@@ -15,6 +16,27 @@ export class NodeUtil {
         const sels: string[] = [];
         getAs().selectedNodes.forEach(id => sels.push(id));
         return sels;
+    }
+
+    getDisplayName = (node: J.NodeInfo): string => {
+        const isNostr = S.nostr.isNostrUserName(node.owner);
+        let name = "";
+        if (isNostr) {
+            name = S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) ||
+                S.props.getPropStr(J.NodeProp.NOSTR_NAME, node) ||
+                S.props.getPropStr(J.NodeProp.NOSTR_USER_NAME, node);
+
+            if (!name) {
+                name = nip19.npubEncode(node.owner.substring(1));
+                if (name) {
+                    name = name.substring(0, 15) + "...";
+                }
+            }
+        }
+        else {
+            name = node.owner;
+        }
+        return name;
     }
 
     clearSelNodes = () => {

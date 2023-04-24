@@ -75,6 +75,11 @@ export class NodeCompRowHeader extends Div {
                 displayName = "PENDING XFER -> " + displayName;
             }
 
+            // if display name is a nostr one...
+            if (displayName.startsWith(".")) {
+                displayName = S.nodeUtil.getDisplayName(this.node);
+            }
+
             children.push(new Span(displayName, {
                 className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,

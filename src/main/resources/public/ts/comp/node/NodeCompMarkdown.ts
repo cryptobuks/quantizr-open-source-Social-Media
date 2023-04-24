@@ -80,7 +80,11 @@ export class NodeCompMarkdown extends Html {
 
         val = S.render.injectSubstitutions(node, content);
         val = this.replaceOgImgFileNames(val);
-        val = this.replaceNostrLinks(val);
+
+        // oops I didn't need to write this because replaceNostrRefs() does this!
+        // val = this.replaceNostrLinks(val);
+
+        val = S.nostr.replaceNostrRefs(node, val);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
 
@@ -98,6 +102,7 @@ export class NodeCompMarkdown extends Html {
         // be rendered as plain Images when OpenGraph rendering is complete.
         return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
             if (S.quanta.imageUrls.has(url)) {
+                // todo-1: we can add 'click to expand' functionality here.
                 return `<img src='${url}' class='insImgInRow'>`;
             }
             else {
@@ -109,20 +114,20 @@ export class NodeCompMarkdown extends Html {
     // need to make this be an href that with target=_blank that opens the URL in a new tab.
     // so we need a new URL format like nostrId=? that checks when index.html is loading if the
     // node is not available and if not triggers the client to load from a relay and display it.
-    replaceNostrLinks = (val: string): string => {
-        return val.replace(NodeCompMarkdown.nostrRegex, (url: string) => {
-            if (url.startsWith("nostr:note")) {
-                url = url.substring(6);
-                url = S.nostr.translateNip19(url);
-                console.log("nip19 translated to: " + url);
-                const shortId = url.substring(0, 10) + "...";
-                // Note: 'nostr-note' class in here is so that our OpenGraph link detector can ignore this and leave
-                // it as a regular anchor tag link
-                return `<a href='${window.location.origin}?nostrId=${url}&refNodeId=${this.node.ownerId}' class='nostr-note' target='_blank'>${shortId}</a>`;
-            }
-            else return url;
-        });
-    }
+    // todo-0: delete this method (soon). It's not needed.
+    // replaceNostrLinks = (val: string): string => {
+    //     return val.replace(NodeCompMarkdown.nostrRegex, (url: string) => {
+    //         if (url.startsWith("nostr:note")) {
+    //             url = url.substring(6);
+    //             url = S.nostr.translateNip19(url);
+    //             const shortId = url.substring(0, 10) + "...";
+    //             // Note: 'nostr-note' class in here is so that our OpenGraph link detector can ignore this and leave
+    //             // it as a regular anchor tag link
+    //             return `<a href='${window.location.origin}?nostrId=${url}&refNodeId=${this.node.ownerId}' class='nostr-note' target='_blank'>[Note ${shortId}]</a>`;
+    //         }
+    //         else return url;
+    //     });
+    // }
 
     parseAnchorTags = (val: string, content: string) => {
         if (val.indexOf("<") === -1 ||

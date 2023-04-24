@@ -141,7 +141,12 @@ public class NostrService extends ServiceBase {
 				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
 				nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
 				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+
+				// note: we always need to be able to generate KEY so don't ever let the client upload
+				// an nip05 web url to save to this. Always send up the key.
 				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
+				
+				// todo-0: display this (and other missing things on UserProfile dialogs)
 				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 
 				nostrAccnt.setCreateTime(timestamp);
@@ -226,14 +231,16 @@ public class NostrService extends ServiceBase {
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	private SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
+	public SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);
 			}
-			saveCount.inc();
+			if (saveCount != null) {
+				saveCount.inc();
+			}
 		} else {
 			if (postsNode != null) {
 				SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
@@ -244,7 +251,8 @@ public class NostrService extends ServiceBase {
 		return nostrAccnt;
 	}
 
-	// nodeMissing sends back 'true' if we did attemp to find a NostrNode and failed to find it in the DB
+	// nodeMissing sends back 'true' if we did attemp to find a NostrNode and failed to find it in the
+	// DB
 	public SubNode getNodeBeingRepliedTo(MongoSession ms, SubNode node, Val<Boolean> nodeMissing) {
 		if (!isNostrNode(node))
 			return null;

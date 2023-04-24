@@ -1407,7 +1407,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getUserProfile", false, false, req, session, ms -> {
 			GetUserProfileResponse res = new GetUserProfileResponse();
-			res.setUserProfile(user.getUserProfile(req.getUserId(), null, false));
+			res.setUserProfile(user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false));
 			res.setSuccess(true);
 			return res;
 		});

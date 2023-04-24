@@ -16,7 +16,7 @@ import {
 import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-import { getAs } from "./AppContext";
+import { Comp } from "./comp/base/Comp";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -60,11 +60,12 @@ export class Nostr {
         //     "wss://nos.lol",
         //     "wss://relay.damus.io"
         // ],
-        //     "nostr:note1px3tv34c0mh8qxwslnpsqye36jr5hgqes67kls5w9p29zk4ye94qjtu2tn",
-        //     // "09a2b646b87eee7019d0fcc3001331d4874ba01986bd6fc28e2854515aa4c96a",
+        //     // "nostr:note1px3tv34c0mh8qxwslnpsqye36jr5hgqes67kls5w9p29zk4ye94qjtu2tn",
+        //     "73fe45d89cf4872ea17ee0fb232ea1b31543c327cee9c264188cd14c6c146a30",
         //     false);
         // if (event) {
-        //     console.log("test2(). event=" + S.util.prettyPrint(event));
+        //     console.log("test(). event=" + S.util.prettyPrint(event));
+        //     this.dumpEventRefs(event);
         // }
 
         // this.sendMessageToUser("Hi Clay!", ["wss://relay.snort.social"], "npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
@@ -160,11 +161,10 @@ export class Nostr {
 
             // if not found in cache get from server
             if (!relays) {
-                // todo-0: need to cache the UserProfile the same way we're caching other things
-                // query user profile of owner of the node, to get their relays to bootstrap our traversal from
-                // todo-0: need a server call just for 'getUserRelays' so this is slightly more efficient.
+                // todo-1: need a server call just for 'getUserRelays' so this is slightly more efficient.
                 const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: node.ownerId
+                    userId: node.ownerId,
+                    nostrPubKey: null
                 });
 
                 if (!res.success) {
@@ -172,7 +172,6 @@ export class Nostr {
                     return null;
                 }
                 // console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
-
                 relays = this.getRelays(res.userProfile.relays);
 
                 // save relays in cache
@@ -257,9 +256,8 @@ export class Nostr {
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
-                // #todo-0: what should this limit here be?
-                if (events.length > 20) {
-                    console.log("enough events: " + events.length);
+                if (events.length > 50) {
+                    console.warn("stopping after enough thread events: " + events.length);
                     return;
                 }
                 if (Array.isArray(event.tags)) {
@@ -356,33 +354,8 @@ export class Nostr {
         return ok && verifyOk;
     }
 
-    /* Loads the event from a relay, and displays it to the user */
-    // loadEventNode = async (id: string) => {
-    //     if (id.startsWith(".")) {
-    //         id = id.substring(1);
-    //     }
-
-    //     // todo-0: we can get from default relays (will be assignable by admin), and if those fail to find event we can
-    //     // build the relays by extracting all the user identities from where this originated and
-    //     // first load all those users into the system and then extract the full set of all relays from
-    //     // those users and try to get the even from there.
-    //     const relays = ["wss://nostr-pub.wellorder.net",
-    //         "wss://relay.damus.io",
-    //         "wss://relay.nostr.info"
-    //     ];
-    //     const event = await this.getEvent(relays, id, true);
-    //     return event;
-    //     // if (event) {
-    //     //     console.log("got it: Jump To NodeId: ." + id);
-    //     //     S.view.jumpToId("." + id);
-    //     // }
-    //     // else {
-    //     //     console.log("event was not found on any relays: eventId=" + id);
-    //     // }
-    // }
-
     getEvent = async (relays: string[], id: string, persist: boolean): Promise<Event> => {
-        console.log("getEvent: nostrId=" + id);
+        // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
         // return the cached event if we have it.
@@ -420,6 +393,7 @@ export class Nostr {
     */
     getEvent_subscriptionBased = async (rurl: string, id: string): Promise<Event> => {
         return new Promise<Event>(async (resolve, reject) => {
+            id = this.translateNip19(id);
             const relay = await this.openRelay(rurl);
             let resolved = false;
 
@@ -485,8 +459,6 @@ export class Nostr {
         });
     }
 
-    // todo-0: make sure we call this to translate for any ID or User (PubKey) before trying to search for it,
-    // across the entire app.
     translateNip19 = (val: string) => {
         // remove the "nostr:" prefix if it exists
         if (val.startsWith("nostr:npub") || val.startsWith("nostr:note")) {
@@ -536,8 +508,7 @@ export class Nostr {
             events.forEach(e => (e as any).npub = nip19.npubEncode(e.pubkey));
         }
 
-        // sort rev chron
-        events.sort((a, b) => b.created_at - a.created_at);
+        this.revChronSort(events);
         const retEvents: Event[] = [];
         const usersFound = new Set<string>();
         events.forEach(e => {
@@ -558,24 +529,22 @@ export class Nostr {
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean): Promise<J.SaveNostrEventResponse> => {
         console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
-        let npub = null;
         if (isNip05) {
-            npub = user;
             const profile = await nip05.queryProfile(user);
             if (!profile) return null;
             console.log("NIP05: " + S.util.prettyPrint(profile));
-            user = profile.pubkey;
 
-            console.log("Found NIP05 pubkey: " + user);
+            // todo-0: we should transfer the NIP05 URL up to the server to it can be stored
+            // in use account node to be displayed in UserProfile.
+            user = profile.pubkey;
+            // console.log("Found NIP05 pubkey: " + user);
 
             if (profile.relays) {
                 relays = relays.concat(profile.relays);
-            }
-        }
 
-        if (relays.length === 0) {
-            // todo-0: get "getAs()" out of this class. decouple.
-            relays = this.getRelays(getAs().userProfile?.relays);
+                // remove any dupliates
+                relays = [...new Set(relays)];
+            }
         }
 
         if (relays.length === 0) {
@@ -598,15 +567,8 @@ export class Nostr {
         }
 
         if (events?.length > 0) {
-            // todo-0: we get this data from multiple relays so we should sort by newest and take top one (newest)
-            // save the npub onto the object, just to infomr server of it.
-            // todo-1: add type-safety here.
-            if (npub) {
-                (events[0] as any).npub = npub;
-            }
-            else {
-                (events[0] as any).npub = nip19.npubEncode(user);
-            }
+            this.revChronSort(events);
+            (events[0] as any).npub = nip19.npubEncode(user);
         }
         else {
             console.log("Failed to find user.");
@@ -614,6 +576,11 @@ export class Nostr {
         }
 
         return await this.persistEvents(events, relayUrl);
+    }
+
+    revChronSort = (events: Event[]): void => {
+        if (!events || events.length === 0) return;
+        events.sort((a, b) => b.created_at - a.created_at);
     }
 
     // Possible Filter Params
@@ -756,7 +723,7 @@ export class Nostr {
                 console.log("eventCheck Failed.");
             }
 
-            this.dumpEventRefs(event);
+            // this.dumpEventRefs(event);
         });
 
         // Push the events up to the server for storage
@@ -768,6 +735,67 @@ export class Nostr {
         return res;
     }
 
+    replaceNostrRefs = (node: J.NodeInfo, val: string): string => {
+        if (!this.isNostrNode(node) || !node.nostrPubKey) return val;
+        try {
+            const event = this.makeUnsignedEventFromNode(node);
+            const references = parseReferences(event);
+            if (!references || references.length === 0) {
+                return val;
+            }
+            // console.log("REFS=" + S.util.prettyPrint(references));
+            references.forEach((ref: any) => {
+                if (ref.profile) {
+
+                    // todo-0: need a background thread that queues up these pubkeys, and queries for them
+                    // first on the server, and secondarily on relays until it can eventually render with
+                    // the actual username in this span.
+
+                    const elmId = Comp.getNextId();
+                    const keyAbbrev = ref.profile.pubkey.substring(0, 10);
+                    val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
+                    setTimeout(() => {
+                        const e: HTMLElement = document.getElementById(elmId);
+                        if (e) {
+                            e.addEventListener("click", () => {
+                                S.user.showUserProfileByNostrKey(ref.profile.pubkey);
+                            });
+                        }
+                    }, 1000);
+                }
+                else if (ref.event) {
+                    const text = ref.text.substring(6);
+                    const shortId = text.substring(5, 13) + "...";
+                    // Note: 'nostr-note' class in here is so that our OpenGraph link detector can ignore this and leave
+                    // it as a regular anchor tag link
+                    val = val.replace(ref.text, `<a href='${window.location.origin}?nostrId=${ref.event.id}&refNodeId=${node.ownerId}' class='nostr-note nostrLink' target='_blank'>[Note ${shortId}]</a>`);
+                }
+                else if (ref.address) {
+                    // todo-0: add support for address
+                }
+            });
+        }
+        catch (ex) {
+            S.util.logErr(ex, "Failed processing Nostr Refs on: " + S.util.prettyPrint(node));
+        }
+        return val;
+    }
+
+    /* Creates an unsigned event */
+    makeUnsignedEventFromNode = (node: J.NodeInfo): any => {
+        const event: any = {
+            kind: 1, // todo-0: this may need to be updated
+            pubkey: this.translateNip19(node.nostrPubKey),
+            created_at: node.lastModified / 1000,
+            tags: S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node) || [],
+            content: node.content
+        };
+        // console.log("MADE EVENT: " + S.util.prettyPrint(event));
+        // event.id = getEventHash(event);
+        // event.sig = signEvent(event, this.sk);
+        return event;
+    }
+
     /* References are basically 'mentions', but can point to other things besides people too I think. But
     we're not supporting this yet.
     */
@@ -776,20 +804,6 @@ export class Nostr {
         if (references?.length > 0) {
             console.log("REFS=" + S.util.prettyPrint(references));
         }
-
-        // DO NOT DELETE
-        // let simpleAugmentedContent = event.content
-        // for (let i = 0; i < references.length; i++) {
-        // let { text, profile, event, address } = references[i];
-        // let augmentedReference = profile
-        //     ? `<strong>@${profilesCache[profile.pubkey].name}</strong>`
-        //     : event
-        //         ? `<em>${eventsCache[event.id].content.slice(0, 5)}</em>`
-        //         : address
-        //             ? `<a href="${text}">[link]</a>`
-        //             : text
-        // simpleAugmentedContent.replaceAll(text, augmentedReference)
-        // }
     }
 
     makeEventsList = (events: any[]): J.NostrEvent[] => {

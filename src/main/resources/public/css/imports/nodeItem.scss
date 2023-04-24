@@ -68,12 +68,10 @@
 }
 
 .insImgInRow {
-    cursor: pointer;
-    vertical-align: top;
     border-radius: $border-radius;
-
     border: 1px solid $gray-700;
     margin: $smallGap $smallGap $smallGap 0;
+    display: block;
     width: 100%;
 }
 

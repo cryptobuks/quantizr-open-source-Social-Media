@@ -4,6 +4,7 @@ import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { TrendingView } from "./tabs/TrendingView";
@@ -180,6 +181,11 @@ export class User {
         ]);
     }
 
+    showUserProfileByNostrKey = (identity: string) => {
+        const dlg = new UserProfileDlg(null, identity);
+        dlg.open();
+    }
+
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean) => {
         if (S.util.checkSuccess("Login", res)) {
 
@@ -257,30 +263,23 @@ export class User {
             if (S.quanta.configRes.loadNostrId) {
                 // need client to be showing instant progress indicator underway.
                 let nostrId = S.quanta.configRes.loadNostrId;
+                S.quanta.configRes.loadNostrId = null;
+
                 if (nostrId.startsWith(".")) {
                     nostrId = nostrId.substring(1);
                 }
 
                 // load relays saved in config or else use ones defined by this user.
-                // (todo-0: probably should just merge these lists)
-                let relays: string[] = [];
-                if (S.quanta.configRes.loadNostrIdRelays) {
-                    // console.log("Using loadNostIdRelays: " + S.quanta.configRes.loadNostrIdRelays);
-                    relays = S.nostr.getRelays(S.quanta.configRes.loadNostrIdRelays);
-                }
-
-                relays = relays.concat(S.nostr.getRelays(ast.userProfile?.relays));
+                const relays: string[] = S.nostr.getRelays(ast.userProfile?.relays + "\n" + (S.quanta.configRes.loadNostrIdRelays || ""));
+                S.quanta.configRes.loadNostrIdRelays = null;
 
                 if (!relays || relays.length === 0) {
-                    // console.log("No relays were available.");
+                    console.log("No relays were available.");
                     return;
                 }
                 const event = await S.nostr.getEvent(relays, nostrId, true);
                 if (!event) {
-                    // todo-0: when user tries to click a Nostr Node link ("nostr:note1...") and none
-                    // or our relays had that we end up here. Theoretically we can get better relays
-                    // next and try again, before giving up.
-                    // console.warn("Unable to lookup nostrId=" + nostrId);
+                    console.warn("Unable to lookup nostrId=" + nostrId);
                     return;
                 }
                 id = "." + event.id;
@@ -341,7 +340,8 @@ export class User {
 
     queryUserProfile = async (userId: string) => {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId
+            userId,
+            nostrPubKey: null
         });
 
         if (res?.userProfile) {
