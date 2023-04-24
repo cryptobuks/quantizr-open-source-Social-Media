@@ -369,6 +369,7 @@ public class MongoRead extends ServiceBase {
      * 5) name of an admin-owned node formatted as ":nodeName"
      * 6) special named location, like '~sn:inbox', or '~sn:friendList' (starts with tilde)
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
+     * 7) starts with '.' indicates it's a nostrId
      * </pre>
      */
     @PerfMon(category = "read(m,i,a)")
@@ -384,7 +385,10 @@ public class MongoRead extends ServiceBase {
         SubNode ret = null;
         boolean authPending = true;
 
-        if (identifier.startsWith("~")) {
+        if (identifier.startsWith(".")) {
+            ret = nostr.getNodeByNostrId(ms, identifier, allowAuth);
+        }
+        else if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;

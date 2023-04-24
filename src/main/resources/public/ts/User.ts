@@ -240,7 +240,11 @@ export class User {
                 await promiseDispatch("setAccessFailed", s => {
                     s.activeTab = C.TAB_MAIN;
                 });
-                return;
+
+                // special case when we fail to access a nostr node we attempt to load it from the client side
+                if (!S.quanta.configRes.loadNostrId) {
+                    return;
+                }
             }
 
             if (this.usingUrlTab()) {
@@ -250,7 +254,39 @@ export class User {
             // we may have just processed a dispatch so we need to get the current state now.
             const ast = getAs();
 
-            if (S.quanta.initialNodeId) {
+            if (S.quanta.configRes.loadNostrId) {
+                // need client to be showing instant progress indicator underway.
+                let nostrId = S.quanta.configRes.loadNostrId;
+                if (nostrId.startsWith(".")) {
+                    nostrId = nostrId.substring(1);
+                }
+
+                // load relays saved in config or else use ones defined by this user.
+                // (todo-0: probably should just merge these lists)
+                let relays: string[] = [];
+                if (S.quanta.configRes.loadNostrIdRelays) {
+                    // console.log("Using loadNostIdRelays: " + S.quanta.configRes.loadNostrIdRelays);
+                    relays = S.nostr.getRelays(S.quanta.configRes.loadNostrIdRelays);
+                }
+
+                relays = relays.concat(S.nostr.getRelays(ast.userProfile?.relays));
+
+                if (!relays || relays.length === 0) {
+                    // console.log("No relays were available.");
+                    return;
+                }
+                const event = await S.nostr.getEvent(relays, nostrId, true);
+                if (!event) {
+                    // todo-0: when user tries to click a Nostr Node link ("nostr:note1...") and none
+                    // or our relays had that we end up here. Theoretically we can get better relays
+                    // next and try again, before giving up.
+                    // console.warn("Unable to lookup nostrId=" + nostrId);
+                    return;
+                }
+                id = "." + event.id;
+                console.log("nostr id loaded: " + event.id);
+            }
+            else if (S.quanta.initialNodeId) {
                 id = S.quanta.initialNodeId;
                 S.quanta.initialNodeId = null;
                 if (id && id.startsWith("~")) {

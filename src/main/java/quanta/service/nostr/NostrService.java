@@ -134,8 +134,6 @@ public class NostrService extends ServiceBase {
 
 			// if this nostr object is a brand new one or newer data than our current info
 			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
-				accountNodeIds.add(nostrAccnt.getIdStr());
-
 				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
 				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
 				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
@@ -149,6 +147,9 @@ public class NostrService extends ServiceBase {
 				nostrAccnt.setCreateTime(timestamp);
 				nostrAccnt.setModifyTime(timestamp);
 			}
+
+			// We send back account nodes EVEN if this is not a new node, because client needs the info.
+			accountNodeIds.add(nostrAccnt.getIdStr());
 
 			if (!StringUtils.isEmpty(relays)) {
 				String existingRelays = nostrAccnt.getStr(NodeProp.NOSTR_RELAYS);

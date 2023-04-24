@@ -134,7 +134,7 @@ export class SearchUsersDlg extends DialogBase {
                 SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
             // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
             this.close();
-            if (ret.accntNodeIds?.length > 0) {
+            if (ret?.accntNodeIds?.length > 0) {
                 new UserProfileDlg(ret.accntNodeIds[0]).open();
             }
         }

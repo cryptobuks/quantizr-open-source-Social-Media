@@ -1,3 +1,4 @@
+import { nip19 } from "nostr-tools";
 import { Comp } from "../comp/base/Comp";
 import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
@@ -31,8 +32,6 @@ export class AccountType extends TypeBase {
     }
 
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        // console.log("node: " + S.util.prettyPrint(node));
-
         // Note: Nostr names start with '.'
         const isNostr = S.nostr.isNostrUserName(node.owner);
         let name = null;
@@ -40,6 +39,13 @@ export class AccountType extends TypeBase {
             name = S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) ||
                 S.props.getPropStr(J.NodeProp.NOSTR_NAME, node) ||
                 S.props.getPropStr(J.NodeProp.NOSTR_USER_NAME, node);
+
+            if (!name) {
+                name = nip19.npubEncode(node.owner.substring(1));
+                if (name) {
+                    name = name.substring(0, 15) + "...";
+                }
+            }
         }
         else {
             name = node.owner;

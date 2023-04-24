@@ -16,6 +16,7 @@ import {
 import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { getAs } from "./AppContext";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -29,8 +30,8 @@ export class Nostr {
     // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
     // TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
 
-    TEST_RELAY_URL: string = "wss://nos.lol\nwss://relay.damus.io";;
-    TEST_USER_KEY: string = "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
+    TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net\nwss://nos.lol\nwss://relay.damus.io";
+    TEST_USER_KEY: string = "1qguf67wjaq05snx0nfwgrpnhls8a94stquu58lzpnr0q2355u45sjs9fsr"; // "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
 
     sk: string = null; // secret key, hex string
     pk: string = null; // public key, hex string
@@ -52,7 +53,19 @@ export class Nostr {
 
         // this.testNpub();
 
-        await this.getEvent(["wss://relay.snort.social"], "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2", false);
+        // await this.getEvent(["wss://relay.snort.social"], "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2", false);
+
+        // const event = await this.getEvent(["wss://relay.snort.social",
+        //     "wss://nostr-pub.wellorder.net",
+        //     "wss://nos.lol",
+        //     "wss://relay.damus.io"
+        // ],
+        //     "nostr:note1px3tv34c0mh8qxwslnpsqye36jr5hgqes67kls5w9p29zk4ye94qjtu2tn",
+        //     // "09a2b646b87eee7019d0fcc3001331d4874ba01986bd6fc28e2854515aa4c96a",
+        //     false);
+        // if (event) {
+        //     console.log("test2(). event=" + S.util.prettyPrint(event));
+        // }
 
         // this.sendMessageToUser("Hi Clay!", ["wss://relay.snort.social"], "npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
 
@@ -64,7 +77,6 @@ export class Nostr {
         // console.log("SaveCount: " + res.saveCount);
 
         // this.saveEvent();
-
         // this.createEvent();
 
         // Object from original examples:
@@ -126,7 +138,7 @@ export class Nostr {
 
         this.pk = getPublicKey(this.sk);
         this.npub = nip19.npubEncode(this.pk);
-        if (this.pk !== this.translateUserKey(this.npub)) {
+        if (this.pk !== this.translateNip19(this.npub)) {
             console.error("Problem with npub key");
         }
 
@@ -237,11 +249,11 @@ export class Nostr {
                 preferredRelays.add(relayRepliedTo);
             }
 
-            console.log("LOADING ThreadItem: " + eventRepliedTo);
+            // console.log("LOADING ThreadItem: " + eventRepliedTo);
             const event = await this.getEvent(this.toRelayArray(preferredRelays), eventRepliedTo, false);
             if (event) {
                 threadUsers.add(event.pubkey);
-                console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
+                // console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
@@ -344,7 +356,34 @@ export class Nostr {
         return ok && verifyOk;
     }
 
+    /* Loads the event from a relay, and displays it to the user */
+    // loadEventNode = async (id: string) => {
+    //     if (id.startsWith(".")) {
+    //         id = id.substring(1);
+    //     }
+
+    //     // todo-0: we can get from default relays (will be assignable by admin), and if those fail to find event we can
+    //     // build the relays by extracting all the user identities from where this originated and
+    //     // first load all those users into the system and then extract the full set of all relays from
+    //     // those users and try to get the even from there.
+    //     const relays = ["wss://nostr-pub.wellorder.net",
+    //         "wss://relay.damus.io",
+    //         "wss://relay.nostr.info"
+    //     ];
+    //     const event = await this.getEvent(relays, id, true);
+    //     return event;
+    //     // if (event) {
+    //     //     console.log("got it: Jump To NodeId: ." + id);
+    //     //     S.view.jumpToId("." + id);
+    //     // }
+    //     // else {
+    //     //     console.log("event was not found on any relays: eventId=" + id);
+    //     // }
+    // }
+
     getEvent = async (relays: string[], id: string, persist: boolean): Promise<Event> => {
+        console.log("getEvent: nostrId=" + id);
+        id = this.translateNip19(id);
 
         // return the cached event if we have it.
         const cachedEvent = this.textCache.get(id);
@@ -366,12 +405,14 @@ export class Nostr {
                 }
                 return events[0];
             }
+            else {
+                console.log("Unable to load event: " + id + " (tried on " + relays.length + " relays)");
+                return null;
+            }
         }
         finally {
             S.rpcUtil.decRpcCounter();
         }
-
-        return null;
     }
 
     /* Opens a relay, retrieves a single event from the relay, and then shuts down the relay.
@@ -444,18 +485,35 @@ export class Nostr {
         });
     }
 
-    translateUserKey = (user: string) => {
-        if (user.startsWith("npub")) {
-            const npub = nip19.decode(user);
+    // todo-0: make sure we call this to translate for any ID or User (PubKey) before trying to search for it,
+    // across the entire app.
+    translateNip19 = (val: string) => {
+        // remove the "nostr:" prefix if it exists
+        if (val.startsWith("nostr:npub") || val.startsWith("nostr:note")) {
+            val = val.substring(6);
+        }
+
+        if (val.startsWith("npub")) {
+            const npub = nip19.decode(val);
             if (npub.type === "npub") {
-                user = npub.data as string;
+                val = npub.data as string;
             }
             else {
                 console.log("Unhandled npub type: " + S.util.prettyPrint(npub));
                 return null;
             }
         }
-        return user;
+        else if (val.startsWith("note")) {
+            const note = nip19.decode(val);
+            if (note.type === "note") {
+                val = note.data as string;
+            }
+            else {
+                console.log("Unhandled note type: " + S.util.prettyPrint(note));
+                return null;
+            }
+        }
+        return val;
     }
 
     readMultiUserMetadata = async (users: string[], relays: string[]): Promise<Event[]> => {
@@ -464,7 +522,7 @@ export class Nostr {
             return null;
         }
 
-        users = users.map(u => this.translateUserKey(u));
+        users = users.map(u => this.translateNip19(u));
         // NOTE: By the time we get here 'user' will be a PublicKey (not npub or nip05)
 
         const query: any = {
@@ -498,14 +556,17 @@ export class Nostr {
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean): Promise<J.SaveNostrEventResponse> => {
+        console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
         let npub = null;
         if (isNip05) {
             npub = user;
             const profile = await nip05.queryProfile(user);
             if (!profile) return null;
-            // console.log("NIP05: " + S.util.prettyPrint(profile));
+            console.log("NIP05: " + S.util.prettyPrint(profile));
             user = profile.pubkey;
+
+            console.log("Found NIP05 pubkey: " + user);
 
             if (profile.relays) {
                 relays = relays.concat(profile.relays);
@@ -513,22 +574,31 @@ export class Nostr {
         }
 
         if (relays.length === 0) {
+            // todo-0: get "getAs()" out of this class. decouple.
+            relays = this.getRelays(getAs().userProfile?.relays);
+        }
+
+        if (relays.length === 0) {
             console.warn("No relays. Can't lookup user: " + user);
             return null;
         }
 
-        user = this.translateUserKey(user);
+        user = this.translateNip19(user);
         // NOTE: By the time we get here 'user' will be a PublicKey (not npub or nip05)
 
         const query: any = {
             authors: [user],
             kinds: [Kind.Metadata],
-            limit: 1
+            limit: 10
         };
 
         const events = await this.queryRelays(relays, query);
+        if (events) {
+            console.log("Result of Metadata Lookup: " + S.util.prettyPrint(events));
+        }
 
-        if (events && events.length === 1) {
+        if (events?.length > 0) {
+            // todo-0: we get this data from multiple relays so we should sort by newest and take top one (newest)
             // save the npub onto the object, just to infomr server of it.
             // todo-1: add type-safety here.
             if (npub) {
@@ -537,6 +607,10 @@ export class Nostr {
             else {
                 (events[0] as any).npub = nip19.npubEncode(user);
             }
+        }
+        else {
+            console.log("Failed to find user.");
+            return null;
         }
 
         return await this.persistEvents(events, relayUrl);
@@ -558,7 +632,7 @@ export class Nostr {
     //
     readPosts = async (userKeys: string[], relays: string[], since: number): Promise<J.SaveNostrEventResponse> => {
         // console.log("readPosts for userKey: " + userKey);
-        userKeys = userKeys.map(u => this.translateUserKey(u));
+        userKeys = userKeys.map(u => this.translateNip19(u));
 
         const query: any = {
             authors: userKeys,
@@ -587,7 +661,7 @@ export class Nostr {
         return new Promise<boolean>(async (resolve, reject) => {
             await this.initKeys();
             const relays = this.getRelays(relaysStr);
-            recipient = this.translateUserKey(recipient);
+            recipient = this.translateNip19(recipient);
 
             const event: any = {
                 kind: 1,
@@ -666,7 +740,9 @@ export class Nostr {
                 return r;
             }).filter(r => !!r);
         }
-        return relays;
+
+        // this Set trick removes is simply for removing duplicates from array
+        return [...new Set(relays)];
     }
 
     persistEvents = async (events: Event[], relays: string): Promise<J.SaveNostrEventResponse> => {

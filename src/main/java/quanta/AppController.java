@@ -50,6 +50,7 @@ import quanta.model.NodeInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -238,6 +239,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			// =======================================================================================
 			/* REQUEST PARAMS */
 			@RequestParam(value = "id", required = false) String id, //
+			@RequestParam(value = "nostrId", required = false) String nostrId, //
+			@RequestParam(value = "refNodeId", required = false) String refNodeId, //
 
 			// be careful removing this, clicking on a node updates the browser history to
 			// an 'n=' style url if this node is named
@@ -255,8 +258,11 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			boolean isHomeNodeRequest = false;
 
+			if (nostrId != null) {
+				id = "." + nostrId;
+			}
 			// Node Names are identified using a colon in front of it, to make it detectable
-			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+			else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
 				if ("home".equalsIgnoreCase(nameOnUserNode)) {
 					isHomeNodeRequest = true;
 				}
@@ -267,21 +273,21 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + name;
 			}
 
-			boolean urlId = false;
+			boolean hasUrlId = false;
 
 			// if we have an ID, try to look it up, to put it in the session and load the Social Card properties
 			// for this request.
 
 			// If no id given defalt to ":home" only so we can get the social card props.
-			if (id == null) {
-				id = ":home";
+			if (id != null) {
+				hasUrlId = true;
 			} else {
-				urlId = true;
+				id = ":home";
 			}
 
 			// log.debug("ID specified on url=" + id);
 			String _id = id;
-			boolean _urlId = urlId;
+			boolean _hasUrlId = hasUrlId;
 			boolean _isHomeNodeRequest = isHomeNodeRequest;
 
 			arun.run(as -> {
@@ -290,8 +296,26 @@ public class AppController extends ServiceBase implements ErrorController {
 					Val<SubNode> accntNode = new Val<>();
 					node = read.getNode(as, _id, true, accntNode);
 
-					if (node == null && _isHomeNodeRequest && accntNode.hasVal()) {
-						sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
+					if (node == null) {
+						// if we just tried to look in local DB for nostrId and didn't find it
+						// we set the loadNostrId
+						if (_id.startsWith(".")) {
+
+							// set this var to signal to client it needs to load the nostrId from client.
+							sc.setLoadNostrId(nostrId);
+
+							// refNodeId is optional and tells us which nodeId is the account from which we should
+							// try to get relays for looking up nostrId
+							if (refNodeId != null) {
+								SubNode nostrUserAccnt = read.getNode(as, refNodeId);
+								if (nostrUserAccnt != null) {
+									sc.setLoadNostrIdRelays(nostrUserAccnt.getStr(NodeProp.NOSTR_RELAYS));
+								}
+							}
+						}
+						if (_isHomeNodeRequest && accntNode.hasVal()) {
+							sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
+						}
 					}
 				} catch (Exception e) {
 					sc.setUrlIdFailMsg("Unable to access node: " + _id);
@@ -299,7 +323,8 @@ public class AppController extends ServiceBase implements ErrorController {
 				}
 
 				if (node != null) {
-					if (_urlId) {
+					if (_hasUrlId) {
+						// todo-0: should this always be set even when we used ":home" above?
 						sc.setInitialNodeId(_id);
 					}
 
@@ -1456,6 +1481,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			res.setUserMsg(sc.getUserMsg());
 			res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
 			res.setInitialNodeId(sc.getInitialNodeId());
+			res.setLoadNostrId(sc.getLoadNostrId());
+			res.setLoadNostrIdRelays(sc.getLoadNostrIdRelays());
 		}
 
 		res.setConfig(prop.getConfig());

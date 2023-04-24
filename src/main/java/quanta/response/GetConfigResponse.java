@@ -16,4 +16,6 @@ public class GetConfigResponse extends ResponseBase {
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
+    private String loadNostrId;
+    private String loadNostrIdRelays;
 }

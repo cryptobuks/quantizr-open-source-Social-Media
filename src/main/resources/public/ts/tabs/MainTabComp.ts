@@ -28,6 +28,8 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;
+
+        // todo-0: if loadNostrId set, show a progress indicator here
         if (S.quanta.configRes.urlIdFailMsg) {
             contentDiv = new Heading(4, S.quanta.configRes.urlIdFailMsg);
         }

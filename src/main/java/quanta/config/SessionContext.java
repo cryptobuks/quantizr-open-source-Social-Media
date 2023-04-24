@@ -36,6 +36,8 @@ public class SessionContext extends ServiceBase {
 	private String userMsg;
 	private String displayUserProfileId;
 	private String initialNodeId;
+	private String loadNostrId;
+	private String loadNostrIdRelays;
 
 	public PublicKey pubSigKey = null;
 
@@ -100,7 +102,8 @@ public class SessionContext extends ServiceBase {
 		urlIdFailMsg = null;
 		userMsg = null;
 		displayUserProfileId = null;
-		initialNodeId = null;			
+		initialNodeId = null;	
+		loadNostrIdRelays = null;	
 	}
 
 	public boolean isEnableIPSM() {
@@ -645,5 +648,21 @@ public class SessionContext extends ServiceBase {
 
 	public void setInitialNodeId(String initialNodeId) {
 		this.initialNodeId = initialNodeId;
+	}
+
+	public String getLoadNostrId() {
+		return loadNostrId;
+	}
+
+	public void setLoadNostrId(String loadNostrId) {
+		this.loadNostrId = loadNostrId;
+	}
+
+	public String getLoadNostrIdRelays() {
+		return loadNostrIdRelays;
+	}
+
+	public void setLoadNostrIdRelays(String loadNostrIdRelays) {
+		this.loadNostrIdRelays = loadNostrIdRelays;
 	}
 }

@@ -12,6 +12,7 @@ interface LS {
 export class NodeCompMarkdown extends Html {
     // detects URLs in a string (from Stack Overflow, not fully vetted yet)
     static urlRegex = /(https?:\/\/[^\s]+)/g;
+    static nostrRegex = /(nostr:[^\s]+)/g;
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
@@ -79,6 +80,7 @@ export class NodeCompMarkdown extends Html {
 
         val = S.render.injectSubstitutions(node, content);
         val = this.replaceOgImgFileNames(val);
+        val = this.replaceNostrLinks(val);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
 
@@ -87,10 +89,10 @@ export class NodeCompMarkdown extends Html {
         return val;
     }
 
-    // This method is part of a work in progress to make it where
-    // IMAGE urls can be included right in content and it renders without
-    // showing the URL. OpenGraph-type logic alrelady *is* wokring however
-    // to make the actual images display when IMG links are in the content.
+    /* It's kind of ugly here to see the URLs disappearing as the image is loaded
+    so think about a way to fix that. Maybe render nothing for urls until we know
+    their mime type or OpenGraph result...becasue it's better for things to magically
+    appear on the screen than to disappear */
     replaceOgImgFileNames = (val: string): string => {
         // find all the urls in the val, and remove the ones that we know are doing go
         // be rendered as plain Images when OpenGraph rendering is complete.
@@ -101,6 +103,24 @@ export class NodeCompMarkdown extends Html {
             else {
                 return url;
             }
+        });
+    }
+
+    // need to make this be an href that with target=_blank that opens the URL in a new tab.
+    // so we need a new URL format like nostrId=? that checks when index.html is loading if the
+    // node is not available and if not triggers the client to load from a relay and display it.
+    replaceNostrLinks = (val: string): string => {
+        return val.replace(NodeCompMarkdown.nostrRegex, (url: string) => {
+            if (url.startsWith("nostr:note")) {
+                url = url.substring(6);
+                url = S.nostr.translateNip19(url);
+                console.log("nip19 translated to: " + url);
+                const shortId = url.substring(0, 10) + "...";
+                // Note: 'nostr-note' class in here is so that our OpenGraph link detector can ignore this and leave
+                // it as a regular anchor tag link
+                return `<a href='${window.location.origin}?nostrId=${url}&refNodeId=${this.node.ownerId}' class='nostr-note' target='_blank'>${shortId}</a>`;
+            }
+            else return url;
         });
     }
 
@@ -124,7 +144,8 @@ export class NodeCompMarkdown extends Html {
             trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
             if (e.classList.contains("mention") ||
                 e.classList.contains("hashtag") ||
-                e.classList.contains("u-url")) return;
+                e.classList.contains("u-url") ||
+                e.classList.contains("nostr-note")) return;
 
             // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
             if (content.indexOf("(" + href + ")") !== -1) return;

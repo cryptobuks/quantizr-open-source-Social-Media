@@ -764,6 +764,8 @@ export interface GetConfigResponse extends ResponseBase {
     userMsg: string;
     displayUserProfileId: string;
     initialNodeId: string;
+    loadNostrId: string;
+    loadNostrIdRelays: string;
 }
 
 export interface GetFollowersResponse extends ResponseBase {
