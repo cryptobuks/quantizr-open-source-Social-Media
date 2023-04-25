@@ -33,7 +33,7 @@ export class NodeCompRowHeader extends Div {
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
         const isNostr = S.nostr.isNostrNode(this.node);
-        const isActPub = S.nostr.isActPubNode(this.node);
+        // const isActPub = S.nostr.isActPubNode(this.node);
 
         // if user has set their displayName
         if (this.node.displayName) {
@@ -88,12 +88,13 @@ export class NodeCompRowHeader extends Div {
                 }
             }, null, true));
 
-            if (isNostr) {
-                children.push(new Span("Nostr", { className: "smallMarginRight" }));
-            }
-            else if (isActPub) {
-                children.push(new Span("AP", { className: "smallMarginRight" }));
-            }
+            // do not delete...yet
+            // if (isNostr) {
+            //     children.push(new Span("Nostr", { className: "smallMarginRight" }));
+            // }
+            // else if (isActPub) {
+            //     children.push(new Span("AP", { className: "smallMarginRight" }));
+            // }
         }
 
         const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);

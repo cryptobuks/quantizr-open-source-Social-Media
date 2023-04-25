@@ -750,7 +750,6 @@ export class Nostr {
                     // todo-0: need a background thread that queues up these pubkeys, and queries for them
                     // first on the server, and secondarily on relays until it can eventually render with
                     // the actual username in this span.
-
                     const elmId = Comp.getNextId();
                     const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                     val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);

@@ -139,7 +139,7 @@ export class UserProfileDlg extends DialogBase {
                                 title: "Click to Unfollow user"
                             }) : null,
 
-                            state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
+                            !nostrId && state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
                                 onClick: () => {
                                     if (state.userProfile.followerCount) {
                                         this.close();
@@ -154,7 +154,7 @@ export class UserProfileDlg extends DialogBase {
                                 className: "followCount"
                             }) : null,
 
-                            state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
+                            !nostrId && state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
                                 onClick: () => {
                                     if (state.userProfile.followingCount) {
                                         this.close();
@@ -182,10 +182,7 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                nostrId ? new Div("Identity: " + nostrId, { className: "marginLeft" }) : null,
-                // isNostr ? new Div("Relays: ") : null,
-                // isNostr ? new Html(S.util.markdown(state.userProfile.relays?.replace("\n", "\n<br>"))) : null,
-
+                nostrId ? this.createNostrInfoDiv(nostrId) : null,
                 web3Div,
 
                 new ButtonBar([
@@ -233,6 +230,25 @@ export class UserProfileDlg extends DialogBase {
         ];
 
         return children;
+    }
+
+    createNostrInfoDiv = (nostrId: string): Div => {
+        const ast = getAs();
+        const children = [
+            new Div("Nostr ID: "),
+            new Div(nostrId, { className: "marginLeft" })
+        ];
+
+        if (ast.userProfile.relays) {
+            children.push(new Div("Relays: "));
+            const relays = S.nostr.getRelays(ast.userProfile.relays);
+            if (relays) {
+                relays.forEach(r => {
+                    children.push(new Div(r, { className: "marginLeft" }));
+                });
+            }
+        }
+        return new Div(null, { className: "nostrInfoPanel" }, children);
     }
 
     deleteFriend = async () => {

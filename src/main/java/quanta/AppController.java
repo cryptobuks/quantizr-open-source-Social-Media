@@ -324,7 +324,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 				if (node != null) {
 					if (_hasUrlId) {
-						// todo-0: should this always be set even when we used ":home" above?
+						// todo-1: should this always be set even when we used ":home" above?
 						sc.setInitialNodeId(_id);
 					}
 

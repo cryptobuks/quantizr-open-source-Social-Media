@@ -48,6 +48,13 @@
     margin: $smallGap 30px 20px 30px;
 }
 
+.nostrInfoPanel {
+    margin-top: $smallGap;
+    padding: $smallGap;
+    border: 1px solid gray;
+    border-radius: $border-radius;
+}
+
 .userDisplayName {
     padding-left: $smallGap;
     width: 40rem;

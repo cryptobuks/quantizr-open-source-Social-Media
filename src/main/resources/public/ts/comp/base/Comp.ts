@@ -47,6 +47,9 @@ export abstract class Comp implements CompIntf {
     public ordinal: number;
 
     constructor(attribs?: any, private stateMgr?: State) {
+        if (typeof attribs === "string") {
+            throw new Error("string was passed for 'attribs' in " + this.constructor.name);
+        }
         if (this.debug) {
             console.log("construct: " + this.constructor.name);
         }
