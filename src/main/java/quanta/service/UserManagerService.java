@@ -996,14 +996,7 @@ public class UserManagerService extends ServiceBase {
 			if (userNode != null) {
 				userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER);
-
-				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-				if (StringUtils.isEmpty(displayName)) {
-					displayName = userNode.getStr(NodeProp.NOSTR_NAME);
-				}
-				if (StringUtils.isEmpty(displayName)) {
-					displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
-				}
+				String displayName = getFriendlyNameFromNode(userNode);
 
 				userProfile.setUserName(nodeUserName);
 				userProfile.setDisplayName(displayName);
@@ -1063,6 +1056,17 @@ public class UserManagerService extends ServiceBase {
 			}
 			return userProfile;
 		});
+	}
+
+	public String getFriendlyNameFromNode(SubNode userNode) {
+		String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+		if (StringUtils.isEmpty(displayName)) {
+			displayName = userNode.getStr(NodeProp.NOSTR_NAME);
+		}
+		if (StringUtils.isEmpty(displayName)) {
+			displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
+		}
+		return displayName;
 	}
 
 	public boolean userIsFollowedByMe(MongoSession ms, SubNode inUserNode, String maybeFollowedUser) {
@@ -1447,7 +1451,8 @@ public class UserManagerService extends ServiceBase {
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
 			if (userNode != null) {
-				fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
+				String displayName = getFriendlyNameFromNode(userNode);
+				fi.setDisplayName(displayName);
 			}
 
 			String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
