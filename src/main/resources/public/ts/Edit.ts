@@ -90,7 +90,7 @@ export class Edit {
     }
 
     public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, nostrRecips: string, nostrRecipRelays: string) => {
+        showJumpButton: boolean, replyToId: string) => {
         const ast = getAs();
         if (S.util.checkSuccess("Editing node", res)) {
             if (ast.mobileMode) forceUsePopup = true;
@@ -120,8 +120,6 @@ export class Edit {
                         s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editNode = res.nodeInfo;
-                        s.nostrRecips = nostrRecips;
-                        s.nostrRecipRelays = nostrRecipRelays;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                     });
@@ -131,16 +129,12 @@ export class Edit {
                 else if (editInPopup) {
                     await promiseDispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
-                        s.nostrRecips = nostrRecips;
-                        s.nostrRecipRelays = nostrRecipRelays;
                     });
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
-                        s.nostrRecips = nostrRecips;
-                        s.nostrRecipRelays = nostrRecipRelays;
                         s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
@@ -301,7 +295,7 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, getAs());
-            this.runEditNode(null, res.newNode.id, false, false, false, null, false, null, null);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, false);
         }
     }
 
@@ -311,7 +305,8 @@ export class Edit {
                 S.quanta.refresh();
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, false, res.nostrRecips, res.nostrRecipRelays);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, //
+                    false);
             }
         }
     }
@@ -713,7 +708,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, false, null, null);
+        this.runEditNode(null, id, false, false, false, null, false);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -723,8 +718,7 @@ export class Edit {
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean,
-        nostrRecips: string, nostrRecipRelays: string) => {
+        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
         if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -751,7 +745,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, nostrRecips, nostrRecipRelays);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, ast?: AppState) => {
@@ -1400,7 +1394,7 @@ export class Edit {
 
         // if not all the shares are mentioned in the text ask the user about putting them the content automatically
         if (!dlg.areAllSharesInContent()) {
-            const confDlg = new ConfirmDlg("Add to Sharing/Mentions to content text?", "Add Mentions ?");
+            const confDlg = new ConfirmDlg("Insert Mentions into content text?", "Add Mentions ?");
             await confDlg.open();
             if (confDlg.yes) {
                 await dlg.addSharingToContentText();

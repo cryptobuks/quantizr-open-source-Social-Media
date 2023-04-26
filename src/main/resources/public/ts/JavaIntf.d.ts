@@ -536,6 +536,7 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
+    saveToActPub: boolean;
 }
 
 export interface SaveNostrEventRequest extends RequestBase {
@@ -699,8 +700,6 @@ export interface CopySharingResponse extends ResponseBase {
 export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
     encrypt: boolean;
-    nostrRecips: string;
-    nostrRecipRelays: string;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {
@@ -1133,6 +1132,8 @@ export interface AccessControlInfo {
     displayName: string;
     principalName: string;
     principalNodeId: string;
+    nostrNpub: string;
+    nostrRelays: string;
     avatarVer: string;
     foreignAvatarUrl: string;
     privileges: PrivilegeInfo[];

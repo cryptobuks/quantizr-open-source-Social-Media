@@ -303,7 +303,7 @@ export class NodeUtil {
                 if (ac.displayName) {
                     title = ac.displayName;
                 }
-                title += (title ? "\n\n@" : "@") + ac.principalName;
+                title += (title ? "\n\n" : "") + S.util.getFriendlyPrincipalName(ac);
 
                 // If we have a local node for this user we will have the principleNodeId here and show a link
                 // to open the user.
@@ -331,7 +331,7 @@ export class NodeUtil {
 
                 if (numShares > 5) {
                     moreCount++;
-                    showMore += "@" + ac.principalName;
+                    showMore += S.util.getFriendlyPrincipalName(ac);
                     if (ac.displayName) {
                         showMore += " (" + ac.displayName + ")"
                     }
@@ -339,7 +339,7 @@ export class NodeUtil {
                     showMore += "\n";
                 }
                 else {
-                    let nameInSpan = ac.principalName;
+                    let nameInSpan = S.util.getFriendlyPrincipalName(ac);
 
                     // If nameInSpan contains '@' (a foreign user) then chop off the server name to make the
                     // display shorter
@@ -348,7 +348,7 @@ export class NodeUtil {
                         nameInSpan = nameInSpan.substring(0, atIdx);
                     }
 
-                    ret.push(new Span("@" + nameInSpan + suffix, props));
+                    ret.push(new Span(nameInSpan + suffix, props));
                 }
                 numShares++;
             }

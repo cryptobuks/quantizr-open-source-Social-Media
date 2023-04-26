@@ -79,12 +79,6 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	public String getAccountPropById(MongoSession ms, String accountId, String prop) {
-		// special case of a public share
-		if (PrincipalName.PUBLIC.s().equals(accountId)
-				&& (prop.equals(NodeProp.DISPLAY_NAME.s()) || prop.equals(NodeProp.USER.s()))) {
-			return PrincipalName.PUBLIC.s();
-		}
-
 		String propVal = null;
 		SubNode accntNode = null;
 
@@ -508,6 +502,8 @@ public class MongoAuth extends ServiceBase {
 		String publicKey = null;
 		String avatarVer = null;
 		String foreignAvatarUrl = null;
+		String nostrNpub = null;
+		String nostrRelays = null;
 
 		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
@@ -522,6 +518,8 @@ public class MongoAuth extends ServiceBase {
 			principalName = principalNode.getStr(NodeProp.USER);
 			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
+			nostrNpub = principalNode.getStr(NodeProp.NOSTR_USER_NPUB);
+			nostrRelays = principalNode.getStr(NodeProp.NOSTR_RELAYS);
 
 			// This will be null if it's a local node, and this is fine
 			foreignAvatarUrl = principalNode.getStr(NodeProp.USER_ICON_URL);
@@ -532,8 +530,8 @@ public class MongoAuth extends ServiceBase {
 			}
 		}
 
-		AccessControlInfo info =
-				new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer, foreignAvatarUrl);
+		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, nostrNpub, nostrRelays,
+				avatarVer, foreignAvatarUrl);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}

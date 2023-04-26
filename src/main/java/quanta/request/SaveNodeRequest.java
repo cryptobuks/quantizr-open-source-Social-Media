@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SaveNodeRequest extends RequestBase {
 	private NodeInfo node;
+	boolean saveToActPub;
 }

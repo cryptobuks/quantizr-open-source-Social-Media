@@ -17,6 +17,8 @@ public class AccessControlInfo {
 	private String displayName;
 	private String principalName;
 	private String principalNodeId;
+	private String nostrNpub;
+	private String nostrRelays;
 
 	// used to build local user avatars
 	private String avatarVer;
@@ -27,7 +29,7 @@ public class AccessControlInfo {
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
-	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey, String avatarVer,
+	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey, String nostrNpub, String nostrRelays, String avatarVer,
 			String foreignAvatarUrl) {
 		this.displayName = displayName;
 		this.principalName = principalName;
@@ -35,6 +37,8 @@ public class AccessControlInfo {
 		this.publicKey = publicKey;
 		this.avatarVer = avatarVer;
 		this.foreignAvatarUrl = foreignAvatarUrl;
+		this.nostrNpub = nostrNpub;
+		this.nostrRelays = nostrRelays;
 	}
 
 	public void addPrivilege(PrivilegeInfo priv) {

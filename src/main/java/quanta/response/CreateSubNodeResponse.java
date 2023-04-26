@@ -17,7 +17,4 @@ public class CreateSubNodeResponse extends ResponseBase {
 	 * Mainly used in a 'reply' to an encrypted node.
 	 */
 	private boolean encrypt;
-
-	private String nostrRecips;
-	private String nostrRecipRelays;
 }

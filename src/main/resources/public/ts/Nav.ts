@@ -659,7 +659,15 @@ export class Nav {
     }
 
     messagesFromFriends = async () => {
-        await S.nostr.readPostsFromFriends();
+        const ast = getAs();
+        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
+            // todo-0: instead of reading only upon demand here, we could also
+            // open our defined (for this user) relays and just subscribe to all
+            // events from our "friends" and then we'd only call this
+            // on demand thing at app startup to catchup what as missed
+            // while we were offline.
+            await S.nostr.readPostsFromFriends();
+        }
 
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");

@@ -1028,7 +1028,7 @@ export class Util {
         const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
         if (editorData?.nodeId && editorData?.content) {
             await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
-            S.edit.runEditNode(editorData.content, editorData.nodeId, true, false, false, null, false, null, null);
+            S.edit.runEditNode(editorData.content, editorData.nodeId, true, false, false, null, false);
         }
     }
 
@@ -1042,6 +1042,19 @@ export class Util {
                 break;
             default:
                 break;
+        }
+    }
+
+    // Gets a name like "@user" (for AP names) or "12345678..." for nostr users
+    getFriendlyPrincipalName = (ac: J.AccessControlInfo) => { // userName: string): string => {
+        if (ac.nostrNpub) {
+            return ac.nostrNpub.substring(0, 14);
+        }
+        else if (S.nostr.isNostrUserName(ac.principalName)) {
+            return ac.principalName.substring(1, 9) + "...";
+        }
+        else {
+            return "@" + ac.principalName;
         }
     }
 

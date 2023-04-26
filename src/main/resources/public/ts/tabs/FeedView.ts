@@ -283,10 +283,24 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     ],
                         null, "protocolPickerOnView", {
                         setValue: (val: string) => {
-                            this.data.props.protocolFilter = val;
+                            dispatch("setProtocol", s => {
+                                s.protocolFilter = val;
+                                if (val === "all") {
+                                    s.sendToActPub = true;
+                                    s.sendToNostr = true;
+                                }
+                                else if (val === "ap") {
+                                    s.sendToActPub = true;
+                                    s.sendToNostr = false;
+                                }
+                                else if (val === "nostr") {
+                                    s.sendToActPub = false;
+                                    s.sendToNostr = true;
+                                }
+                            });
                             S.srch.refreshFeed();
                         },
-                        getValue: (): string => this.data.props.protocolFilter
+                        getValue: (): string => getAs().protocolFilter
                     }),
                     friendsTagDropDown,
                     new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {

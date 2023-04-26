@@ -50,7 +50,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         }
 
         const displayName = this.aclEntry.displayName;
-        const userNameDisp = "@" + this.aclEntry.principalName;
+        const userNameDisp = S.util.getFriendlyPrincipalName(this.aclEntry);
         const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
@@ -74,7 +74,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     ]) : null
                 ]),
                 new Divc({ className: "sharingDisplayName" }, [
-                    isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
+                    isPublic ? new Div("Public (Everyone)", { className: "largeFont" })
                         : new Div(displayName, {
                             className: "friendName",
                             onClick: () => {

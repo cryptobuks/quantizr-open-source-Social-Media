@@ -399,6 +399,7 @@ export class EditNodeDlg extends DialogBase {
         let sharingDivClearFix = null;
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
+            const chooseProtocol = ast.protocolFilter === "all" && isPublic && !unpublished;
             sharingDiv = new Divc({
                 className: "float-end clickable marginBottom"
             }, [
@@ -411,6 +412,24 @@ export class EditNodeDlg extends DialogBase {
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
+                }) : null,
+
+                // If user hasn't choosen a protocol filter make them choose one here.
+                chooseProtocol ? new Checkbox("Nostr", { className: "marginLeft" }, {
+                    setValue: (checked: boolean) => {
+                        dispatch("updateProtocolTarget", s => {
+                            s.sendToNostr = checked;
+                        });
+                    },
+                    getValue: (): boolean => getAs().sendToNostr
+                }) : null,
+                chooseProtocol ? new Checkbox("ActivityPub", null, {
+                    setValue: (checked: boolean) => {
+                        dispatch("updateProtocolTarget", s => {
+                            s.sendToActPub = checked;
+                        });
+                    },
+                    getValue: (): boolean => getAs().sendToActPub
                 }) : null
             ]);
             sharingDivClearFix = new Clearfix();
@@ -783,8 +802,6 @@ export class EditNodeDlg extends DialogBase {
         EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {
             s.editNode = null;
-            s.nostrRecipRelays = null;
-            s.nostrRecips = null;
             s.editNodeOnTab = null;
             s.editNodeReplyToId = null;
             S.quanta.newNodeTargetId = null;
@@ -916,11 +933,6 @@ export class EditNodeDlg extends DialogBase {
         const ast = getAs();
         const value = ast.editNode.content || "";
 
-        // this is 'per spec' but mentions are not required and we're not supporting this yet.
-        // if (ast.nostrRecips) {
-        //     value = "nostr:" + ast.nostrRecips + value;
-        // }
-
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
         if (!encrypted) {
             this.contentEditorState.setValue(value);
@@ -1032,7 +1044,8 @@ export class EditNodeDlg extends DialogBase {
             let accum = 0;
             for (const ac of ast.editNode.ac) {
                 if (ac.principalName !== J.PrincipalName.PUBLIC) {
-                    const insertName = "@" + ac.principalName;
+                    const insertName = S.util.getFriendlyPrincipalName(ac);
+
                     if (content.indexOf(insertName) === -1) {
                         if (!newLine) {
                             content += "\n\n";

@@ -16,7 +16,6 @@ export class FeedViewProps {
     name: string = J.Constant.FEED_PUB;
 
     friendsTagSearch: string = null;
-    protocolFilter: string = "all";
 
     /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
      for any non-node specific feed query this stays null. */

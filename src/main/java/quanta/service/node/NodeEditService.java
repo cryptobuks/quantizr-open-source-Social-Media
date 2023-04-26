@@ -196,31 +196,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (allowSharing) {
-			// if replying to a Nostr foreign Node, we get the npub and relays of who we're replying to
-			// and put then in the response so the client can send the message.
-			if (nodeBeingRepliedTo != null) {
-				String objId = nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID);
-				if (objId != null && objId.startsWith(".")) {
-
-					// If we're replying to a Nostr user, send back the nostr info
-					SubNode replyToNostrAccnt = read.getNode(ms, nodeBeingRepliedTo.getOwner(), false);
-					if (replyToNostrAccnt != null) {
-						res.setNostrRecips(replyToNostrAccnt.getStr(NodeProp.NOSTR_USER_NPUB));
-						res.setNostrRecipRelays(replyToNostrAccnt.getStr(NodeProp.NOSTR_RELAYS));
-					}
-				}
-			}
-
 			// if a user to share to (a Direct Message) is provided, add it.
 			if (req.getShareToUserId() != null) {
-
-				// If we're sharing to a Nostr user, send back the nostr info
-				SubNode shareToNostrAccnt = read.getNode(ms, req.getShareToUserId(), false);
-				if (shareToNostrAccnt != null && nostr.isNostrUserName(shareToNostrAccnt.getStr(NodeProp.USER))) {
-					res.setNostrRecips(shareToNostrAccnt.getStr(NodeProp.NOSTR_USER_NPUB));
-					res.setNostrRecipRelays(shareToNostrAccnt.getStr(NodeProp.NOSTR_RELAYS));
-				}
-
 				HashMap<String, AccessControl> ac = new HashMap<>();
 				ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
 				newNode.setAc(ac);
@@ -271,7 +248,7 @@ public class NodeEditService extends ServiceBase {
 		 */
 		if (!req.isPendingEdit() && req.getBoostTarget() != null) {
 			// log.debug("publishing boost: " + newNode.getIdStr());
-			processAfterSave(ms, newNode, parentNode);
+			processAfterSave(ms, newNode, parentNode, true);
 		}
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
@@ -670,7 +647,7 @@ public class NodeEditService extends ServiceBase {
 		 * Send notification to local server or to remote server when a node is added (and not by admin)
 		 */
 		if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
-			processAfterSave(ms, node, parent);
+			processAfterSave(ms, node, parent, req.isSaveToActPub());
 		}
 
 		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, //
@@ -716,7 +693,7 @@ public class NodeEditService extends ServiceBase {
 
 	// 'parent' (of 'node') can be passed in if already known, or else null can be passed for
 	// parent and we get the parent automatically in here
-	public void processAfterSave(MongoSession ms, SubNode node, SubNode parent) {
+	public void processAfterSave(MongoSession ms, SubNode node, SubNode parent, boolean allowPublishToActPub) {
 		// never do any of this logic if this is an admin-owned node being saved.
 		if (acl.isAdminOwned(node)) {
 			return;
@@ -753,7 +730,7 @@ public class NodeEditService extends ServiceBase {
 
 			if (forceSendToPublic || node.getAc() != null) {
 				// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-				if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
+				if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
 					SubNode _parent = parent;
 					if (_parent == null) {
 						_parent = read.getParent(ms, node, false);

@@ -465,8 +465,15 @@ public class Convert extends ServiceBase {
 			arun.run(s -> {
 				// todo-2: if the actual user account has been delete we can get here and end up with null user name
 				// I think. Look into it.
-				acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
-				acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
+				if (PrincipalName.PUBLIC.s().equals(principalId)) {
+					acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
+					acInfo.setDisplayName(PrincipalName.PUBLIC.s());
+				} else {
+					acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
+					acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
+					acInfo.setNostrNpub(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_USER_NPUB.s()));
+					acInfo.setNostrRelays(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_RELAYS.s()));
+				}
 				return null;
 			});
 		}

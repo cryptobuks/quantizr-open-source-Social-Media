@@ -481,7 +481,7 @@ export class Search {
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,
             applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks,
-            protocol: FeedTab.inst.props.protocolFilter
+            protocol: ast.protocolFilter
         });
 
         dispatch("RenderFeedResults", s => {

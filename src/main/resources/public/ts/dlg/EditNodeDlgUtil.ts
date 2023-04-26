@@ -89,24 +89,25 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
+        // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-            node: editNode
+            node: editNode,
+            saveToActPub: ast.sendToActPub
         });
 
         if (!res?.success) {
             return false;
         }
 
-        // console.log("NEW OBJ: "+S.util.prettyPrint(res.node));
-        if (ast.nostrRecips) {
-            S.nostr.sendMessageToUser(editNode.content, res.node.lastModified, ast.nostrRecipRelays, ast.nostrRecips);
+        if (ast.sendToNostr) {
+            // console.log("NEW OBJ (nostr send): " + S.util.prettyPrint(res.node));
+            S.nostr.sendNode(res.node);
         }
 
         dlg.resetAutoSaver();
 
         S.render.fadeInId = editNode.id;
         S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset);
-
         S.util.notifyNodeUpdated(editNode.id, editNode.type);
         return true;
     }

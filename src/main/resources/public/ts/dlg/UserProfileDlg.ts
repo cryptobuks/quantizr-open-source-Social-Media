@@ -51,7 +51,6 @@ export class UserProfileDlg extends DialogBase {
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
         if (S.nostr.isNostrUserName(userName)) {
-            userName = userName.substring(0, 17);
             return "Nostr Account";
         }
         if (userName.indexOf("@") === -1) {

@@ -17,6 +17,7 @@ import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Comp } from "./comp/base/Comp";
+import { getAs } from "./AppContext";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -623,25 +624,54 @@ export class Nostr {
         return ret;
     }
 
-    // Note: timestamp is assumed to be in milliseconds here.
-    sendMessageToUser = async (content: string, timestamp: number, relaysStr: string, recipient: string): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
-            await this.initKeys();
-            const relays = this.getRelays(relaysStr);
-            recipient = this.translateNip19(recipient);
+    /* Sends the message to nostr relays if there are Nostr shares on it and/or of it's public */
+    sendNode = async (node: J.NodeInfo) => {
+        if (!node || !node.ac || node.ac.length === 0) return;
+        const tags: string[][] = [];
+        let isPublic = false;
+        let relaysStr = "";
+        node.ac.forEach(acl => {
+            if (acl.principalName === J.PrincipalName.PUBLIC) {
+                isPublic = true;
+            }
+            else if (acl.nostrNpub) {
+                const pubkey = this.translateNip19(acl.nostrNpub);
+                tags.push(["p", pubkey]);
+                if (relaysStr) {
+                    relaysStr += "\n";
+                }
+                relaysStr += acl.nostrRelays;
+            }
+        });
 
+        // if nothing nostrish to share to, then do nothing.
+        if (!isPublic && tags.length === 0) {
+            return;
+        }
+
+        // todo-0: final step here is to insert into content #[0], #[1], etc for the ACL mentions. ("p" tags)
+        // by replacing "npub"-prefixed abbreviated terms into the content.
+        const relays = this.getRelays(relaysStr + "\n" + getAs().userProfile.relays);
+        this.sendMessage(node.content, node.lastModified, relays, tags);
+    }
+
+    sendMessage = async (content: string, timestamp: number, relays: string[], tags: string[][]) => {
+        await this.initKeys();
+        return new Promise<boolean>(async (resolve, reject) => {
             const event: any = {
                 kind: 1,
                 pubkey: this.pk,
                 created_at: Math.floor(timestamp / 1000),
-                tags: [["p", recipient]],
+                tags,
                 content
             };
             event.id = getEventHash(event);
             event.sig = signEvent(event, this.sk);
             this.cacheEvent(event);
 
-            // console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+            // DO NOT DELETE (until Nostr testing is finished.)
+            console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+
             let pub: Pub = null;
             let relay: Relay = null;
             let pool: SimplePool = null;
