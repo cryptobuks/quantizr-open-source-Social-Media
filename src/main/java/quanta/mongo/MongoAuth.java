@@ -186,44 +186,59 @@ public class MongoAuth extends ServiceBase {
 			// add `parent.owner` to the ACL
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
-			/*
-			 * We also extract the 'mentions' out of any 'tag' array that might be on this node, so we can
-			 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
-			 * mentioned in the tags array
-			 */
-			HashMap<String, APObj> tags = apub.parseTags(parent);
-
-			// if no content, and the parent isn't our own node
-			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
-				SubNode parentUserNode = arun.run(as -> read.getNode(as, parent.getOwner()));
-
-				if (parentUserNode != null) {
-					String user = parentUserNode.getStr(NodeProp.USER);
-					String url = parentUserNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-					if (url == null) {
-						url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
-					}
-
-					tags.put("@" + user, new APOMention(url, "@" + user));
-				}
-			}
-
-			if (tags.size() > 0) {
-				String content = "";
-				for (String key : tags.keySet()) {
-					if (key.startsWith("@")) {
-						content += key + " ";
-					}
-				}
-
-				/*
-				 * This will put a string of all mentioned users right in the text of the message so they can see
-				 * who will be replied to or remove users they don't want replied to.
-				 */
-				child.setContent(content);
+			if (nostr.isNostrNode(parent)) {
+				addMentionsToContentNostr(parent, child);
+			} else {
+				addMentionsToContentActPub(parent, child);
 			}
 		}
 		child.setAc(ac);
+	}
+
+	private void addMentionsToContentNostr(SubNode parent, SubNode child) {
+		// todo-0: work in progress here.
+	}
+
+	private void addMentionsToContentActPub(SubNode parent, SubNode child) {
+		/*
+		 * We also extract the 'mentions' out of any 'tag' array that might be on this node, so we can
+		 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
+		 * mentioned in the tags array
+		 */
+		HashMap<String, APObj> tags = apub.parseTags(parent);
+
+		// if no content, and the parent isn't our own node
+		if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
+			SubNode parentUserNode = arun.run(as -> read.getNode(as, parent.getOwner()));
+
+			if (parentUserNode != null) {
+				String user = parentUserNode.getStr(NodeProp.USER);
+
+				// todo-0: right here if user is nostr (starts with '.')
+				String url = parentUserNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
+				if (url == null) {
+					url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
+				}
+
+				tags.put("@" + user, new APOMention(url, "@" + user));
+			}
+		}
+
+		if (tags.size() > 0) {
+			String content = "";
+			for (String key : tags.keySet()) {
+				// todo-0: what about nostr key here?
+				if (key.startsWith("@")) {
+					content += key + " ";
+				}
+			}
+
+			/*
+			 * This will put a string of all mentioned users right in the text of the message so they can see
+			 * who will be replied to or remove users they don't want replied to.
+			 */
+			child.setContent(content);
+		}
 	}
 
 	public boolean isAllowedUserName(String userName) {

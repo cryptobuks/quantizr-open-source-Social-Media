@@ -397,10 +397,15 @@ export class UserProfileDlg extends DialogBase {
     }
 
     saveResponse = (res: J.SaveUserPreferencesResponse) => {
-        this.close();
-        dispatch("SaveUserPerferences", s => {
-            s.displayName = this.displayNameState.getValue();
-        });
+        if (res?.success) {
+            this.close();
+            dispatch("SaveUserPerferences", s => {
+                s.displayName = this.displayNameState.getValue();
+            });
+
+            // push any updated user profile info to the server.
+            setTimeout(S.nostr.publishUserMetadata, 1500);
+        }
     }
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {

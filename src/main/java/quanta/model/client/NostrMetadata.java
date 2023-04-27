@@ -3,9 +3,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// "lud16" : "outsideice77@walletofsatoshi.com",
-// "lud06" : "",
-
 @Data
 @NoArgsConstructor
 public class NostrMetadata {
@@ -20,4 +17,5 @@ public class NostrMetadata {
     private String banner;
     private String website;
     private String nip05;
+    private boolean reactions;
 }

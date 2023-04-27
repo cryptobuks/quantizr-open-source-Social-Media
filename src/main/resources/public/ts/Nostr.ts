@@ -29,11 +29,11 @@ https://github.com/nbd-wtf/nostr-tools
 */
 
 export class Nostr {
-    // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
-    // TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
+    TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
+    TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
 
-    TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net\nwss://nos.lol\nwss://relay.damus.io";
-    TEST_USER_KEY: string = "1qguf67wjaq05snx0nfwgrpnhls8a94stquu58lzpnr0q2355u45sjs9fsr"; // "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
+    // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net\nwss://nos.lol\nwss://relay.damus.io";
+    // TEST_USER_KEY: string = "1qguf67wjaq05snx0nfwgrpnhls8a94stquu58lzpnr0q2355u45sjs9fsr"; // "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
 
     sk: string = null; // secret key, hex string
     pk: string = null; // public key, hex string
@@ -52,6 +52,8 @@ export class Nostr {
     // This can be run from Admin Console
     test = async () => {
         await this.initKeys();
+
+        // this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false, false, null);
 
         // this.testNpub();
 
@@ -88,6 +90,71 @@ export class Nostr {
         // Object posted from Quanta
         // await this.getEvent(this.TEST_RELAY_URL, "fec9091d99d8aa4dc1d544563cecb587fea5c3ccb744ca668c8b4021daced097");
         // await this.publishEvent();
+    }
+
+    publishUserMetadata = async (): Promise<void> => {
+        await this.initKeys();
+
+        // get the relays string for this user
+        const userRelays = getAs().userProfile?.relays;
+        if (!userRelays) {
+            console.warn("No relays added yet.");
+            return;
+        }
+
+        // split relays to array of relays
+        const relays = this.getRelays(userRelays);
+        if (!relays || relays.length === 0) return;
+
+        const currentMetaPayload = this.createMetaPayload();
+        const currentMeta = this.createMetadataEvent(currentMetaPayload);
+
+        // we need to scan one relay at a time to verify we have our identity on each one.
+        relays.forEach(async (relay: string) => {
+            const outEvent: any = {};
+
+            // try to read the metadata from the relay
+            await S.nostr.readUserMetadata(this.pk, relay, false, false, outEvent);
+
+            // if the relay didn't have matching out metadata we need to publish it to this relay
+            if (!this.metadataMatches(currentMetaPayload, outEvent.val)) {
+                console.log("Pushing new meta to relay: " + relay);
+
+                // don't await for this, we can let them all run in parallel
+                this.publishEvent(currentMeta, relay);
+            }
+            else {
+                console.log("Meta is up to date on relay: " + relay);
+            }
+        });
+    }
+
+    metadataMatches(meta: J.NostrMetadata, event: Event): boolean {
+        if (!event) {
+            return false;
+        }
+        try {
+            const eventMeta: J.NostrMetadata = JSON.parse(event.content);
+            if (!eventMeta) {
+                return false;
+            }
+            const same = eventMeta.name === meta.name &&
+                eventMeta.username === meta.username &&
+                eventMeta.about === meta.about &&
+                eventMeta.picture === meta.picture &&
+                eventMeta.banner === meta.banner &&
+                eventMeta.website === meta.website &&
+                eventMeta.nip05 === meta.nip05 &&
+                eventMeta.reactions === meta.reactions &&
+                eventMeta.display_name === meta.display_name;
+            if (!same) {
+                console.log("OUTDATED META: " + S.util.prettyPrint(meta));
+            }
+            return same;
+        }
+        catch (e) {
+            return false;
+        }
     }
 
     cacheEvent = (event: Event): void => {
@@ -149,7 +216,7 @@ export class Nostr {
         return this.npub;
     }
 
-    // todo-0: Need to investigate how we can reuse SimplePool
+    // todo-0: Need to investigate how we can reuse SimplePool in this process.
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) return null;
@@ -319,6 +386,42 @@ export class Nostr {
         return event;
     }
 
+    createMetaPayload = (): J.NostrMetadata => {
+        const userProfile = getAs().userProfile;
+
+        const meta: J.NostrMetadata = {
+            name: userProfile.userName,
+            username: userProfile.userName,
+            about: userProfile.userBio,
+            picture: S.render.getAvatarImgUrl(userProfile.userNodeId, userProfile.avatarVer),
+            banner: S.render.getProfileHeaderImgUrl(userProfile.userNodeId, userProfile.avatarVer),
+            website: null,
+            nip05: null,
+            display_name: userProfile.displayName,
+            reactions: null
+        };
+
+        console.log("CURRENT META: " + S.util.prettyPrint(meta));
+        return meta;
+    }
+
+    // Creates the Nostr Metadata event for this user
+    createMetadataEvent = (meta: J.NostrMetadata): any => {
+        const event: any = {
+            kind: Kind.Metadata,
+            created_at: Math.floor(Date.now() / 1000),
+            tags: [],
+            content: JSON.stringify(meta),
+            pubkey: this.pk
+        };
+
+        event.id = getEventHash(event);
+        event.sig = signEvent(event, this.sk);
+        this.cacheEvent(event);
+        console.log("NEW METADATA EVENT: " + S.util.prettyPrint(event));
+        return event;
+    }
+
     checkEvent = (event: Event): boolean => {
         const ok = validateEvent(event);
         const verifyOk = verifySignature(event);
@@ -425,17 +528,14 @@ export class Nostr {
         return relay;
     }
 
-    // todo-1: handle reject case.
-    // Creates a test event and publishes it to our test relay. We can then call 'getEvent()' to verify
-    // that we can read it back from the relay.
-    publishEvent_originalTest = async (): Promise<void> => {
+    publishEvent = async (event: Event, relayStr: string): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            const event = this.createEvent();
-            const relay = await this.openRelay(this.TEST_RELAY_URL);
-
+            // console.log("Publishing Event: " + event.id + " to relay " + relayStr);
+            const relay = await this.openRelay(relayStr);
             const pub = relay.publish(event);
+
             pub.on("ok", () => {
-                console.log(`${relay.url} has accepted our event`);
+                console.log(`${relay.url} accepted event`);
                 relay.close();
                 resolve();
             });
@@ -515,7 +615,8 @@ export class Nostr {
     }
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
-    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean): Promise<J.SaveNostrEventResponse> => {
+    // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
+    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: any): Promise<J.SaveNostrEventResponse> => {
         console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
         if (isNip05) {
@@ -557,14 +658,22 @@ export class Nostr {
 
         if (events?.length > 0) {
             this.revChronSort(events);
-            (events[0] as any).npub = nip19.npubEncode(user);
+            const event: any = events[0];
+            event.npub = nip19.npubEncode(user);
+
+            if (outEvent) {
+                outEvent.val = event;
+            }
         }
         else {
-            console.log("Failed to find user.");
+            console.log("Failed to find user: pubKey=" + user);
             return null;
         }
 
-        return await this.persistEvents(events, relayUrl);
+        if (persist) {
+            return await this.persistEvents(events, relayUrl);
+        }
+        return null;
     }
 
     revChronSort = (events: Event[]): void => {
@@ -685,10 +794,10 @@ export class Nostr {
 
             if (relays.length === 1) {
                 relay = await this.openRelay(relays[0]);
-                pub = await relay.publish(event);
+                pub = relay.publish(event);
             } else {
                 pool = new SimplePool();
-                pub = await pool.publish(relays, event);
+                pub = pool.publish(relays, event);
                 poolRemainder = relays.length;
             }
 

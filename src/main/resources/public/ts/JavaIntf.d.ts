@@ -87,6 +87,7 @@ export interface NostrMetadata {
     banner: string;
     website: string;
     nip05: string;
+    reactions: boolean;
     display_name: string;
 }
 
