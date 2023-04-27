@@ -89,6 +89,10 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
+        if (ast.sendToNostr) {
+            S.nostr.processOutboundNode(editNode, false);
+        }
+
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode,
@@ -100,8 +104,7 @@ export class EditNodeDlgUtil {
         }
 
         if (ast.sendToNostr) {
-            // console.log("NEW OBJ (nostr send): " + S.util.prettyPrint(res.node));
-            S.nostr.sendNode(res.node);
+            S.nostr.processOutboundNode(res.node, true);
         }
 
         dlg.resetAutoSaver();

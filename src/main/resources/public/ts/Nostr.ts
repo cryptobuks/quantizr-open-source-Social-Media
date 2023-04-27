@@ -1,17 +1,18 @@
 import {
     Event,
     Kind,
+    Pub,
     Relay,
+    SimplePool,
     generatePrivateKey,
     getEventHash,
     getPublicKey,
     nip05,
     nip19,
-    SimplePool,
     parseReferences,
     relayInit,
     signEvent,
-    validateEvent, verifySignature, Pub
+    validateEvent, verifySignature
 } from "nostr-tools";
 import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
@@ -625,9 +626,11 @@ export class Nostr {
     }
 
     /* Sends the message to nostr relays if there are Nostr shares on it and/or of it's public */
-    sendNode = async (node: J.NodeInfo) => {
+    processOutboundNode = async (node: J.NodeInfo, send: boolean) => {
         if (!node || !node.ac || node.ac.length === 0) return;
         const tags: string[][] = [];
+        const npubs: string[] = [];
+
         let isPublic = false;
         let relaysStr = "";
         node.ac.forEach(acl => {
@@ -637,6 +640,7 @@ export class Nostr {
             else if (acl.nostrNpub) {
                 const pubkey = this.translateNip19(acl.nostrNpub);
                 tags.push(["p", pubkey]);
+                npubs.push(acl.nostrNpub);
                 if (relaysStr) {
                     relaysStr += "\n";
                 }
@@ -649,10 +653,25 @@ export class Nostr {
             return;
         }
 
-        // todo-0: final step here is to insert into content #[0], #[1], etc for the ACL mentions. ("p" tags)
-        // by replacing "npub"-prefixed abbreviated terms into the content.
-        const relays = this.getRelays(relaysStr + "\n" + getAs().userProfile.relays);
-        this.sendMessage(node.content, node.lastModified, relays, tags);
+        const words = node.content?.split(/[ \n\r\t]+/g);
+        words?.forEach(w => {
+            if (w.startsWith("npub")) {
+                // const acl = node.ac.find(acl => acl.nostrNpub?.startsWith(w));
+                // node.content = node.content.replace(w, acl.nostrNpub);
+                for (let i = 0; i < npubs.length; i++) {
+                    if (npubs[i].startsWith(w)) {
+                        node.content = node.content.replace(w, `#[${i}]`);
+                    }
+                }
+            }
+        });
+
+        S.props.setPropVal(J.NodeProp.NOSTR_TAGS, node, tags);
+
+        if (send) {
+            const relays = this.getRelays(relaysStr + "\n" + getAs().userProfile.relays);
+            this.sendMessage(node.content, node.lastModified, relays, tags);
+        }
     }
 
     sendMessage = async (content: string, timestamp: number, relays: string[], tags: string[][]) => {
@@ -766,7 +785,8 @@ export class Nostr {
     }
 
     replaceNostrRefs = (node: J.NodeInfo, val: string): string => {
-        if (!this.isNostrNode(node) || !node.nostrPubKey) return val;
+        if (!this.hasNostrTags(node) || !node.nostrPubKey) return val;
+
         try {
             const event = this.makeUnsignedEventFromNode(node);
             const references = parseReferences(event);
@@ -776,10 +796,9 @@ export class Nostr {
             // console.log("REFS=" + S.util.prettyPrint(references));
             references.forEach((ref: any) => {
                 if (ref.profile) {
-
                     // todo-0: need a background thread that queues up these pubkeys, and queries for them
                     // first on the server, and secondarily on relays until it can eventually render with
-                    // the actual username in this span.
+                    // the actual username in this span, and also be sure they're cached on the client too
                     const elmId = Comp.getNextId();
                     const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                     val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
@@ -813,15 +832,12 @@ export class Nostr {
     /* Creates an unsigned event */
     makeUnsignedEventFromNode = (node: J.NodeInfo): any => {
         const event: any = {
-            kind: 1, // todo-0: this may need to be updated
+            kind: 1,
             pubkey: this.translateNip19(node.nostrPubKey),
             created_at: node.lastModified / 1000,
             tags: S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node) || [],
             content: node.content
         };
-        // console.log("MADE EVENT: " + S.util.prettyPrint(event));
-        // event.id = getEventHash(event);
-        // event.sig = signEvent(event, this.sk);
         return event;
     }
 
@@ -895,6 +911,10 @@ export class Nostr {
     isNostrNode = (node: J.NodeInfo) => {
         const id = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
         return id?.startsWith(".");
+    }
+
+    hasNostrTags = (node: J.NodeInfo) => {
+        return !!S.props.getPropStr(J.NodeProp.NOSTR_TAGS, node);
     }
 
     isActPubNode = (node: J.NodeInfo) => {

@@ -212,11 +212,6 @@ public class UserFeedService extends ServiceBase {
 
 		// Nostr 
 		if (req.getProtocol().equals("nostr")) {
-			// todo-0: for this to work, and display any local nodes, we would need to have a way to know when
-			// a user is posting something with their "Nostr Outbound" (some kind of option) on, and then
-			// add the OBJECT_ID to all outbound Nostr objects, BUT be careful that this will not introduce
-			// bugs in any places where the mere existence of an OBJECT_ID is currently indicating it's
-			// ActivityPub or at least a "Foreign Node"
 			List<Criteria> orCrit = new LinkedList<>();
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
 
