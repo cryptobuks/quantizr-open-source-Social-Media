@@ -277,7 +277,8 @@ export class User {
                     console.log("No relays were available.");
                     return;
                 }
-                const event = await S.nostr.getEvent(relays, nostrId, true);
+                const persistResponse = {};
+                const event = await S.nostr.getEvent(relays, nostrId, persistResponse);
                 if (!event) {
                     console.warn("Unable to lookup nostrId=" + nostrId);
                     return;

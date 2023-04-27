@@ -53,10 +53,8 @@ public class NostrService extends ServiceBase {
 		String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(as -> {
-			boolean failed = false;
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
-
-			if (!failed) {
+			if (!StringUtils.isEmpty(req.getRelays())) {
 				userNode.set(NodeProp.NOSTR_RELAYS, req.getRelays());
 				update.save(as, userNode);
 				res.setSuccess(true);
@@ -145,7 +143,7 @@ public class NostrService extends ServiceBase {
 				// note: we always need to be able to generate KEY so don't ever let the client upload
 				// an nip05 web url to save to this. Always send up the key.
 				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
-				
+
 				// todo-0: display this (and other missing things on UserProfile dialogs)
 				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 

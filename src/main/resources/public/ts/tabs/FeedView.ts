@@ -277,7 +277,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 }, "bigMarginLeft ") : null,
                 ast.isAnonUser ? null : new Divc({ className: "float-end" }, [
                     new Selection(null, null, [
-                        { key: "all", val: "All Protocols" },
+                        { key: "all", val: "All Networks" },
                         { key: "nostr", val: "Nostr" },
                         { key: "ap", val: "ActivityPub" }
                     ],

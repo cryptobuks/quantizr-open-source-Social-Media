@@ -15,6 +15,7 @@ import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
+import { SearchByNostrDlg } from "./dlg/SearchByNostr";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
@@ -130,6 +131,7 @@ export class MenuPanel extends Div {
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
+    static searchByNostr = () => { new SearchByNostrDlg().open(); };
     static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static multiFollow = () => { new MultiFollowDlg().open(); };
@@ -311,7 +313,10 @@ export class MenuPanel extends Div {
                 new MenuItem("By Content", MenuPanel.searchByContent, !!hltNode), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
+
+                new MenuItemSeparator(), //
                 new MenuItem("By Fediverse URL", MenuPanel.searchByFediUrl), //
+                new MenuItem("By Nostr Resource", MenuPanel.searchByNostr), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //

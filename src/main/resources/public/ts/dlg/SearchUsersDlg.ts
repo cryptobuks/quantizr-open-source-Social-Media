@@ -122,20 +122,21 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultNostrRelay = this.nostrRelayState.getValue();
         const searchType = this.getState<LS>().searchType;
 
-        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR) {
-            if (!SearchUsersDlg.defaultNostrRelay) {
-                S.util.showMessage("Nostr needs a relay.", "Warning");
-                return;
-            }
-        }
-
-        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
+        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || //
+            searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
 
             const userRelays = getAs().userProfile?.relays || "";
 
-            const ret: J.SaveNostrEventResponse = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText,
-                SearchUsersDlg.defaultNostrRelay + "\n" + userRelays, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
-            // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
+            let ret = null;
+            try {
+                S.rpcUtil.incRpcCounter();
+                ret = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText,
+                    SearchUsersDlg.defaultNostrRelay + "\n" + userRelays, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05);
+                // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
+            }
+            finally {
+                S.rpcUtil.decRpcCounter();
+            }
             this.close();
             if (ret?.accntNodeIds?.length > 0) {
                 new UserProfileDlg(ret.accntNodeIds[0]).open();

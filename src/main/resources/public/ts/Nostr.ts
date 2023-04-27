@@ -149,8 +149,7 @@ export class Nostr {
         return this.npub;
     }
 
-    // todo-0: It's probably more efficient to create a RelayPool and just keep adding to it as we go
-    // along if that's possible, so we can just keep retrieving stuff thru the same pool as we go along.
+    // todo-0: Need to investigate how we can reuse SimplePool
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) return null;
@@ -159,36 +158,16 @@ export class Nostr {
             S.rpcUtil.incRpcCounter();
 
             // try to get userRelays from local cache
-            let relays: string[] = this.userRelaysCache.get(node.ownerId);
-
-            // if not found in cache get from server
-            if (!relays) {
-                // todo-1: need a server call just for 'getUserRelays' so this is slightly more efficient.
-                const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: node.ownerId,
-                    nostrPubKey: null
-                });
-
-                if (!res.success) {
-                    console.log("Unable to query user profile for userId: " + node.ownerId);
-                    return null;
-                }
-                // console.log("userProfile: " + S.util.prettyPrint(res.userProfile));
-                relays = this.getRelays(res.userProfile.relays);
-
-                // save relays in cache
-                this.userRelaysCache.set(node.ownerId, relays);
-            }
-
-            if (!relays) {
-                console.log("No relays known for userId: " + node.ownerId);
-                return;
-            }
+            let relays: string[] = await this.getRelaysForUser(node);
 
             const events: Event[] = [];
             const preferredRelays: Set<string> = new Set<string>();
             const threadUsers: Set<string> = new Set<string>();
 
+            // if no relays for this user fall back to our own relays
+            if (relays.length === 0) {
+                relays = this.getRelays(getAs().userProfile.relays);
+            }
             relays.forEach(r => preferredRelays.add(r));
 
             await this.traverseUpReplyChain(events, tags, preferredRelays, threadUsers);
@@ -212,7 +191,7 @@ export class Nostr {
         }
     }
 
-    // As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
+    // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
     // be only looking at the relays we will find parts of this thread on.
     traverseUpReplyChain = async (events: Event[], tags: string[][], preferredRelays: Set<string>,
         threadUsers: Set<string>): Promise<void> => {
@@ -220,9 +199,11 @@ export class Nostr {
         let eventRepliedTo: string = null;
         let relayRepliedTo: string = null;
 
+        // todo-0: we could have used 'getReferences' here...
         // iterate all tags and whatever the right most (last) values arefor the *RepliedTo vars will be what we want
         // becasue according to spec that's what is being replied to.
         for (const ta of tags) {
+            // todo-0: are quanta outbound notes correctly setting the "relay replied to" value ?
             if (Array.isArray(ta)) {
                 if (ta[0] === "e") {
                     // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
@@ -251,7 +232,7 @@ export class Nostr {
             }
 
             // console.log("LOADING ThreadItem: " + eventRepliedTo);
-            const event = await this.getEvent(this.toRelayArray(preferredRelays), eventRepliedTo, false);
+            const event = await this.getEvent(this.toRelayArray(preferredRelays), eventRepliedTo, null);
             if (event) {
                 threadUsers.add(event.pubkey);
                 // console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
@@ -356,7 +337,9 @@ export class Nostr {
         return ok && verifyOk;
     }
 
-    getEvent = async (relays: string[], id: string, persist: boolean): Promise<Event> => {
+    /* persistResponse.res will contain the data saved on the server, but we accept null for persistResonse
+    to indicate that no persistence on the server should be done */
+    getEvent = async (relays: string[], id: string, persistResponse: any): Promise<Event> => {
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -366,8 +349,10 @@ export class Nostr {
             return cachedEvent;
         }
 
+        // query for up to 10 events just so we can get the latest one
         const query: any = {
-            ids: [id]
+            ids: [id],
+            limit: 10
         };
 
         try {
@@ -375,10 +360,12 @@ export class Nostr {
             const events = await this.queryRelays(relays, query);
             // console.log("getEvent: " + S.util.prettyPrint(events));
             if (events?.length > 0) {
-                if (persist) {
-                    await this.persistEvents(events, relays.join("\n"));
+                this.revChronSort(events);
+                const oneEvent = events[0];
+                if (persistResponse) {
+                    persistResponse.res = await this.persistEvents([oneEvent], relays.join("\n"));
                 }
-                return events[0];
+                return oneEvent;
             }
             else {
                 console.log("Unable to load event: " + id + " (tried on " + relays.length + " relays)");
@@ -734,6 +721,10 @@ export class Nostr {
         });
     }
 
+    // todo-0: we could add an option arg here for "fallbackToKnownRelays" (mainly for when looking up a specific
+    // event) so that if we fail to find the event we can query the 'this.knownRelays' for the event before returning
+    // an empty event set here. (not be sure remove from 'knownRelays' all the ones we just failed to find on, before
+    // running the query so that none of the relays are called again unnecessarily)
     queryRelays = async (relays: string[], query: any): Promise<Event[]> => {
         if (relays.length === 1) {
             return await this.singleRelayQuery(relays[0], query);
@@ -819,7 +810,7 @@ export class Nostr {
                     val = val.replace(ref.text, `<a href='${window.location.origin}?nostrId=${ref.event.id}&refNodeId=${node.ownerId}' class='nostr-note nostrLink' target='_blank'>[Note ${shortId}]</a>`);
                 }
                 else if (ref.address) {
-                    // todo-0: add support for address
+                    // todo-1: add support for address
                 }
             });
         }
@@ -924,6 +915,29 @@ export class Nostr {
 
     isNostrUserName = (userName: string) => {
         return userName?.startsWith(".") && userName.indexOf("@") === -1;
+    }
+
+    private async getRelaysForUser(node: J.NodeInfo) {
+        let relays: string[] = this.userRelaysCache.get(node.ownerId);
+
+        // if not found in cache get from server
+        if (!relays) {
+            // todo-1: need a server call just for 'getUserRelays' so this is slightly more efficient.
+            const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                userId: node.ownerId,
+                nostrPubKey: null
+            });
+
+            if (!res.success) {
+                console.log("Unable to query user profile for userId: " + node.ownerId);
+            }
+            // console.log("loadReplyChain userProfile: " + S.util.prettyPrint(res.userProfile));
+            relays = this.getRelays(res.userProfile.relays);
+
+            // save relays in cache
+            this.userRelaysCache.set(node.ownerId, relays);
+        }
+        return relays;
     }
 
     private async singleRelayQuery(relayUrl: string, query: any): Promise<Event[]> {

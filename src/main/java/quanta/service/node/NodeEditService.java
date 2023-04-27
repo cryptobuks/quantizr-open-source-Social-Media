@@ -371,6 +371,7 @@ public class NodeEditService extends ServiceBase {
 				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));
 			}
 
+			// todo-0: need to rethink if we really want to have per-friend relay assignments
 			String nostrRelays = userNode.getStr(NodeProp.NOSTR_RELAYS);
 			if (!StringUtils.isEmpty(nostrRelays)) {
 				properties.add(new PropertyInfo(NodeProp.NOSTR_RELAYS.s(), nostrRelays));

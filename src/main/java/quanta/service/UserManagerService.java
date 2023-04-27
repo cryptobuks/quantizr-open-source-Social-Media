@@ -229,7 +229,7 @@ public class UserManagerService extends ServiceBase {
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
 		// We only allow the login to auto-set the NPUB at user login if there's not currently any NPUB.
-		// todo-0: Eventually we'll let users specify their own NPUB (or generate one) thru the GUI.
+		// todo-0: Eventually we'll let users specify their own PrivateKey
 		String existingNpub = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
 		if (existingNpub == null) {
 			userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);

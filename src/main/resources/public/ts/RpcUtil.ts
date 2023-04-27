@@ -234,6 +234,10 @@ export class RpcUtil {
 
     incRpcCounter = () => {
         this.rpcCounter++;
+
+        // incrementing waitCounter to 3 will make the progress indicator come up instantly
+        this.waitCounter = 3;
+        this.progressInterval();
     }
 
     decRpcCounter = () => {
