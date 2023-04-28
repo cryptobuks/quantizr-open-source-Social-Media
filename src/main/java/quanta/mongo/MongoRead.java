@@ -1468,7 +1468,7 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Generates a Document-like View of a Subgraph. Nodes in "document order", as if reading like a
-     * book, or conventional word processing monolilthic document view. Very powerful becasue of
+     * book, or conventional word processing monolilthic document view. Very powerful because of
      * 'nodeId' which is the place to start loading from. With 'nodeId' it's like we can start our
      * recursion from anywhere, so as we're browsing down a document scrolling in new content each time
      * this method is called to load more records, the nodeId passed in will be whatever was at the

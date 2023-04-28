@@ -462,7 +462,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		/*
-		 * We always add on any privileges assigned to the PUBLIC when checking privs for this user, becasue
+		 * We always add on any privileges assigned to the PUBLIC when checking privs for this user, because
 		 * the auth equivalent is really the union of this set.
 		 */
 		AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());

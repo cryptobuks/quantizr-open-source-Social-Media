@@ -196,7 +196,7 @@ public class MongoUpdate extends ServiceBase {
 							 * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could be more
 							 * aggressive about 'correctness' here and actually call ipfs.objectStat on each CID, to get a more
 							 * bullet proof total bytes amount, but we are safe enough trusting what the node info holds,
-							 * becasue it should be correct.
+							 * because it should be correct.
 							 */
 							UserStats stats = statsMap.get(ipfsNode.getOwner());
 							if (stats == null) {

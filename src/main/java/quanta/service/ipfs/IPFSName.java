@@ -37,7 +37,7 @@ public class IPFSName extends ServiceBase {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            // Use a rest call with no timeout becasue publish can take a LONG time.
+            // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Publishing IPNS: " + url);
             ResponseEntity<String> response =
                     ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);

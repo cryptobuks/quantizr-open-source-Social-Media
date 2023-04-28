@@ -58,7 +58,7 @@ export class AppTab<PT = any, TT = any> extends Div {
             const headingBarHeight = this.headingBar?.getRef()?.offsetHeight || 0;
 
             // we scroll up the additional 12 pixels just to make a slight gap between top row border
-            // and heading border, becasue it's slightly better looking that way.
+            // and heading border, because it's slightly better looking that way.
             let top = elm.offsetTop - headingBarHeight - 12;
             if (top < 0) top = 0;
 

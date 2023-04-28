@@ -230,7 +230,7 @@ export class NodeCompButtonBar extends Div {
             // -----------------------
             // DO NOT DELETE!!
             // This code works perfecly but I realized I never use it AND more importantly a "Next Sibling on Tree" (and Prev)
-            // is going to be too confusing to users, becasue they're too accustomed to "vertical" rather than "horizontal"
+            // is going to be too confusing to users, because they're too accustomed to "vertical" rather than "horizontal"
             // navigation so to speak...and next-sibiliong is definitely sort of "horizontal[ish]"
             // There are TWO places in the code I've removed this.
             //

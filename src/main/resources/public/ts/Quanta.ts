@@ -289,7 +289,7 @@ export class Quanta {
     }
 
     addPageLevelEventListeners = () => {
-        /* We have to run this timer to wait for document.body to exist becasue we load our JS in the HTML HEAD
+        /* We have to run this timer to wait for document.body to exist because we load our JS in the HTML HEAD
             because we need our styling in place BEFORE the page renders or else you get that
             well-known issue of a momentarily unstyled render before the page finishes loading */
         const interval = setInterval(() => {

@@ -46,7 +46,7 @@ export class EditNodeDlgUtil {
         const ast = getAs();
         const editNode = ast.editNode;
 
-        // save these two values, becasue the S.quanta copy can get overwritten before we use them here.
+        // save these two values, because the S.quanta copy can get overwritten before we use them here.
         const newNodeTargetId = S.quanta.newNodeTargetId;
         const newNodeTargetOffset = S.quanta.newNodeTargetOffset;
 

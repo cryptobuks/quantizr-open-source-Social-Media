@@ -25,7 +25,7 @@ import quanta.util.val.Val;
  * scope bean and non-static methods.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class SubNodeUtil extends ServiceBase {
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID);
@@ -99,18 +99,13 @@ public class SubNodeUtil extends ServiceBase {
 			return false;
 		}
 
-		// todo-0: use a big else block here and not a switch so we can reference NodeProp properties here.
-		switch (propName) {
-			case "apid":
-
-				// we don't allow user to modify storage, becasue only admin can control storage.
-			case "bin":
-			case "sn:binTot":
-			case "sn:binQuota":
-				return false;
-			default:
-				break;
+		if (propName.equals(NodeProp.OBJECT_ID.s()) || //
+				propName.equals(NodeProp.BIN.s()) || //
+				propName.equals(NodeProp.BIN_TOTAL.s()) || //
+				propName.equals(NodeProp.BIN_QUOTA.s())) {
+			return false;
 		}
+
 		return true;
 	}
 
@@ -203,7 +198,8 @@ public class SubNodeUtil extends ServiceBase {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true, true);
+				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true,
+						true);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
@@ -346,7 +342,8 @@ public class SubNodeUtil extends ServiceBase {
 
 	public String getFirstAttachmentUrl(SubNode node) {
 		Attachment att = node.getFirstAttachment();
-		if (att == null) return null;
+		if (att == null)
+			return null;
 		String ipfsLink = att.getIpfsLink();
 
 		String bin = ipfsLink != null ? ipfsLink : att.getBin();

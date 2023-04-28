@@ -73,7 +73,7 @@ export class MainTab implements TabIntf<any> {
         ]);
     };
 
-    // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
+    // Put these directly here on main page for non-logged in users, because we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
     customAnonRHSLinks = (): CompIntf[] => {
         // if not anon user return empty items

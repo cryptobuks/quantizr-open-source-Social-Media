@@ -73,7 +73,7 @@ export class NodeCompContent extends Div {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
                 // so we break a bit of type safety here.
 
-                // show it here only if there's no "position(p)" for it, becasue the positioned ones are layed out
+                // show it here only if there's no "position(p)" for it, because the positioned ones are layed out
                 // via html in 'render.injectSubstitutions'
                 if (!att.p || att.p === "auto") {
                     attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0));

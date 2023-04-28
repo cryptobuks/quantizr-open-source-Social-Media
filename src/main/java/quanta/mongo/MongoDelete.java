@@ -719,7 +719,7 @@ public class MongoDelete extends ServiceBase {
 
 		/*
 		 * This will potentially leave orphans and this is fine. We don't bother cleaning orphans now
-		 * becasue there's no need.
+		 * because there's no need.
 		 */
 		DeleteResult delRes = ops.remove(q, SubNode.class);
 		String msg = "Nodes deleted: " + delRes.getDeletedCount();

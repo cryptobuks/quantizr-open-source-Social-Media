@@ -34,7 +34,7 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
         return new Div(text, { className: "tabTitle" });
     }
 
-    /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically
+    /* Renders the info for the OWNER of 'node', and not the content of the actual node, because the content will basically
     all be the same here which will be the user being followed, and is not needed to be displayed.
 
     This node needs to share as much implementation for item rendering as possible with what's done in the, FriendType

@@ -155,7 +155,7 @@ public enum NodeProp {
     FS_LINK("fs:link"), //
 
     /*
-     * property used to indicate we should not query the IPFS network again for this conten becasue we
+     * property used to indicate we should not query the IPFS network again for this conten because we
      * have already loaded it
      */
     IPFS_OK("ipfs:ok"), //
@@ -171,6 +171,8 @@ public enum NodeProp {
 
     JSON_FILE_SEARCH_RESULT("sn:json"), //
     NOWRAP("sn:nowrap"), //
+
+    BIN("bin"),
 
     // get how many bytes of storage the user currently holds
     BIN_TOTAL("sn:binTot"), // see isSavableProperty

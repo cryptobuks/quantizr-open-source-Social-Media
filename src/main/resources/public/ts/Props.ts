@@ -250,7 +250,7 @@ export class Props {
             J.NodeProp.UNPUBLISHED
         ]);
 
-        /* These props are the ones we don't create a TextField for during editing, becasue the editor will have
+        /* These props are the ones we don't create a TextField for during editing, because the editor will have
         some other more specialized way of managing the property */
         S.util.addAllToSet(this.controlBasedPropertyList, [ //
             J.NodeProp.INLINE_CHILDREN, //

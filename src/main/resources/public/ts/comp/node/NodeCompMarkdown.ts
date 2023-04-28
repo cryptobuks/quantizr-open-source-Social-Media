@@ -91,7 +91,7 @@ export class NodeCompMarkdown extends Html {
 
     /* It's kind of ugly here to see the URLs disappearing as the image is loaded
     so think about a way to fix that. Maybe render nothing for urls until we know
-    their mime type or OpenGraph result...becasue it's better for things to magically
+    their mime type or OpenGraph result...because it's better for things to magically
     appear on the screen than to disappear */
     replaceOgImgFileNames = (val: string): string => {
         // find all the urls in the val, and remove the ones that we know are doing go

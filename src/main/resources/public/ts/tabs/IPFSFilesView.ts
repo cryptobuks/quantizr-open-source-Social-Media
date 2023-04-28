@@ -307,7 +307,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
     }
 
     goBack = () => {
-        // going back requires two pops becasue the first pop gives us the CURRENT location
+        // going back requires two pops because the first pop gives us the CURRENT location
         let path = IPFSFilesView.history.pop();
         if (path) {
             path = IPFSFilesView.history.pop();

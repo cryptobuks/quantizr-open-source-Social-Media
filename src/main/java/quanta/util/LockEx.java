@@ -98,7 +98,7 @@ public class LockEx extends ReentrantLock {
 		}
 
 		/*
-		 * if we printed a warning message becasue lock took a while to obtain then print a mia culpa on
+		 * if we printed a warning message because lock took a while to obtain then print a mia culpa on
 		 * that and because we got the lock now!!! Sometimes things just take some time. That' ok. These
 		 * messages are just to help diagnose REAL confirmed deadlock situations.
 		 */

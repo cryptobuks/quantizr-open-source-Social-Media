@@ -1220,7 +1220,7 @@ public class ActPubService extends ServiceBase {
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
 
         // note: I was temporarily think this was doing too much sharing, but
-        // I now think we do need it, especially becasue sometimes the only place
+        // I now think we do need it, especially because sometimes the only place
         // some posts put their 'public' designation is in the CC, so let's process
         // all ccs. The risk (I thought I had was that a 'reply to node', will cause these CCs
         // to be included when they shouldn't). We'll see.
@@ -1497,7 +1497,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public APOPerson generatePersonObj(String userName) {
         return arun.<APOPerson>run(as -> {
-            // we get the usernode without authorizing becasue the APOPerson is guaranteed to only contain
+            // we get the usernode without authorizing because the APOPerson is guaranteed to only contain
             // public info.
             SubNode userNode = read.getUserNodeByUserName(as, userName, false);
             if (userNode != null) {
@@ -1508,7 +1508,7 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
-     * Be careful, becasue any user you queue into here will have their outbox loaded into Quanta, and
+     * Be careful, because any user you queue into here will have their outbox loaded into Quanta, and
      * it's easy to set off a chain reaction where more users keep comming in like a FediCrawler
      */
     public void userEncountered(String apUserName, boolean force) {

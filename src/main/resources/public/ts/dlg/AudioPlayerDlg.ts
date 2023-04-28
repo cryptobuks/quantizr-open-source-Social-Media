@@ -33,7 +33,7 @@ export class AudioPlayerDlg extends DialogBase {
     /*
     If the 'adSegments' array variable below contains an array of start/stop times then during playback this player will seamlessly and autmatically
     jump over those time ranges in the audio during playing just like they didn't even exist, basically censoring out those time ranges.
-    Currently we aren't using this at all, becasue it's not friendly to the podcasting industry!
+    Currently we aren't using this at all, because it's not friendly to the podcasting industry!
     */
     private adSegments: I.AdSegment[] = null;
     private saveTimer: any = null;

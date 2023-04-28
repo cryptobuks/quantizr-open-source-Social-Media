@@ -4,7 +4,7 @@ but actually existing for mostly different reasons having to do with our need to
 references.
 
 WARNING: Singletons (just like in Spring) are not allowed to do any logic that requires other modules
-inside their constructors becasue there is no guarantee that all (or any) of the other Singletons have
+inside their constructors because there is no guarantee that all (or any) of the other Singletons have
 been constructed yet.
 */
 import { Attachment } from "./Attachment";

@@ -11,7 +11,7 @@ because Redux is no longer needed, now that React can do that all the
 state management we need and do it better (i.e. simpler) than Redux.
 
 NOTE: dispatcher doesn't get set until the root component calls initDispatch WHILE BEING
-rendered. This is a requirement becasue it comes from useReducer which can only be called
+rendered. This is a requirement because it comes from useReducer which can only be called
 inside a react function */
 
 let dispatcher: Function = null;
@@ -33,7 +33,7 @@ function reducer(s: AppState, action: DispatchData) {
 
         // ============================
         // WARNING!!!! Normally dispatch methods return NOTHING, and so returning exactly 'false' is the only
-        // case we need to detect here. Do not change this to handle any "falsy" type becasue that will
+        // case we need to detect here. Do not change this to handle any "falsy" type because that will
         // break the entier app.
         // ============================
         if (action.func(newState) === false) {
@@ -130,7 +130,7 @@ export function promiseDispatch(type: string, func: StateModFunc): Promise<void>
             type, func: function (s: AppState): any {
                 // ============================
                 // WARNING!!!! Normally dispatch methods return NOTHING, and so returning exactly 'false' is the only
-                // case we need to detect here. Do not change this to handle any "falsy" type becasue that will
+                // case we need to detect here. Do not change this to handle any "falsy" type because that will
                 // break the entier app.
                 // ============================
                 if (func(s) === false) {

@@ -147,7 +147,7 @@ public class AttachmentService extends ServiceBase {
 		try {
 			/*
 			 * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
-			 * UNDERNEATH this current node. Pass allowAuth=false here becasue below we check the ownerAuth
+			 * UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
 			 * which will be even more strict.
 			 */
 			SubNode node = null;

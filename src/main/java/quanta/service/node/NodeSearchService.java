@@ -66,7 +66,7 @@ public class NodeSearchService extends ServiceBase {
 	static final String SENTENCE_DELIMS = ".!?";
 
 	/*
-	 * Warning: Do not add '#' or '@' to this list becasue we're using it to parse text for hashtags
+	 * Warning: Do not add '#' or '@' to this list because we're using it to parse text for hashtags
 	 * and/or usernames so those characters are part of the text. Also since urls sometimes contain
 	 * something like "/path/#hash=" where a hashtag is used as a parameter in the url we also don't
 	 * want / or ? or & characters in this delimiters list, and to support hyphenated terms we don't

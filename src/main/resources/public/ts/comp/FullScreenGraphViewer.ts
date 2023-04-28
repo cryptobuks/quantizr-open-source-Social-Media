@@ -31,7 +31,7 @@ export class FullScreenGraphViewer extends Main {
 
     forceDirectedTree = () => {
 
-        /* We use 'thiz' to capture 'this' becasue the methods below to expect to have their own 'this'
+        /* We use 'thiz' to capture 'this' because the methods below to expect to have their own 'this'
          that will be set based on code outside our control that is expected by the Graph Implementation itself. */
         const thiz = this;
         const ast = getAs();

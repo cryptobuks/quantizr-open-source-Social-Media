@@ -807,7 +807,7 @@ public class NodeEditService extends ServiceBase {
 				String prevMcid = node.getPrevMcid();
 
 				try {
-					// intentionally not using setters here (becasue of dirty flag)
+					// intentionally not using setters here (because of dirty flag)
 					node.mcid = null;
 					node.prevMcid = null;
 

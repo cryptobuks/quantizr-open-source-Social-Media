@@ -74,7 +74,7 @@ export class FriendsTableRow extends ListBoxRow {
                     ]),
 
                     // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,
-                    // becasue if friendNodeId is null it just means this is a user independent of anything to do with Friends.
+                    // because if friendNodeId is null it just means this is a user independent of anything to do with Friends.
                     this.friend.friendNodeId ? S.render.renderTagsStrDiv(this.friend.tags, this.removeTag, this.editTags) : null
                 ]),
                 this.friend.liked ? new Icon({

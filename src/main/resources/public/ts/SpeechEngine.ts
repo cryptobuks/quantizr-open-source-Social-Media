@@ -226,7 +226,7 @@ export class SpeechEngine {
             S.tabUtil.selectTab(C.TAB_TTS);
         }
 
-        // only becasue speech has had bugs over the years and one bug report I saw claimed putting the call
+        // only because speech has had bugs over the years and one bug report I saw claimed putting the call
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
         // else make the claim.
         setTimeout(async () => {
@@ -510,7 +510,7 @@ export class SpeechEngine {
                     // finishing a quote
                     if (inQuote) {
                         inQuote = false;
-                        // wrap previous string in quotes, because this is the correct text AND becasue the
+                        // wrap previous string in quotes, because this is the correct text AND because the
                         // engine will be detecting that during playback to use quoted voice.
                         if (ret.length > 0) {
                             ret[ret.length - 1] = "\"" + ret[ret.length - 1] + "\"";

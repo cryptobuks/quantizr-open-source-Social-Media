@@ -1213,7 +1213,7 @@ export class Edit {
             await this.setEditMode(true);
         }
 
-        // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
+        // pending edit will only be true if not a boost, because ActPub doesn't support posting content into a boost
         // so we save the node without any content in this case.
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: !boostTarget,

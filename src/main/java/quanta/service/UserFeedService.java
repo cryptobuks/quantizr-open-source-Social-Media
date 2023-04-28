@@ -58,7 +58,7 @@ public class UserFeedService extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		/*
-		 * limit to just markdown types and comments, becasue we need to avoid everything else since we are
+		 * limit to just markdown types and comments, because we need to avoid everything else since we are
 		 * searching from the root of all user accounts.
 		 */
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
@@ -143,7 +143,7 @@ public class UserFeedService extends ServiceBase {
 			}
 			/*
 			 * Then we set the public chat to indicate to the rest of the code below not to do any further
-			 * authorization, becasue the way ACL works on chart rooms is if a person is authorized to READ
+			 * authorization, because the way ACL works on chart rooms is if a person is authorized to READ
 			 * (what about WRITE? todo-2: probably should make the above read and write) the actual CHAT NODE
 			 * itself (the root of the chat nodes) then they are known to be granted access to all children
 			 */

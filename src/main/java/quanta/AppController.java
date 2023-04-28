@@ -427,7 +427,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				}
 
 				if (cacheBytes != null) {
-					// limiting the stream just becasue for now this is only used in feed
+					// limiting the stream just because for now this is only used in feed
 					// processing, and 5MB is plenty
 					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
 							response.getOutputStream());

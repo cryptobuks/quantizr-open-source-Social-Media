@@ -90,7 +90,7 @@ import quanta.util.Validator;
  * 
  * Another reason this class is good is that it gives every object a way to call methods on itself
  * AND have AOP methods (like @PerfMon-driven ones) be capable of working. If you don't call a
- * method thru it's proxy object then Spring AOP does NOT work, and this is a problem becasue in
+ * method thru it's proxy object then Spring AOP does NOT work, and this is a problem because in
  * Spring normally when you call a method in the same object you're calling from Spring WILL NOT go
  * thru the proxy. As an example if we called a method in UserFeedService from inside that same
  * service, then unless we call like this: userFeed.myMethod(), then the proxy-based AOP stuff will

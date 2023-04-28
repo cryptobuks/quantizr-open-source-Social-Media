@@ -141,7 +141,7 @@ public class SessionContext extends ServiceBase {
 
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
-			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
+			 * because all our code makes the assumption there will be a SessionContext on the thread.
 			 * log.debug("Creating new session at req "+httpReq.getRequestURI());
 			 */
 			scBean = (SessionContext) context.getBean(SessionContext.class);

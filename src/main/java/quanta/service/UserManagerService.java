@@ -241,7 +241,7 @@ public class UserManagerService extends ServiceBase {
 
 		/*
 		 * NOTE: For user to forcably change their public keys, they have to use the menu option for doing
-		 * that, it won't happen here, automatically becasue their current browser may have different keys
+		 * that, it won't happen here, automatically because their current browser may have different keys
 		 * than their current keys. In other words we only set keys if we don't have the key yet (i.e. will
 		 * not overwrite existing key here)
 		 */
@@ -830,7 +830,7 @@ public class UserManagerService extends ServiceBase {
 
 			// we run a for loop but there will only be only up to one friend node in this result set.
 			for (SubNode friendNode : friendNodes) {
-				// we delete with updateHasChildren=false, becasue it's more efficient
+				// we delete with updateHasChildren=false, because it's more efficient
 				delete.delete(ms, friendNode, false);
 			}
 		}
@@ -965,7 +965,7 @@ public class UserManagerService extends ServiceBase {
 			// updates AND sends the friend request out to the foreign server.
 			edit.updateSavedFriendNode(userDoingFollow, friendNode);
 
-			// Update our cache, becasue we now have a new followed user.
+			// Update our cache, because we now have a new followed user.
 			synchronized (apCache.followedUsers) {
 				apCache.followedUsers.add(userToFollow);
 			}
@@ -1302,7 +1302,7 @@ public class UserManagerService extends ServiceBase {
 			tags.putAll(nodePropTags);
 		}
 
-		// if we have likes add them into 'tags', becasue that's what we feed thru the rest of the code.
+		// if we have likes add them into 'tags', because that's what we feed thru the rest of the code.
 		if (node.getLikes() != null) {
 			node.getLikes().forEach(userName -> {
 				String mention = "@" + userName;

@@ -72,7 +72,7 @@ public class SyncFromMFSService extends ServiceBase {
 					res.setSuccess(false);
 				}
 			}
-			// Loading from an actual MFS path was completed, but is not very usable becasue we can only
+			// Loading from an actual MFS path was completed, but is not very usable because we can only
 			// access data from the local MFS
 			else {
 				if (processPath(req.getPath())) {

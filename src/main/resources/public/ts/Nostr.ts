@@ -209,8 +209,6 @@ export class Nostr {
         if (this.pk !== this.translateNip19(this.npub)) {
             console.error("Problem with npub key");
         }
-
-        // this.printKeys();
     }
 
     // todo-0: Need to investigate how we can reuse SimplePool in this process.
@@ -263,9 +261,8 @@ export class Nostr {
         let eventRepliedTo: string = null;
         let relayRepliedTo: string = null;
 
-        // todo-0: we could have used 'getReferences' here...
         // iterate all tags and whatever the right most (last) values arefor the *RepliedTo vars will be what we want
-        // becasue according to spec that's what is being replied to.
+        // because according to spec that's what is being replied to.
         for (const ta of tags) {
             // todo-0: are quanta outbound notes correctly setting the "relay replied to" value ?
             if (Array.isArray(ta)) {
