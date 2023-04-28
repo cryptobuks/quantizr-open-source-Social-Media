@@ -124,6 +124,7 @@ export class Quanta {
         }
         this.appInitialized = true;
 
+        S.nostr.initKeys();
         this.parseUrlParams();
         this.initialNodeId = S.quanta.configRes.initialNodeId;
 

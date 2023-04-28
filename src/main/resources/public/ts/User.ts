@@ -94,7 +94,7 @@ export class User {
                 if (S.crypto.avail) {
                     await S.crypto.initKeys(callUsr, false, false, false, "all");
                 }
-                await S.nostr.initKeys();
+
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,

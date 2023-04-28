@@ -93,8 +93,6 @@ export class Nostr {
     }
 
     publishUserMetadata = async (): Promise<void> => {
-        await this.initKeys();
-
         // get the relays string for this user
         const userRelays = getAs().userProfile?.relays;
         if (!userRelays) {
@@ -720,9 +718,15 @@ export class Nostr {
         return ret;
     }
 
-    /* Sends the message to nostr relays if there are Nostr shares on it and/or of it's public */
-    processOutboundNode = async (node: J.NodeInfo, send: boolean) => {
-        if (!node || !node.ac || node.ac.length === 0) return;
+    /* Creates an event node to send to nostr relays and also performs the following side effects:
+    *
+    * - for each ac on the node, add a "p" into the tags array, and sets the tags array onto the node
+    * - substitutes npub tags into node.content
+    * - build relaysStr based on acl list
+    * - sets NOSTR_TAGS and NOSTR_ID onto the node
+    */
+    prepareOutboundEvent = async (node: J.NodeInfo, relays: string[]): Promise<Event> => {
+        if (!node || !node.ac || node.ac.length === 0) return null;
         const tags: string[][] = [];
         const npubs: string[] = [];
 
@@ -745,7 +749,7 @@ export class Nostr {
 
         // if nothing nostrish to share to, then do nothing.
         if (!isPublic && tags.length === 0) {
-            return;
+            return null;
         }
 
         const words = node.content?.split(/[ \n\r\t]+/g);
@@ -763,26 +767,25 @@ export class Nostr {
 
         S.props.setPropVal(J.NodeProp.NOSTR_TAGS, node, tags);
 
-        if (send) {
-            const relays = this.getRelays(relaysStr + "\n" + getAs().userProfile.relays);
-            this.sendMessage(node.content, node.lastModified, relays, tags);
-        }
+        const event: any = {
+            kind: 1,
+            pubkey: this.pk,
+            created_at: Math.floor(Date.now() / 1000),
+            tags,
+            content: node.content
+        };
+        event.id = getEventHash(event);
+        event.sig = signEvent(event, this.sk);
+        this.cacheEvent(event);
+
+        S.props.setPropVal(J.NodeProp.NOSTR_ID, node, event.id);
+        relays.push(...this.getRelays(relaysStr + "\n" + getAs().userProfile.relays));
+        return event;
     }
 
-    sendMessage = async (content: string, timestamp: number, relays: string[], tags: string[][]) => {
+    sendMessage = async (event: Event, relays: string[]) => {
         await this.initKeys();
         return new Promise<boolean>(async (resolve, reject) => {
-            const event: any = {
-                kind: 1,
-                pubkey: this.pk,
-                created_at: Math.floor(timestamp / 1000),
-                tags,
-                content
-            };
-            event.id = getEventHash(event);
-            event.sig = signEvent(event, this.sk);
-            this.cacheEvent(event);
-
             // DO NOT DELETE (until Nostr testing is finished.)
             console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
 

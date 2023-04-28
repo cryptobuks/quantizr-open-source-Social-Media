@@ -14,7 +14,7 @@ import { EditPropertyDlg, LS as EditPropertyDlgState } from "./EditPropertyDlg";
 import { EmojiPickerDlg, LS as EmojiPickerDlgState } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-
+import { Event } from "nostr-tools";
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
         const ast = getAs();
@@ -89,8 +89,10 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
+        let nostrEvent: Event = null;
+        const nostrRelays: string[] = [];
         if (ast.sendToNostr) {
-            S.nostr.processOutboundNode(editNode, false);
+            nostrEvent = await S.nostr.prepareOutboundEvent(editNode, nostrRelays);
         }
 
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
@@ -103,8 +105,8 @@ export class EditNodeDlgUtil {
             return false;
         }
 
-        if (ast.sendToNostr) {
-            S.nostr.processOutboundNode(res.node, true);
+        if (ast.sendToNostr && nostrEvent) {
+            S.nostr.sendMessage(nostrEvent, nostrRelays);
         }
 
         dlg.resetAutoSaver();
