@@ -723,7 +723,6 @@ export class Nostr {
     * - for each ac on the node, add a "p" into the tags array, and sets the tags array onto the node
     * - substitutes npub tags into node.content
     * - build relaysStr based on acl list
-    * - sets NOSTR_TAGS and NOSTR_ID onto the node
     */
     prepareOutboundEvent = async (node: J.NodeInfo, relays: string[]): Promise<Event> => {
         if (!node || !node.ac || node.ac.length === 0) return null;
@@ -765,8 +764,6 @@ export class Nostr {
             }
         });
 
-        S.props.setPropVal(J.NodeProp.NOSTR_TAGS, node, tags);
-
         const event: any = {
             kind: 1,
             pubkey: this.pk,
@@ -778,7 +775,6 @@ export class Nostr {
         event.sig = signEvent(event, this.sk);
         this.cacheEvent(event);
 
-        S.props.setPropVal(J.NodeProp.NOSTR_ID, node, event.id);
         relays.push(...this.getRelays(relaysStr + "\n" + getAs().userProfile.relays));
         return event;
     }
@@ -879,7 +875,7 @@ export class Nostr {
 
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
-            events: this.makeEventsList(events),
+            events: events.map(e => this.makeNostrEvent(e)),
             relays
         });
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
@@ -953,23 +949,19 @@ export class Nostr {
         }
     }
 
-    makeEventsList = (events: any[]): J.NostrEvent[] => {
-        const ret: J.NostrEvent[] = [];
-        for (const event of events) {
-            ret.push({
-                id: event.id,
-                sig: event.sig,
-                pk: event.pubkey,
-                kind: event.kind,
-                content: event.content,
-                tags: event.tags,
-                timestamp: event.created_at,
+    makeNostrEvent = (event: Event) => {
+        return {
+            id: event.id,
+            sig: event.sig,
+            pk: event.pubkey,
+            kind: event.kind,
+            content: event.content,
+            tags: event.tags,
+            timestamp: event.created_at,
 
-                // note: npub on this Event is Quanta-specific
-                npub: event.npub
-            });
-        }
-        return ret;
+            // note: npub on this Event is Quanta-specific
+            npub: (event as any).npub
+        };
     }
 
     updateProfile = async () => {

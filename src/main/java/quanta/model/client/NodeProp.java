@@ -2,8 +2,7 @@ package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum NodeProp {
-    NOSTR_ID("sn:nosid"),    
+public enum NodeProp {  
     NOSTR_RELAYS("sn:relays"),
     
     // NOTE: We store both npub and PubKey so that searching works MongoDB full text searching works.

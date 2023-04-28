@@ -63,6 +63,7 @@ import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateFriendNodeResponse;
 import quanta.service.AclService;
+import quanta.service.nostr.NostrCrypto;
 import quanta.types.TypeBase;
 import quanta.util.Convert;
 import quanta.util.SubNodeUtil;
@@ -366,11 +367,6 @@ public class NodeEditService extends ServiceBase {
 				properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
 			}
 
-			String nostrId = userNode.getStr(NodeProp.OBJECT_ID);
-			if (!StringUtils.isEmpty(nostrId)) {
-				properties.add(new PropertyInfo(NodeProp.NOSTR_ID.s(), nostrId));
-			}
-
 			// todo-0: need to rethink if we really want to have per-friend relay assignments
 			String nostrRelays = userNode.getStr(NodeProp.NOSTR_RELAYS);
 			if (!StringUtils.isEmpty(nostrRelays)) {
@@ -593,10 +589,22 @@ public class NodeEditService extends ServiceBase {
 						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
 						 * cannot ever be entered)
 						 */
-						log.debug("Ignoring unneeded save attempt on unneeded prop: " + property.getName());
+						log.debug("Ignoring save attempt of prop: " + property.getName());
 					}
 				}
 			}
+		}
+
+		/*
+		 * if client is saving what will be sent out as a nostr event we need to validate it and then assign
+		 * it's TAGS and OBJECT_ID onto the node
+		 */
+		if (req.getNostrEvent() != null) {
+			if (!NostrCrypto.verifyEvent(req.getNostrEvent())) {
+				throw new RuntimeException("Signature failed on event.");
+			}
+			node.set(NodeProp.NOSTR_TAGS, req.getNostrEvent().getTags());
+			node.set(NodeProp.OBJECT_ID, "." + req.getNostrEvent().getId());
 		}
 
 		// if not encrypted remove ENC_KEY too. It won't be doing anything in this case.

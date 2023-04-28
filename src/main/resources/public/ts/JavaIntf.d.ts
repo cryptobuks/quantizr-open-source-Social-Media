@@ -538,6 +538,7 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
+    nostrEvent: NostrEvent;
     saveToActPub: boolean;
 }
 
@@ -1200,7 +1201,6 @@ export const enum ErrorType {
 }
 
 export const enum NodeProp {
-    NOSTR_ID = "sn:nosid",
     NOSTR_RELAYS = "sn:relays",
     NOSTR_USER_NPUB = "sn:npub",
     NOSTR_USER_PUBKEY = "sn:nopk",

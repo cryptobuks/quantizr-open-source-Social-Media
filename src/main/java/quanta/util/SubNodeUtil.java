@@ -98,6 +98,8 @@ public class SubNodeUtil extends ServiceBase {
 		if (propName.startsWith("ap:")) {
 			return false;
 		}
+
+		// todo-0: use a big else block here and not a switch so we can reference NodeProp properties here.
 		switch (propName) {
 			case "apid":
 

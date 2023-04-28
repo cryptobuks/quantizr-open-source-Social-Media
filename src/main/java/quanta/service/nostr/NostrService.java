@@ -75,18 +75,10 @@ public class NostrService extends ServiceBase {
 
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-				/*
-				 * NOTE: todo-0: For performance, I'm removing this server-side verification for now (for anything
-				 * other than user metadata), but in the future we can do this in an async worker thread, such that
-				 * it will retro-actively delete the node from the DB if it does happen to be a bad signature. Since
-				 * we do veify on client, this server-side verify is basically just protection against hackers
-				 * (hostile actors)
-				 */
-				if (event.getKind() != KIND_Metadata) {
-					if (!NostrCrypto.verifyEvent(event)) {
-						log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
-						continue;
-					}
+
+				if (!NostrCrypto.verifyEvent(event)) {
+					log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
+					continue;
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
@@ -322,6 +314,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
+	// NOTE: All OBJECT_IDs that are Nostr ones start with "."
 	public SubNode getNodeByNostrId(MongoSession ms, String id, boolean allowAuth) {
 		if (!id.startsWith(".")) {
 			id = "." + id;
