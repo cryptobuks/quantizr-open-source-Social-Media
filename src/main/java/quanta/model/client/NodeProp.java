@@ -5,7 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NodeProp {
     NOSTR_ID("sn:nosid"),    
     NOSTR_RELAYS("sn:relays"),
+    
+    // NOTE: We store both npub and PubKey so that searching works MongoDB full text searching works.
     NOSTR_USER_NPUB("sn:npub"),
+    NOSTR_USER_PUBKEY("sn:nopk"),
+
     NOSTR_TAGS("sn:ntags"), 
     NOSTR_NAME("sn:nosName"),
     NOSTR_USER_NAME("sn:nosUserName"),

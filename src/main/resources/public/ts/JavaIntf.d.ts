@@ -428,6 +428,7 @@ export interface LoginRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
     nostrNpub: string;
+    nostrPubKey: string;
     tzOffset?: number;
     dst?: boolean;
 }
@@ -1202,6 +1203,7 @@ export const enum NodeProp {
     NOSTR_ID = "sn:nosid",
     NOSTR_RELAYS = "sn:relays",
     NOSTR_USER_NPUB = "sn:npub",
+    NOSTR_USER_PUBKEY = "sn:nopk",
     NOSTR_TAGS = "sn:ntags",
     NOSTR_NAME = "sn:nosName",
     NOSTR_USER_NAME = "sn:nosUserName",

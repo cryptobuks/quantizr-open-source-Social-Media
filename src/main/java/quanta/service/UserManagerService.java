@@ -153,7 +153,7 @@ public class UserManagerService extends ServiceBase {
 
 		if (sc.isAuthenticated()) {
 			MongoSession ms = ThreadLocals.getMongoSession();
-			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey(), req.getNostrNpub());
+			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey(), req.getNostrNpub(), req.getNostrPubKey());
 			log.debug("login: user=" + sc.getUserName());
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
@@ -197,7 +197,7 @@ public class UserManagerService extends ServiceBase {
 	 * userName
 	 */
 	public void processLogin(MongoSession ms, LoginResponse res, SubNode userNode, String userName, String asymEncKey,
-			String sigKey, String nostrNpub) {
+			String sigKey, String nostrNpub, String nostrPubKey) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
 		if (userNode == null) {
@@ -228,11 +228,15 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		// We only allow the login to auto-set the NPUB at user login if there's not currently any NPUB.
 		// todo-0: Eventually we'll let users specify their own PrivateKey
 		String existingNpub = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
 		if (existingNpub == null) {
 			userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);
+		}
+
+		String existingNostrPubKey = userNode.getStr(NodeProp.NOSTR_USER_PUBKEY);
+		if (existingNostrPubKey == null) {
+			userNode.set(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
 		}
 
 		/*
@@ -1012,6 +1016,9 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
 				userProfile.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
+				
+				// todo-0: add this
+				// userProfile.setNostrPubKey(userNode.getStr(NodeProp.NOSTR_USER_PUBKEY));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (att != null) {

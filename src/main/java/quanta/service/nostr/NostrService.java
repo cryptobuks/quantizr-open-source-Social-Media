@@ -119,11 +119,16 @@ public class NostrService extends ServiceBase {
 			IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
-			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
-			// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
+			SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+			if (nostrAccnt != null) {
+				log.debug("saveNostrMetadataEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
+						+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
+				// if the npub is owned by a local user we're done, and no need to create the foreign holder account
+				return;
+			}
 
 			int beforeSaveCount = saveCount.getVal();
-			SubNode nostrAccnt = getNostrAccount(as, event.getPk(), null, saveCount);
+			nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
 			boolean isNew = saveCount.getVal() > beforeSaveCount;
@@ -132,6 +137,9 @@ public class NostrService extends ServiceBase {
 
 			// if this nostr object is a brand new one or newer data than our current info
 			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
+				NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
+				// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
+
 				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
 				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
 				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
@@ -143,6 +151,9 @@ public class NostrService extends ServiceBase {
 				// note: we always need to be able to generate KEY so don't ever let the client upload
 				// an nip05 web url to save to this. Always send up the key.
 				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
+
+				// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
+				// username itself is the pubkey with a '.' prefix.
 
 				// todo-0: display this (and other missing things on UserProfile dialogs)
 				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
@@ -187,6 +198,15 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount) {
+
+		SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+		if (nostrAccnt != null) {
+			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
+					+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
+			// if the npub is owned by a local user we're done, and no need to create the foreign holder account
+			return;
+		}
+
 		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
 		if (nostrNode != null) {
 			eventNodeIds.add(nostrNode.getIdStr());
@@ -195,7 +215,7 @@ public class NostrService extends ServiceBase {
 		}
 
 		Val<SubNode> postsNode = new Val<>();
-		SubNode nostrAccnt = getNostrAccount(as, event.getPk(), postsNode, saveCount);
+		nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), postsNode, saveCount);
 		if (nostrAccnt == null) {
 			log.debug("Unable to get account: " + event.getPk());
 			return;
@@ -229,7 +249,7 @@ public class NostrService extends ServiceBase {
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	public SubNode getNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
+	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);

@@ -42,7 +42,7 @@ import quanta.util.val.Val;
  * information in the thread for use during context of one call
  */
 @Component
-@Slf4j 
+@Slf4j
 public class MongoRead extends ServiceBase {
     int MAX_DOC_DEPTH = 7;
     int MAX_DOC_ITEMS_PER_CALL = 40;
@@ -387,8 +387,7 @@ public class MongoRead extends ServiceBase {
 
         if (identifier.startsWith(".")) {
             ret = nostr.getNodeByNostrId(ms, identifier, allowAuth);
-        }
-        else if (identifier.startsWith("~")) {
+        } else if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
@@ -1120,7 +1119,34 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getUserNodeByUserName(MongoSession ms, String user) {
-        return read.getUserNodeByUserName(ms, user, true);
+        return getUserNodeByUserName(ms, user, true);
+    }
+
+    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal) {
+        return getLocalUserNodeByProp(ms, propName, propVal, true);
+    }
+
+    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean allowAuth) {
+        if (StringUtils.isEmpty(propVal)) return null;
+        
+        // Otherwise for ordinary users root is based off their username
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)) //
+                .and(SubNode.PROPS + "." + propName).is(propVal) //
+                .and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
+
+        q.addCriteria(crit);
+
+        SubNode ret = mongoUtil.findOne(q);
+        if (allowAuth) {
+            SubNode _ret = ret;
+            // we run with 'ms' if it's non-null, or with admin if ms is null
+            arun.run(ms, as -> {
+                auth.auth(as, _ret, PrivilegeType.READ);
+                return null;
+            });
+        }
+        return ret;
     }
 
     @PerfMon(category = "read")
@@ -1134,7 +1160,8 @@ public class MongoRead extends ServiceBase {
         // character, so that ONLY foreign names will have any '@' in the string.
         user = convertIfLocalName(user);
 
-        String pathToQuery = user.contains("@") || nostr.isNostrUserName(user) ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
+        String pathToQuery =
+                user.contains("@") || nostr.isNostrUserName(user) ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
 
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
@@ -1386,7 +1413,7 @@ public class MongoRead extends ServiceBase {
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
-        
+
         q.addCriteria(crit.orOperator(critList));
 
         if (limit != null && limit.intValue() > 0) {

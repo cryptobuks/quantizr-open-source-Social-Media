@@ -13,6 +13,7 @@ public class LoginRequest extends RequestBase {
     private String asymEncKey;
     private String sigKey;
     private String nostrNpub;
+    private String nostrPubKey;
 
     /* timezone offset */
     @Nullable

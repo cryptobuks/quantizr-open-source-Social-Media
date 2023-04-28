@@ -138,6 +138,7 @@ public class Convert extends ServiceBase {
 
 			displayName = user.getFriendlyNameFromNode(userNode);
 			nostrPubKey = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
+			// todo-0: we could add NOSTR_USER_PUBKEY too, but not yet needed
 			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.USER_BANNER_URL);
 			owner = nameProp;
@@ -472,6 +473,7 @@ public class Convert extends ServiceBase {
 					acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
 					acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
 					acInfo.setNostrNpub(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_USER_NPUB.s()));
+					// todo-0: we could add NOSTR_USER_PUBKEY too, but not yet needed
 					acInfo.setNostrRelays(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_RELAYS.s()));
 				}
 				return null;

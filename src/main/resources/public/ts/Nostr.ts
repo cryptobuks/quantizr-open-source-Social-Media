@@ -193,7 +193,7 @@ export class Nostr {
     }
 
     // Initializes our keys, and returns the npub key
-    initKeys = async (): Promise<string> => {
+    initKeys = async (): Promise<void> => {
         // if already initialized do nothing.
         if (this.pk) return;
 
@@ -212,8 +212,7 @@ export class Nostr {
             console.error("Problem with npub key");
         }
 
-        this.printKeys();
-        return this.npub;
+        // this.printKeys();
     }
 
     // todo-0: Need to investigate how we can reuse SimplePool in this process.
@@ -624,7 +623,7 @@ export class Nostr {
             if (!profile) return null;
             console.log("NIP05: " + S.util.prettyPrint(profile));
 
-            // todo-0: we should transfer the NIP05 URL up to the server to it can be stored
+            // todo-0: we should transfer the NIP05 URL up to the server so it can be stored
             // in use account node to be displayed in UserProfile.
             user = profile.pubkey;
             // console.log("Found NIP05 pubkey: " + user);
@@ -830,10 +829,6 @@ export class Nostr {
         });
     }
 
-    // todo-0: we could add an option arg here for "fallbackToKnownRelays" (mainly for when looking up a specific
-    // event) so that if we fail to find the event we can query the 'this.knownRelays' for the event before returning
-    // an empty event set here. (not be sure remove from 'knownRelays' all the ones we just failed to find on, before
-    // running the query so that none of the relays are called again unnecessarily)
     queryRelays = async (relays: string[], query: any): Promise<Event[]> => {
         if (relays.length === 1) {
             return await this.singleRelayQuery(relays[0], query);
@@ -852,13 +847,17 @@ export class Nostr {
                 if (!r.startsWith("wss://")) {
                     r = "wss://" + r;
                 }
+                r = this.normalizeURL(r);
+                r = S.util.stripIfEndsWith(r, "/");
                 this.knownRelays.add(r);
                 return r;
             }).filter(r => !!r);
         }
 
         // this Set trick removes is simply for removing duplicates from array
-        return [...new Set(relays)];
+        const ret = [...new Set(relays)];
+        // console.log("parsed relay string " + relayUrls + " to Array: " + S.util.prettyPrint(ret));
+        return ret;
     }
 
     persistEvents = async (events: Event[], relays: string): Promise<J.SaveNostrEventResponse> => {
@@ -1081,5 +1080,19 @@ export class Nostr {
         const ret = await pool.list(relays, [query]);
         pool.close(relays);
         return ret;
+    }
+
+    normalizeURL = (url: string): string => {
+        const p = new URL(url);
+        p.pathname = p.pathname.replace(/\/+/g, "/");
+        if (p.pathname.endsWith("/")) p.pathname = p.pathname.slice(0, -1);
+        if ((p.port === "80" && p.protocol === "ws:") ||
+            (p.port === "443" && p.protocol === "wss:")) {
+            p.port = "";
+        }
+
+        p.searchParams.sort();
+        p.hash = "";
+        return p.toString();
     }
 }
