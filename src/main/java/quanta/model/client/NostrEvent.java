@@ -24,4 +24,5 @@ public class NostrEvent {
 
     // Non-Nostr Properties used by Quanta only
     private String npub; // if this is a user metadata event we put the npub here.
+    private String relays; // if user metadate client will send relays here
 }

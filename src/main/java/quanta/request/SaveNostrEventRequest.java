@@ -10,7 +10,4 @@ import quanta.request.base.RequestBase;
 @NoArgsConstructor
 public class SaveNostrEventRequest extends RequestBase {
     public List<NostrEvent> events;
-
-    // newline delimited list of relays
-    public String relays;
 }

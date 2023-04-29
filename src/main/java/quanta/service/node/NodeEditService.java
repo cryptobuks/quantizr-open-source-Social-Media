@@ -104,6 +104,12 @@ public class NodeEditService extends ServiceBase {
 		SubNode nodeBeingRepliedTo = null;
 
 		if (req.isReply()) {
+			// todo-0: need to get the nostr tags array off the node we're replying to
+			// to we can extract out the "p" tags? The goal is that we end up
+			// having the SHARING (Quanta Shares) add in all the current "p" values 
+			// to the sharing for Quanta to have that info on the node and also to be sure
+			// out outbound transmission of this to relays includes EVERYONE that we ended 
+			// up deciding to share this too. 
 			nodeBeingRepliedTo = read.getNode(ms, nodeId);
 		}
 

@@ -228,7 +228,6 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		// todo-0: Eventually we'll let users specify their own PrivateKey
 		String existingNpub = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
 		if (existingNpub == null) {
 			userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);
@@ -1016,9 +1015,6 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
 				userProfile.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
-				
-				// todo-0: add this
-				// userProfile.setNostrPubKey(userNode.getStr(NodeProp.NOSTR_USER_PUBKEY));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (att != null) {

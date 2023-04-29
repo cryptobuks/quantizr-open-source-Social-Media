@@ -399,7 +399,7 @@ export class EditNodeDlg extends DialogBase {
         let sharingDivClearFix = null;
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
-            const chooseProtocol = ast.protocolFilter === "all" && isPublic && !unpublished;
+            const chooseProtocol = /* ast.protocolFilter === "all" && */ isPublic && !unpublished;
             sharingDiv = new Divc({
                 className: "float-end clickable marginBottom"
             }, [

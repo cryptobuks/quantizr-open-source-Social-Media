@@ -534,7 +534,6 @@ public class MongoAuth extends ServiceBase {
 			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 			nostrNpub = principalNode.getStr(NodeProp.NOSTR_USER_NPUB);
-			// todo-0 add NOSTR_USER_PUBKEY here.
 			nostrRelays = principalNode.getStr(NodeProp.NOSTR_RELAYS);
 
 			// This will be null if it's a local node, and this is fine

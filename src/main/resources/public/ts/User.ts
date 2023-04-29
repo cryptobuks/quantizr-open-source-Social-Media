@@ -262,6 +262,13 @@ export class User {
             // we may have just processed a dispatch so we need to get the current state now.
             const ast = getAs();
 
+            // When user has perhaps requested a NostrId on the URL we'll end up here where we need to get the Nostr
+            // data and display it.
+            //
+            // todo-0: Currently we always try to pull loadNostrId immediatelyt from a relay here, but we could
+            // do a lookup for it on the server for it during the initial URL request to load the page
+            // and if the node happened to be found for this event, we'd set initialNodeId or whatever's required to
+            // load that ID for the already-existing node.
             if (S.quanta.configRes.loadNostrId) {
                 // need client to be showing instant progress indicator underway.
                 let nostrId = S.quanta.configRes.loadNostrId;
@@ -279,11 +286,14 @@ export class User {
                     console.log("No relays were available.");
                     return;
                 }
-                const persistResponse = {};
-                const event = await S.nostr.getEvent(relays, nostrId, persistResponse);
+
+                const event = await S.nostr.getEvent(nostrId, relays);
                 if (!event) {
                     console.warn("Unable to lookup nostrId=" + nostrId);
                     return;
+                }
+                else {
+                    await S.nostr.persistEvents([event]);
                 }
                 id = "." + event.id;
                 console.log("nostr id loaded: " + event.id);

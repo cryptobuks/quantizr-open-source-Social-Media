@@ -77,6 +77,7 @@ export interface NostrEvent {
     tags: string[][];
     timestamp: number;
     npub: string;
+    relays: string;
 }
 
 export interface NostrMetadata {
@@ -544,7 +545,6 @@ export interface SaveNodeRequest extends RequestBase {
 
 export interface SaveNostrEventRequest extends RequestBase {
     events: NostrEvent[];
-    relays: string;
 }
 
 export interface SaveNostrSettingsRequest extends RequestBase {
@@ -1278,6 +1278,7 @@ export const enum NodeProp {
     CODE = "sn:code",
     JSON_FILE_SEARCH_RESULT = "sn:json",
     NOWRAP = "sn:nowrap",
+    BIN = "bin",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     ALLOWED_FEATURES = "sn:features",

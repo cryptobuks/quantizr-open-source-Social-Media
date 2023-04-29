@@ -7,7 +7,6 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
-import * as J from "../JavaIntf";
 
 export class SearchByNostrDlg extends DialogBase {
 
@@ -45,14 +44,16 @@ export class SearchByNostrDlg extends DialogBase {
         let event = null;
         try {
             S.rpcUtil.incRpcCounter();
-            const persistResponse: any = {};
             const find = S.nostr.translateNip19(SearchByNostrDlg.defaultSearchText);
-            event = await S.nostr.getEvent(S.nostr.getRelays(getAs().userProfile.relays), find, persistResponse);
-            const res: J.SaveNostrEventResponse = persistResponse.res;
-            if (res && res.eventNodeIds.length > 0) {
-                const desc = "For ID: " + SearchByNostrDlg.defaultSearchText;
-                await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
-                    false, 0, true, null, null, false, false, false);
+            const relays = S.nostr.getRelays(getAs().userProfile.relays);
+            event = await S.nostr.getEvent(find, relays);
+            if (event) {
+                const res = await S.nostr.persistEvents([event]);
+                if (res?.eventNodeIds?.length > 0) {
+                    const desc = "For ID: " + SearchByNostrDlg.defaultSearchText;
+                    await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
+                        false, 0, true, null, null, false, false, false);
+                }
             }
         }
         finally {

@@ -82,7 +82,7 @@ public class NostrService extends ServiceBase {
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event, accountNodeIds, eventNodeIds, req.getRelays(), saveCount);
+				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 			}
 			return null;
 		});
@@ -92,11 +92,10 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			String relays, IntVal saveCount) {
+	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds, IntVal saveCount) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
-				saveNostrMetadataEvent(as, event, accountNodeIds, relays, saveCount);
+				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
 				break;
 			case KIND_Text:
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
@@ -107,7 +106,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, String relays,
+	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds,
 			IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
@@ -147,7 +146,6 @@ public class NostrService extends ServiceBase {
 				// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
 				// username itself is the pubkey with a '.' prefix.
 
-				// todo-0: display this (and other missing things on UserProfile dialogs)
 				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 
 				nostrAccnt.setCreateTime(timestamp);
@@ -157,6 +155,7 @@ public class NostrService extends ServiceBase {
 			// We send back account nodes EVEN if this is not a new node, because client needs the info.
 			accountNodeIds.add(nostrAccnt.getIdStr());
 
+			String relays = event.getRelays();
 			if (!StringUtils.isEmpty(relays)) {
 				String existingRelays = nostrAccnt.getStr(NodeProp.NOSTR_RELAYS);
 				if (!StringUtils.isEmpty(existingRelays)) {
