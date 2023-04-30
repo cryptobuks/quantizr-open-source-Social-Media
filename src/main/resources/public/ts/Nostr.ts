@@ -268,28 +268,13 @@ export class Nostr {
     // be only looking at the relays we will find parts of this thread on.
     traverseUpReplyChain = async (events: Event[], tags: string[][], preferredRelays: Set<string>,
         threadUsers: Set<string>): Promise<void> => {
-        // if we have an array of "e" tags
-        let eventRepliedTo: string = null;
-        let relayRepliedTo: string = null;
 
-        // iterate all tags and whatever the right most (last) values arefor the *RepliedTo vars will be what we want
-        // because according to spec that's what is being replied to.
-        for (const ta of tags) {
-            if (Array.isArray(ta)) {
-                if (ta[0] === "e") {
-                    // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
-                    if (ta.length < 4) {
-                        eventRepliedTo = ta[1];
-                        relayRepliedTo = ta[2];
-                    }
-                    // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
-                    else if (ta[3] === "reply") {
-                        eventRepliedTo = ta[1];
-                        relayRepliedTo = ta[2];
-                    }
-                }
-            }
-        }
+        // get the array representing what event (with 'tags' in it) is a reply to.
+        const repliedToArray: string[] = this.getRepliedToItem(tags);
+        if (!repliedToArray) return null;
+
+        const eventRepliedTo = repliedToArray[1];
+        const relayRepliedTo = repliedToArray[2];
 
         // if we found what event the 'tags' had as it's replyTo
         if (eventRepliedTo) {
@@ -348,9 +333,17 @@ export class Nostr {
     /* Returns the Nostr ID of whatever the node is a reply to if it's a reply or else null
     ref: https://github.com/nostr-protocol/nips/blob/master/10.md
     */
-    getRepliedToItem = (node: J.NodeInfo): string[] => {
+    getRepliedToItemOfNode = (node: J.NodeInfo): string[] => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
+        return this.getRepliedToItem(tags);
+    }
+
+    // Returns the tags array entry that represents what the Event is a reply to, or null of not a reply
+    getRepliedToItem = (tags: string[][]): string[] => {
         if (!Array.isArray(tags)) return null;
+        let anyEvent: string[] = null;
+        let replyEvent: string[] = null;
+        let rootEvent: string[] = null;
 
         // if we have an array of "e" tags
         for (const ta of tags) {
@@ -358,17 +351,21 @@ export class Nostr {
                 if (ta[0] === "e") {
                     // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
                     if (ta.length < 4) {
-                        return ta;
+                        anyEvent = ta;
                     }
-
                     // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
-                    if (ta.length === 4 && ta[3] === "reply") {
-                        return ta;
+                    else if (ta.length === 4) {
+                        if (ta[3] === "reply") {
+                            replyEvent = ta;
+                        }
+                        else if (ta[3] === "root") {
+                            rootEvent = ta;
+                        }
                     }
                 }
             }
         }
-        return null;
+        return replyEvent || rootEvent || anyEvent;
     }
 
     encodeToNpub = (hex: string): string => {
@@ -699,17 +696,13 @@ export class Nostr {
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
     //
-    // NOTE: We can set a limit and the relay is supposed to send the most *recent* ones up to around
-    // that value.
-    //
     readPosts = async (userKeys: string[], relays: string[], since: number): Promise<J.SaveNostrEventResponse> => {
-        // console.log("readPosts for userKey: " + userKey);
         userKeys = userKeys.map(u => this.translateNip19(u));
 
         const query: any = {
             authors: userKeys,
             kinds: [Kind.Text],
-            limit: 25
+            limit: 50
         };
         if (since !== -1) {
             query.since = since;
@@ -728,7 +721,12 @@ export class Nostr {
         return ret;
     }
 
-    hasNostrShares = (node: J.NodeInfo): boolean => {
+    hasNostrAcls = (node: J.NodeInfo): boolean => {
+        if (!node || !node.ac || node.ac.length === 0) return false;
+        return !!node.ac.find(acl => !!acl.nostrNpub);
+    }
+
+    hasNostrShareTags = (node: J.NodeInfo): boolean => {
         const event = this.makeUnsignedEventFromNode(node);
         const refs = parseReferences(event);
         if (refs) {
@@ -741,7 +739,7 @@ export class Nostr {
 
     /* Creates an event node to send to nostr relays and also performs the following side effects:
     *
-    * - for each ac on the node, add a "p" into the tags array, and sets the tags array onto the node
+    * - for each acl on the node, add a "p" into the tags array, and sets the tags array onto the node
     * - substitutes npub tags into node.content
     * - build relaysStr based on acl list
     */
@@ -796,7 +794,7 @@ export class Nostr {
         event.sig = signEvent(event, this.sk);
         this.cacheEvent(event);
 
-        relays.push(...this.getRelays(relaysStr + "\n" + getAs().userProfile.relays));
+        relays.push(...this.getRelays((relaysStr || "") + "\n" + (getAs().userProfile.relays) || ""));
         return event;
     }
 
@@ -1001,11 +999,15 @@ export class Nostr {
             subType: "nostr"
         });
 
-        if (!res.people) return;
+        // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
+        if (!res.people || res.people.length === 0) {
+            // console.debug("No friends defined.");
+            return;
+        }
         const userNames: string[] = [];
         const relaysSet: Set<String> = new Set<String>();
 
-        // scan all people to build list of users and relays to read from
+        // scan all people to build list of users (PublicKeys) and relays to read from
         for (const person of res.people) {
             if (!S.nostr.isNostrUserName(person.userName)) continue;
             userNames.push(person.userName.substring(1));
@@ -1015,13 +1017,28 @@ export class Nostr {
             }
         }
 
-        const relaysArray: string[] = [];
+        let relaysArray: string[] = [];
         relaysSet.forEach((r: any) => relaysArray.push(r));
+
+        relaysArray = this.addMyRelays(relaysArray);
+
+        if (relaysArray.length === 0) {
+            console.warn("no relays to read from.");
+        }
 
         if (userNames.length > 0 && relaysArray.length > 0) {
             console.log("Reading " + userNames.length + " users from " + relaysArray.length + " relays.");
         }
         await this.readPosts(userNames, relaysArray, -1);
+    }
+
+    addMyRelays = (relays: string[]): string[] => {
+        if (relays == null) relays = [];
+        const myRelays = this.getRelays(getAs().userProfile.relays);
+        if (myRelays) {
+            relays = relays.concat(myRelays);
+        }
+        return [...new Set(relays)];
     }
 
     isNostrNode = (node: J.NodeInfo) => {

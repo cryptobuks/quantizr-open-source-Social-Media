@@ -92,7 +92,8 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds, IntVal saveCount) {
+	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+			IntVal saveCount) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
@@ -106,8 +107,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds,
-			IntVal saveCount) {
+	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
 			SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
@@ -284,31 +284,42 @@ public class NostrService extends ServiceBase {
 	public void getReplyInfo(SubNode node, Val<String> event, Val<String> relay) {
 
 		ArrayList<ArrayList<String>> tags = (ArrayList) node.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
-		for (ArrayList<String> subList : tags) {
-			int len = subList.size();
+		ArrayList<String> any = null;
+		ArrayList<String> reply = null;
+		ArrayList<String> root = null;
 
-			if ("e".equals(subList.get(0))) {
-				boolean accept = false;
-
+		for (ArrayList<String> itm : tags) {
+			if ("e".equals(itm.get(0))) {
 				// deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
-				if (len < 4) {
-					accept = true;
+				if (itm.size() < 4) {
+					any = itm;
 				}
 				// Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
-				else if ("reply".equals(subList.get(3))) {
-					accept = true;
+				else if ("reply".equals(itm.get(3))) {
+					reply = itm;
+				} else if ("root".equals(itm.get(3))) {
+					root = itm;
 				}
+			}
+		}
 
-				if (accept) {
-					if (len > 1) {
-						event.setVal(subList.get(1));
-						relay.setVal("");
-					}
+		ArrayList<String> accept = null;
+		if (reply != null) {
+			accept = reply;
+		} else if (root != null) {
+			accept = root;
+		} else {
+			accept = any;
+		}
 
-					if (len > 2) {
-						relay.setVal(subList.get(2));
-					}
-				}
+		if (accept != null) {
+			if (accept.size() > 1) {
+				event.setVal(accept.get(1));
+				relay.setVal("");
+			}
+
+			if (accept.size() > 2) {
+				relay.setVal(accept.get(2));
 			}
 		}
 	}

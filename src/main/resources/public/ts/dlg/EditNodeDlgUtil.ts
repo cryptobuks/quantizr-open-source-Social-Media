@@ -91,7 +91,7 @@ export class EditNodeDlgUtil {
 
         let nostrEvent: Event = null;
         const nostrRelays: string[] = [];
-        const hasNostrShares = S.nostr.hasNostrShares(editNode);
+        const hasNostrShares = S.nostr.hasNostrAcls(editNode);
         const sendToNostr = (ast.sendToNostr && S.props.isPublic(editNode)) || hasNostrShares;
         if (sendToNostr) {
             nostrEvent = await S.nostr.prepareOutboundEvent(editNode, nostrRelays);
