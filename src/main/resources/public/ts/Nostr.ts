@@ -30,8 +30,8 @@ https://github.com/nbd-wtf/nostr-tools
 */
 
 export class Nostr {
-    TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
-    TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
+    // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
+    // TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
 
     // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net\nwss://nos.lol\nwss://relay.damus.io";
     // TEST_USER_KEY: string = "1qguf67wjaq05snx0nfwgrpnhls8a94stquu58lzpnr0q2355u45sjs9fsr"; // "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
@@ -887,6 +887,9 @@ export class Nostr {
     persistEvents = async (events: Event[]): Promise<J.SaveNostrEventResponse> => {
         if (!events || events.length === 0) return;
 
+        // map key is 'pk'.
+        const userSet: Map<String, J.NostrUserInfo> = new Map<String, J.NostrUserInfo>();
+
         let idx = 0;
         events.forEach(event => {
             this.cacheEvent(event);
@@ -895,12 +898,28 @@ export class Nostr {
                 console.log("eventCheck Failed.");
             }
 
+            // To persit events well be sending up to server this unique set of info for each user so the
+            // server can know all the npub values for each pubkey without the server knowing how to generate that.
+            const refs = parseReferences(event);
+            refs?.forEach(ref => {
+                if (ref.profile) {
+                    userSet.set(ref.profile.pubkey, {
+                        pk: ref.profile.pubkey,
+                        npub: nip19.npubEncode(ref.profile.pubkey)
+                    });
+                }
+            });
+
             // this.dumpEventRefs(event);
         });
 
+        const userInfo: J.NostrUserInfo[] = Array.from(userSet.values());
+        // console.log("saveNostrEvents has this userInfo: " + userInfo);
+
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
-            events: events.map(e => this.makeNostrEvent(e))
+            events: events.map(e => this.makeNostrEvent(e)),
+            userInfo
         });
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;

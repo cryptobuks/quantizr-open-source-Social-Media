@@ -92,6 +92,11 @@ export interface NostrMetadata {
     display_name: string;
 }
 
+export interface NostrUserInfo {
+    pk: string;
+    npub: string;
+}
+
 export interface OpenGraph {
     mime: string;
     url: string;
@@ -545,6 +550,7 @@ export interface SaveNodeRequest extends RequestBase {
 
 export interface SaveNostrEventRequest extends RequestBase {
     events: NostrEvent[];
+    userInfo: NostrUserInfo[];
 }
 
 export interface SaveNostrSettingsRequest extends RequestBase {

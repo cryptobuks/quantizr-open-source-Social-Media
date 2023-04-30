@@ -3,6 +3,7 @@ package quanta.service.nostr;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.NostrEvent;
 import quanta.model.client.NostrMetadata;
+import quanta.model.client.NostrUserInfo;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
@@ -73,6 +75,14 @@ public class NostrService extends ServiceBase {
 		HashSet<String> accountNodeIds = new HashSet<>();
 		List<String> eventNodeIds = new ArrayList<>();
 
+		// build userInfoMap for efficient lookups
+		HashMap<String, NostrUserInfo> userInfoMap = new HashMap<>();
+		if (req.getUserInfo() != null) {
+			req.getUserInfo().forEach(ui -> {
+				userInfoMap.put(ui.getPk(), ui);
+			});
+		}
+
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
 
@@ -82,7 +92,7 @@ public class NostrService extends ServiceBase {
 				}
 
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
+				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 			}
 			return null;
 		});
@@ -93,13 +103,13 @@ public class NostrService extends ServiceBase {
 	}
 
 	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			IntVal saveCount) {
+			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
 				break;
 			case KIND_Text:
-				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				break;
 			default:
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
@@ -187,7 +197,7 @@ public class NostrService extends ServiceBase {
 	}
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			IntVal saveCount) {
+			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
 
 		SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 		if (nostrAccnt != null) {
@@ -227,6 +237,7 @@ public class NostrService extends ServiceBase {
 
 		if (event.getTags() != null) {
 			newNode.set(NodeProp.NOSTR_TAGS, event.getTags());
+			auth.shareToAllNostrUsers(event.getTags(), newNode);
 		}
 
 		Date timestamp = new Date(event.getTimestamp() * 1000);

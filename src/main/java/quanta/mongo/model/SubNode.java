@@ -416,6 +416,9 @@ public class SubNode {
 	@JsonIgnore
 	public void putAc(String key, AccessControl ac) {
 
+		// don't allow adding this node to it's own sharing.
+		if (getOwner().toHexString().equals(key)) return;
+
 		// look up any ac already existing for this key
 		AccessControl thisAc = safeGetAc().get(key);
 
@@ -432,7 +435,10 @@ public class SubNode {
 		if (ac == null && this.ac == null)
 			return;
 		ThreadLocals.dirty(this);
+		// todo-0: need to review threadsafety on this class for any other places we aren't using acLock synchronized block
 		synchronized (acLock) {
+			// sanity check do disallow this this node sharing to it's owner
+			ac.remove(getOwner().toHexString());
 			this.ac = ac;
 		}
 	}

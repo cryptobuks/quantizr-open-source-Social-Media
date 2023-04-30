@@ -151,19 +151,6 @@ public class MongoAuth extends ServiceBase {
 			return;
 
 		// log.debug("childNode: " + child.getIdStr() + " being created under " + parent.getIdStr());
-
-		/*
-		 * get ACL of the parent (minus the child.owner if he exists there), or else if parent isn't shared
-		 * at all we create a new empty ACL.
-		 */
-		HashMap<String, AccessControl> ac = parent.getAc();
-		if (ac == null) {
-			ac = new HashMap<>();
-		} else {
-			ac = (HashMap<String, AccessControl>) ac.clone();
-			ac.remove(child.getOwner().toHexString());
-		}
-
 		/*
 		 * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
 		 * message to the user that friend node represents
@@ -176,7 +163,7 @@ public class MongoAuth extends ServiceBase {
 			if (userName != null) {
 				SubNode accountNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 				if (accountNode != null) {
-					ac.put(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
+					child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
 				}
 			}
 		}
@@ -185,19 +172,34 @@ public class MongoAuth extends ServiceBase {
 		 */
 		else {
 			// add `parent.owner` to the ACL
-			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
+			child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
+			// todo-0: what if user specified to send to BOTH AP and Nostr? Can we combine both
+			// of these logics into same outbound node? Some would have "@name" (for AP) and some would be
+			// @npub12345678 for Nostr in the content.
 			if (nostr.isNostrNode(parent)) {
-				addMentionsToContentNostr(parent, child, ac);
+				processNostrForNewNode(parent, child);
 			} else {
-				addMentionsToContentActPub(parent, child);
+				processActPubForNewNode(parent, child);
 			}
 		}
-		child.setAc(ac);
 	}
 
-	private void addMentionsToContentNostr(SubNode parent, SubNode child, HashMap<String, AccessControl> ac) {
+	private void processNostrForNewNode(SubNode parent, SubNode child) {
 		ArrayList<ArrayList<String>> tags = (ArrayList) parent.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
+
+		shareToAllNostrUsers(tags, child);
+
+		// todo-0: just like the ActPub version does we need to have had the client convert all the
+		// "p" tags for this new node and send up some kind of mapping to convert from "hex key" to "npub"
+		// value so we can insert all the "mentions" into the content here. (see how it's done for ActPub
+		// below)
+		// Would just be setting the content to just all those mentions.
+	}
+
+	public void shareToAllNostrUsers(ArrayList<ArrayList<String>> tags, SubNode child) {
+		if (tags == null)
+			return;
 
 		// Scan all "p" (people) tags to include sharing for them.
 		for (ArrayList<String> itm : tags) {
@@ -206,19 +208,20 @@ public class MongoAuth extends ServiceBase {
 				// get pub key of the user
 				String pubKey = itm.get(1);
 
-				// lookup the SubNode for the account. First try to get 
+				// lookup the SubNode for the account, and we might get back a Foreign account node or Local node,
+				// doesn't matter.
 				SubNode nostrAccnt = arun.run(as -> nostr.getAccountByNostrPubKey(as, pubKey));
-				
+
 				// if we found the account with that key and it's not our own account
 				if (nostrAccnt != null && !nostrAccnt.getOwner().equals(child.getOwner())) {
 					// add the ACL for this user
-					ac.put(nostrAccnt.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
+					child.putAc(nostrAccnt.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 				}
 			}
 		}
 	}
 
-	private void addMentionsToContentActPub(SubNode parent, SubNode child) {
+	private void processActPubForNewNode(SubNode parent, SubNode child) {
 		/*
 		 * We also extract the 'mentions' out of any 'tag' array that might be on this node, so we can
 		 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
