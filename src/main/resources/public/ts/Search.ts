@@ -68,7 +68,7 @@ export class Search {
 
         // if we dead-ended on a nostr item we didn't have on server yet, then nostrDeadEnd is set in the results..
         // This triggers us to load the data, and then attempt 'getNodeThreadView' again.
-        // todo-0: I added this code path for the "load more" of Nostr threads, but I need to test it a more
+        // todo-0: I added this code path for the "load more" of Nostr threads, but I need to test it more
         if (res.nostrDeadEnd) {
             // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
             // we resume from the actual 'node' we're trying to get Thread of.

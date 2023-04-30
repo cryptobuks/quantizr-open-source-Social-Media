@@ -287,7 +287,7 @@ export class User {
                     return;
                 }
 
-                const event = await S.nostr.getEvent(nostrId, relays);
+                const event = await S.nostr.getEvent(nostrId, null, relays);
                 if (!event) {
                     console.warn("Unable to lookup nostrId=" + nostrId);
                     return;

@@ -233,7 +233,6 @@ public class MongoAuth extends ServiceBase {
 			if (parentUserNode != null) {
 				String user = parentUserNode.getStr(NodeProp.USER);
 
-				// todo-0: right here if user is nostr (starts with '.')
 				String url = parentUserNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 				if (url == null) {
 					url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
@@ -246,7 +245,6 @@ public class MongoAuth extends ServiceBase {
 		if (tags.size() > 0) {
 			String content = "";
 			for (String key : tags.keySet()) {
-				// todo-0: what about nostr key here?
 				if (key.startsWith("@")) {
 					content += key + " ";
 				}

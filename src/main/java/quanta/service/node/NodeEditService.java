@@ -104,12 +104,6 @@ public class NodeEditService extends ServiceBase {
 		SubNode nodeBeingRepliedTo = null;
 
 		if (req.isReply()) {
-			// todo-0: need to get the nostr tags array off the node we're replying to
-			// to we can extract out the "p" tags? The goal is that we end up
-			// having the SHARING (Quanta Shares) add in all the current "p" values 
-			// to the sharing for Quanta to have that info on the node and also to be sure
-			// out outbound transmission of this to relays includes EVERYONE that we ended 
-			// up deciding to share this too. 
 			nodeBeingRepliedTo = read.getNode(ms, nodeId);
 		}
 
@@ -371,12 +365,6 @@ public class NodeEditService extends ServiceBase {
 			String userImgUrl = userNode.getStr(NodeProp.USER_ICON_URL);
 			if (!StringUtils.isEmpty(userImgUrl)) {
 				properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
-			}
-
-			// todo-0: need to rethink if we really want to have per-friend relay assignments
-			String nostrRelays = userNode.getStr(NodeProp.NOSTR_RELAYS);
-			if (!StringUtils.isEmpty(nostrRelays)) {
-				properties.add(new PropertyInfo(NodeProp.NOSTR_RELAYS.s(), nostrRelays));
 			}
 
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,

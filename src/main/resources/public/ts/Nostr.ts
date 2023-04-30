@@ -214,33 +214,33 @@ export class Nostr {
 
     // Builds all the nodes in the thread (by traversing up the tree of replies) going back in time towards
     // the original post.
-    //
-    // todo-0: Need to investigate if we should use one SimplePool in this process, and just keep adding relays
-    // to it as needed as we go up the reply chain
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) return null;
         // console.log("loadReplyChain of nodeId: " + node.id);
+        let pool: SimplePool = null;
+        let relaySet: Set<string> = null;
 
         try {
+            pool = new SimplePool();
             S.rpcUtil.incRpcCounter();
 
             // Get userRelays associated with this the owner of 'node'
             let relays: string[] = await this.getRelaysForUser(node);
+            relays = this.addMyRelays(relays);
+
+            if (relays.length === 0) {
+                console.warn("No relays!");
+                return null;
+            }
 
             // collections we'll be adding to as we walk up the reply tree
             const events: Event[] = [];
-            const preferredRelays: Set<string> = new Set<string>();
-            const threadUsers: Set<string> = new Set<string>();
-
-            // if no relays for this user fall back to our own relays
-            if (relays.length === 0) {
-                relays = this.getRelays(getAs().userProfile.relays);
-            }
-            relays.forEach(r => preferredRelays.add(r));
+            const userSet: Set<string> = new Set<string>();
+            relaySet = new Set<string>(relays);
 
             // now recursively walk up the the entire thread one reply back at a time.
-            await this.traverseUpReplyChain(events, tags, preferredRelays, threadUsers);
+            await this.traverseUpReplyChain(events, tags, pool, relaySet, userSet);
 
             // before we persist events, we need to prefix all the events with
             // the event metadata for all users involved so that when the server processes
@@ -248,30 +248,32 @@ export class Nostr {
             // required or else it would fail trying to save data but not having a user account
             // to put something under.
             //
-            const userMetadata = await this.readMultiUserMetadata(this.toUserArray(threadUsers), relays);
+            const userMetadata = await this.readMultiUserMetadata(this.toUserArray(userSet), relays);
             // console.log("metadataForUsers: " + S.util.prettyPrint(userMetadata));
 
             if (!events || !userMetadata) {
                 console.log("No reply info found.");
                 return;
             }
-            console.log("PERSISTING THREAD EVENTS: ");
             const ret = await this.persistEvents([...userMetadata, ...events]);
             return ret;
         }
         finally {
             S.rpcUtil.decRpcCounter();
+            pool?.close(this.toRelayArray(relaySet));
         }
     }
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
     // be only looking at the relays we will find parts of this thread on.
-    traverseUpReplyChain = async (events: Event[], tags: string[][], preferredRelays: Set<string>,
-        threadUsers: Set<string>): Promise<void> => {
+    traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>,
+        userSet: Set<string>): Promise<void> => {
 
         // get the array representing what event (with 'tags' in it) is a reply to.
         const repliedToArray: string[] = this.getRepliedToItem(tags);
-        if (!repliedToArray) return null;
+
+        // if node wasn't a reply to anything, return null, we're done.
+        if (!repliedToArray || repliedToArray.length < 3) return null;
 
         const eventRepliedTo = repliedToArray[1];
         const relayRepliedTo = repliedToArray[2];
@@ -279,31 +281,26 @@ export class Nostr {
         // if we found what event the 'tags' had as it's replyTo
         if (eventRepliedTo) {
             // if no relays were listed in replyTo
-            if (!relayRepliedTo) {
-                if (preferredRelays.size === 0) {
-                    console.log("Failed to traverse thread because eventId " + eventRepliedTo + " didn't have a relay in tag array.")
-                    return null;
-                }
-            }
-            // add relays mentioned in the repliedTo array element.
-            else {
-                preferredRelays.add(relayRepliedTo);
+            if (relayRepliedTo) {
+                relaySet.add(relayRepliedTo);
             }
 
             // console.log("LOADING ThreadItem: " + eventRepliedTo);
-            const event = await this.getEvent(eventRepliedTo, this.toRelayArray(preferredRelays));
+            const event = await this.getEvent(eventRepliedTo, pool, this.toRelayArray(relaySet));
             if (event) {
-                threadUsers.add(event.pubkey);
+                userSet.add(event.pubkey);
                 // console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
+                // todo-0: put this 50 in a var.
                 if (events.length > 50) {
-                    console.warn("stopping after enough thread events: " + events.length);
+                    console.warn("stopping after max thread events: " + events.length);
                     return;
                 }
+
                 if (Array.isArray(event.tags)) {
-                    await this.traverseUpReplyChain(events, event.tags, preferredRelays, threadUsers);
+                    await this.traverseUpReplyChain(events, event.tags, pool, relaySet, userSet);
                 }
             }
         }
@@ -311,22 +308,16 @@ export class Nostr {
 
     toUserArray = (usersSet: Set<string>): string[] => {
         const users: string[] = [];
-        if (usersSet) {
-            usersSet.forEach(r => {
-                users.push(r);
-            });
-        }
+        usersSet?.forEach(r => users.push(r));
         return users;
     }
 
     toRelayArray = (relaySet: Set<string>): string[] => {
         const relays: string[] = [];
-        if (relaySet) {
-            relaySet.forEach(r => {
-                relays.push(r);
-                this.knownRelays.add(r);
-            });
-        }
+        relaySet?.forEach(r => {
+            relays.push(r);
+            this.knownRelays.add(r);
+        });
         return relays;
     }
 
@@ -445,8 +436,12 @@ export class Nostr {
     }
 
     /* persistResponse.res will contain the data saved on the server, but we accept null for persistResonse
-    to indicate that no persistence on the server should be done */
-    getEvent = async (id: string, relays: string[]): Promise<Event> => {
+    to indicate that no persistence on the server should be done,
+
+    'pool' arg is optional and if not passed then relays will be used for making a new pool. When pool is passed in
+    we DO ensure all the mentioned relays *are* added to it if not already in it.
+    */
+    getEvent = async (id: string, pool: SimplePool, relays: string[]): Promise<Event> => {
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -464,7 +459,18 @@ export class Nostr {
 
         try {
             S.rpcUtil.incRpcCounter();
-            const events = await this.queryRelays(relays, query);
+            let events = null;
+
+            // if a pool was provided use it.
+            if (pool) {
+                // if we have relays make sure our pool does contain them all.
+                relays?.forEach(r => pool.ensureRelay(r));
+                events = await pool.list(relays, [query]);
+            }
+            // else call queryRelays which does automiatic pooling if it can.
+            else {
+                events = await this.queryRelays(relays, query);
+            }
             // console.log("getEvent: " + S.util.prettyPrint(events));
 
             if (events?.length > 0) {
@@ -1091,6 +1097,8 @@ export class Nostr {
 
     private async multiRelayQuery(relays: string[], query: any): Promise<Event[]> {
         if (!relays) return null;
+
+        // update knownRelays set.
         relays.forEach(r => this.knownRelays.add(r));
         const pool = new SimplePool();
 

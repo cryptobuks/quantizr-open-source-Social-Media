@@ -1450,12 +1450,13 @@ public class UserManagerService extends ServiceBase {
 			fi.setUserName(userName);
 			fi.setTags(friendNode.getTags());
 			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.USER_ICON_URL));
-			fi.setRelays(friendNode.getStr(NodeProp.NOSTR_RELAYS));
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
 			if (userNode != null) {
 				String displayName = getFriendlyNameFromNode(userNode);
 				fi.setDisplayName(displayName);
+
+				fi.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
 			}
 
 			String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);

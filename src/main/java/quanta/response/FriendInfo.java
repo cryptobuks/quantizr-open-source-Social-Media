@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class FriendInfo {
     private String displayName;
     private String userName;
-    private String relays;
+    private String relays; // note: Relays is not STORED in the actual friend node but only on the account node.
     private String avatarVer;
     private String userNodeId;
     private String friendNodeId;

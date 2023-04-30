@@ -46,7 +46,7 @@ export class SearchByNostrDlg extends DialogBase {
             S.rpcUtil.incRpcCounter();
             const find = S.nostr.translateNip19(SearchByNostrDlg.defaultSearchText);
             const relays = S.nostr.getRelays(getAs().userProfile.relays);
-            event = await S.nostr.getEvent(find, relays);
+            event = await S.nostr.getEvent(find, null, relays);
             if (event) {
                 const res = await S.nostr.persistEvents([event]);
                 if (res?.eventNodeIds?.length > 0) {
