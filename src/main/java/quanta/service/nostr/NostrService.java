@@ -112,8 +112,7 @@ public class NostrService extends ServiceBase {
 		try {
 			SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 			if (nostrAccnt != null) {
-				log.debug("saveNostrMetadataEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
-						+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
+				accountNodeIds.add(nostrAccnt.getIdStr());
 				// if the npub is owned by a local user we're done, and no need to create the foreign holder account
 				return;
 			}
@@ -237,6 +236,17 @@ public class NostrService extends ServiceBase {
 		update.save(as, newNode, false);
 		eventNodeIds.add(newNode.getIdStr());
 		saveCount.inc();
+	}
+
+	public SubNode getAccountByNostrPubKey(MongoSession as, String pubKey) {
+		SubNode accntNode = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
+
+		// if account wasn't found as a local user's public key try a foreign one.
+		if (accntNode == null) {
+			accntNode = nostr.getOrCreateNostrAccount(as, pubKey, null, null);
+		}
+
+		return accntNode;
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */

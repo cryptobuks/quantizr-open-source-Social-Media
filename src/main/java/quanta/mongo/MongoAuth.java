@@ -1,5 +1,6 @@
 package quanta.mongo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -187,7 +188,7 @@ public class MongoAuth extends ServiceBase {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
 			if (nostr.isNostrNode(parent)) {
-				addMentionsToContentNostr(parent, child);
+				addMentionsToContentNostr(parent, child, ac);
 			} else {
 				addMentionsToContentActPub(parent, child);
 			}
@@ -195,8 +196,26 @@ public class MongoAuth extends ServiceBase {
 		child.setAc(ac);
 	}
 
-	private void addMentionsToContentNostr(SubNode parent, SubNode child) {
-		// todo-0: work in progress here.
+	private void addMentionsToContentNostr(SubNode parent, SubNode child, HashMap<String, AccessControl> ac) {
+		ArrayList<ArrayList<String>> tags = (ArrayList) parent.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
+
+		// Scan all "p" (people) tags to include sharing for them.
+		for (ArrayList<String> itm : tags) {
+			if ("p".equals(itm.get(0))) {
+
+				// get pub key of the user
+				String pubKey = itm.get(1);
+
+				// lookup the SubNode for the account. First try to get 
+				SubNode nostrAccnt = arun.run(as -> nostr.getAccountByNostrPubKey(as, pubKey));
+				
+				// if we found the account with that key and it's not our own account
+				if (nostrAccnt != null && !nostrAccnt.getOwner().equals(child.getOwner())) {
+					// add the ACL for this user
+					ac.put(nostrAccnt.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
+				}
+			}
+		}
 	}
 
 	private void addMentionsToContentActPub(SubNode parent, SubNode child) {
