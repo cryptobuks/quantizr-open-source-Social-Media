@@ -789,12 +789,15 @@ export class Nostr {
             }
         });
 
+        // Nostr's way of adding attached files is just to mention their URL in the content, so let's add all that.
+        const content = this.getContentWithUrlsAdded(node);
+
         const event: any = {
             kind: 1,
             pubkey: this.pk,
             created_at: Math.floor(Date.now() / 1000),
             tags,
-            content: node.content
+            content
         };
         event.id = getEventHash(event);
         event.sig = signEvent(event, this.sk);
@@ -802,6 +805,18 @@ export class Nostr {
 
         relays.push(...this.getRelays((relaysStr || "") + "\n" + (getAs().userProfile.relays) || ""));
         return event;
+    }
+
+    getContentWithUrlsAdded = (node: J.NodeInfo): string => {
+        let ret = node.content || "";
+        let idx = 0;
+        S.props.getOrderedAtts(node).forEach(att => {
+            if (idx++ === 0) {
+                ret += "\n"
+            }
+            ret += "\n" + S.attachment.getAttUrl("bin", att, node.id, false);
+        });
+        return ret;
     }
 
     sendMessage = async (event: Event, relays: string[]) => {

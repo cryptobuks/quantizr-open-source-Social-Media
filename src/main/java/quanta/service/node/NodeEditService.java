@@ -486,6 +486,11 @@ public class NodeEditService extends ServiceBase {
 
 	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
+		if (req.getNostrEvent() != null) {
+			if (!NostrCrypto.verifyEvent(req.getNostrEvent())) {
+				throw new RuntimeException("Signature failed on event.");
+			}
+		}
 		SaveNodeResponse res = new SaveNodeResponse();
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
@@ -594,9 +599,6 @@ public class NodeEditService extends ServiceBase {
 		 * it's TAGS and OBJECT_ID onto the node
 		 */
 		if (req.getNostrEvent() != null) {
-			if (!NostrCrypto.verifyEvent(req.getNostrEvent())) {
-				throw new RuntimeException("Signature failed on event.");
-			}
 			node.set(NodeProp.NOSTR_TAGS, req.getNostrEvent().getTags());
 			node.set(NodeProp.OBJECT_ID, "." + req.getNostrEvent().getId());
 		}

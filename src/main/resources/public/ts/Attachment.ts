@@ -51,7 +51,10 @@ export class Attachment {
         /* If this node attachment points to external URL return that url */
         const att = S.props.getAttachment(attName, node);
         if (!att) return null;
+        return this.getAttUrl(urlPart, att, node.id, downloadLink);
+    }
 
+    getAttUrl = (urlPart: string, att: J.Attachment, nodeId: string, downloadLink: boolean): string => {
         if (att.u) {
             return att.u;
         }
@@ -63,7 +66,9 @@ export class Attachment {
             if (ipfsLink) {
                 bin = "ipfs";
             }
-            let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+            // todo-0: to make nostr posts cleaner (when inspected as text) we should support a url in the
+            // form of /att/${nodeId}/${bin} here, and have a version of this 'getAttUrl()' just for Nostr.
+            let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId;
 
             if (downloadLink) {
                 ret += "&download=true";
