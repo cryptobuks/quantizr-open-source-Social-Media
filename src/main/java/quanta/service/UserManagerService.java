@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
+import opennlp.tools.util.StringUtil;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
@@ -1014,7 +1015,15 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
 				userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
 				userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
-				userProfile.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
+
+				// get user's relays but default them to admin's relays if not existing.
+				String relays = userNode.getStr(NodeProp.NOSTR_RELAYS);
+				if (StringUtil.isEmpty(relays)) {
+					SubNode root = read.getDbRoot();
+					relays = root.getStr(NodeProp.NOSTR_RELAYS);
+					userNode.set(NodeProp.NOSTR_RELAYS, relays);
+				}
+				userProfile.setRelays(relays);
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
