@@ -56,7 +56,7 @@ public class NostrService extends ServiceBase {
 
 		arun.run(as -> {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
-			if (!StringUtils.isEmpty(req.getRelays())) {
+			if (userNode != null) {
 				userNode.set(NodeProp.NOSTR_RELAYS, req.getRelays());
 				update.save(as, userNode);
 				res.setSuccess(true);
@@ -210,7 +210,7 @@ public class NostrService extends ServiceBase {
 		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
 		if (nostrNode != null) {
 			eventNodeIds.add(nostrNode.getIdStr());
-			log.debug("Nostr ID Existed: " + event.getId());
+			// log.debug("Nostr ID Existed: " + event.getId());
 			return;
 		}
 

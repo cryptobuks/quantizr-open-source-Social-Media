@@ -194,7 +194,8 @@ export class UserProfileDlg extends DialogBase {
                     localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
 
                     // but all users we know of will have a posts node simply from having their posts imported
-                    new Button("Posts", () => {
+                    new Button("Posts", async () => {
+                        this.readNostrPosts();
                         if (this.currentlyEditingWarning()) return;
                         this.openUserHomePage(state, "posts");
                     }), //
@@ -229,6 +230,16 @@ export class UserProfileDlg extends DialogBase {
         ];
 
         return children;
+    }
+
+    readNostrPosts = () => {
+        const state = this.getState<LS>();
+        if (state.userProfile.nostrNpub) {
+            let relays = S.nostr.getRelays(state.userProfile.relays);
+            relays = S.nostr.addMyRelays(relays);
+            console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
+            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1);
+        }
     }
 
     createNostrInfoDiv = (nostrId: string): Div => {
@@ -338,6 +349,7 @@ export class UserProfileDlg extends DialogBase {
             this.mergeState<LS>({
                 userProfile: state.userProfile
             });
+            this.readNostrPosts();
         }
     }
 

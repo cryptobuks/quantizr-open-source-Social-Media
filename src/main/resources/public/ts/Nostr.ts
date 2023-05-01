@@ -1044,12 +1044,7 @@ export class Nostr {
     readPostsFromFriends = async (): Promise<void> => {
         const lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME) || 0;
         const lastUsersQueryKey: string = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY);
-
         const curTime = Math.floor(Date.now() / 1000);
-        if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
-            console.log("Skipping relays query since last one was less that 30 secs ago.");
-            return;
-        }
 
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,
@@ -1094,6 +1089,10 @@ export class Nostr {
         // if this is the same users and relays we last queried (key matches) then we set the
         // 'since' query time, so we only get new stuff we didn't already see
         if (thisQueryKey === lastUsersQueryKey) {
+            if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
+                console.log("Skipping Nostr query. Identical query was less that 30 secs ago.");
+                return;
+            }
             since = lastUsersQueryTime;
         }
         else {

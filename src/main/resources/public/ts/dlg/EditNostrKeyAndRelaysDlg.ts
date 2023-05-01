@@ -14,7 +14,7 @@ export class EditNostrKeyAndRelaysDlg extends DialogBase {
     nostrRelayState: Validator = new Validator();
 
     constructor() {
-        super("Nostr Key/Relays", "appModalContMediumWidth");
+        super("Nostr Relays", "appModalContMediumWidth");
         // this.onMount(() => this.userTextField?.focus());
         this.nostrRelayState.setValue(getAs().userProfile.relays);
     }
@@ -37,7 +37,6 @@ export class EditNostrKeyAndRelaysDlg extends DialogBase {
             key: null,
             relays: this.nostrRelayState.getValue()
         });
-        console.log("saveNostrSettings res: " + S.util.prettyPrint(res));
         if (res.success) {
             dispatch("setUserProfileRelays", s => {
                 s.userProfile.relays = this.nostrRelayState.getValue();
