@@ -1,9 +1,10 @@
 import { dispatch, getAs } from "../AppContext";
-import { ScrollPos } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
+import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
@@ -23,7 +24,8 @@ import { Validator } from "../Validator";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 interface LS { // Local State
-    userProfile: J.UserProfile;
+    userProfile?: J.UserProfile;
+    showNostrInfo?: boolean;
 }
 
 export class UserProfileDlg extends DialogBase {
@@ -39,7 +41,7 @@ export class UserProfileDlg extends DialogBase {
         const ast = getAs();
         userNodeId = lookupByNostrPubKey ? null : (userNodeId || ast.userProfile.userNodeId);
         this.readOnly = lookupByNostrPubKey ? true : (!ast.userProfile || ast.userProfile.userNodeId !== userNodeId);
-        this.mergeState<LS>({ userProfile: null });
+        this.mergeState<LS>({ userProfile: null, showNostrInfo: false });
     }
 
     override getTitleText(): string {
@@ -242,7 +244,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    createNostrInfoDiv = (nostrId: string): Div => {
+    createNostrInfoDiv = (nostrId: string): Comp => {
         const ast = getAs();
         const children = [
             new Div("Nostr ID: "),
@@ -258,7 +260,10 @@ export class UserProfileDlg extends DialogBase {
                 });
             }
         }
-        return new Div(null, { className: "nostrInfoPanel" }, children);
+
+        return new CollapsiblePanel("Nostr Info", "Hide Nostr Info", null, children, false, (exp: boolean) => {
+            this.mergeState<LS>({ showNostrInfo: exp })
+        }, this.getState<LS>().showNostrInfo, "marginTop marginBottom");
     }
 
     deleteFriend = async () => {
