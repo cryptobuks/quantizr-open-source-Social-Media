@@ -6,7 +6,6 @@ import { Validator } from "../Validator";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
 
@@ -21,10 +20,8 @@ export class EditNostrKeyAndRelaysDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const ast = getAs();
         return [
             new Diva([
-                new Div(ast.userProfile.nostrNpub),
                 new TextArea("Nostr Relays", { rows: 8 }, this.nostrRelayState, null, false, 8),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),

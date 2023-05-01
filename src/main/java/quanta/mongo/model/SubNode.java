@@ -415,19 +415,20 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void putAc(String key, AccessControl ac) {
-
 		// don't allow adding this node to it's own sharing.
 		if (getOwner() != null && getOwner().toHexString().equals(key))
 			return;
 
-		// look up any ac already existing for this key
-		AccessControl thisAc = safeGetAc().get(key);
+		synchronized (acLock) {
+			// look up any ac already existing for this key
+			AccessControl thisAc = safeGetAc().get(key);
 
-		// only put the new ac key in the map if the existing was not found or if it's not the same value we
-		// already have
-		if (thisAc == null || !thisAc.eq(ac)) {
-			safeGetAc().put(key, ac);
-			ThreadLocals.dirty(this);
+			// only put the new ac key in the map if the existing was not found or if it's not the same value we
+			// already have
+			if (thisAc == null || !thisAc.eq(ac)) {
+				safeGetAc().put(key, ac);
+				ThreadLocals.dirty(this);
+			}
 		}
 	}
 
@@ -436,8 +437,6 @@ public class SubNode {
 		if (ac == null && this.ac == null)
 			return;
 		ThreadLocals.dirty(this);
-		// todo-0: need to review threadsafety on this class for any other places we aren't using acLock
-		// synchronized block
 		synchronized (acLock) {
 			// sanity check do disallow this this node sharing to it's owner
 			if (ac != null && getOwner() != null) {

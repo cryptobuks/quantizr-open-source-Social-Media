@@ -43,7 +43,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Logout", S.user.userLogout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
-                        this.settingsLink("Nostr Settings", () => new EditNostrKeyAndRelaysDlg().open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Storage Space", () => new ManageStorageDlg().open())
                     ]),
@@ -108,6 +107,15 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
+
+                // -----------------------
+                this.sectionTitle("Nostr"),
+                new HorizontalLayout([
+                    new Divc({ className: "accountSettingsCol" }, [
+                        this.settingsLink("Private Key", S.nostr.showPrivateKey),
+                        this.settingsLink("Relays", () => new EditNostrKeyAndRelaysDlg().open())
+                    ])
+                ], horzClass),
 
                 // -----------------------
                 this.sectionTitle("Tools"),

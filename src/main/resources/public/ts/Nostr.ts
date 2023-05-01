@@ -20,6 +20,7 @@ import { S } from "./Singletons";
 import { Comp } from "./comp/base/Comp";
 import { getAs } from "./AppContext";
 import { Val } from "./Val";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -1208,5 +1209,19 @@ export class Nostr {
         p.searchParams.sort();
         p.hash = "";
         return p.toString();
+    }
+
+    showPrivateKey = async () => {
+        const dlg = new ConfirmDlg("Are you sure? Show your Secret Key?", "Warning",
+            "btn-danger", "alert alert-danger");
+        await dlg.open();
+        if (dlg.yes) {
+            const ast = getAs();
+            const msg = "Public ID: " + ast.userProfile.nostrNpub + "\n" +
+                "Public Key (Hex): " + this.pk + "\n\n" +
+                "Private Key (Hex): " + this.sk;
+
+            S.util.showMessage(msg, "Nostr Identity", true);
+        }
     }
 }
