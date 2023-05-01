@@ -151,6 +151,8 @@ public class CallProcessor extends ServiceBase {
 			}
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
+
+			nostr.pushNostrInfoToClient();
 		}
 
 		logResponse(ret);

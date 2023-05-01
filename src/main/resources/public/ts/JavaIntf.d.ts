@@ -921,6 +921,10 @@ export interface MoveNodesResponse extends ResponseBase {
     signaturesRemoved: boolean;
 }
 
+export interface NewNostrUsersPushInfo extends ServerPushInfo {
+    users: string[];
+}
+
 export interface NodeEditedPushInfo extends ServerPushInfo {
     nodeInfo: NodeInfo;
 }

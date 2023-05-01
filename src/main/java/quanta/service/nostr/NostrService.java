@@ -30,6 +30,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.SaveNostrEventRequest;
 import quanta.request.SaveNostrSettingsRequest;
+import quanta.response.NewNostrUsersPushInfo;
 import quanta.response.SaveNostrEventResponse;
 import quanta.response.SaveNostrSettingsResponse;
 import quanta.util.ThreadLocals;
@@ -127,39 +128,39 @@ public class NostrService extends ServiceBase {
 				return;
 			}
 
-			int beforeSaveCount = saveCount.getVal();
 			nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
-			boolean isNew = saveCount.getVal() > beforeSaveCount;
 
 			Date timestamp = new Date(event.getTimestamp() * 1000);
 
-			// if this nostr object is a brand new one or newer data than our current info
-			if (isNew || timestamp.getTime() > nostrAccnt.getModifyTime().getTime()) {
-				NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
-				// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
+			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
+			// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
 
-				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
-				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
-				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
-				nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
-				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
-				nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
-				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+			// todo-0: Need to ensure that this isn't called too much and doing unnecessary saving of identical
+			// data to MongoDB ever. I think we can key off the timestamp, compared to the SAME timestamp
+			// we have in the db which needs to be different from the ModifyTime on MongoDB record becasue when 
+			// we initially save this it will NOT have all data (props below) so we need to save the ACTUAL
+			// nostr timestamp that goes along with this data.
+			nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
+			nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
+			nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
+			nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
+			nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
+			nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
+			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
 
-				// note: we always need to be able to generate KEY so don't ever let the client upload
-				// an nip05 web url to save to this. Always send up the key.
-				nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
+			// note: we always need to be able to generate KEY so don't ever let the client upload
+			// an nip05 web url to save to this. Always send up the key.
+			nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
 
-				// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
-				// username itself is the pubkey with a '.' prefix.
+			// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
+			// username itself is the pubkey with a '.' prefix.
 
-				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
+			nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 
-				nostrAccnt.setCreateTime(timestamp);
-				nostrAccnt.setModifyTime(timestamp);
-			}
+			nostrAccnt.setCreateTime(timestamp);
+			nostrAccnt.setModifyTime(timestamp);
 
 			// We send back account nodes EVEN if this is not a new node, because client needs the info.
 			accountNodeIds.add(nostrAccnt.getIdStr());
@@ -260,10 +261,30 @@ public class NostrService extends ServiceBase {
 		return accntNode;
 	}
 
+	public void pushNostrInfoToClient() {
+		if (ThreadLocals.getNewNostrUsers().size() > 0) {
+			// WARNING: make call to get users BEFORE 'exec.run()' or else we won't be on the request thread.
+			List<String> users = new LinkedList<String>(ThreadLocals.getNewNostrUsers());
+			log.debug("Server Push Nostr Users" + XString.prettyPrint(users));
+
+			if (users.size() > 0) {
+				// todo-0: look for all calls to exec.run, and check for places where ThreadLocals will be
+				// the WRONG instance of ThreadLocals, and we might need to always pass in ThreadLocals, thru
+				// exec.run() ?
+				exec.run(() -> {
+					push.sendServerPushInfo(ThreadLocals.getSC(), new NewNostrUsersPushInfo(users));
+					ThreadLocals.getNewNostrUsers().clear();
+				});
+			}
+		}
+	}
+
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
 	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
+			// log.debug("New Nostr User: " + userKey + " newCount=" + ThreadLocals.getNewNostrUsers().size());
+			ThreadLocals.getNewNostrUsers().add(userKey);
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);
@@ -271,12 +292,12 @@ public class NostrService extends ServiceBase {
 			if (saveCount != null) {
 				saveCount.inc();
 			}
-		} else {
-			if (postsNode != null) {
-				SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
-						Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-				postsNode.setVal(postsNodeFound);
-			}
+		}
+
+		if (postsNode != null) {
+			SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
+					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+			postsNode.setVal(postsNodeFound);
 		}
 		return nostrAccnt;
 	}

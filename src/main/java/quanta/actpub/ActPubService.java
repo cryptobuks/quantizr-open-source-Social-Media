@@ -263,7 +263,9 @@ public class ActPubService extends ServiceBase {
         // if not in cache find the node from the DB and ADD to the cache.
         if (node == null) {
             node = read.getNode(ms, id, allowAuth, accntNode);
-            apCache.acctNodesById.put(id, node);
+            if (node != null) {
+                apCache.acctNodesById.put(id, node);
+            }
         }
         return node;
     }
@@ -984,8 +986,10 @@ public class ActPubService extends ServiceBase {
 
                 // DO NOT DELETE (THIS MAY COME BACK)
                 // by removing this line, we change the design to where inbound replies always go into user's POSTS
-                // node, rather than underneath the node they're replying to. I'm leaving this line here in case there
-                // are scenarios in the future where we might want this old functionality back where replies go in to
+                // node, rather than underneath the node they're replying to. I'm leaving this line here in case
+                // there
+                // are scenarios in the future where we might want this old functionality back where replies go in
+                // to
                 // subnodes under the thing bring replied to,.
                 // nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
             }
@@ -994,8 +998,8 @@ public class ActPubService extends ServiceBase {
         /*
          * If a foreign user is replying to a specific node, we put the reply under that node
          * 
-         * NOTE: yes this is code path is intentionally disabled by commenting out the setting of nodeBeingRepliedTo above
-         * (see note above: do not delete this dead block of code)
+         * NOTE: yes this is code path is intentionally disabled by commenting out the setting of
+         * nodeBeingRepliedTo above (see note above: do not delete this dead block of code)
          */
         if (nodeBeingRepliedTo != null) {
             apLog.trace("foreign actor replying to a quanta node.");
@@ -1014,7 +1018,8 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true, replyToId);
+                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true,
+                        replyToId);
             }
         }
     }
@@ -1061,7 +1066,8 @@ public class ActPubService extends ServiceBase {
 
         Date published = apDate(obj, APObj.published);
 
-        // NOTE: If this is an inbound reply to a local node, normally we can expect inReplyTo to be set here and
+        // NOTE: If this is an inbound reply to a local node, normally we can expect inReplyTo to be set
+        // here and
         // it will be the nodeId of the node being replied to.
         if (inReplyTo == null) {
             inReplyTo = apStr(obj, APObj.inReplyTo);
@@ -2110,113 +2116,113 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-	/*
-	 * Returns map of of APOHashtag and/or APOMention objects, where the keys are the hashtag or mention
-	 * including the # or @ as first char of the key.
-	 */
-	public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
-		HashMap<String, APObj> tags = new HashMap<>();
-		if (content == null)
-			return tags;
+    /*
+     * Returns map of of APOHashtag and/or APOMention objects, where the keys are the hashtag or mention
+     * including the # or @ as first char of the key.
+     */
+    public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
+        HashMap<String, APObj> tags = new HashMap<>();
+        if (content == null)
+            return tags;
 
-		StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
+        StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
 
-		while (t.hasMoreTokens()) {
-			String tok = t.nextToken();
+        while (t.hasMoreTokens()) {
+            String tok = t.nextToken();
 
-			if (tok.length() > 1) {
-				// MENTION (@name@server.com or @name)
-				int atMatches = StringUtils.countMatches(tok, "@");
-				if (parseMentions && tok.startsWith("@") && atMatches <= 2) {
-					String actor = null;
+            if (tok.length() > 1) {
+                // MENTION (@name@server.com or @name)
+                int atMatches = StringUtils.countMatches(tok, "@");
+                if (parseMentions && tok.startsWith("@") && atMatches <= 2) {
+                    String actor = null;
 
-					String userName = tok;
-					boolean isLocalUserName = userName.endsWith("@" + prop.getMetaHost().toLowerCase());
-					if (isLocalUserName) {
-						userName = XString.stripIfStartsWith(userName, "@");
-						userName = apUtil.stripHostFromUserName(userName);
-						actor = apUtil.makeActorUrlForUserName(userName);
-					}
-					// foreign userName
-					else if (atMatches == 2) {
-						String userDoingAction = ThreadLocals.getSC().getUserName();
-						actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
-					}
-					tags.put(tok, new APOMention(actor, tok));
-				}
-				// HASHTAG
-				else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
-					String shortTok = XString.stripIfStartsWith(tok, "#");
-					tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
-				}
-			}
-		}
+                    String userName = tok;
+                    boolean isLocalUserName = userName.endsWith("@" + prop.getMetaHost().toLowerCase());
+                    if (isLocalUserName) {
+                        userName = XString.stripIfStartsWith(userName, "@");
+                        userName = apUtil.stripHostFromUserName(userName);
+                        actor = apUtil.makeActorUrlForUserName(userName);
+                    }
+                    // foreign userName
+                    else if (atMatches == 2) {
+                        String userDoingAction = ThreadLocals.getSC().getUserName();
+                        actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
+                    }
+                    tags.put(tok, new APOMention(actor, tok));
+                }
+                // HASHTAG
+                else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
+                    String shortTok = XString.stripIfStartsWith(tok, "#");
+                    tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
+                }
+            }
+        }
 
-		return tags;
-	}
+        return tags;
+    }
 
-	/**
-	 * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
-	 */
-	public HashMap<String, APObj> parseTags(SubNode node) {
-		HashMap<String, APObj> tagMap = new HashMap<>();
-		if (node == null)
-			return tagMap;
+    /**
+     * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
+     */
+    public HashMap<String, APObj> parseTags(SubNode node) {
+        HashMap<String, APObj> tagMap = new HashMap<>();
+        if (node == null)
+            return tagMap;
 
-		List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
-		if (tags == null)
-			return tagMap;
+        List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
+        if (tags == null)
+            return tagMap;
 
-		for (APTag tag : tags) {
-			try {
-				// ActPub spec originally didn't have Hashtag here, so default to that if no type
-				if (tag.getType() == null) {
-					tag.setType("Hashtag");
-				}
+        for (APTag tag : tags) {
+            try {
+                // ActPub spec originally didn't have Hashtag here, so default to that if no type
+                if (tag.getType() == null) {
+                    tag.setType("Hashtag");
+                }
 
-				if ("Hashtag".equalsIgnoreCase(tag.getType())) {
-					tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
-				}
-				// Process Mention
-				else if ("Mention".equalsIgnoreCase(tag.getType())) {
-					APOMention tagObj = new APOMention(tag.getHref(), tag.getName());
+                if ("Hashtag".equalsIgnoreCase(tag.getType())) {
+                    tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
+                }
+                // Process Mention
+                else if ("Mention".equalsIgnoreCase(tag.getType())) {
+                    APOMention tagObj = new APOMention(tag.getHref(), tag.getName());
 
-					// add a string like host@username
-					URL hrefUrl = new URL(tag.getHref());
+                    // add a string like host@username
+                    URL hrefUrl = new URL(tag.getHref());
 
-					// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
-					// or else we end up with "user@server.com@server.com"
-					String longName = tag.getName();
+                    // sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
+                    // or else we end up with "user@server.com@server.com"
+                    String longName = tag.getName();
 
-					// if 'longName' is like "@user" with no domain, then add the domain.
-					if (StringUtils.countMatches(longName, "@") < 2) {
-						longName += "@" + hrefUrl.getHost();
-					}
+                    // if 'longName' is like "@user" with no domain, then add the domain.
+                    if (StringUtils.countMatches(longName, "@") < 2) {
+                        longName += "@" + hrefUrl.getHost();
+                    }
 
-					// I'm just adding this as a sanity check but it should be unnecessary
-					if (!longName.startsWith("@")) {
-						longName = "@" + longName;
-					}
+                    // I'm just adding this as a sanity check but it should be unnecessary
+                    if (!longName.startsWith("@")) {
+                        longName = "@" + longName;
+                    }
 
-					// one more sanity check to be sure everything is ok with the name
-					if (StringUtils.countMatches(longName, "@") > 2) {
-						continue;
-					}
+                    // one more sanity check to be sure everything is ok with the name
+                    if (StringUtils.countMatches(longName, "@") > 2) {
+                        continue;
+                    }
 
-					// build this name without host part if it's a local user, otherwise full fediverse name
-					String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? tag.getName() : longName;
+                    // build this name without host part if it's a local user, otherwise full fediverse name
+                    String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? tag.getName() : longName;
 
-					// add the name if it's not the current user. No need to self-mention in a reply?
-					if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
-						tagMap.put(user, tagObj);
-					}
-				}
-			} catch (Exception e) {
-				log.error("Unable to process tag.", e);
-				// ignore errors on any tag and continue to next tag
-			}
-		}
+                    // add the name if it's not the current user. No need to self-mention in a reply?
+                    if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
+                        tagMap.put(user, tagObj);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Unable to process tag.", e);
+                // ignore errors on any tag and continue to next tag
+            }
+        }
 
-		return tagMap;
-	}
+        return tagMap;
+    }
 }

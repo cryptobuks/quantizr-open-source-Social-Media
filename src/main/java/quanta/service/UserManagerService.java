@@ -153,7 +153,8 @@ public class UserManagerService extends ServiceBase {
 
 		if (sc.isAuthenticated()) {
 			MongoSession ms = ThreadLocals.getMongoSession();
-			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey(), req.getNostrNpub(), req.getNostrPubKey());
+			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey(), req.getNostrNpub(),
+					req.getNostrPubKey());
 			log.debug("login: user=" + sc.getUserName());
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
@@ -1363,10 +1364,12 @@ public class UserManagerService extends ServiceBase {
 						continue;
 
 					SubNode accntNode = apub.cachedGetAccntNodeById(as, accntId, false, null);
-					FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
-					if (fi != null) {
-						friends.add(fi);
-						idSet.add(accntId);
+					if (accntNode != null) {
+						FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
+						if (fi != null) {
+							friends.add(fi);
+							idSet.add(accntId);
+						}
 					}
 				}
 				res.setPeople(friends);

@@ -95,6 +95,8 @@ export class Nostr {
         // await this.publishEvent();
     }
 
+    // todo-0: this won't run unless user does a "Save" from their userprofile dlg right? But we really need to consider
+    // them a "live" user whenever they edit their relays tho instead right?
     publishUserMetadata = async (): Promise<void> => {
         // get the relays string for this user
         const userRelays = getAs().userProfile?.relays;
@@ -238,26 +240,16 @@ export class Nostr {
 
             // collections we'll be adding to as we walk up the reply tree
             const events: Event[] = [];
-            const userSet: Set<string> = new Set<string>();
             relaySet = new Set<string>(relays);
 
             // now recursively walk up the the entire thread one reply back at a time.
-            await this.traverseUpReplyChain(events, tags, pool, relaySet, userSet);
+            await this.traverseUpReplyChain(events, tags, pool, relaySet);
 
-            // before we persist events, we need to prefix all the events with
-            // the event metadata for all users involved so that when the server processes
-            // the "persistEvents" it will encounter the users ahead of all the data which is
-            // required or else it would fail trying to save data but not having a user account
-            // to put something under.
-            //
-            const userMetadata = await this.readMultiUserMetadata(this.toUserArray(userSet), relays);
-            // console.log("metadataForUsers: " + S.util.prettyPrint(userMetadata));
-
-            if (!events || !userMetadata) {
+            if (!events) {
                 console.log("No reply info found.");
                 return;
             }
-            const ret = await this.persistEvents([...userMetadata, ...events]);
+            const ret = await this.persistEvents(events);
             return ret;
         }
         finally {
@@ -268,8 +260,7 @@ export class Nostr {
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
     // be only looking at the relays we will find parts of this thread on.
-    traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>,
-        userSet: Set<string>): Promise<void> => {
+    traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>): Promise<void> => {
 
         // get the array representing what event (with 'tags' in it) is a reply to.
         const repliedToArray: string[] = this.getRepliedToItem(tags);
@@ -290,7 +281,6 @@ export class Nostr {
             // console.log("LOADING ThreadItem: " + eventRepliedTo);
             const event = await this.getEvent(eventRepliedTo, pool, this.toRelayArray(relaySet));
             if (event) {
-                userSet.add(event.pubkey);
                 // console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
@@ -302,7 +292,7 @@ export class Nostr {
                 }
 
                 if (Array.isArray(event.tags)) {
-                    await this.traverseUpReplyChain(events, event.tags, pool, relaySet, userSet);
+                    await this.traverseUpReplyChain(events, event.tags, pool, relaySet);
                 }
             }
         }
@@ -585,6 +575,24 @@ export class Nostr {
         return val;
     }
 
+    loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
+        // todo-0: the userInfo items needs to hold relays too!?? per user?
+        const relays = this.getRelays(getAs().userProfile.relays);
+        if (relays.length === 0) {
+            console.log("loadUserMetadata ignored. No relays.");
+            return;
+        }
+        userInfo.users?.forEach(user => {
+            console.log("SERVER REQ. USER LOAD: " + user);
+
+            // todo-0: Important to queue these and persist all at once! for now we persist each individually instead of queueing them up.
+            S.nostr.readUserMetadata(user, getAs().userProfile.relays, false, true, null);
+        });
+        return null;
+    }
+
+    // todo-0: this function is not good. We should only read one user at a time so that when we get multiple
+    // results back we know we can take the latest one and that will be perfect.
     readMultiUserMetadata = async (users: string[], relays: string[]): Promise<Event[]> => {
         if (relays.length === 0) {
             console.warn("No relays. Can't lookup users");

@@ -1,6 +1,7 @@
 package quanta.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -30,6 +31,7 @@ public class ThreadLocals {
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
+	private static final ThreadLocal<HashSet<String>> newNostrUsers = new ThreadLocal<>();
 
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
@@ -70,6 +72,7 @@ public class ThreadLocals {
 
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
+		getNewNostrUsers().clear();
 		setParentCheckEnabled(true);
 		session.remove();
 	}
@@ -194,6 +197,13 @@ public class ThreadLocals {
 
 	public static void setDirtyNodes(HashMap<ObjectId, SubNode> dn) {
 		dirtyNodes.set(dn);
+	}
+
+	public static HashSet<String> getNewNostrUsers() {
+		if (newNostrUsers.get() == null) {
+			newNostrUsers.set(new HashSet<String>());
+		}
+		return newNostrUsers.get();
 	}
 
 	public static void cacheNode(SubNode node) {
