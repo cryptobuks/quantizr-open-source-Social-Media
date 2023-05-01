@@ -1048,7 +1048,7 @@ export class Util {
     // Gets a name like "@user" (for AP names) or "12345678..." for nostr users
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => { // userName: string): string => {
         if (ac.nostrNpub) {
-            return ac.nostrNpub.substring(0, 14);
+            return ac.nostrNpub.substring(0, 12);
         }
         else if (S.nostr.isNostrUserName(ac.principalName)) {
             return ac.principalName.substring(1, 9) + "...";
