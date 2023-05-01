@@ -49,6 +49,7 @@ export class Nostr {
     metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==event id)
     textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==user's pubkey)
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
+    persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
     // This can be run from Admin Console
     test = async () => {
@@ -902,6 +903,9 @@ export class Nostr {
     persistEvents = async (events: Event[]): Promise<J.SaveNostrEventResponse> => {
         if (!events || events.length === 0) return;
 
+        // remove any events we know we've already persisted
+        events = events.filter(e => !this.persistedEvents.has(e.id));
+
         // map key is 'pk'.
         const userSet: Map<String, J.NostrUserInfo> = new Map<String, J.NostrUserInfo>();
 
@@ -936,6 +940,10 @@ export class Nostr {
             events: events.map(e => this.makeNostrEvent(e)),
             userInfo
         });
+
+        // keep track of what we've just sent to server.
+        events.forEach(e => this.persistedEvents.add(e.id));
+
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
     }
@@ -1033,6 +1041,15 @@ export class Nostr {
     }
 
     readPostsFromFriends = async (): Promise<void> => {
+        const lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME) || 0;
+        const lastUsersQueryKey: string = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY);
+
+        const curTime = Math.floor(Date.now() / 1000);
+        if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
+            console.log("Skipping relays query since last one was less that 30 secs ago.");
+            return;
+        }
+
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,
             type: "friends",
@@ -1069,7 +1086,28 @@ export class Nostr {
         if (userNames.length > 0 && relaysArray.length > 0) {
             console.log("Reading " + userNames.length + " users from " + relaysArray.length + " relays.");
         }
-        await this.readPosts(userNames, relaysArray, -1);
+
+        const thisQueryKey = this.makeQueryKey(userNames, relaysArray);
+        let since = -1;
+
+        // if this is the same users and relays we last queried (key matches) then we set the
+        // 'since' query time, so we only get new stuff we didn't already see
+        if (thisQueryKey === lastUsersQueryKey) {
+            since = lastUsersQueryTime;
+        }
+        else {
+            S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY, thisQueryKey);
+        }
+
+        S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
+        console.log("readPosts: since=" + since);
+        await this.readPosts(userNames, relaysArray, since);
+    }
+
+    makeQueryKey = (users: string[], relays: string[]) => {
+        users.sort();
+        relays.sort();
+        return users.join("\n") + "\n" + relays.join("\b");
     }
 
     addMyRelays = (relays: string[]): string[] => {

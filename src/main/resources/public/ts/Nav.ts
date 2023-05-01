@@ -539,7 +539,12 @@ export class Nav {
         });
     }
 
-    messagesToFromMe = () => {
+    messagesToFromMe = async () => {
+        const ast = getAs();
+        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
+            await S.nostr.readPostsFromFriends();
+        }
+
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -558,7 +563,12 @@ export class Nav {
         });
     }
 
-    messagesMyMentions = () => {
+    messagesMyMentions = async () => {
+        const ast = getAs();
+        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
+            await S.nostr.readPostsFromFriends();
+        }
+
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -577,7 +587,12 @@ export class Nav {
         });
     }
 
-    messagesToMe = () => {
+    messagesToMe = async () => {
+        const ast = getAs();
+        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
+            await S.nostr.readPostsFromFriends();
+        }
+
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
