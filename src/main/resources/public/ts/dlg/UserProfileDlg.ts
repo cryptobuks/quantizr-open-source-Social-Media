@@ -294,19 +294,44 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async () => {
-        const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const ast = getAs();
+        let res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: this.userNodeId,
             nostrPubKey: this.lookupByNostrPubKey
         });
 
-        // console.log("UserProfile Response: " + S.util.prettyPrint(res));
+        console.log("UserProfile Response: " + S.util.prettyPrint(res));
         if (res?.userProfile) {
-            this.userNodeId = res.userProfile.userNodeId;
-            this.bioState.setValue(res.userProfile.userBio);
-            this.displayNameState.setValue(res.userProfile.displayName);
-            this.mergeState<LS>({
-                userProfile: res.userProfile
-            });
+            // for now always forcably query for updated information for any user any time
+            // someone opens their dialog in case the metadata is not known. When the server creates a new
+            // nostr account there's no guarantee the browser will be left open long enough to do the
+            // processing that needed to be done to save it so we have this gap where we MIGHT not have
+            // the full metadata on any given Nostr account node at any give time, and so this call to
+            // always run 'readUserMetadata' is used for now to ensure we DO have the metadata for the user.
+            // (todo-0: eventually we'll make this know if we've
+            // queries relays for their metadata yet or not)
+            if (S.nostr.isNostrUserName(res.userProfile.userName)) {
+
+                // read this user using their relays or our own for.
+                await S.nostr.readUserMetadata(res.userProfile.userName.substring(1),
+                    res.userProfile.relays || ast.userProfile.relays, false, true, null);
+
+                res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    userId: this.userNodeId,
+                    nostrPubKey: this.lookupByNostrPubKey
+                });
+
+                console.log("Second UserProfile Response: " + S.util.prettyPrint(res));
+            }
+
+            if (res?.userProfile) {
+                this.userNodeId = res.userProfile.userNodeId;
+                this.bioState.setValue(res.userProfile.userBio);
+                this.displayNameState.setValue(res.userProfile.displayName);
+                this.mergeState<LS>({
+                    userProfile: res.userProfile
+                });
+            }
         }
     }
 
