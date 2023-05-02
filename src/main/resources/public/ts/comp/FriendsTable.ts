@@ -1,8 +1,8 @@
-import { CompIntf } from "../comp/base/CompIntf";
 import { FriendInfo } from "../JavaIntf";
-import { Div } from "./core/Div";
+import { CompIntf } from "../comp/base/CompIntf";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
+import { Div } from "./core/Div";
 
 export class FriendsTable extends ListBox {
     static scrollPos: number = 0;

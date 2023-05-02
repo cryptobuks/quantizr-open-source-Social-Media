@@ -166,6 +166,10 @@ public class NostrService extends ServiceBase {
 			if (!StringUtils.isEmpty(relays)) {
 				nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 			}
+
+			// this should be updating thru the call to apCache.saveNotify(node) in 
+			// MongoListener, but I need to retest to be sure.
+			apCache.acctNodesById.put(nostrAccnt.getIdStr(), nostrAccnt);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

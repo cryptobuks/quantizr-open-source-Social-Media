@@ -57,12 +57,14 @@ export class FriendsDlg extends DialogBase {
         };
     }
 
-   override preLoad = async () => {
+    override preLoad = async () => {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: this.nodeId,
             type: "friends",
             subType: null
         });
+
+        // console.log("FriendsDlg getPeople(): " + S.util.prettyPrint(res));
 
         await promiseDispatch("SetFriendHashTags", s => { s.friendHashTags = res.friendHashTags; });
 

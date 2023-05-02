@@ -1290,6 +1290,9 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
+	/* Looks like this code can 'discover' users that have a node in the system, but just never
+	 * got it's metadata requested for updating by the server push technique (todo-0)
+	 */
 	public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
 		GetPeopleResponse res = new GetPeopleResponse();
 		SubNode node = read.getNode(ms, nodeId);
@@ -1322,7 +1325,6 @@ public class UserManagerService extends ServiceBase {
 
 		List<FriendInfo> friends = new LinkedList<>();
 		arun.run(as -> {
-
 			SubNode ownerAccntNode = read.getNode(as, node.getOwner());
 			String ownerName = null;
 
