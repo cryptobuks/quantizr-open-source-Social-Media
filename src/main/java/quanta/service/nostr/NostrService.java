@@ -265,9 +265,6 @@ public class NostrService extends ServiceBase {
 			log.debug("Server Push Nostr Users" + XString.prettyPrint(users));
 
 			if (users.size() > 0) {
-				// todo-0: look for all calls to exec.run, and check for places where ThreadLocals will be
-				// the WRONG instance of ThreadLocals, and we might need to always pass in ThreadLocals, thru
-				// exec.run() ?
 				exec.run(() -> {
 					push.sendServerPushInfo(ThreadLocals.getSC(), new NewNostrUsersPushInfo(users));
 					ThreadLocals.getNewNostrUsers().clear();

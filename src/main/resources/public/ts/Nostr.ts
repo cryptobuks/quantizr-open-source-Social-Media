@@ -95,8 +95,6 @@ export class Nostr {
         // await this.publishEvent();
     }
 
-    // todo-0: this won't run unless user does a "Save" from their userprofile dlg right? But we really need to consider
-    // them a "live" user whenever they edit their relays tho instead right?
     publishUserMetadata = async (): Promise<void> => {
         // get the relays string for this user
         const userRelays = getAs().userProfile?.relays;
@@ -285,7 +283,7 @@ export class Nostr {
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
-                // todo-0: put this 50 in a var.
+                // todo-0: put this val in a var, and there's a few other hard coded vals like this too
                 if (events.length > 50) {
                     console.warn("stopping after max thread events: " + events.length);
                     return;
@@ -576,7 +574,7 @@ export class Nostr {
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
-        // todo-0: the userInfo items needs to hold relays too!?? per user?
+        // todo-00: the userInfo items needs to hold relays too!?? per user?
         const relays = this.getRelays(getAs().userProfile.relays);
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
@@ -585,49 +583,11 @@ export class Nostr {
         userInfo.users?.forEach(user => {
             console.log("SERVER REQ. USER LOAD: " + user);
 
-            // todo-0: Important to queue these and persist all at once! for now we persist each individually instead of queueing them up.
+            // todo-00: It's much better to gather all these Events and push them up to server all at once.
+            // for now we persist each individually instead of queueing them up.
             S.nostr.readUserMetadata(user, getAs().userProfile.relays, false, true, null);
         });
         return null;
-    }
-
-    // todo-0: this function is not good. We should only read one user at a time so that when we get multiple
-    // results back we know we can take the latest one and that will be perfect.
-    readMultiUserMetadata = async (users: string[], relays: string[]): Promise<Event[]> => {
-        if (relays.length === 0) {
-            console.warn("No relays. Can't lookup users");
-            return null;
-        }
-
-        users = users.map(u => this.translateNip19(u));
-        // NOTE: By the time we get here 'user' will be a PublicKey (not npub or nip05)
-
-        const query: any = {
-            authors: users,
-            kinds: [Kind.Metadata]
-            // limit: users.length * 3 // <== this is a WAG to try to get only what we need
-        };
-
-        const events = await this.queryRelays(relays, query);
-        if (events) {
-            events.forEach(e => (e as any).npub = nip19.npubEncode(e.pubkey));
-        }
-
-        this.revChronSort(events);
-        const retEvents: Event[] = [];
-        const usersFound = new Set<string>();
-        events.forEach(e => {
-            if (!usersFound.has(e.pubkey)) {
-                usersFound.add(e.pubkey);
-                retEvents.push(e);
-            }
-        });
-
-        if (usersFound.size < users.length) {
-            console.warn("NOT ALL USER METADATA WAS FOUND: missing " + (users.length - usersFound.size));
-        }
-
-        return retEvents;
     }
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
