@@ -137,11 +137,8 @@ public class NostrService extends ServiceBase {
 			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
 			// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
 
-			// todo-0: Need to ensure that this isn't called too much and doing unnecessary saving of identical
-			// data to MongoDB ever. I think we can key off the timestamp, compared to the SAME timestamp
-			// we have in the db which needs to be different from the ModifyTime on MongoDB record becasue when 
-			// we initially save this it will NOT have all data (props below) so we need to save the ACTUAL
-			// nostr timestamp that goes along with this data.
+			// Note: We can safely call all these setters and the 'dirty node' handling is smart enough to only
+			// do a DB Write if something has changed.
 			nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
 			nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
 			nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());

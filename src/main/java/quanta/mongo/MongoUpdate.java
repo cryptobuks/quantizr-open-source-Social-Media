@@ -30,7 +30,7 @@ import quanta.util.val.Val;
 @Slf4j 
 public class MongoUpdate extends ServiceBase {
 	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
-	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
+	private static final InheritableThreadLocal<Boolean> saving = new InheritableThreadLocal<>();
 
 	public void saveObj(Object obj) {
 		ops.save(obj);

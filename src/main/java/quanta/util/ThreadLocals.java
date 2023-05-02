@@ -24,32 +24,32 @@ import quanta.response.base.ResponseBase;
  */
 @Slf4j 
 public class ThreadLocals {
-	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
-	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
-	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
-	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
-	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
-	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
-	private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
-	private static final ThreadLocal<HashSet<String>> newNostrUsers = new ThreadLocal<>();
+	private static final InheritableThreadLocal<HttpServletResponse> servletResponse = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<HttpSession> httpSession = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<SessionContext> sessionContext = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<ResponseBase> response = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<MongoSession> session = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<String> reqBearerToken = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<String> reqSig = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<HashSet<String>> newNostrUsers = new InheritableThreadLocal<>();
 
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
 	 * will be added as top level children under it. Currently we don't do a hierarchy, but just one
 	 * level of containment
 	 */
-	private static final ThreadLocal<PerfMonEvent> rootEvent = new ThreadLocal<>();
+	private static final InheritableThreadLocal<PerfMonEvent> rootEvent = new InheritableThreadLocal<>();
 
 	/*
 	 * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
 	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request.
 	 */
-	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
+	private static final InheritableThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new InheritableThreadLocal<>();
 
 	// We judiciously add only *some* nodes to this cache that we know are safe to cache because 
 	// they're able to be treated as readonly during the context of the thread.
-	private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
+	private static final InheritableThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new InheritableThreadLocal<>();
 
 	/*
 	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
@@ -59,7 +59,7 @@ public class ThreadLocals {
 	 * fail, up until the full node graph has been imported), and so I'm creating this hack to globally
 	 * disable the check during the import only.
 	 */
-	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<>();
+	private static final InheritableThreadLocal<Boolean> parentCheckEnabled = new InheritableThreadLocal<>();
 
 	public static void removeAll() {
 		httpSession.remove();
@@ -90,22 +90,22 @@ public class ThreadLocals {
 		}
 	}
 
-	public static ThreadLocalsContext getContext() {
-		// log.debug("getting context from thread: " + Thread.currentThread().getName());
-		ThreadLocalsContext ctx = new ThreadLocalsContext();
-		ctx.threadId = Thread.currentThread().getId();
-		ctx.httpSession = getHttpSession();
-		ctx.sessionContext = getSC();
-		return ctx;
-	}
+	// public static ThreadLocalsContext getContext() {
+	// 	// log.debug("getting context from thread: " + Thread.currentThread().getName());
+	// 	ThreadLocalsContext ctx = new ThreadLocalsContext();
+	// 	ctx.threadId = Thread.currentThread().getId();
+	// 	ctx.httpSession = getHttpSession();
+	// 	ctx.sessionContext = getSC();
+	// 	return ctx;
+	// }
 
-	public static void setContext(ThreadLocalsContext ctx) {
-		// log.debug("setting context into thread: " + Thread.currentThread().getName());
-		setHttpSession(ctx.httpSession);
-		if (ctx.sessionContext != null) {
-			setSC(ctx.sessionContext.cloneForThread());
-		}
-	}
+	// public static void setContext(ThreadLocalsContext ctx) {
+	// 	// log.debug("setting context into thread: " + Thread.currentThread().getName());
+	// 	setHttpSession(ctx.httpSession);
+	// 	if (ctx.sessionContext != null) {
+	// 		setSC(ctx.sessionContext.cloneForThread());
+	// 	}
+	// }
 
 	public static void setHttpSession(HttpSession session) {
 		httpSession.set(session);
