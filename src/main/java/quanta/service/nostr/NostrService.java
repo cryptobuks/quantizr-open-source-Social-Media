@@ -146,6 +146,7 @@ public class NostrService extends ServiceBase {
 			nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
 			nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
 			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, event.getTimestamp());
 
 			// note: we always need to be able to generate KEY so don't ever let the client upload
 			// an nip05 web url to save to this. Always send up the key.

@@ -181,6 +181,7 @@ export interface UserProfile {
     blocked: boolean;
     relays: string;
     nostrNpub: string;
+    nostrTimestamp: number;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -1220,6 +1221,7 @@ export const enum NodeProp {
     NOSTR_USER_NAME = "sn:nosUserName",
     NOSTR_NIP05 = "sn:nosNip05",
     NOSTR_USER_WEBSITE = "sn:nosWebsite",
+    NOSTR_USER_TIMESTAMP = "sn:nosTimestamp",
     OBJECT_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",

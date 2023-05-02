@@ -36,7 +36,7 @@ export class UserProfileDlg extends DialogBase {
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
-    constructor(private userNodeId: string, private lookupByNostrPubKey: string = null, private forceRelayLoad: boolean = true) {
+    constructor(private userNodeId: string, private lookupByNostrPubKey: string = null) {
         super("User Profile", "appModalCont");
         const ast = getAs();
         userNodeId = lookupByNostrPubKey ? null : (userNodeId || ast.userProfile.userNodeId);
@@ -298,18 +298,12 @@ export class UserProfileDlg extends DialogBase {
             userId: this.userNodeId,
             nostrPubKey: this.lookupByNostrPubKey
         });
-        // console.log("UserProfile Response: " + S.util.prettyPrint(res));
+        // console.log("First UserProfile Response: " + S.util.prettyPrint(res));
 
         if (res?.userProfile) {
-            // for now always forcably query for updated information for any user any time
-            // someone opens their dialog in case the metadata is not known. When the server creates a new
-            // nostr account there's no guarantee the browser will be left open long enough to do the
-            // processing that needed to be done to save it so we have this gap where we MIGHT not have
-            // the full metadata on any given Nostr account node at any give time, and so this call to
-            // always run 'readUserMetadata' is used for now to ensure we DO have the metadata for the user.
-            // (todo-0: eventually we'll make this know if we've
-            // queries relays for their metadata yet or not)
-            if (this.forceRelayLoad && S.nostr.isNostrUserName(res.userProfile.userName)) {
+            // if we get back a userprofile that's a nostr one but with no nostrTimestamp we need load it from
+            // relay now becasue lack of a timestamp indicates we've never read from relay.
+            if (res.userProfile.nostrTimestamp === 0 && S.nostr.isNostrUserName(res.userProfile.userName)) {
 
                 // read this user using their relays or our own for.
                 await S.nostr.readUserMetadataEx(res.userProfile.userName.substring(1),

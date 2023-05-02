@@ -14,6 +14,7 @@ public enum NodeProp {
     NOSTR_USER_NAME("sn:nosUserName"),
     NOSTR_NIP05("sn:nosNip05"),
     NOSTR_USER_WEBSITE("sn:nosWebsite"),
+    NOSTR_USER_TIMESTAMP("sn:nosTimestamp"),
 
     // If this property is non-null on a node it means the node originated (was posted by) some other forgien server.
     // If the value starts with "." that indicated "Nostr" and otherwise "ActPub" is assumed.

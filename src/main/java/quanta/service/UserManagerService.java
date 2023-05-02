@@ -1024,6 +1024,7 @@ public class UserManagerService extends ServiceBase {
 				}
 				userProfile.setRelays(relays);
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
+				userProfile.setNostrTimestamp(userNode.getInt(NodeProp.NOSTR_USER_TIMESTAMP));
 
 				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (att != null) {

@@ -50,4 +50,5 @@ public class UserProfile {
 
 	private String relays;
 	private String nostrNpub;
+	private Long nostrTimestamp;
 }
