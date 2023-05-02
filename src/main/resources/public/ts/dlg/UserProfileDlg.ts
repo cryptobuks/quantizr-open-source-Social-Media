@@ -294,7 +294,6 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async () => {
-        const ast = getAs();
         let res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: this.userNodeId,
             nostrPubKey: this.lookupByNostrPubKey
@@ -313,8 +312,8 @@ export class UserProfileDlg extends DialogBase {
             if (this.forceRelayLoad && S.nostr.isNostrUserName(res.userProfile.userName)) {
 
                 // read this user using their relays or our own for.
-                await S.nostr.readUserMetadata(res.userProfile.userName.substring(1),
-                    res.userProfile.relays || ast.userProfile.relays, false, true, null);
+                await S.nostr.readUserMetadataEx(res.userProfile.userName.substring(1),
+                    res.userProfile.relays, false, true, null);
 
                 res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: this.userNodeId,

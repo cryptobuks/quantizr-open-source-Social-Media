@@ -125,14 +125,11 @@ export class SearchUsersDlg extends DialogBase {
         if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || //
             searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
 
-            const userRelays = getAs().userProfile?.relays || "";
-
             let ret = null;
             try {
                 S.rpcUtil.incRpcCounter();
-                ret = await S.nostr.readUserMetadata(SearchUsersDlg.defaultSearchText,
-                    SearchUsersDlg.defaultNostrRelay + "\n" +
-                    userRelays, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05, true, null);
+                ret = await S.nostr.readUserMetadataEx(SearchUsersDlg.defaultSearchText,
+                    SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05, true, null);
                 // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
             }
             finally {

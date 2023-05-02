@@ -585,7 +585,7 @@ export class Nostr {
             console.log("SERVER REQ. USER LOAD: " + user);
 
             const eventVal = new Val<Event>();
-            await S.nostr.readUserMetadata(user.pk, (user.relays || "") + "\n" + getAs().userProfile.relays, false, false, eventVal);
+            await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal);
 
             if (eventVal.val) {
                 events.push(eventVal.val);
@@ -596,6 +596,22 @@ export class Nostr {
             await this.persistEvents(events);
         }
         return null;
+    }
+
+    /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
+    readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>): Promise<J.SaveNostrEventResponse> => {
+        const e = new Val<Event>();
+        let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e);
+
+        // if we didn't find the metadata fallback to using our own relays to try.
+        if (!e.val) {
+            ret = await this.readUserMetadata(user, getAs().userProfile.relays, isNip05, persist, e);
+        }
+
+        if (outEvent) {
+            outEvent.val = e.val;
+        }
+        return ret;
     }
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
