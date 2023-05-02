@@ -128,7 +128,7 @@ public class NostrService extends ServiceBase {
 				return;
 			}
 
-			nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), null, saveCount);
+			nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), event.getRelays(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
 
@@ -164,11 +164,6 @@ public class NostrService extends ServiceBase {
 
 			String relays = event.getRelays();
 			if (!StringUtils.isEmpty(relays)) {
-				String existingRelays = nostrAccnt.getStr(NodeProp.NOSTR_RELAYS);
-				if (!StringUtils.isEmpty(existingRelays)) {
-					relays += "\n" + existingRelays;
-				}
-				relays = removeDuplicateRelays(relays);
 				nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 			}
 		} catch (Exception e) {
@@ -178,6 +173,7 @@ public class NostrService extends ServiceBase {
 
 	// parses the new-line delimited string of relays, and returns a string with the same ones
 	// but guarantees no duplicates.
+	// todo-0: we need to call this for when users upload their own relays thru the SettingsView
 	private String removeDuplicateRelays(String relays) {
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(relays, "\n\r\t ", false);
@@ -213,7 +209,7 @@ public class NostrService extends ServiceBase {
 		}
 
 		Val<SubNode> postsNode = new Val<>();
-		nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), postsNode, saveCount);
+		nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), null, postsNode, saveCount);
 		if (nostrAccnt == null) {
 			log.debug("Unable to get account: " + event.getPk());
 			return;
@@ -252,7 +248,7 @@ public class NostrService extends ServiceBase {
 
 		// if account wasn't found as a local user's public key try a foreign one.
 		if (accntNode == null) {
-			accntNode = nostr.getOrCreateNostrAccount(as, pubKey, null, null);
+			accntNode = nostr.getOrCreateNostrAccount(as, pubKey, null, null, null);
 		}
 
 		return accntNode;
@@ -261,7 +257,7 @@ public class NostrService extends ServiceBase {
 	public void pushNostrInfoToClient() {
 		if (ThreadLocals.getNewNostrUsers().size() > 0) {
 			// WARNING: make call to get users BEFORE 'exec.run()' or else we won't be on the request thread.
-			List<String> users = new LinkedList<String>(ThreadLocals.getNewNostrUsers());
+			List<NostrUserInfo> users = new LinkedList<NostrUserInfo>(ThreadLocals.getNewNostrUsers().values());
 			log.debug("Server Push Nostr Users" + XString.prettyPrint(users));
 
 			if (users.size() > 0) {
@@ -274,11 +270,12 @@ public class NostrService extends ServiceBase {
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, Val<SubNode> postsNode, IntVal saveCount) {
+	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
 			// log.debug("New Nostr User: " + userKey + " newCount=" + ThreadLocals.getNewNostrUsers().size());
-			ThreadLocals.getNewNostrUsers().add(userKey);
+			ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
+			
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);

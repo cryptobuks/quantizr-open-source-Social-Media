@@ -1,7 +1,6 @@
 package quanta.util;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMonEvent;
+import quanta.model.client.NostrUserInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.base.ResponseBase;
@@ -31,7 +31,7 @@ public class ThreadLocals {
 	private static final InheritableThreadLocal<MongoSession> session = new InheritableThreadLocal<>();
 	private static final InheritableThreadLocal<String> reqBearerToken = new InheritableThreadLocal<>();
 	private static final InheritableThreadLocal<String> reqSig = new InheritableThreadLocal<>();
-	private static final InheritableThreadLocal<HashSet<String>> newNostrUsers = new InheritableThreadLocal<>();
+	private static final InheritableThreadLocal<HashMap<String, NostrUserInfo>> newNostrUsers = new InheritableThreadLocal<>();
 
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
@@ -199,9 +199,9 @@ public class ThreadLocals {
 		dirtyNodes.set(dn);
 	}
 
-	public static HashSet<String> getNewNostrUsers() {
+	public static HashMap<String, NostrUserInfo> getNewNostrUsers() {
 		if (newNostrUsers.get() == null) {
-			newNostrUsers.set(new HashSet<String>());
+			newNostrUsers.set(new HashMap<String, NostrUserInfo>());
 		}
 		return newNostrUsers.get();
 	}

@@ -574,7 +574,6 @@ export class Nostr {
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
-        // todo-00: the userInfo items needs to hold relays too!?? per user?
         const relays = this.getRelays(getAs().userProfile.relays);
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
@@ -585,7 +584,7 @@ export class Nostr {
 
             // todo-00: It's much better to gather all these Events and push them up to server all at once.
             // for now we persist each individually instead of queueing them up.
-            S.nostr.readUserMetadata(user, getAs().userProfile.relays, false, true, null);
+            S.nostr.readUserMetadata(user.pk, (user.relays || "") + "\n" + getAs().userProfile.relays, false, true, null);
         });
         return null;
     }
@@ -893,7 +892,11 @@ export class Nostr {
                 if (ref.profile) {
                     userSet.set(ref.profile.pubkey, {
                         pk: ref.profile.pubkey,
-                        npub: nip19.npubEncode(ref.profile.pubkey)
+                        npub: nip19.npubEncode(ref.profile.pubkey),
+
+                        // I'm adding relays here just for consistency but when this code was originally written
+                        // we didn't have a relays property on the NostrUserInfo object.
+                        relays: ref.profile.relays ? ref.profile.relays.join("\n") : null
                     });
                 }
             });

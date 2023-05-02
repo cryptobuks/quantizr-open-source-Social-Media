@@ -275,7 +275,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,
-                ast.isAnonUser ? null : new Divc({ className: "float-end" }, [
+                new Divc({ className: "float-end" }, [
                     new Selection(null, null, [
                         { key: "all", val: "All Networks" },
                         { key: "nostr", val: "Nostr" },
@@ -302,8 +302,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         },
                         getValue: (): string => getAs().protocolFilter
                     }),
-                    friendsTagDropDown,
-                    new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
+                    ast.isAnonUser ? null : friendsTagDropDown,
+                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "attentionButton")
                 ])

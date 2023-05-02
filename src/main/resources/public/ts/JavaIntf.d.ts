@@ -95,6 +95,7 @@ export interface NostrMetadata {
 export interface NostrUserInfo {
     pk: string;
     npub: string;
+    relays: string;
 }
 
 export interface OpenGraph {
@@ -922,7 +923,7 @@ export interface MoveNodesResponse extends ResponseBase {
 }
 
 export interface NewNostrUsersPushInfo extends ServerPushInfo {
-    users: string[];
+    users: NostrUserInfo[];
 }
 
 export interface NodeEditedPushInfo extends ServerPushInfo {

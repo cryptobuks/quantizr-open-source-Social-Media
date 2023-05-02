@@ -29,7 +29,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
-import opennlp.tools.util.StringUtil;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
@@ -1018,7 +1017,7 @@ public class UserManagerService extends ServiceBase {
 
 				// get user's relays but default them to admin's relays if not existing.
 				String relays = userNode.getStr(NodeProp.NOSTR_RELAYS);
-				if (StringUtil.isEmpty(relays)) {
+				if (StringUtils.isEmpty(relays)) {
 					SubNode root = read.getDbRoot();
 					relays = root.getStr(NodeProp.NOSTR_RELAYS);
 					userNode.set(NodeProp.NOSTR_RELAYS, relays);
