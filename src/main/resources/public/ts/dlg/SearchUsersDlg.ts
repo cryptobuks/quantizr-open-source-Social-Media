@@ -140,7 +140,8 @@ export class SearchUsersDlg extends DialogBase {
             }
             this.close();
             if (ret?.accntNodeIds?.length > 0) {
-                new UserProfileDlg(ret.accntNodeIds[0]).open();
+                // pass forceRelayReload=false since we just called the relay just now.
+                new UserProfileDlg(ret.accntNodeIds[0], null, false).open();
             }
         }
         else {
