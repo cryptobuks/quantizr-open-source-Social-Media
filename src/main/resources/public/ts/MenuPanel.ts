@@ -159,6 +159,10 @@ export class MenuPanel extends Div {
 
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
+    static queryNostrRelays = () => {
+        S.nostr.queryAndDisplayNodeInfo(S.nodeUtil.getHighlightedNode());
+    };
+
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
     static nodeStats = () => S.view.getNodeStats(false, false);
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
@@ -170,6 +174,7 @@ export class MenuPanel extends Div {
 
         const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
+        const nostrNodeHighlighted = !!hltNode && S.nostr.isNostrNode(hltNode);
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;
 
@@ -393,6 +398,7 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Show URLs", MenuPanel.showUrls, !!hltNode), //
                 new MenuItem("Show Raw Data", MenuPanel.showRawData, selNodeIsMine), //
+                new MenuItem("Query Nostr Relays", MenuPanel.queryNostrRelays, !ast.isAnonUser && nostrNodeHighlighted), //
                 ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
                 new MenuItemSeparator(), //
                 new MenuItem("Node Stats", MenuPanel.nodeStats) //

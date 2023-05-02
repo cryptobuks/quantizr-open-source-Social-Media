@@ -14,13 +14,14 @@ import {
     signEvent,
     validateEvent, verifySignature
 } from "nostr-tools";
+import { dispatch, getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-import { Comp } from "./comp/base/Comp";
-import { getAs } from "./AppContext";
 import { Val } from "./Val";
+import { Comp } from "./comp/base/Comp";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { SetNostrPrivateKeyDlg } from "./dlg/SetNostrPrivateKeyDlg";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -54,8 +55,6 @@ export class Nostr {
 
     // This can be run from Admin Console
     test = async () => {
-        await this.initKeys();
-
         // this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false, false, null);
 
         // this.testNpub();
@@ -95,7 +94,13 @@ export class Nostr {
         // await this.publishEvent();
     }
 
+    checkInit = (): boolean => {
+        return !!this.pk;
+    }
+
     publishUserMetadata = async (): Promise<void> => {
+        if (!this.checkInit()) return;
+
         // get the relays string for this user
         const userRelays = getAs().userProfile?.relays;
         if (!userRelays) {
@@ -131,6 +136,7 @@ export class Nostr {
     }
 
     metadataMatches(meta: J.NostrMetadata, event: Event): boolean {
+        if (!this.checkInit()) return;
         if (!event) {
             return false;
         }
@@ -187,36 +193,47 @@ export class Nostr {
 
     // Logs keys to JS console
     printKeys = () => {
+        if (!this.checkInit()) return;
         console.log("Nostr Keys:");
         // console.log("  Priv: " + this.sk); // keep this one secret by default
         console.log("  PubKey: " + this.pk);
         console.log("  npub: " + this.npub);
     }
 
+    setPrivateKey = async (sk: string, userName: string) => {
+        this.sk = sk;
+        this.pk = getPublicKey(this.sk);
+        this.npub = nip19.npubEncode(this.pk);
+        await S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, sk, userName);
+
+        this.printKeys();
+    }
+
     // Initializes our keys, and returns the npub key
-    initKeys = async (): Promise<void> => {
+    initKeys = async (userName: string): Promise<void> => {
         // if already initialized do nothing.
         if (this.pk) return;
 
         // Yes this is bad practice to save key this way, but this is just a prototype!
-        this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY);
+        this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY, userName);
 
         // If key was not yet created, then create one and save it.
         if (!this.sk) {
             this.sk = generatePrivateKey();
-            S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, this.sk);
+            S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, this.sk, userName);
         }
 
         this.pk = getPublicKey(this.sk);
         this.npub = nip19.npubEncode(this.pk);
-        if (this.pk !== this.translateNip19(this.npub)) {
-            console.error("Problem with npub key");
-        }
+        // if (this.pk !== this.translateNip19(this.npub)) {
+        //     console.error("Problem with npub key");
+        // }
     }
 
     // Builds all the nodes in the thread (by traversing up the tree of replies) going back in time towards
     // the original post.
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
+        if (!this.checkInit()) return;
         console.log("nostr.loadReplyChain() for node: " + S.util.prettyPrint(node));
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) {
@@ -269,7 +286,7 @@ export class Nostr {
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
     // be only looking at the relays we will find parts of this thread on.
-    traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>): Promise<void> => {
+    private traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>): Promise<void> => {
         console.log("nostr.traverseUpReplyChain: via tags " + S.util.prettyPrint(tags));
         // get the array representing what event (with 'tags' in it) is a reply to.
         const repliedToArray: string[] = this.getRepliedToItem(tags);
@@ -386,6 +403,7 @@ export class Nostr {
 
     // Returns the tags array entry that represents what the Event is a reply to, or null of not a reply
     getRepliedToItem = (tags: string[][]): string[] => {
+        if (!this.checkInit()) return null;
         if (!Array.isArray(tags)) {
             console.log("no tags array.");
             return null;
@@ -496,6 +514,35 @@ export class Nostr {
         return ok && verifyOk;
     }
 
+    queryAndDisplayNodeInfo = async (node: J.NodeInfo) => {
+        if (!this.checkInit()) return;
+        let nostrId = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
+        nostrId = nostrId.substring(1);
+        const event = await this.getEvent(nostrId, null, this.getMyRelays());
+        const e = new Val<Event>();
+        if (event) {
+            await this.readUserMetadata(event.pubkey, getAs().userProfile.relays, false, false, e);
+        }
+
+        let report = "Event: \n" + S.util.prettyPrint(event);
+
+        if (e.val) {
+            report += "\n\nOwner: \n" + S.util.prettyPrint(e.val);
+        }
+        else {
+            report += "\n\nUnable to find owner on your relays.";
+        }
+        report += "\n";
+
+        dispatch("showServerInfo", s => {
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO);
+            s.activeTab = C.TAB_SERVERINFO;
+            s.serverInfoText = report;
+            s.serverInfoCommand = "";
+            s.serverInfoTitle = "Nostr Info";
+        });
+    }
+
     /* persistResponse.res will contain the data saved on the server, but we accept null for persistResonse
     to indicate that no persistence on the server should be done,
 
@@ -503,6 +550,7 @@ export class Nostr {
     we DO ensure all the mentioned relays *are* added to it if not already in it.
     */
     getEvent = async (id: string, pool: SimplePool, relays: string[]): Promise<Event> => {
+        if (!this.checkInit()) return;
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -596,6 +644,7 @@ export class Nostr {
     }
 
     publishEvent = async (event: Event, relayStr: string): Promise<void> => {
+        if (!this.checkInit()) return;
         return new Promise<void>(async (resolve, reject) => {
             // console.log("Publishing Event: " + event.id + " to relay " + relayStr);
             const relay = await this.openRelay(relayStr);
@@ -645,6 +694,7 @@ export class Nostr {
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
+        if (!this.checkInit()) return;
         const relays = this.getRelays(getAs().userProfile.relays);
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
@@ -683,6 +733,7 @@ export class Nostr {
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
     readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
+        if (!this.checkInit()) return;
         const e = new Val<Event>();
         let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e, background);
 
@@ -701,6 +752,7 @@ export class Nostr {
     // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
+        if (!this.checkInit()) return;
         console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
         let profile = null;
@@ -781,6 +833,7 @@ export class Nostr {
     // "limit": <maximum number of events to be returned in the initial query>
     //
     readPosts = async (userKeys: string[], relays: string[], since: number): Promise<J.SaveNostrEventResponse> => {
+        if (!this.checkInit()) return;
         userKeys = userKeys.map(u => this.translateNip19(u));
 
         const query: any = {
@@ -828,6 +881,7 @@ export class Nostr {
     * - build relaysStr based on acl list
     */
     prepareOutboundEvent = async (node: J.NodeInfo, relays: string[]): Promise<Event> => {
+        if (!this.checkInit()) return;
         if (!node || !node.ac || node.ac.length === 0) return null;
         const tags: string[][] = [];
         const npubs: string[] = [];
@@ -898,7 +952,7 @@ export class Nostr {
     }
 
     sendMessage = async (event: Event, relays: string[]) => {
-        await this.initKeys();
+        if (!this.checkInit()) return;
         return new Promise<boolean>(async (resolve, reject) => {
             // DO NOT DELETE (until Nostr testing is finished.)
             console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
@@ -978,6 +1032,7 @@ export class Nostr {
     }
 
     persistEvents = async (events: Event[], background: boolean = false): Promise<J.SaveNostrEventResponse> => {
+        if (!this.checkInit()) return;
         if (!events || events.length === 0) return;
 
         // remove any events we know we've already persisted
@@ -1128,6 +1183,7 @@ export class Nostr {
     }
 
     readPostsFromFriends = async (): Promise<void> => {
+        if (!this.checkInit()) return;
         let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
         if (!lastUsersQueryTime) {
             lastUsersQueryTime = 0;
@@ -1200,11 +1256,15 @@ export class Nostr {
 
     addMyRelays = (relays: string[]): string[] => {
         if (relays == null) relays = [];
-        const myRelays = this.getRelays(getAs().userProfile.relays);
+        const myRelays = this.getMyRelays();
         if (myRelays) {
             relays = relays.concat(myRelays);
         }
         return [...new Set(relays)];
+    }
+
+    getMyRelays = (): string[] => {
+        return this.getRelays(getAs().userProfile.relays);
     }
 
     isNostrNode = (node: J.NodeInfo) => {
@@ -1226,6 +1286,7 @@ export class Nostr {
     }
 
     private async getRelaysForUser(node: J.NodeInfo) {
+        if (!this.checkInit()) return;
         let relays: string[] = this.userRelaysCache.get(node.ownerId);
 
         // if not found in cache get from server
@@ -1253,6 +1314,7 @@ export class Nostr {
     }
 
     private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false): Promise<Event[]> {
+        if (!this.checkInit()) return;
         try {
             if (!background) S.rpcUtil.incRpcCounter();
             const relay = await this.openRelay(relayUrl);
@@ -1266,6 +1328,7 @@ export class Nostr {
     }
 
     private async multiRelayQuery(relays: string[], query: any, background: boolean = false): Promise<Event[]> {
+        if (!this.checkInit()) return;
         if (!relays) return null;
 
         // update knownRelays set.
@@ -1326,5 +1389,10 @@ export class Nostr {
 
             S.util.showMessage(msg, "Nostr Identity", true);
         }
+    }
+
+    editPrivateKey = async (): Promise<void> => {
+        const dlg = new SetNostrPrivateKeyDlg();
+        await dlg.open();
     }
 }

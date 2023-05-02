@@ -112,7 +112,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.sectionTitle("Nostr"),
                 new HorizontalLayout([
                     new Divc({ className: "accountSettingsCol" }, [
-                        this.settingsLink("Private Key", S.nostr.showPrivateKey),
+                        this.settingsLink("Show Private Key", S.nostr.showPrivateKey),
+                        this.settingsLink("Change Private Key", S.nostr.editPrivateKey),
                         this.settingsLink("Relays", () => new EditNostrKeyAndRelaysDlg().open())
                     ])
                 ], horzClass),

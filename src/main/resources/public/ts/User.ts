@@ -194,6 +194,8 @@ export class User {
             // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
 
+                await S.nostr.initKeys(usr);
+
                 await promiseDispatch("unknownPubKeys", s => {
                     // we capture these 'unknowns' here, but we only issue a warning to user only later on
                     // if/when the crypto is actually attempted to be used.
