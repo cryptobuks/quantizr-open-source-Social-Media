@@ -168,7 +168,7 @@ public class NostrService extends ServiceBase {
 				nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
 			}
 
-			// this should be updating thru the call to apCache.saveNotify(node) in 
+			// this should be updating thru the call to apCache.saveNotify(node) in
 			// MongoListener, but I need to retest to be sure.
 			apCache.acctNodesById.put(nostrAccnt.getIdStr(), nostrAccnt);
 		} catch (Exception e) {
@@ -274,13 +274,14 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode, IntVal saveCount) {
+	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary &&& */
+	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode,
+			IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 		if (nostrAccnt == null) {
 			// log.debug("New Nostr User: " + userKey + " newCount=" + ThreadLocals.getNewNostrUsers().size());
 			ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
-			
+
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);
@@ -288,6 +289,16 @@ public class NostrService extends ServiceBase {
 			if (saveCount != null) {
 				saveCount.inc();
 			}
+		} else {
+			// any time we get a node, and see it's metadata has never been queried for we cache that up to happen asap
+			
+			// NOTE: Doing this would be theoretically correct, but we don't really need it afaik, and also currently
+			// there's no way to stop the client from getting queued up with multiple requests to query relays
+			// for the same data as different request threads come thru and activate this code before the DB
+			// has yet been update. (dupliation of work is possible if I turn this on now)
+			// if (nostrAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
+			// 	ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
+			// }
 		}
 
 		if (postsNode != null) {

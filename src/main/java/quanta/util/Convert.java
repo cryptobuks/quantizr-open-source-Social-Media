@@ -29,6 +29,7 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NostrUserInfo;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
@@ -141,6 +142,16 @@ public class Convert extends ServiceBase {
 			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.USER_BANNER_URL);
 			owner = nameProp;
+
+			if (nostr.isNostrNode(node) && nameProp.startsWith(".")) {
+				// nostrId will be the name wit the "." prefix removed
+				String nostrId = nameProp.substring(1);
+				String relays = userNode.getStr(NodeProp.NOSTR_RELAYS);
+				if (userNode.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
+					log.debug("Queueing client to update metadata for nostr user: " + nostrPubKey);
+					ThreadLocals.getNewNostrUsers().put(nostrId, new NostrUserInfo(nostrId, null, relays));
+				}
+			}
 
 			/*
 			 * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back

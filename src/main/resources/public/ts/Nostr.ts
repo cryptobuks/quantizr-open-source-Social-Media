@@ -231,7 +231,6 @@ export class Nostr {
             S.rpcUtil.incRpcCounter();
 
             // Get userRelays associated with this the owner of 'node'
-            // todo-00: shouldn't the relays come FROM the TAGS array if they're there?
             let relays: string[] = await this.getRelaysForUser(node);
 
             // only add from MY relays if no relays were found for user...(let's try that)
@@ -286,11 +285,6 @@ export class Nostr {
 
         // if we found what event the 'tags' had as it's replyTo
         if (eventRepliedTo) {
-            // if no relays were listed in replyTo
-            if (relayRepliedTo) {
-                relaySet.add(relayRepliedTo);
-            }
-
             console.log("LOADING ThreadItem: " + eventRepliedTo);
 
             let queryRelays = this.toRelayArray(relaySet);
@@ -299,7 +293,38 @@ export class Nostr {
             // without regard to any unnessary relays being queried.
             queryRelays = this.addMyRelays(queryRelays);
 
-            const event = await this.getEvent(eventRepliedTo, pool, queryRelays);
+            let event = null;
+
+            // it's more efficient to query for the event ONLY on a known preferrable relay if possible
+            // so we try this first if we have a relayRepliedTo value
+            if (relayRepliedTo) {
+                console.log("Querying specific relay: " + relayRepliedTo);
+                const localPool = new SimplePool();
+                const localRelays = this.getRelays(relayRepliedTo);
+                try {
+                    event = await this.getEvent(eventRepliedTo, localPool, localRelays);
+                }
+                finally {
+                    localPool.close(localRelays);
+                }
+                if (!event) {
+                    console.log("Specific relay didn't have event: " + relayRepliedTo);
+                }
+            }
+
+            // if we still don't have an event, try getting from the full pool of relays.
+            if (!event) {
+                event = await this.getEvent(eventRepliedTo, pool, queryRelays);
+            }
+
+            // add to relaySet only now that we know we would've tried relayRepliedTo first and used it or not
+            // but regardless we add it to the known set for this processing workload.
+            // todo-1: This may not be needed to add the specific relay, and might indeed even be counterproductive, but I'm
+            // throwing this in for not to err on the side of getting data rather than failing.
+            if (relayRepliedTo) {
+                relaySet.add(relayRepliedTo);
+            }
+
             if (event) {
                 console.log("REPLY: Chain Event: " + S.util.prettyPrint(event));
                 // add to front of array so the chronological ordering is top down.
@@ -489,7 +514,7 @@ export class Nostr {
                 relays?.forEach(r => pool.ensureRelay(r));
                 events = await pool.list(relays, [query]);
             }
-            // else call queryRelays which does automiatic pooling if it can.
+            // else call queryRelays which does automatic pooling if it can.
             else {
                 events = await this.queryRelays(relays, query);
             }
@@ -627,6 +652,17 @@ export class Nostr {
         if (events.length > 0) {
             await this.persistEvents(events);
         }
+
+        // todo-0: need ability to have the server update any parts of the page where there's a node
+        // that's being displayed without the full metadata having been queried yet. We should theoretically
+        // be able to use the same code we use for like updating all pages when some node gets deleted, to be able
+        // to traverse all GUI components and inject at least the Avatar and Friendly Username directly into all
+        // in-browser memory and then just force page to rerender, and all this new metadata we just recieved should
+        // instantly become correct on the page.
+        //
+        // For now the main 'symptom' we see of not doing this is that when we do a "Thread View" of a node and some
+        // of the rows are in that threadview without full metadata we have to click them to get the metadata (avatar, etc)
+        // by essentially opening up the UserProfileDlg of the owner of the row.
         return null;
     }
 
@@ -968,7 +1004,7 @@ export class Nostr {
         });
 
         const userInfo: J.NostrUserInfo[] = Array.from(userSet.values());
-        console.log("saveNostrEvents has this userInfo: " + userInfo);
+        console.log("saveNostrEvents has this userInfo: " + S.util.prettyPrint(userInfo));
 
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
@@ -1075,9 +1111,6 @@ export class Nostr {
         console.log("PROFILE: " + S.util.prettyPrint(profile));
     }
 
-    // todo-00: need to add diagnostic logging in here to see where it might be short circulting. I'm not sure this
-    // is working perfectly. There are times when it fails to show content of a person that's just been followed
-    // until we do a "Posts" request thru their UserProfileDlg which DOES cause messages to load.
     readPostsFromFriends = async (): Promise<void> => {
         let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
         if (!lastUsersQueryTime) {
@@ -1094,7 +1127,7 @@ export class Nostr {
 
         // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
         if (!res.people || res.people.length === 0) {
-            // console.debug("No friends defined.");
+            console.debug("No friends defined.");
             return;
         }
         const userNames: string[] = [];
@@ -1112,7 +1145,6 @@ export class Nostr {
 
         let relaysArray: string[] = [];
         relaysSet.forEach((r: any) => relaysArray.push(r));
-
         relaysArray = this.addMyRelays(relaysArray);
 
         if (relaysArray.length === 0) {
@@ -1120,7 +1152,7 @@ export class Nostr {
         }
 
         if (userNames.length > 0 && relaysArray.length > 0) {
-            console.log("Reading " + userNames.length + " users from " + relaysArray.length + " relays.");
+            console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
         }
 
         const thisQueryKey = this.makeQueryKey(userNames, relaysArray);

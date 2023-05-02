@@ -29,7 +29,7 @@ export class NodeUtil {
             if (!name) {
                 name = nip19.npubEncode(node.owner.substring(1));
                 if (name) {
-                    name = name.substring(0, 15) + "...";
+                    name = name.substring(0, 13) + "...";
                 }
             }
         }
