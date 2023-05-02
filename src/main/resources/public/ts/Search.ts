@@ -109,13 +109,17 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
+        console.log("search.showThread()");
         // First call the server in case it has enough data already to render the Thread, in which case
         // we don't need to load any events from relays via client
+        console.log("Calling Server: getNodeThreadView");
         let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true,
             nostrNodeIds: null
         });
+
+        console.log("res=" + S.util.prettyPrint(res));
 
         // if we dead-ended on a nostr item we didn't have on server...load the data, and then attempt 'getNodeThreadView' again.
         if (res.nostrDeadEnd) {
@@ -124,6 +128,7 @@ export class Search {
             const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
             const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(resumeFromNode);
 
+            console.log("Dead End Repaired: Calling Server again: getNodeThreadView");
             res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
                 nodeId: node.id,
                 loadOthers: true,

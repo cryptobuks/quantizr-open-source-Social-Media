@@ -234,14 +234,16 @@ export class RpcUtil {
 
     incRpcCounter = () => {
         this.rpcCounter++;
+        S.quanta.setOverlay(true);
 
-        // incrementing waitCounter to 3 will make the progress indicator come up instantly
-        this.waitCounter = 3;
+        // incrementing waitCounter to 1 will make the progress indicator come up faster
+        this.waitCounter = 1;
         this.progressInterval();
     }
 
     decRpcCounter = () => {
         this.rpcCounter--;
+        S.quanta.setOverlay(false);
         if (this.rpcCounter < 0) {
             this.rpcCounter = 0;
         }

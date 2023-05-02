@@ -914,7 +914,7 @@ public class ActPubUtil extends ServiceBase {
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, List<String> nostrNodeIds,
             boolean loadOthers) {
-        boolean debug = false;
+        boolean debug = true;
 
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
@@ -1028,7 +1028,7 @@ public class ActPubUtil extends ServiceBase {
                         // grap the current topmost nostrIdId and then remove it from the array.
                         parent = read.getNode(ms, nostrNodeIds.get(0));
                         if (parent != null) {
-                            // log.debug("Got Nostr ThreadItem: " + parent.getIdStr());
+                            log.debug("Got Nostr Parent ThreadItem: " + parent.getIdStr());
                         }
                         nostrNodeIds.remove(0);
                     }

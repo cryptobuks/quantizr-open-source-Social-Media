@@ -1291,8 +1291,8 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
-	/* Looks like this code can 'discover' users that have a node in the system, but just never
-	 * got it's metadata requested for updating by the server push technique (todo-0)
+	/* Looks like this code can often 'discover' users that have a node in the system, but just never
+	 * got their metadata requested for updating by the server push technique (todo-0)
 	 */
 	public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
 		GetPeopleResponse res = new GetPeopleResponse();
@@ -1430,7 +1430,7 @@ public class UserManagerService extends ServiceBase {
 		if ("friends".equals(type)) {
 			nodeType = NodeType.FRIEND_LIST.s();
 			if ("nostr".equals(subType)) {
-				// this regex simly is "Starts with a period"
+				// this regex simply is "Starts with a period"
 				moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
 			}
 		} //
