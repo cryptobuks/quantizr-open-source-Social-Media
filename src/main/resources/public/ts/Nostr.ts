@@ -117,7 +117,7 @@ export class Nostr {
             // try to read the metadata from the relay
             await S.nostr.readUserMetadata(this.pk, relay, false, false, eventVal);
 
-            // if the relay didn't have matching out metadata we need to publish it to this relay
+            // if the relay didn't have matching metadata we need to publish it to this relay
             if (!this.metadataMatches(currentMetaPayload, eventVal.val)) {
                 console.log("Pushing new meta to relay: " + relay);
 
@@ -579,13 +579,22 @@ export class Nostr {
             console.log("loadUserMetadata ignored. No relays.");
             return;
         }
-        userInfo.users?.forEach(user => {
+
+        const events: Event[] = [];
+        userInfo.users?.forEach(async (user) => {
             console.log("SERVER REQ. USER LOAD: " + user);
 
-            // todo-00: It's much better to gather all these Events and push them up to server all at once.
-            // for now we persist each individually instead of queueing them up.
-            S.nostr.readUserMetadata(user.pk, (user.relays || "") + "\n" + getAs().userProfile.relays, false, true, null);
+            const eventVal = new Val<Event>();
+            await S.nostr.readUserMetadata(user.pk, (user.relays || "") + "\n" + getAs().userProfile.relays, false, false, eventVal);
+
+            if (eventVal.val) {
+                events.push(eventVal.val);
+            }
         });
+
+        if (events.length > 0) {
+            await this.persistEvents(events);
+        }
         return null;
     }
 

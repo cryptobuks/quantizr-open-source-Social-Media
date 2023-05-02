@@ -1404,7 +1404,7 @@ public class UserManagerService extends ServiceBase {
 
 	public FriendInfo buildPersonInfoFromAccntNode(MongoSession ms, SubNode userNode) {
 		FriendInfo fi = new FriendInfo();
-		String userName = userNode.getStr(NodeProp.USER);
+		String userName = user.getFriendlyNameFromNode(userNode);
 		fi.setUserName(userName);
 		fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 		fi.setUserNodeId(userNode.getIdStr());

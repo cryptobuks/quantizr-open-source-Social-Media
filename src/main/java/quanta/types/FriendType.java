@@ -66,7 +66,7 @@ public class FriendType extends TypeBase {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", att.getBin()));
                 }
 
-                String friendDisplayName = user.getFriendlyNameFromNode(accountNode); // accountNode.getStr(NodeProp.DISPLAY_NAME);
+                String friendDisplayName = user.getFriendlyNameFromNode(accountNode);
                 if (friendDisplayName != null) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
                 }
