@@ -93,7 +93,7 @@ export class ServerPush {
 
         this.eventSource.addEventListener("newNostrUsersPush", async (e: any) => {
             const data: J.NewNostrUsersPushInfo = JSON.parse(e.data);
-            await S.nostr.loadUserMetadata(data);
+            await S.nostr.loadUserMetadata(data, true);
         }, false);
 
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {

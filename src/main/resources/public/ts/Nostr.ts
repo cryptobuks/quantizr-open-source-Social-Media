@@ -233,7 +233,7 @@ export class Nostr {
             // Get userRelays associated with this the owner of 'node'
             let relays: string[] = await this.getRelaysForUser(node);
 
-            // only add from MY relays if no relays were found for user...(let's try that)
+            // only add from MY relays if no relays were found for user
             if (relays.length === 0) {
                 console.log("No relays specific to the node, so we use our relays");
                 relays = this.addMyRelays(relays);
@@ -287,12 +287,6 @@ export class Nostr {
         if (eventRepliedTo) {
             console.log("LOADING ThreadItem: " + eventRepliedTo);
 
-            let queryRelays = this.toRelayArray(relaySet);
-
-            // todo-0: this *may be* unnecessary to always add in my relays, but for now I just want to be sure it works
-            // without regard to any unnessary relays being queried.
-            queryRelays = this.addMyRelays(queryRelays);
-
             let event = null;
 
             // it's more efficient to query for the event ONLY on a known preferrable relay if possible
@@ -312,9 +306,29 @@ export class Nostr {
                 }
             }
 
-            // if we still don't have an event, try getting from the full pool of relays.
+            // if we still don't have an event, try getting from the full pool of relays in use by this processing
             if (!event) {
+                const queryRelays = this.toRelayArray(relaySet);
                 event = await this.getEvent(eventRepliedTo, pool, queryRelays);
+                if (!event) {
+                    console.log("Pooled relays didn't have event.");
+                }
+            }
+
+            // and as a last resort we try using our own relays
+            if (!event) {
+                console.log("Last resort. Querying with *our* relays");
+                const localPool = new SimplePool();
+                const localRelays = this.getRelays(getAs().userProfile.relays);
+                try {
+                    event = await this.getEvent(eventRepliedTo, localPool, localRelays);
+                }
+                finally {
+                    localPool.close(localRelays);
+                }
+                if (!event) {
+                    console.log("Our own relays didn't have event either: " + relayRepliedTo);
+                }
             }
 
             // add to relaySet only now that we know we would've tried relayRepliedTo first and used it or not
@@ -630,7 +644,7 @@ export class Nostr {
         return val;
     }
 
-    loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
+    loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
         const relays = this.getRelays(getAs().userProfile.relays);
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
@@ -642,7 +656,7 @@ export class Nostr {
             console.log("SERVER REQ. USER LOAD: " + user);
 
             const eventVal = new Val<Event>();
-            await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal);
+            await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
 
             if (eventVal.val) {
                 events.push(eventVal.val);
@@ -650,7 +664,7 @@ export class Nostr {
         });
 
         if (events.length > 0) {
-            await this.persistEvents(events);
+            await this.persistEvents(events, background);
         }
 
         // todo-0: need ability to have the server update any parts of the page where there's a node
@@ -667,13 +681,14 @@ export class Nostr {
     }
 
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
-    readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>): Promise<J.SaveNostrEventResponse> => {
+    readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
+        background: boolean = false): Promise<J.SaveNostrEventResponse> => {
         const e = new Val<Event>();
-        let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e);
+        let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e, background);
 
         // if we didn't find the metadata fallback to using our own relays to try.
         if (!e.val) {
-            ret = await this.readUserMetadata(user, getAs().userProfile.relays, isNip05, persist, e);
+            ret = await this.readUserMetadata(user, getAs().userProfile.relays, isNip05, persist, e, background);
         }
 
         if (outEvent) {
@@ -684,7 +699,8 @@ export class Nostr {
 
     // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
     // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
-    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>): Promise<J.SaveNostrEventResponse> => {
+    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
+        background: boolean = false): Promise<J.SaveNostrEventResponse> => {
         console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
         let profile = null;
@@ -720,7 +736,7 @@ export class Nostr {
             limit: 1
         };
 
-        const events = await this.queryRelays(relays, query);
+        const events = await this.queryRelays(relays, query, background);
         if (events) {
             console.log("Result of Metadata Lookup: " + S.util.prettyPrint(events));
         }
@@ -743,7 +759,7 @@ export class Nostr {
         }
 
         if (persist) {
-            return await this.persistEvents(events);
+            return await this.persistEvents(events, background);
         }
         return null;
     }
@@ -930,12 +946,12 @@ export class Nostr {
         });
     }
 
-    queryRelays = async (relays: string[], query: any): Promise<Event[]> => {
+    queryRelays = async (relays: string[], query: any, background: boolean = false): Promise<Event[]> => {
         if (relays.length === 1) {
-            return await this.singleRelayQuery(relays[0], query);
+            return await this.singleRelayQuery(relays[0], query, background);
         }
         else {
-            return await this.multiRelayQuery(relays, query);
+            return await this.multiRelayQuery(relays, query, background);
         }
     }
 
@@ -961,7 +977,7 @@ export class Nostr {
         return ret;
     }
 
-    persistEvents = async (events: Event[]): Promise<J.SaveNostrEventResponse> => {
+    persistEvents = async (events: Event[], background: boolean = false): Promise<J.SaveNostrEventResponse> => {
         if (!events || events.length === 0) return;
 
         // remove any events we know we've already persisted
@@ -1010,7 +1026,7 @@ export class Nostr {
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
             events: events.map(e => this.makeNostrEvent(e)),
             userInfo
-        });
+        }, background);
 
         // keep track of what we've just sent to server.
         events.forEach(e => this.persistedEvents.add(e.id));
@@ -1236,20 +1252,20 @@ export class Nostr {
         return relays;
     }
 
-    private async singleRelayQuery(relayUrl: string, query: any): Promise<Event[]> {
+    private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false): Promise<Event[]> {
         try {
-            S.rpcUtil.incRpcCounter();
+            if (!background) S.rpcUtil.incRpcCounter();
             const relay = await this.openRelay(relayUrl);
             const ret = await relay.list([query]);
             relay.close();
             return ret;
         }
         finally {
-            S.rpcUtil.decRpcCounter();
+            if (!background) S.rpcUtil.decRpcCounter();
         }
     }
 
-    private async multiRelayQuery(relays: string[], query: any): Promise<Event[]> {
+    private async multiRelayQuery(relays: string[], query: any, background: boolean = false): Promise<Event[]> {
         if (!relays) return null;
 
         // update knownRelays set.
@@ -1274,13 +1290,13 @@ export class Nostr {
         // })
 
         try {
-            S.rpcUtil.incRpcCounter();
+            if (!background) S.rpcUtil.incRpcCounter();
             const ret = await pool.list(relays, [query]);
             pool.close(relays);
             return ret;
         }
         finally {
-            S.rpcUtil.decRpcCounter();
+            if (!background) S.rpcUtil.decRpcCounter();
         }
     }
 
