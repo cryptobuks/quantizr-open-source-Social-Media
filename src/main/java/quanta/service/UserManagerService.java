@@ -1073,9 +1073,18 @@ public class UserManagerService extends ServiceBase {
 
 	public String getFriendlyNameFromNode(SubNode userNode) {
 		String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+
+		if (StringUtils.isEmpty(displayName)) {
+			String userName = userNode.getStr(NodeProp.USER);
+			if (userName != null && !userName.startsWith(".")) {
+				displayName = userName;
+			}
+		}
+
 		if (StringUtils.isEmpty(displayName)) {
 			displayName = userNode.getStr(NodeProp.NOSTR_NAME);
 		}
+
 		if (StringUtils.isEmpty(displayName)) {
 			displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
 		}
@@ -1291,7 +1300,8 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
-	/* Looks like this code can often 'discover' users that have a node in the system, but just never
+	/*
+	 * Looks like this code can often 'discover' users that have a node in the system, but just never
 	 * got their metadata requested for updating by the server push technique (todo-0)
 	 */
 	public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
@@ -1405,12 +1415,13 @@ public class UserManagerService extends ServiceBase {
 
 	public FriendInfo buildPersonInfoFromAccntNode(MongoSession ms, SubNode userNode) {
 		FriendInfo fi = new FriendInfo();
-		String userName = user.getFriendlyNameFromNode(userNode);
-		fi.setUserName(userName);
+		String displayName = user.getFriendlyNameFromNode(userNode);
+		fi.setUserName(displayName);
 		fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 		fi.setUserNodeId(userNode.getIdStr());
 		fi.setForeignAvatarUrl(userNode.getStr(NodeProp.USER_ICON_URL));
 
+		String userName = userNode.getStr(NodeProp.USER);
 		if (userName.indexOf("@") == -1) {
 			Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 			if (att != null) {

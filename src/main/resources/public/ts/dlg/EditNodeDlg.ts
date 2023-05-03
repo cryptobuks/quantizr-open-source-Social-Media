@@ -394,6 +394,7 @@ export class EditNodeDlg extends DialogBase {
         const binarySection = hasAttachment ? new EditAttachmentsPanel(ast.editNode, this) : null;
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(ast.editNode, this);
         const isPublic = S.props.isPublic(ast.editNode);
+        const hasNostrShares = S.nostr.hasNostrAcls(ast.editNode);
 
         let sharingDiv = null;
         let sharingDivClearFix = null;
@@ -403,12 +404,13 @@ export class EditNodeDlg extends DialogBase {
             sharingDiv = new Divc({
                 className: "float-end clickable marginBottom"
             }, [
+                !isPublic ? new Div("Warning: Content posted to Nostr doesn't yet support encryption (or DMs) and will all be visible to everyone.") : null,
                 new Span("Shared to: ", {
                     title: "Edit Node Sharing",
                     onClick: () => this.utl.share(this)
                 }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
+                !isPublic && hasNostrShares ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
