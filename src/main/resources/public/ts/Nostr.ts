@@ -1251,7 +1251,7 @@ export class Nostr {
     makeQueryKey = (users: string[], relays: string[]) => {
         users.sort();
         relays.sort();
-        return users.join("\n") + "\n" + relays.join("\b");
+        return users.join("\n") + "\n" + relays.join("\n");
     }
 
     addMyRelays = (relays: string[]): string[] => {
