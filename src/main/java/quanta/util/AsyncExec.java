@@ -24,12 +24,19 @@ public class AsyncExec extends ServiceBase {
     int maxExecCounter = 0; // max value for execCounter ever
 
     public void run(Runnable runnable) {
+        run(ThreadLocals.getContext(), runnable);
+    }
+
+    private void run(ThreadLocalsContext tlc, Runnable runnable) {
         executor.execute(new Runnable() {
             public void run() {
                 try {
                     execCounter++;
                     if (execCounter > maxExecCounter) {
                         maxExecCounter = execCounter;
+                    }
+                    if (tlc != null) {
+                        ThreadLocals.setContext(tlc);
                     }
                     runnable.run();
                 } catch (Exception e) {
