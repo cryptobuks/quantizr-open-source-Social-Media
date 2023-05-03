@@ -14,6 +14,7 @@ import { ConfigProp } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { nip19 } from "nostr-tools";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -1046,16 +1047,17 @@ export class Util {
     }
 
     // Gets a name like "@user" (for AP names) or "12345678..." for nostr users
-    getFriendlyPrincipalName = (ac: J.AccessControlInfo) => { // userName: string): string => {
-        if (ac.nostrNpub) {
-            return ac.nostrNpub.substring(0, 12);
-        }
-        else if (S.nostr.isNostrUserName(ac.principalName)) {
-            return ac.principalName.substring(1, 9) + "...";
+    getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
+        let ret = null;
+        if (S.nostr.isNostrUserName(ac.principalName)) {
+            const pubKey = ac.principalName.substring(1);
+            const npub = nip19.npubEncode(pubKey);
+            ret = npub.substring(1, 13);
         }
         else {
-            return "@" + ac.principalName;
+            ret = ac.principalName;
         }
+        return ret;
     }
 
     // Leave this at the END of the module since it makes calls to methods that might not be created at

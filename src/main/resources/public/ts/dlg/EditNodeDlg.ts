@@ -404,7 +404,6 @@ export class EditNodeDlg extends DialogBase {
             sharingDiv = new Divc({
                 className: "float-end clickable marginBottom"
             }, [
-                !isPublic ? new Div("Warning: Content posted to Nostr doesn't yet support encryption (or DMs) and will all be visible to everyone.") : null,
                 new Span("Shared to: ", {
                     title: "Edit Node Sharing",
                     onClick: () => this.utl.share(this)
