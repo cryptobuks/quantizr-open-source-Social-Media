@@ -29,9 +29,6 @@ import quanta.util.val.Val;
 @Component
 @Slf4j 
 public class MongoUpdate extends ServiceBase {
-	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
-	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
-
 	public void saveObj(Object obj) {
 		ops.save(obj);
 	}
@@ -83,18 +80,14 @@ public class MongoUpdate extends ServiceBase {
 		update.saveSession(ms, false);
 	}
 
-	private boolean isSaving() {
-		return saving.get() != null && saving.get().booleanValue();
-	}
-
 	@PerfMon(category = "update")
 	public void saveSession(MongoSession ms, boolean asAdmin) {
-		if (ms == null || isSaving() || !ThreadLocals.hasDirtyNodes())
+		if (ms == null || ThreadLocals.getSaving().booleanValue() || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
 			// we check the saving flag to ensure we don't go into circular recursion here.
-			saving.set(true);
+			ThreadLocals.setSaving(true);
 
 			synchronized (ms) {
 				ThreadLocals.getDirtyNodes().forEach((key, value) -> {
@@ -143,7 +136,7 @@ public class MongoUpdate extends ServiceBase {
 			ExUtil.error(log, "exception in call processor", e);
 		} //
 		finally {
-			saving.set(false);
+			ThreadLocals.setSaving(false);
 		}
 	}
 

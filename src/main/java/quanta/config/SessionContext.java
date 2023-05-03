@@ -179,31 +179,6 @@ public class SessionContext extends ServiceBase {
 		watchingPath = null;
 	}
 
-	/* Creates a new instance that inherits all the values that could be used by a different thread */
-	public SessionContext cloneForThread() {
-		SessionContext sc = (SessionContext) context.getBean(SessionContext.class);
-		sc.live = live;
-		sc.rootId = rootId;
-		sc.timelinePath = timelinePath;
-		sc.userName = userName;
-		sc.userNodeId = userNodeId;
-		sc.pastUserName = pastUserName;
-		sc.timezone = timezone;
-		sc.timeZoneAbbrev = timeZoneAbbrev;
-		sc.lastLoginTime = lastLoginTime;
-		sc.lastActiveTime = lastActiveTime;
-		sc.userPreferences = userPreferences;
-		sc.counter = counter;
-		sc.pushEmitter = pushEmitter;
-		sc.actionCounters = new HashMap<>();
-		sc.captcha = captcha;
-		sc.captchaFails = captchaFails;
-		sc.userToken = userToken;
-		sc.watchingPath = watchingPath;
-		sc.enableIPSM = enableIPSM;
-		return sc;
-	}
-
 	public void addAction(String actionName) {
 		Integer count = actionCounters.get(actionName);
 		if (count == null) {

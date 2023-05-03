@@ -22,7 +22,7 @@ import quanta.response.base.ResponseBase;
  * decouple from Web Requests, and have these variables available on a *any* thread even if it's a
  * worker or deamon thread that isn't an actual Web Request.
  */
-@Slf4j 
+@Slf4j
 public class ThreadLocals {
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
@@ -32,6 +32,7 @@ public class ThreadLocals {
 	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
 	private static final ThreadLocal<HashMap<String, NostrUserInfo>> newNostrUsers = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
@@ -47,7 +48,7 @@ public class ThreadLocals {
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
 
-	// We judiciously add only *some* nodes to this cache that we know are safe to cache because 
+	// We judiciously add only *some* nodes to this cache that we know are safe to cache because
 	// they're able to be treated as readonly during the context of the thread.
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
 
@@ -60,6 +61,9 @@ public class ThreadLocals {
 	 * disable the check during the import only.
 	 */
 	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<>();
+	static {
+		parentCheckEnabled.set(true);
+	}
 
 	public static void removeAll() {
 		httpSession.remove();
@@ -69,7 +73,7 @@ public class ThreadLocals {
 		reqBearerToken.remove();
 		reqSig.remove();
 		rootEvent.remove();
-
+		saving.remove();
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
 		getNewNostrUsers().clear();
@@ -87,25 +91,6 @@ public class ThreadLocals {
 		MongoSession as = ThreadLocals.getMongoSession();
 		if (as == null || !as.isAdmin()) {
 			throw new NodeAuthFailedException();
-		}
-	}
-
-	// &&&
-	public static ThreadLocalsContext getContext() {
-		// log.debug("getting context from thread: " + Thread.currentThread().getName());
-		ThreadLocalsContext ctx = new ThreadLocalsContext();
-		ctx.threadId = Thread.currentThread().getId();
-		ctx.httpSession = getHttpSession();
-		ctx.sessionContext = getSC();
-		return ctx;
-	}
-
-	// &&&
-	public static void setContext(ThreadLocalsContext ctx) {
-		// log.debug("setting context into thread: " + Thread.currentThread().getName());
-		setHttpSession(ctx.httpSession);
-		if (ctx.sessionContext != null) {
-			setSC(ctx.sessionContext.cloneForThread());
 		}
 	}
 
@@ -176,6 +161,16 @@ public class ThreadLocals {
 		return reqSig.get();
 	}
 
+	public static void setSaving(Boolean val) {
+		saving.set(val);
+	}
+
+	public static Boolean getSaving() {
+		if (saving.get() == null)
+			return false;
+		return saving.get();
+	}
+
 	public static void setParentCheckEnabled(Boolean val) {
 		parentCheckEnabled.set(val);
 	}
@@ -206,6 +201,10 @@ public class ThreadLocals {
 			newNostrUsers.set(new HashMap<String, NostrUserInfo>());
 		}
 		return newNostrUsers.get();
+	}
+
+	public static void setNewNostrUsers(HashMap<String, NostrUserInfo> val) {
+		newNostrUsers.set(val);
 	}
 
 	public static void cacheNode(SubNode node) {
@@ -281,7 +280,7 @@ public class ThreadLocals {
 		if (nodeFound != null) {
 			// Not checking this, because it can happen in normal code flow
 			// if (nodeFound.hashCode() != node.hashCode()) {
-			// 	ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+			// ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
 			// }
 			return;
 		}

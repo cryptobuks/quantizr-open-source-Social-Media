@@ -8,11 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 /*
- * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to use
+ * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to
+ * use
+ * 
  * @Async annotation. That approach is dangerous and won't work in all scenarios
  */
 @Component
-@Slf4j 
+@Slf4j
 public class AsyncExec extends ServiceBase {
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -24,7 +26,7 @@ public class AsyncExec extends ServiceBase {
     int maxExecCounter = 0; // max value for execCounter ever
 
     public void run(Runnable runnable) {
-        run(ThreadLocals.getContext(), runnable);
+        run(new ThreadLocalsContext(), runnable);
     }
 
     private void run(ThreadLocalsContext tlc, Runnable runnable) {
@@ -36,15 +38,16 @@ public class AsyncExec extends ServiceBase {
                         maxExecCounter = execCounter;
                     }
                     if (tlc != null) {
-                        ThreadLocals.setContext(tlc);
+                        tlc.setValsIntoThread();
                     }
                     runnable.run();
                 } catch (Exception e) {
                     ExUtil.error(log, "exception in AsyncExec", e);
                 } finally {
+                    ThreadLocals.removeAll();
                     execCounter--;
-                    //log.debug("Finished thread: " + Thread.currentThread().getName() + " execCounter="
-                    //       + String.valueOf(execCounter) + " maxConcurrency=" + String.valueOf(maxExecCounter));
+                    // log.debug("Finished thread: " + Thread.currentThread().getName() + " execCounter="
+                    // + String.valueOf(execCounter) + " maxConcurrency=" + String.valueOf(maxExecCounter));
                 }
             }
         });
