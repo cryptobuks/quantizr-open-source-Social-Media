@@ -46,6 +46,12 @@ export class EditNodeDlgUtil {
         const ast = getAs();
         const editNode = ast.editNode;
 
+        // if trying to send non-public node over Nostr. Disallow it for now. Until we have encryptio support.
+        if (ast.sendToNostr && !S.props.isPublic(editNode)) {
+            S.util.showMessage("You cannot send private messages over Nostr on this platform yet. To publish to Nostr make the node public.", "Nostr Warning");
+            return false;
+        }
+
         // save these two values, because the S.quanta copy can get overwritten before we use them here.
         const newNodeTargetId = S.quanta.newNodeTargetId;
         const newNodeTargetOffset = S.quanta.newNodeTargetOffset;
@@ -91,8 +97,7 @@ export class EditNodeDlgUtil {
 
         let nostrEvent: Event = null;
         const nostrRelays: string[] = [];
-        const hasNostrShares = S.nostr.hasNostrAcls(editNode);
-        const sendToNostr = (ast.sendToNostr || hasNostrShares) && S.props.isPublic(editNode);
+        const sendToNostr = ast.sendToNostr && S.props.isPublic(editNode);
         if (sendToNostr) {
             nostrEvent = await S.nostr.prepareOutboundEvent(editNode, nostrRelays);
         }

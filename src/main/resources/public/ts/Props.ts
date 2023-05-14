@@ -79,10 +79,6 @@ export class Props {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC);
     }
 
-    sharesIncludeNosterUsers = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => !!ace.nostrNpub);
-    }
-
     isPublicWritable = (node: J.NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }

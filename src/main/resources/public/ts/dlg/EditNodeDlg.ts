@@ -394,13 +394,11 @@ export class EditNodeDlg extends DialogBase {
         const binarySection = hasAttachment ? new EditAttachmentsPanel(ast.editNode, this) : null;
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(ast.editNode, this);
         const isPublic = S.props.isPublic(ast.editNode);
-        const hasNostrShares = S.nostr.hasNostrAcls(ast.editNode);
 
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
-            const chooseProtocol = /* ast.protocolFilter === "all" && */ isPublic && !unpublished;
             sharingDiv = new Divc({
                 className: "float-end clickable marginBottom"
             }, [
@@ -409,29 +407,29 @@ export class EditNodeDlg extends DialogBase {
                     onClick: () => this.utl.share(this)
                 }),
                 ...shareComps,
-                !isPublic && hasNostrShares ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
+                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
                 }) : null,
 
                 // If user hasn't choosen a protocol filter make them choose one here.
-                chooseProtocol ? new Checkbox("Nostr", { className: "marginLeft" }, {
+                new Checkbox("Nostr", { className: "marginLeft" }, {
                     setValue: (checked: boolean) => {
                         dispatch("updateProtocolTarget", s => {
                             s.sendToNostr = checked;
                         });
                     },
                     getValue: (): boolean => getAs().sendToNostr
-                }) : null,
-                chooseProtocol ? new Checkbox("ActivityPub", null, {
+                }),
+                new Checkbox("ActivityPub", null, {
                     setValue: (checked: boolean) => {
                         dispatch("updateProtocolTarget", s => {
                             s.sendToActPub = checked;
                         });
                     },
                     getValue: (): boolean => getAs().sendToActPub
-                }) : null
+                })
             ]);
             sharingDivClearFix = new Clearfix();
         }

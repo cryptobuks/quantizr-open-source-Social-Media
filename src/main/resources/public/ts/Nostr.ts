@@ -858,10 +858,11 @@ export class Nostr {
         return ret;
     }
 
-    hasNostrAcls = (node: J.NodeInfo): boolean => {
-        if (!node || !node.ac || node.ac.length === 0) return false;
-        return !!node.ac.find(acl => !!acl.nostrNpub);
-    }
+    // oops, everyone can have nostrNpub, not just foreign users.
+    // hasNostrAcls = (node: J.NodeInfo): boolean => {
+    //     if (!node || !node.ac || node.ac.length === 0) return false;
+    //     return !!node.ac.find(acl => !!acl.nostrNpub);
+    // }
 
     hasNostrShareTags = (node: J.NodeInfo): boolean => {
         const event = this.makeUnsignedEventFromNode(node);

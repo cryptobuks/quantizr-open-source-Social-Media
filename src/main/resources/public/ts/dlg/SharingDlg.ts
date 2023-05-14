@@ -121,14 +121,6 @@ export class SharingDlg extends DialogBase {
 
     super_close = this.close;
     override close = () => {
-
-        const ast = getAs();
-        const isPublic = S.props.isPublic(ast.editNode);
-        if (!isPublic && S.props.sharesIncludeNosterUsers(ast.editNode)) {
-            S.util.showMessage("When sharing to Nostr Users, you must make the node public. This is a technical platform limitation that will be fixed soon.", "Warning");
-            return;
-        }
-
         this.super_close();
 
         if (this.dirty) {
