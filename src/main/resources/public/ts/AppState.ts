@@ -132,7 +132,8 @@ export class AppState {
 
     userProfile: J.UserProfile = null;
 
-    newMessageCount: number = 0;
+    myNewMessageCount: number = 0;
+    nostrNewMessageCount: number = 0;
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
@@ -160,7 +161,7 @@ export class AppState {
     bookmarks: J.Bookmark[];
 
     editNode: J.NodeInfo;
-    protocolFilter: string = "all";
+    protocolFilter: string = J.Constant.NETWORK_ACTPUB;
     sendToActPub: boolean = true;
     sendToNostr: boolean = true;
 

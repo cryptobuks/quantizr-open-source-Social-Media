@@ -1182,6 +1182,8 @@ export interface PrivilegeInfo {
 }
 
 export const enum Constant {
+    NETWORK_NOSTR = "nostr",
+    NETWORK_ACTPUB = "ap",
     SEARCH_TYPE_USER_LOCAL = "userLocal",
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",

@@ -1,4 +1,5 @@
 import { dispatch, getAs } from "./AppContext";
+import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
@@ -135,11 +136,14 @@ export class Quanta {
             }
 
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "allUsers");
-            if (mobileMode) {
-                dispatch("SetMobileMode", s => {
+
+            // todo-0: need to test this: When I tried to put the protocolFilter initialization
+            // in here it has an issue, so that calls into quesstion if this code is working.
+            dispatch("InitState", async (s: AppState) => {
+                if (mobileMode) {
                     s.mobileMode = mobileMode === "true";
-                });
-            }
+                }
+            });
 
             // runClassDemoTest();
 
@@ -250,8 +254,14 @@ export class Quanta {
                 S.rpcUtil.SESSION_TIMEOUT_MINS = this.configRes.sessionTimeoutMinutes || 30;
                 S.rpcUtil.sessionTimeRemainingMillis = S.rpcUtil.SESSION_TIMEOUT_MINS * 60_000;
 
+                const network = await S.localDB.getVal(C.LOCALDB_NETWORK_SELECTION, "allUsers");
+
                 dispatch("configUpdates", s => {
                     s.config = this.configRes.config || {};
+
+                    if (network) {
+                        s.protocolFilter = network;
+                    }
 
                     // we show the user message after the config is set, but there's no reason to do it here
                     // other than perhaps have the screen updated with the latest based on the config.

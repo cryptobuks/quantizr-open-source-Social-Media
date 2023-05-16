@@ -3,6 +3,8 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Constant {
+    NETWORK_NOSTR("nostr"),
+    NETWORK_ACTPUB("ap"),
     SEARCH_TYPE_USER_LOCAL("userLocal"), 
     SEARCH_TYPE_USER_ALL("userAll"), 
     SEARCH_TYPE_USER_FOREIGN("userForeign"), 

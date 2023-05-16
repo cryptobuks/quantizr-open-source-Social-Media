@@ -445,8 +445,10 @@ export class Search {
 
                 // once user requests their stuff, turn off the new messages count indicator.
                 if (FeedTab.inst.props.feedFilterToMe) {
-                    s.newMessageCount = 0;
+                    s.myNewMessageCount = 0;
                 }
+
+                s.nostrNewMessageCount = 0;
 
                 FeedTab.inst.props.feedResults = [res.node];
                 FeedTab.inst.props.feedEndReached = true;
@@ -495,8 +497,9 @@ export class Search {
 
             // once user requests their stuff, turn off the new messages count indicator.
             if (FeedTab.inst.props.feedFilterToMe) {
-                s.newMessageCount = 0;
+                s.myNewMessageCount = 0;
             }
+            s.nostrNewMessageCount = 0;
 
             let scrollToTop = true;
 

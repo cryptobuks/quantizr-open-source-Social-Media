@@ -35,5 +35,5 @@ public class NodeFeedRequest extends RequestBase {
 	// textual representation of what kind of request is being done.
 	private String name;
 
-	private String protocol; // all | nostr | ap
+	private String protocol; // See: Constant.NETWORK_*
 }

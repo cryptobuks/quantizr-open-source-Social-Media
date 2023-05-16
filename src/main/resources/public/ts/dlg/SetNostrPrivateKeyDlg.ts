@@ -13,8 +13,7 @@ export class SetNostrPrivateKeyDlg extends DialogBase {
 
     keyField: TextField;
     keyState: Validator = new Validator("", [
-        { name: ValidatorRuleName.REQUIRED },
-        { name: ValidatorRuleName.MINLEN, payload: 15 } // need to lookup correct value for this. todo-0
+        { name: ValidatorRuleName.REQUIRED }
     ]);
 
     constructor() {

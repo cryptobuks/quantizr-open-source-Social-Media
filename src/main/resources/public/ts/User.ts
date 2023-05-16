@@ -348,7 +348,7 @@ export class User {
         const res = await S.rpcUtil.rpc<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", null, true);
         if (res) {
             dispatch("SetNewMessageCount", s => {
-                s.newMessageCount = res.numNew;
+                s.myNewMessageCount = res.numNew;
             });
         }
     }

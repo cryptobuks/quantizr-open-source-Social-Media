@@ -465,6 +465,23 @@ export class Nav {
             return;
         }
 
+        const ast = getAs();
+        if (ast.protocolFilter === J.Constant.NETWORK_NOSTR) {
+            switch (props.name) {
+                case J.Constant.FEED_PUB:
+                case J.Constant.FEED_TOFROMME:
+                case J.Constant.FEED_MY_MENTIONS:
+                case J.Constant.FEED_TOME:
+                case J.Constant.FEED_FROMFRIENDS:
+                    // do not 'await' here. Let this run in background
+                    S.nostr.readPostsFromFriends(true);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
         FeedTab.inst.props.refreshCounter++;
 
@@ -540,11 +557,6 @@ export class Nav {
     }
 
     messagesToFromMe = async () => {
-        const ast = getAs();
-        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
-            await S.nostr.readPostsFromFriends();
-        }
-
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -564,11 +576,6 @@ export class Nav {
     }
 
     messagesMyMentions = async () => {
-        const ast = getAs();
-        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
-            await S.nostr.readPostsFromFriends();
-        }
-
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -588,11 +595,6 @@ export class Nav {
     }
 
     messagesToMe = async () => {
-        const ast = getAs();
-        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
-            await S.nostr.readPostsFromFriends();
-        }
-
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -674,11 +676,6 @@ export class Nav {
     }
 
     messagesFromFriends = async () => {
-        const ast = getAs();
-        if (ast.protocolFilter === "all" || ast.protocolFilter === "nostr") {
-            await S.nostr.readPostsFromFriends();
-        }
-
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }

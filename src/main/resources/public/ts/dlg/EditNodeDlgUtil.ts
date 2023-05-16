@@ -47,7 +47,7 @@ export class EditNodeDlgUtil {
         const editNode = ast.editNode;
 
         // if trying to send non-public node over Nostr. Disallow it for now. Until we have encryptio support.
-        if (ast.sendToNostr && !S.props.isPublic(editNode)) {
+        if (ast.sendToNostr && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
             S.util.showMessage("You cannot send private messages over Nostr on this platform yet. To publish to Nostr make the node public.", "Nostr Warning");
             return false;
         }

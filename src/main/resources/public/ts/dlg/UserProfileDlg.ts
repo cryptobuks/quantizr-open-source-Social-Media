@@ -240,7 +240,7 @@ export class UserProfileDlg extends DialogBase {
             let relays = S.nostr.getRelays(state.userProfile.relays);
             relays = S.nostr.addMyRelays(relays);
             console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
-            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1);
+            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false);
         }
     }
 
@@ -371,7 +371,9 @@ export class UserProfileDlg extends DialogBase {
             this.mergeState<LS>({
                 userProfile: state.userProfile
             });
-            this.readNostrPosts();
+
+            // We 'could' get their posts now, but this is unnecessary.
+            // this.readNostrPosts();
         }
     }
 

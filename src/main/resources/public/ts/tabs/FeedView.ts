@@ -108,7 +108,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         title: "Search Feed"
                     }),
                     new IconButton("fa-refresh", null, {
-                        onClick: () => S.srch.refreshFeed(),
+                        onClick: S.srch.refreshFeed,
                         title: "Refresh Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
@@ -277,23 +277,19 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 }, "bigMarginLeft ") : null,
                 new Divc({ className: "float-end" }, [
                     new Selection(null, null, [
-                        { key: "all", val: "All Networks" },
-                        { key: "nostr", val: "Nostr" },
-                        { key: "ap", val: "ActivityPub" }
+                        { key: J.Constant.NETWORK_NOSTR, val: "Nostr" },
+                        { key: J.Constant.NETWORK_ACTPUB, val: "ActivityPub" }
                     ],
                         null, "protocolPickerOnView", {
                         setValue: (val: string) => {
                             dispatch("setProtocol", s => {
                                 s.protocolFilter = val;
-                                if (val === "all") {
-                                    s.sendToActPub = true;
-                                    s.sendToNostr = true;
-                                }
-                                else if (val === "ap") {
+                                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val, "allUsers");
+                                if (val === J.Constant.NETWORK_ACTPUB) {
                                     s.sendToActPub = true;
                                     s.sendToNostr = false;
                                 }
-                                else if (val === "nostr") {
+                                else {
                                     s.sendToActPub = false;
                                     s.sendToNostr = true;
                                 }

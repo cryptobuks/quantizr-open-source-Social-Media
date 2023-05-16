@@ -53,6 +53,8 @@ export class Nostr {
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
     persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
+    bigQueryRunning: boolean = false;
+
     // This can be run from Admin Console
     test = async () => {
         // this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false, false, null);
@@ -405,7 +407,7 @@ export class Nostr {
     getRepliedToItem = (tags: string[][]): string[] => {
         if (!this.checkInit()) return null;
         if (!Array.isArray(tags)) {
-            console.log("no tags array.");
+            // console.log("no tags array.");
             return null;
         }
         let anyEvent: string[] = null;
@@ -418,7 +420,7 @@ export class Nostr {
                 if (ta[0] === "e") {
                     // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
                     if (ta.length < 4) {
-                        console.log("anyEvent=" + S.util.prettyPrint(ta));
+                        // console.log("anyEvent=" + S.util.prettyPrint(ta));
                         anyEvent = ta;
                     }
                     // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
@@ -832,7 +834,7 @@ export class Nostr {
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
     //
-    readPosts = async (userKeys: string[], relays: string[], since: number): Promise<J.SaveNostrEventResponse> => {
+    readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean): Promise<J.SaveNostrEventResponse> => {
         if (!this.checkInit()) return;
         userKeys = userKeys.map(u => this.translateNip19(u));
 
@@ -847,12 +849,12 @@ export class Nostr {
 
         let ret = null;
         try {
-            S.rpcUtil.incRpcCounter();
-            const events = await this.queryRelays(relays, query);
-            ret = await this.persistEvents(events);
+            if (!background) S.rpcUtil.incRpcCounter();
+            const events = await this.queryRelays(relays, query, background);
+            ret = await this.persistEvents(events, background);
         }
         finally {
-            S.rpcUtil.decRpcCounter();
+            if (!background) S.rpcUtil.decRpcCounter();
         }
 
         return ret;
@@ -1088,6 +1090,13 @@ export class Nostr {
         events.forEach(e => this.persistedEvents.add(e.id));
 
         console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
+
+        dispatch("SetNostrNewMessageCount", s => {
+            // todo-0: check the server just to be sure this 'saveCount' is correct. I can't remember how experimental
+            // that was or if it's indeed 'perfect' or not.
+            s.nostrNewMessageCount = res.saveCount;
+        });
+
         return res;
     }
 
@@ -1183,70 +1192,82 @@ export class Nostr {
         console.log("PROFILE: " + S.util.prettyPrint(profile));
     }
 
-    readPostsFromFriends = async (): Promise<void> => {
+    readPostsFromFriends = async (background: boolean = false): Promise<void> => {
         if (!this.checkInit()) return;
-        let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
-        if (!lastUsersQueryTime) {
-            lastUsersQueryTime = 0;
-        }
-        const lastUsersQueryKey: string = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY);
-        const curTime = Math.floor(Date.now() / 1000);
 
-        const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
-            nodeId: null,
-            type: "friends",
-            subType: "nostr"
-        });
-
-        // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
-        if (!res.people || res.people.length === 0) {
-            console.debug("No friends defined.");
+        if (this.bigQueryRunning) {
+            console.log("Avoiding large concurrent queries.");
             return;
         }
-        const userNames: string[] = [];
-        const relaysSet: Set<String> = new Set<String>();
 
-        // scan all people to build list of users (PublicKeys) and relays to read from
-        for (const person of res.people) {
-            if (!S.nostr.isNostrUserName(person.userName)) continue;
-            userNames.push(person.userName.substring(1));
-            const personRelays = this.getRelays(person.relays);
-            if (personRelays) {
-                personRelays.forEach(r => relaysSet.add(r));
+        try {
+            this.bigQueryRunning = true;
+            let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
+            if (!lastUsersQueryTime) {
+                lastUsersQueryTime = 0;
             }
-        }
+            const lastUsersQueryKey: string = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY);
+            const curTime = Math.floor(Date.now() / 1000);
 
-        let relaysArray: string[] = [];
-        relaysSet.forEach((r: any) => relaysArray.push(r));
-        relaysArray = this.addMyRelays(relaysArray);
+            const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
+                nodeId: null,
+                type: "friends",
+                subType: J.Constant.NETWORK_NOSTR
+            }, background);
 
-        if (relaysArray.length === 0) {
-            console.warn("no relays to read from.");
-        }
-
-        if (userNames.length > 0 && relaysArray.length > 0) {
-            console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
-        }
-
-        const thisQueryKey = this.makeQueryKey(userNames, relaysArray);
-        let since = -1;
-
-        // if this is the same users and relays we last queried (key matches) then we set the
-        // 'since' query time, so we only get new stuff we didn't already see
-        if (thisQueryKey === lastUsersQueryKey) {
-            if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
-                console.log("Skipping Nostr query. Identical query was less that 30 secs ago.");
+            // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
+            if (!res.people || res.people.length === 0) {
+                console.debug("No friends defined.");
                 return;
             }
-            since = lastUsersQueryTime;
-        }
-        else {
-            S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY, thisQueryKey);
-        }
+            const userNames: string[] = [];
+            const relaysSet: Set<String> = new Set<String>();
 
-        S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
-        console.log("readPosts: since=" + since);
-        await this.readPosts(userNames, relaysArray, since);
+            // scan all people to build list of users (PublicKeys) and relays to read from
+            for (const person of res.people) {
+                if (!S.nostr.isNostrUserName(person.userName)) continue;
+                userNames.push(person.userName.substring(1));
+                const personRelays = this.getRelays(person.relays);
+                if (personRelays) {
+                    personRelays.forEach(r => relaysSet.add(r));
+                }
+            }
+
+            let relaysArray: string[] = [];
+            relaysSet.forEach((r: any) => relaysArray.push(r));
+            relaysArray = this.addMyRelays(relaysArray);
+
+            if (relaysArray.length === 0) {
+                console.warn("no relays to read from.");
+            }
+
+            if (userNames.length > 0 && relaysArray.length > 0) {
+                console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
+            }
+
+            const thisQueryKey = this.makeQueryKey(userNames, relaysArray);
+            let since = -1;
+
+            // if this is the same users and relays we last queried (key matches) then we set the
+            // 'since' query time, so we only get new stuff we didn't already see
+            if (thisQueryKey === lastUsersQueryKey) {
+                if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
+                    console.log("Skipping Nostr query. Identical query was less that 30 secs ago.");
+                    return;
+                }
+                since = lastUsersQueryTime;
+            }
+            else {
+                S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY, thisQueryKey);
+            }
+
+            S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
+            console.log("readPosts: since=" + since);
+            await this.readPosts(userNames, relaysArray, since, background);
+        }
+        finally {
+            this.bigQueryRunning = false;
+        }
     }
 
     makeQueryKey = (users: string[], relays: string[]) => {

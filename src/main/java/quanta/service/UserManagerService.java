@@ -1440,7 +1440,7 @@ public class UserManagerService extends ServiceBase {
 		Criteria moreCriteria = null;
 		if ("friends".equals(type)) {
 			nodeType = NodeType.FRIEND_LIST.s();
-			if ("nostr".equals(subType)) {
+			if (Constant.NETWORK_NOSTR.s().equals(subType)) {
 				// this regex simply is "Starts with a period"
 				moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
 			}

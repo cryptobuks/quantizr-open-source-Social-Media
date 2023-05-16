@@ -210,18 +210,22 @@ public class UserFeedService extends ServiceBase {
 		// IMPORTANT: see long comment above where we have similar type filtering.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
-		// Nostr 
-		if (req.getProtocol().equals("nostr")) {
+		// Nostr
+		if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
 			List<Criteria> orCrit = new LinkedList<>();
+
+			// This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
 
-			// this regex simly is "Starts with a period"
+			// this regex simply is "Starts with a period"
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
 			crit = crit.andOperator(new Criteria().orOperator(orCrit));
 		}
 		// ActivityPub
-		else if (req.getProtocol().equals("ap")) {
+		else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) {
 			List<Criteria> orCrit = new LinkedList<>();
+
+			// This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
 
 			// this regex simly is "Starts with a period"
