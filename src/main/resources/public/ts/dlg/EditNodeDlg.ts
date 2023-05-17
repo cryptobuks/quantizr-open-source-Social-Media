@@ -407,11 +407,15 @@ export class EditNodeDlg extends DialogBase {
                 className: "float-end clickable marginBottom"
             }, [
                 new Span("Shared to: ", {
-                    title: "Edit Node Sharing",
-                    onClick: () => this.utl.share(this)
+                    title: "Node Sharing",
+                    onClick: () => {
+                        if (ast.editNode.type !== J.NodeType.NOSTR_ENC_DM) {
+                            this.utl.share(this);
+                        }
+                    }
                 }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
+                ast.editNode.type !== J.NodeType.NOSTR_ENC_DM && !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
@@ -710,7 +714,11 @@ export class EditNodeDlg extends DialogBase {
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
         const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
-        const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
+        let allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
+
+        if (ast.editNode.type === J.NodeType.NOSTR_ENC_DM) {
+            allowShare = false;
+        }
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);

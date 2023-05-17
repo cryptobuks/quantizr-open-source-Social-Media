@@ -1132,7 +1132,7 @@ export class Nostr {
         // keep track of what we've just sent to server.
         events.forEach(e => {
             // todo-00: for now don't ever put Metadata records in 'persistedEvents', until we fix the bug where this
-            // caching short circuits our User Search Dialog breaking ability to lookup users.
+            // caching short-circuits our User Search Dialog breaking ability to lookup users.
             if (e.kind !== Kind.Metadata) {
                 this.persistedEvents.add(e.id);
             }

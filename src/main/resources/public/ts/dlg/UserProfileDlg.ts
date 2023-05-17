@@ -206,6 +206,9 @@ export class UserProfileDlg extends DialogBase {
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
+                        ? new Button("Secure DM", this.sendSecureDM, { title: "Compose a new message to " + state.userProfile.userName }) : null,
+
+                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
@@ -391,6 +394,14 @@ export class UserProfileDlg extends DialogBase {
         this.close();
         setTimeout(() => {
             S.edit.addNode(null, null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false);
+        }, 10);
+    }
+
+    sendSecureDM = () => {
+        if (this.currentlyEditingWarning()) return;
+        this.close();
+        setTimeout(() => {
+            S.edit.addNode(null, null, NodeType.NOSTR_ENC_DM, false, null, this.userNodeId, null, null, false);
         }, 10);
     }
 
