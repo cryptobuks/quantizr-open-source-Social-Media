@@ -98,6 +98,20 @@ export class Nostr {
         // await this.publishEvent();
     }
 
+    decrypt = async (sk: string, pk: string, cipherText: string) => {
+        // get hash of the encrypted data
+        const cipherHash: string = S.util.hashOfString(cipherText);
+        let clearText = S.quanta.decryptCache.get(cipherHash);
+        // if we have already decrypted this data return the result.
+        if (clearText) {
+            return clearText;
+        }
+
+        clearText = await nip04.decrypt(sk, pk, cipherText);
+        S.quanta.decryptCache.set(cipherHash, clearText);
+        return clearText;
+    }
+
     checkInit = (): boolean => {
         return !!this.pk;
     }

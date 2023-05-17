@@ -684,15 +684,14 @@ export class Crypto {
 
     /* Inverse of encryptSharableString() function */
     decryptSharableString = async (privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> => {
-        let ret: string = null;
-
         // get hash of the encrypted data
         const cipherHash: string = S.util.hashOfString(skpd.cipherText);
 
+        let ret = S.quanta.decryptCache.get(cipherHash);
         // if we have already decrypted this data return the result.
-        if (S.quanta.decryptCache.get(cipherHash)) {
+        if (ret) {
             // console.log("decryption cache hit!");
-            return S.quanta.decryptCache.get(cipherHash);
+            return ret;
         }
 
         try {

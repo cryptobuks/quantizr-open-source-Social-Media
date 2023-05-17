@@ -3,7 +3,6 @@ import { Html } from "../../comp/core/Html";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { nip04 } from "nostr-tools";
 
 interface LS {
     content: string;
@@ -160,11 +159,9 @@ export class NodeCompMarkdown extends Html {
             }
 
             const cipherHash = S.util.hashOfString(cipherText);
-
+            let clearText = S.quanta.decryptCache.get(cipherHash);
             // if we have already decrypted this data use the result.
-            if (S.quanta.decryptCache.get(cipherHash)) {
-
-                let clearText = S.quanta.decryptCache.get(cipherHash);
+            if (clearText) {
                 clearText = this.renderRawMarkdown(this.node, clearText);
 
                 this.mergeState<LS>({
@@ -198,9 +195,7 @@ export class NodeCompMarkdown extends Html {
         }
         else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
             const pubKey = S.props.getClientPropStr(J.NodeProp.NOSTR_USER_PUBKEY, this.node);
-
-            // need a wrapper function for decrypt that adds to cache like 'decryptSharableString'
-            clearText = await nip04.decrypt(S.nostr.sk, pubKey, state.pendingDecrypt);
+            clearText = await S.nostr.decrypt(S.nostr.sk, pubKey, state.pendingDecrypt);
         }
 
         // console.log("Decrypted to " + clearText);
