@@ -54,6 +54,7 @@ export class Nostr {
     persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
     bigQueryRunning: boolean = false;
+    queryCounter: number = 0;
 
     // This can be run from Admin Console
     test = async () => {
@@ -866,12 +867,12 @@ export class Nostr {
 
         let ret = null;
         try {
-            if (!background) S.rpcUtil.incRpcCounter();
+            this.nostrQueryBegin(background);
             const events = await this.queryRelays(relays, query, background);
             ret = await this.persistEvents(events, background);
         }
         finally {
-            if (!background) S.rpcUtil.decRpcCounter();
+            this.nostrQueryEnd(background);
         }
 
         return ret;
@@ -1364,14 +1365,14 @@ export class Nostr {
     private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false): Promise<Event[]> {
         if (!this.checkInit()) return;
         try {
-            if (!background) S.rpcUtil.incRpcCounter();
+            this.nostrQueryBegin(background);
             const relay = await this.openRelay(relayUrl);
             const ret = await relay.list([query]);
             relay.close();
             return ret;
         }
         finally {
-            if (!background) S.rpcUtil.decRpcCounter();
+            this.nostrQueryEnd(background);
         }
     }
 
@@ -1401,13 +1402,34 @@ export class Nostr {
         // })
 
         try {
-            if (!background) S.rpcUtil.incRpcCounter();
+            this.nostrQueryBegin(background);
             const ret = await pool.list(relays, [query]);
             pool.close(relays);
             return ret;
         }
         finally {
-            if (!background) S.rpcUtil.decRpcCounter();
+            this.nostrQueryEnd(background);
+        }
+    }
+
+    nostrQueryBegin = (background: boolean) => {
+        if (!background) S.rpcUtil.incRpcCounter();
+        this.queryCounter++;
+        if (this.queryCounter === 1) {
+            dispatch("NostrQueryBegin", s => {
+                s.nostrQueryRunning = true;
+            });
+        }
+    }
+
+    nostrQueryEnd = (background: boolean) => {
+        if (!background) S.rpcUtil.decRpcCounter();
+        this.queryCounter--;
+        if (this.queryCounter < 0) this.queryCounter = 0; // sanity check (should never be necessary)
+        if (this.queryCounter === 0) {
+            dispatch("NostrQueryEnd", s => {
+                s.nostrQueryRunning = false;
+            });
         }
     }
 

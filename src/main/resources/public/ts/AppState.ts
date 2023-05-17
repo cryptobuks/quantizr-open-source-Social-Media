@@ -200,4 +200,6 @@ export class AppState {
 
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
+
+    nostrQueryRunning: boolean = false;
 }

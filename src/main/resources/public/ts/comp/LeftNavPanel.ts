@@ -75,7 +75,10 @@ export class LeftNavPanel extends Div {
                 // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                 // which is in a different class.
                 new Span(null, { className: "float-end" }, [
-                    myMessages ? new Span(myMessages, {
+                    ast.nostrQueryRunning ? new Span("Waiting for Nostr...", {
+                        className: "nostrWaitNote"
+                    }) : null,
+                    myMessages && !nostrMessages ? new Span(myMessages, {
                         className: "newMessagesNote",
                         onClick: S.nav.showMyNewMessages,
                         title: "Show your new messages"
