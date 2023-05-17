@@ -128,7 +128,7 @@ export class Props {
     isEncrypted = (node: J.NodeInfo): boolean => {
         // WARNING: ENC_KEY is only going to be present in the owner's browser
         // So we don't do this here --> return !!this.getPropStr(J.NodeProp.ENC_KEY, node);
-        return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
+        return node?.type === J.NodeType.NOSTR_ENC_DM || node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
     getOrderedAtts = (node: J.NodeInfo): J.Attachment[] => {

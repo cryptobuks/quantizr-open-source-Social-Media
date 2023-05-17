@@ -10,6 +10,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.XString;
 
+// IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
 @Component
 public class RssFeedType extends TypeBase {
 
@@ -22,6 +23,7 @@ public class RssFeedType extends TypeBase {
         String feedSrc = node.getStr(NodeProp.RSS_FEED_SRC);
 
         // if no content or it's encrypted return
+        // todo-0: make this check for NOSTR enc type too
         if (feedSrc == null || feedSrc.startsWith(Constant.ENC_TAG.s()))
             return;
 

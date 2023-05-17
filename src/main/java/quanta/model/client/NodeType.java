@@ -27,6 +27,7 @@ public enum NodeType {
     ACT_PUB_POSTS("ap:posts"), //
 
     NONE("u"), //same as 'markdown' really (untyped, default to markdown)
+    NOSTR_ENC_DM("sn:ned"), // 
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //

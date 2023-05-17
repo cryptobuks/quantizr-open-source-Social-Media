@@ -206,7 +206,7 @@ public class Convert extends ServiceBase {
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
 		if (plugin != null) {
-			plugin.convert(ms, nodeInfo, node, getFollowers);
+			plugin.convert(ms, nodeInfo, node, userNode, getFollowers);
 		}
 
 		// allow client to know if this node is not yet saved by user

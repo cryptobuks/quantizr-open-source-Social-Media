@@ -49,7 +49,7 @@ import quanta.util.XString;
  * rendering the pages on the client as the user browses around on the tree.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class NodeRenderService extends ServiceBase {
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
@@ -662,7 +662,8 @@ public class NodeRenderService extends ServiceBase {
 					} else {
 						content = "";
 					}
-				} else if (content.startsWith(Constant.ENC_TAG.s())) {
+				} else if (node.getType() == NodeType.NOSTR_ENC_DM.s() || //
+						content.startsWith(Constant.ENC_TAG.s())) {
 					content = "[encrypted]";
 				} else {
 					content = getFirstLineAbbreviation(content, 25);

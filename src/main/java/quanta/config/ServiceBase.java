@@ -62,6 +62,7 @@ import quanta.service.node.NodeSearchService;
 import quanta.service.nostr.NostrService;
 import quanta.types.BookmarkType;
 import quanta.types.FriendType;
+import quanta.types.NostrEncryptedDMType;
 import quanta.types.RoomType;
 import quanta.types.RssFeedType;
 import quanta.types.TypePluginMgr;
@@ -151,6 +152,7 @@ public class ServiceBase {
 	public static MimeUtil mimeUtil;
 	public static MongoAppConfig mac;
 	public static BookmarkType bookmarkType;
+	public static NostrEncryptedDMType nostrEncryptedDMType;
 	public static FriendType friendType;
 	public static RoomType roomType;
 	public static RssFeedType rssType;
@@ -240,6 +242,7 @@ public class ServiceBase {
 			fileUtil = getBean(ctx, FileUtils.class);
 			mimeUtil = getBean(ctx, MimeUtil.class);
 			bookmarkType = getBean(ctx, BookmarkType.class);
+			nostrEncryptedDMType = getBean(ctx, NostrEncryptedDMType.class);
 			friendType = getBean(ctx, FriendType.class);
 			roomType = getBean(ctx, RoomType.class);
 			rssType = getBean(ctx, RssFeedType.class);

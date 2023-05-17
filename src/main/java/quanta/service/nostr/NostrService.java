@@ -50,6 +50,7 @@ public class NostrService extends ServiceBase {
 	// todo-1: put in enum
 	static final int KIND_Metadata = 0;
 	static final int KIND_Text = 1;
+	static final int KIND_EncryptedDirectMessage = 4;
 
 	public SaveNostrSettingsResponse saveNostrSettings(SaveNostrSettingsRequest req) {
 		SaveNostrSettingsResponse res = new SaveNostrSettingsResponse();
@@ -109,6 +110,7 @@ public class NostrService extends ServiceBase {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
 				break;
+			case KIND_EncryptedDirectMessage:
 			case KIND_Text:
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				break;
@@ -226,8 +228,18 @@ public class NostrService extends ServiceBase {
 			throw new RuntimeException("Unable to get Posts node.");
 		}
 
+		String newType;
+		switch (event.getKind()) {
+			case KIND_EncryptedDirectMessage:
+				newType = NodeType.NOSTR_ENC_DM.s();
+				break;
+			default:
+				newType = NodeType.NONE.s();
+				break;
+		}
+
 		SubNode newNode = create.createNode(as, postsNode.getVal(), null, //
-				NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, //
+				newType, 0L, CreateNodeLocation.LAST, null, //
 				nostrAccnt.getOwner(), true, true);
 
 		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);

@@ -120,7 +120,7 @@ export class ServerPush {
         const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
         const updatesExistingItem = itemFoundIdx !== -1;
 
-        if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
+        if (S.props.isEncrypted(nodeInfo)) {
             nodeInfo.content = "[Encrypted]";
         }
 
@@ -153,7 +153,7 @@ export class ServerPush {
         if (!nodeInfo || !FeedTab.inst) return;
         const isMine = S.props.isMine(nodeInfo);
 
-        if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
+        if (S.props.isEncrypted(nodeInfo)) {
             nodeInfo.content = "[Encrypted]";
         }
 

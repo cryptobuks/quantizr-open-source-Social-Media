@@ -16,6 +16,7 @@ import { InboxEntryType } from "./plugins/InboxEntryType";
 import { InboxNodeType } from "./plugins/InboxNodeType";
 import { IPFSNodeType } from "./plugins/IPFSNodeType";
 import { MarkdownType } from "./plugins/MarkdownType";
+import { NostrEncryptedDMType } from "./plugins/NostrEncryptedDMType";
 import { NotesNodeType } from "./plugins/NotesNodeType";
 import { PostsType } from "./plugins/PostsType";
 import { RepoRootType } from "./plugins/RepoRootType";
@@ -68,6 +69,7 @@ export class PluginMgr {
         /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order
         so it's better to just have this one place where we define all them in the order we want */
         this.addType(ordinal++, new MarkdownType());
+        this.addType(ordinal++, new NostrEncryptedDMType());
         this.addType(ordinal++, new TextType());
         this.addType(ordinal++, new RssFeedsType());
         this.addType(ordinal++, new RssType());

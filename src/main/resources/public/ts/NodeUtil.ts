@@ -214,7 +214,7 @@ export class NodeUtil {
 
         if (content.length > 140) content = content.substring(0, 140) + "...";
 
-        if (content.startsWith(J.Constant.ENC_TAG)) {
+        if (S.props.isEncrypted(node)) {
             content = "[Encrypted]";
         }
 

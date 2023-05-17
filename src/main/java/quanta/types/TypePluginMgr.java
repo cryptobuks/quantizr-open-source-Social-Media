@@ -1,11 +1,10 @@
 package quanta.types;
 
 import java.util.HashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 @Component
@@ -17,6 +16,7 @@ public class TypePluginMgr extends ServiceBase {
     public void handleContextRefresh(ContextRefreshedEvent event) {
         ServiceBase.init(event.getApplicationContext());
         log.debug("ContextRefreshedEvent");
+        nostrEncryptedDMType.postContruct();
         bookmarkType.postContruct();
         friendType.postContruct();
         roomType.postContruct();
@@ -24,7 +24,7 @@ public class TypePluginMgr extends ServiceBase {
     }
 
     public static void addType(TypeBase type) {
-        log.debug("Plugin: " + type.getClass().getName());
+        log.debug("Registering Plugin: " + type.getClass().getName());
         types.put(type.getName().toLowerCase(), type);
     }
 

@@ -169,6 +169,7 @@ export class Nostr {
 
     cacheEvent = (event: Event): void => {
         switch (event.kind) {
+            case Kind.EncryptedDirectMessage:
             case Kind.Text:
                 if (this.textCache.size > 1000) {
                     this.textCache.clear();
@@ -858,8 +859,14 @@ export class Nostr {
 
         const query: any = {
             authors: userKeys,
-            kinds: [Kind.Text],
-            limit: 50
+
+            // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
+            kinds: [Kind.Text, Kind.EncryptedDirectMessage],
+
+            // I think with out time range in place if we get more than this limit, there's the chance
+            // we'll loose records and never get them all unless this limit is increased or the timerange
+            // is rolled back early enough. Needs more thought (todo-0)
+            limit: 500
         };
         if (since !== -1) {
             query.since = since;

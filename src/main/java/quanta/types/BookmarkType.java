@@ -7,6 +7,7 @@ import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
 import quanta.util.val.Val;
 
+// IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
 @Component
 public class BookmarkType extends TypeBase {
 
