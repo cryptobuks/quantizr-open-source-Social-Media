@@ -9,4 +9,7 @@ import lombok.NoArgsConstructor;
 public class SavePublicKeyRequest extends RequestBase {
 	private String asymEncKey;
 	private String sigKey;
+
+	private String nostrNpub;
+    private String nostrPubKey;
 }

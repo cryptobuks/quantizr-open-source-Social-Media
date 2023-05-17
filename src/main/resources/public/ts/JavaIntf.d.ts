@@ -564,6 +564,8 @@ export interface SaveNostrSettingsRequest extends RequestBase {
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
+    nostrNpub: string;
+    nostrPubKey: string;
 }
 
 export interface SaveUserPreferencesRequest extends RequestBase {

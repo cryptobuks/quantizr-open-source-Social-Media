@@ -285,14 +285,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                             dispatch("setProtocol", s => {
                                 s.protocolFilter = val;
                                 S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val, "allUsers");
-                                if (val === J.Constant.NETWORK_ACTPUB) {
-                                    s.sendToActPub = true;
-                                    s.sendToNostr = false;
-                                }
-                                else {
-                                    s.sendToActPub = false;
-                                    s.sendToNostr = true;
-                                }
                             });
                             S.srch.refreshFeed();
                         },

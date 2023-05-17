@@ -218,15 +218,32 @@ export class Nostr {
 
         // Yes this is bad practice to save key this way, but this is just a prototype!
         this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY, userName);
-
-        // If key was not yet created, then create one and save it.
         if (!this.sk) {
-            this.sk = generatePrivateKey();
-            S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, this.sk, userName);
+            await this.generateNewKey(userName, false);
+        }
+        else {
+            this.pk = getPublicKey(this.sk);
+            this.npub = nip19.npubEncode(this.pk);
+        }
+    }
+
+    generateNewKey = async (userName: string, forceServerUpdate: boolean): Promise<void> => {
+        // If key was not yet created, then create one and save it.
+        this.setPrivateKey(generatePrivateKey(), userName);
+
+        dispatch("UpdateNpub", s => {
+            s.userProfile.nostrNpub = this.npub;
+        });
+
+        if (forceServerUpdate) {
+            await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
+                asymEncKey: null,
+                sigKey: null,
+                nostrNpub: this.npub,
+                nostrPubKey: this.pk
+            });
         }
 
-        this.pk = getPublicKey(this.sk);
-        this.npub = nip19.npubEncode(this.pk);
         // if (this.pk !== this.translateNip19(this.npub)) {
         //     console.error("Problem with npub key");
         // }
@@ -645,21 +662,21 @@ export class Nostr {
         return relay;
     }
 
-    publishEvent = async (event: Event, relayStr: string): Promise<void> => {
+    publishEvent = async (event: Event, relayUrl: string): Promise<void> => {
         if (!this.checkInit()) return;
         return new Promise<void>(async (resolve, reject) => {
             // console.log("Publishing Event: " + event.id + " to relay " + relayStr);
-            const relay = await this.openRelay(relayStr);
+            const relay = await this.openRelay(relayUrl);
             const pub = relay.publish(event);
 
             pub.on("ok", () => {
-                console.log(`${relay.url} accepted event`);
+                console.log(`accepted by relay: ${relay.url}`);
                 relay.close();
                 resolve();
             });
 
-            pub.on("failed", (reason: any) => {
-                console.log(`failed to publish to ${relay.url}: ${reason}`);
+            pub.on("failed", () => {
+                console.log(`rejected by relay: ${relay.url}`);
                 relay.close();
                 resolve();
             });
@@ -958,7 +975,7 @@ export class Nostr {
         if (!this.checkInit()) return;
         return new Promise<boolean>(async (resolve, reject) => {
             // DO NOT DELETE (until Nostr testing is finished.)
-            console.log("Outbound Nostr Event: " + S.util.prettyPrint(event));
+            console.log("Sending Outbound Nostr Event: " + S.util.prettyPrint(event));
 
             let pub: Pub = null;
             let relay: Relay = null;
@@ -974,27 +991,29 @@ export class Nostr {
                 poolRemainder = relays.length;
             }
 
-            pub.on("ok", () => {
-                console.log("relay accepted event");
+            pub.on("ok", (relay: any) => {
+                console.log(`accepted by relay: ${relay}`);
                 if (relay) {
                     relay.close();
                     relay = null;
                 }
 
                 if (pool && --poolRemainder === 0) {
+                    console.log("Relays Done. Closing pool.");
                     pool.close(relays);
                     pool = null;
                 }
                 resolve(true);
             });
 
-            pub.on("failed", (reason: any) => {
-                console.log(`relay failed: ${reason}`);
+            pub.on("failed", (relay: any) => {
+                console.log(`rejected by relay: ${relay}`);
                 if (relay) {
                     relay.close();
                     relay = null;
                 }
                 if (pool && --poolRemainder === 0) {
+                    console.log("Relays Done. Closing pool.");
                     pool.close(relays);
                     pool = null;
                 }
@@ -1087,7 +1106,13 @@ export class Nostr {
         }, background);
 
         // keep track of what we've just sent to server.
-        events.forEach(e => this.persistedEvents.add(e.id));
+        events.forEach(e => {
+            // todo-00: for now don't ever put Metadata records in 'persistedEvents', until we fix the bug where this
+            // caching short circuits our User Search Dialog breaking ability to lookup users.
+            if (e.kind !== Kind.Metadata) {
+                this.persistedEvents.add(e.id);
+            }
+        });
 
         console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
 

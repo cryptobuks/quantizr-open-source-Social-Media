@@ -8,6 +8,7 @@ import { DialogBase } from "../DialogBase";
 import { Validator, ValidatorRuleName } from "../Validator";
 import { S } from "../Singletons";
 import { getAs } from "../AppContext";
+import { ConfirmDlg } from "./ConfirmDlg";
 
 export class SetNostrPrivateKeyDlg extends DialogBase {
 
@@ -17,7 +18,7 @@ export class SetNostrPrivateKeyDlg extends DialogBase {
     ]);
 
     constructor() {
-        super("Nostr Public Key", "appModalContNarrowWidth");
+        super("Nostr Private Key", "appModalContNarrowWidth");
         this.onMount(() => this.keyField?.focus());
         this.validatedStates = [this.keyState];
     }
@@ -25,14 +26,15 @@ export class SetNostrPrivateKeyDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Diva([
-                new TextContent("Enter your new public key..."),
+                new TextContent("Enter your new private key..."),
                 this.keyField = new TextField({
-                    label: "New Public Key",
+                    label: "New Private Key",
                     // inputType: "password",
                     val: this.keyState
                 }),
                 new ButtonBar([
-                    new Button("Set Public Key", this.setKey, null, "btn-primary"),
+                    new Button("Set Private Key", this.setKey, null, "btn-primary"),
+                    new Button("Generate New Private Key", this.genKey, null, "btn-primary"),
                     new Button("Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -50,5 +52,17 @@ export class SetNostrPrivateKeyDlg extends DialogBase {
         }
         await S.nostr.setPrivateKey(this.keyState.getValue(), getAs().userName);
         this.close();
+    }
+
+    genKey = async () => {
+        const dlg = new ConfirmDlg("Create New Private Key, and forget old Key?", "Warning",
+            "btn-danger", "alert alert-danger");
+        await dlg.open();
+        if (dlg.yes) {
+            debugger;
+            await S.nostr.generateNewKey(getAs().userName, true);
+            setTimeout(S.nostr.publishUserMetadata, 1500);
+            this.close();
+        }
     }
 }

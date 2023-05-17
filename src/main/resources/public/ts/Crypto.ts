@@ -296,7 +296,9 @@ export class Crypto {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
-                sigKey: newSigKey
+                sigKey: newSigKey,
+                nostrNpub: S.nostr.npub,
+                nostrPubKey: S.nostr.pk
             });
 
             if (res.success) {

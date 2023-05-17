@@ -47,7 +47,7 @@ export class EditNodeDlgUtil {
         const editNode = ast.editNode;
 
         // if trying to send non-public node over Nostr. Disallow it for now. Until we have encryptio support.
-        if (ast.sendToNostr && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
+        if (ast.protocolFilter === J.Constant.NETWORK_NOSTR && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
             S.util.showMessage("You cannot send private messages over Nostr on this platform yet. To publish to Nostr make the node public.", "Nostr Warning");
             return false;
         }
@@ -97,7 +97,7 @@ export class EditNodeDlgUtil {
 
         let nostrEvent: Event = null;
         const nostrRelays: string[] = [];
-        const sendToNostr = ast.sendToNostr && S.props.isPublic(editNode);
+        const sendToNostr = ast.protocolFilter === J.Constant.NETWORK_NOSTR && S.props.isPublic(editNode);
         if (sendToNostr) {
             nostrEvent = await S.nostr.prepareOutboundEvent(editNode, nostrRelays);
         }
@@ -105,7 +105,7 @@ export class EditNodeDlgUtil {
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode,
-            saveToActPub: ast.sendToActPub,
+            saveToActPub: ast.protocolFilter === J.Constant.NETWORK_ACTPUB,
             nostrEvent: S.nostr.makeNostrEvent(nostrEvent)
         });
 

@@ -162,8 +162,6 @@ export class AppState {
 
     editNode: J.NodeInfo;
     protocolFilter: string = J.Constant.NETWORK_ACTPUB;
-    sendToActPub: boolean = true;
-    sendToNostr: boolean = true;
 
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'
     editNodeReplyToId: string;

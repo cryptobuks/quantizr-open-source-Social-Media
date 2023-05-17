@@ -411,25 +411,7 @@ export class EditNodeDlg extends DialogBase {
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
-                }) : null,
-
-                // If user hasn't choosen a protocol filter make them choose one here.
-                new Checkbox("Nostr", { className: "marginLeft" }, {
-                    setValue: (checked: boolean) => {
-                        dispatch("updateProtocolTarget", s => {
-                            s.sendToNostr = checked;
-                        });
-                    },
-                    getValue: (): boolean => getAs().sendToNostr
-                }),
-                new Checkbox("ActivityPub", null, {
-                    setValue: (checked: boolean) => {
-                        dispatch("updateProtocolTarget", s => {
-                            s.sendToActPub = checked;
-                        });
-                    },
-                    getValue: (): boolean => getAs().sendToActPub
-                })
+                }) : null
             ]);
             sharingDivClearFix = new Clearfix();
         }
