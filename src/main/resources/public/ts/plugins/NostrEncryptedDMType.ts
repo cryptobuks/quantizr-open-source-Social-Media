@@ -7,8 +7,7 @@ import { TypeBase } from "./base/TypeBase";
 export class NostrEncryptedDMType extends TypeBase {
     constructor() {
         // WARNING: There are places in the code where "Markdown" string is hardcoded.
-        // todo-00: put better icon here
-        super(J.NodeType.NOSTR_ENC_DM, "Nostr DM", "fa-align-left", true);
+        super(J.NodeType.NOSTR_ENC_DM, "Nostr DM", "fa-bullseye", true);
     }
 
     override getEditorHelp(): string {

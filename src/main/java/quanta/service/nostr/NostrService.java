@@ -242,7 +242,10 @@ public class NostrService extends ServiceBase {
 				newType, 0L, CreateNodeLocation.LAST, null, //
 				nostrAccnt.getOwner(), true, true);
 
-		acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
+		if (event.getKind() != KIND_EncryptedDirectMessage) {
+			acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
+		}
+
 		newNode.setContent(event.getContent());
 		newNode.set(NodeProp.OBJECT_ID, "." + event.getId());
 
@@ -302,14 +305,16 @@ public class NostrService extends ServiceBase {
 				saveCount.inc();
 			}
 		} else {
-			// any time we get a node, and see it's metadata has never been queried for we cache that up to happen asap
-			
-			// NOTE: Doing this would be theoretically correct, but we don't really need it afaik, and also currently
+			// any time we get a node, and see it's metadata has never been queried for we cache that up to
+			// happen asap
+
+			// NOTE: Doing this would be theoretically correct, but we don't really need it afaik, and also
+			// currently
 			// there's no way to stop the client from getting queued up with multiple requests to query relays
 			// for the same data as different request threads come thru and activate this code before the DB
 			// has yet been update. (dupliation of work is possible if I turn this on now)
 			// if (nostrAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
-			// 	ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
+			// ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
 			// }
 		}
 
