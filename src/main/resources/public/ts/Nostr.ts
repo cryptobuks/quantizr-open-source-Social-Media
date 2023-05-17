@@ -1118,12 +1118,6 @@ export class Nostr {
 
         console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
 
-        dispatch("SetNostrNewMessageCount", s => {
-            // todo-0: check the server just to be sure this 'saveCount' is correct. I can't remember how experimental
-            // that was or if it's indeed 'perfect' or not.
-            s.nostrNewMessageCount = res.saveCount;
-        });
-
         return res;
     }
 
@@ -1227,6 +1221,8 @@ export class Nostr {
             return;
         }
 
+        const bigQueryStartTime = new Date().getTime();
+        let ret: J.SaveNostrEventResponse = null;
         try {
             this.bigQueryRunning = true;
             let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
@@ -1290,10 +1286,27 @@ export class Nostr {
 
             S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
             console.log("readPosts: since=" + since);
-            await this.readPosts(userNames, relaysArray, since, background);
+            ret = await this.readPosts(userNames, relaysArray, since, background);
         }
         finally {
             this.bigQueryRunning = false;
+
+            // if the querying happened fast enough (< 3 seconds) we can just refresh the results
+            // and the user will not be confused by what just happened.
+            if (new Date().getTime() - bigQueryStartTime < 3000) {
+                S.srch.refreshFeed();
+            }
+            // but if query took a few seconds we just show the message rather than distrupting the GUI,
+            // since they might be scrolling already or whatever.
+            else {
+                if (ret?.saveCount) {
+                    dispatch("SetNostrNewMessageCount", s => {
+                        // todo-0: check the server just to be sure this 'saveCount' is correct. I can't remember how experimental
+                        // that was or if it's indeed 'perfect' or not.
+                        s.nostrNewMessageCount = ret.saveCount;
+                    });
+                }
+            }
         }
     }
 
