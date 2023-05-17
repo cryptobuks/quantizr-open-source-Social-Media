@@ -750,7 +750,8 @@ public class NodeEditService extends ServiceBase {
 
 			if (forceSendToPublic || node.getAc() != null) {
 				// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-				if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
+				if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && 
+				node.getType().equals(NodeType.COMMENT.s())) {
 					SubNode _parent = parent;
 					if (_parent == null) {
 						_parent = read.getParent(ms, node, false);

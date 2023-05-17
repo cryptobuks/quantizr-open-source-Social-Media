@@ -7,6 +7,7 @@ import {
     generatePrivateKey,
     getEventHash,
     getPublicKey,
+    nip04,
     nip05,
     nip19,
     parseReferences,
@@ -907,8 +908,10 @@ export class Nostr {
     * - for each acl on the node, add a "p" into the tags array, and sets the tags array onto the node
     * - substitutes npub tags into node.content
     * - build relaysStr based on acl list
+    *
+    * The actual 'node' may have encrypted content, so we always rely on clearText instead for 'content'
     */
-    prepareOutboundEvent = async (node: J.NodeInfo, relays: string[]): Promise<Event> => {
+    prepareOutboundEvent = async (node: J.NodeInfo, clearText: string, relays: string[]): Promise<Event> => {
         if (!this.checkInit()) return;
         if (!node || !node.ac || node.ac.length === 0) return null;
         // console.log("Prepare Outbound for Node: " + S.util.prettyPrint(node));
@@ -917,13 +920,17 @@ export class Nostr {
 
         let isPublic = false;
         let relaysStr = "";
+        let shareToPubKey = null;
+
+        // todo-0: detect if we're sending a DM and have 'multiple' people in this ACL (or public) because
+        // that's always invalid
         node.ac.forEach(acl => {
             if (acl.principalName === J.PrincipalName.PUBLIC) {
                 isPublic = true;
             }
             else if (acl.nostrNpub) {
-                const pubkey = this.translateNip19(acl.nostrNpub);
-                tags.push(["p", pubkey]);
+                shareToPubKey = this.translateNip19(acl.nostrNpub);
+                tags.push(["p", shareToPubKey]);
                 npubs.push(acl.nostrNpub);
                 if (relaysStr) {
                     relaysStr += "\n";
@@ -937,24 +944,32 @@ export class Nostr {
             return null;
         }
 
-        const words = node.content?.split(/[ \n\r\t]+/g);
+        const words = clearText?.split(/[ \n\r\t]+/g);
         words?.forEach(w => {
             if (w.startsWith("npub")) {
                 // const acl = node.ac.find(acl => acl.nostrNpub?.startsWith(w));
-                // node.content = node.content.replace(w, acl.nostrNpub);
+                // clearText = clearText.replace(w, acl.nostrNpub);
                 for (let i = 0; i < npubs.length; i++) {
                     if (npubs[i].startsWith(w)) {
-                        node.content = node.content.replace(w, `#[${i}]`);
+                        clearText = clearText.replace(w, `#[${i}]`);
                     }
                 }
             }
         });
 
         // Nostr's way of adding attached files is just to mention their URL in the content, so let's add all that.
-        const content = this.getContentWithUrlsAdded(node);
+        clearText = this.getContentWithUrlsAdded(node, clearText);
+
+        const kind = node.type === J.NodeType.NOSTR_ENC_DM ? Kind.EncryptedDirectMessage : Kind.Text;
+        let content = clearText;
+        if (kind === Kind.EncryptedDirectMessage) {
+            // console.log("Nostr Encrypting outbound conent: " + content);
+            content = await nip04.encrypt(this.sk, shareToPubKey, content);
+            // console.log("Nostr Cipher conent: " + content);
+        }
 
         const event: any = {
-            kind: 1,
+            kind,
             pubkey: this.pk,
             created_at: Math.floor(Date.now() / 1000),
             tags,
@@ -968,8 +983,8 @@ export class Nostr {
         return event;
     }
 
-    getContentWithUrlsAdded = (node: J.NodeInfo): string => {
-        let ret = node.content || "";
+    getContentWithUrlsAdded = (node: J.NodeInfo, clearText: string): string => {
+        let ret = clearText || "";
         let idx = 0;
         S.props.getOrderedAtts(node).forEach(att => {
             if (idx++ === 0) {

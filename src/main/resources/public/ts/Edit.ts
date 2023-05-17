@@ -300,6 +300,7 @@ export class Edit {
     }
 
     createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string) => {
+        // console.log("createSubNode Res: " + S.util.prettyPrint(res));
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh();

@@ -80,6 +80,10 @@ export class EditNodeDlg extends DialogBase {
         super("[none]", (mode === DialogMode.EMBED ? "appEmbedContent" : "appModalCont") + " " + C.TAB_MAIN, false, mode);
         const ast = getAs();
 
+        if (ast.editNode.type === J.NodeType.NOSTR_ENC_DM) {
+            encrypt = true;
+        }
+
         // need a deterministic id here, that can be found across renders, for scrolling.
         this.setId("EditNodeDlg_" + ast.editNode.id);
         let signCheckboxVal = false;
@@ -87,7 +91,7 @@ export class EditNodeDlg extends DialogBase {
         if (S.crypto.avail) {
             // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
             signCheckboxVal = !ast.unknownPubSigKey && ast.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, ast.editNode);
-            encryptCheckboxVal = !ast.unknownPubEncKey && ast.editNode?.content?.indexOf(J.Constant.ENC_TAG) === 0;
+            encryptCheckboxVal = !ast.unknownPubEncKey && S.props.isEncrypted(ast.editNode);
         }
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
@@ -638,7 +642,9 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
         const ast = getAs();
-        const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
+
+        // Note: We don't show encryption checkbox for Nostr DMs but the checkbox is implicitly set to 'true' (selected)
+        const encryptCheckBox = ast.editNode.type !== J.NodeType.NOSTR_ENC_DM && advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.encKeyOk()) {
                     this.utl.setEncryption(this, checked);

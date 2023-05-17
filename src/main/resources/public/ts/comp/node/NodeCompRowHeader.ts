@@ -130,7 +130,11 @@ export class NodeCompRowHeader extends Div {
                     else {
                         // when replying to a boost, we want to be able to additionally add to the sharing the person
                         // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
-                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
+
+                        // reply to a DM with another DM, else make it a COMMENT type.
+                        const replyType = this.node.type === NodeType.NOSTR_ENC_DM ? NodeType.NOSTR_ENC_DM : NodeType.COMMENT;
+
+                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, replyType, true, null, null, this.node.id, null, true);
                     }
                 }
             }));

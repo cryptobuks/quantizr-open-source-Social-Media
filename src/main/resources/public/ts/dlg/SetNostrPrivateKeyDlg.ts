@@ -59,7 +59,6 @@ export class SetNostrPrivateKeyDlg extends DialogBase {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            debugger;
             await S.nostr.generateNewKey(getAs().userName, true);
             setTimeout(S.nostr.publishUserMetadata, 1500);
             this.close();

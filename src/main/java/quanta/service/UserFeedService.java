@@ -61,7 +61,7 @@ public class UserFeedService extends ServiceBase {
 		 * limit to just markdown types and comments, because we need to avoid everything else since we are
 		 * searching from the root of all user accounts.
 		 */
-		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
+		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s());
 
 		// DO NOT DELETE (keep as example)
 		// This pattern is what is required when you have multiple conditions added to a single field.
@@ -208,7 +208,7 @@ public class UserFeedService extends ServiceBase {
 
 		// limit to just markdown types (no type), and comments
 		// IMPORTANT: see long comment above where we have similar type filtering.
-		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
+		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s());
 
 		// Nostr
 		if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {

@@ -757,7 +757,7 @@ public class MongoDelete extends ServiceBase {
 		// people might have blocked someone with an offensive username, we don't want to DELETE those
 		// blocked user
 		// nodes either, so for now we just delete if the type is a comment
-		crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
+		crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
 
 		crit = auth.addSecurityCriteria(ms, crit);
 		criterias.add(crit);

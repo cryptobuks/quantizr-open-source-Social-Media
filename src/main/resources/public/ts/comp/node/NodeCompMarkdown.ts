@@ -52,7 +52,7 @@ export class NodeCompMarkdown extends Html {
         };
 
         /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
-        if (S.props.isEncrypted(node)) {
+        if (S.props.isEncrypted(node) || node.type === J.NodeType.NOSTR_ENC_DM) {
             att.content = "[Encrypted]";
             att.pendingDecrypt = content;
         }
@@ -146,10 +146,18 @@ export class NodeCompMarkdown extends Html {
         const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {
+            let cipherText = null;
+            if (state.pendingDecrypt.startsWith(J.Constant.ENC_TAG)) {
+                cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
+            }
+            else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
+                cipherText = state.pendingDecrypt;
+            }
 
-            // cipherText has ENC_TAG prefix only if not a nostr DM
-            const cipherText = this.node.type === J.NodeType.NOSTR_ENC_DM ? state.pendingDecrypt
-                : state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
+            if (!cipherText) {
+                console.log("not decrypting. cipherText was unexpected format: " + cipherText);
+                return;
+            }
 
             const cipherHash = S.util.hashOfString(cipherText);
 
@@ -180,21 +188,19 @@ export class NodeCompMarkdown extends Html {
         let clearText = null;
         // console.log("decrypting (in NodeCompMarkdown): " + state.pendingDecrypt);
 
-        // nostr DM decrypt
-        if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
-            const pubKey = S.props.getClientPropStr(J.NodeProp.NOSTR_USER_PUBKEY, this.node);
-
-            // need a wrapper function for decrypt that adds to cache like 'decryptSharableString'
-            clearText = await nip04.decrypt(S.nostr.sk, pubKey, state.pendingDecrypt);
-        }
-        // non-nostr DM decrypt
-        else {
+        if (state.pendingDecrypt.startsWith(J.Constant.ENC_TAG)) {
             const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
             const cipherKey = S.props.getCryptoKey(this.node);
             if (cipherKey) {
                 // console.log("CIPHERKEY " + cipherKey);
                 clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
             }
+        }
+        else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
+            const pubKey = S.props.getClientPropStr(J.NodeProp.NOSTR_USER_PUBKEY, this.node);
+
+            // need a wrapper function for decrypt that adds to cache like 'decryptSharableString'
+            clearText = await nip04.decrypt(S.nostr.sk, pubKey, state.pendingDecrypt);
         }
 
         // console.log("Decrypted to " + clearText);

@@ -46,8 +46,8 @@ export class EditNodeDlgUtil {
         const ast = getAs();
         const editNode = ast.editNode;
 
-        // if trying to send non-public node over Nostr. Disallow it for now. Until we have encryptio support.
-        if (ast.protocolFilter === J.Constant.NETWORK_NOSTR && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
+        // if trying to send non-public node over Nostr. Disallow it for now, unless a DM type (which we do allow). Until we have encryptio support.
+        if (editNode.type !== J.NodeType.NOSTR_ENC_DM && ast.protocolFilter === J.Constant.NETWORK_NOSTR && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
             S.util.showMessage("You cannot send private messages over Nostr on this platform yet. To publish to Nostr make the node public.", "Nostr Warning");
             return false;
         }
@@ -57,8 +57,9 @@ export class EditNodeDlgUtil {
         const newNodeTargetOffset = S.quanta.newNodeTargetOffset;
 
         let content: string;
+        let clearText: string;
         if (dlg.contentEditor) {
-            content = dlg.contentEditor.getValue();
+            content = clearText = dlg.contentEditor.getValue();
 
             if (S.crypto.avail) {
                 const cipherKey = S.props.getCryptoKey(editNode);
@@ -68,8 +69,13 @@ export class EditNodeDlgUtil {
                 }
             }
         }
+
         if (content) {
             content = content.trim();
+        }
+
+        if (clearText) {
+            clearText = clearText.trim();
         }
 
         editNode.content = content;
@@ -97,9 +103,12 @@ export class EditNodeDlgUtil {
 
         let nostrEvent: Event = null;
         const nostrRelays: string[] = [];
-        const sendToNostr = ast.protocolFilter === J.Constant.NETWORK_NOSTR && S.props.isPublic(editNode);
+
+        const sendToNostr = ast.protocolFilter === J.Constant.NETWORK_NOSTR && //
+            (editNode.type === J.NodeType.NOSTR_ENC_DM || S.props.isPublic(editNode));
+
         if (sendToNostr) {
-            nostrEvent = await S.nostr.prepareOutboundEvent(editNode, nostrRelays);
+            nostrEvent = await S.nostr.prepareOutboundEvent(editNode, clearText, nostrRelays);
         }
 
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
