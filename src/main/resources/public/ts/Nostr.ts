@@ -903,7 +903,8 @@ export class Nostr {
     prepareOutboundEvent = async (node: J.NodeInfo, relays: string[]): Promise<Event> => {
         if (!this.checkInit()) return;
         if (!node || !node.ac || node.ac.length === 0) return null;
-        const tags: string[][] = [];
+        // console.log("Prepare Outbound for Node: " + S.util.prettyPrint(node));
+        const tags: string[][] = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node) || [];
         const npubs: string[] = [];
 
         let isPublic = false;

@@ -2,6 +2,7 @@ package quanta.service.node;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,6 +165,8 @@ public class NodeEditService extends ServiceBase {
 
 		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
+			// todo-00: need to set "e" tag correctly here, if this is a nostr node, so it will be sent 
+			// on the outbound object to other servers.
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
 
@@ -228,6 +231,18 @@ public class NodeEditService extends ServiceBase {
 					res.setEncrypt(true);
 				}
 			}
+		}
+
+		if (nostr.isNostrNode(nodeBeingRepliedTo)) {
+			ArrayList<ArrayList<String>> tags = new ArrayList<>();
+			ArrayList<String> element = new ArrayList<String>();
+
+			// I'm using old style of "e" for now, at proof this works, because I don't want to mess with
+			// having to put a relay in here yet.
+			element.add("e");
+			element.add(nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID).substring(1));
+			tags.add(element);
+			newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
 		}
 
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
