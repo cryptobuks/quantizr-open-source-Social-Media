@@ -421,11 +421,11 @@ export class Nostr {
                     // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
                     else if (ta.length === 4) {
                         if (ta[3] === "reply") {
-                            console.log("replyEvent=" + S.util.prettyPrint(ta))
+                            // console.log("replyEvent=" + S.util.prettyPrint(ta))
                             replyEvent = ta;
                         }
                         else if (ta[3] === "root") {
-                            console.log("rootEvent=" + S.util.prettyPrint(ta))
+                            // console.log("rootEvent=" + S.util.prettyPrint(ta))
                             rootEvent = ta;
                         }
                     }
@@ -745,7 +745,9 @@ export class Nostr {
         return ret;
     }
 
-    // user can be the hex, npub, or NIP05 address of the identity. isNip05 must be set to true if 'user' is a nip05.
+    // user can be the hex, npub, or NIP05 address of the identity.
+    // isNip05 must be set to true if 'user' is a nip05.
+    //
     // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
@@ -1116,16 +1118,8 @@ export class Nostr {
         }, background);
 
         // keep track of what we've just sent to server.
-        events.forEach(e => {
-            // todo-0: for now we don't put Metadata records in 'persistedEvents', until we fix the bug where this
-            // caching short-circuits our User Search Dialog breaking ability to lookup users.
-            if (e.kind !== Kind.Metadata) {
-                this.persistedEvents.add(e.id);
-            }
-        });
-
+        events.forEach(e => this.persistedEvents.add(e.id));
         console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
-
         return res;
     }
 

@@ -1,4 +1,12 @@
+import {
+    Event
+} from "nostr-tools";
 import { getAs } from "../AppContext";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
+import { Val } from "../Val";
+import { Validator } from "../Validator";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -7,10 +15,6 @@ import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
-import { Validator } from "../Validator";
 import { UserProfileDlg } from "./UserProfileDlg";
 
 interface LS { // Local State
@@ -125,19 +129,22 @@ export class SearchUsersDlg extends DialogBase {
         if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || //
             searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
 
-            let ret = null;
+            const nostrEvent = new Val<Event>();
             try {
                 S.rpcUtil.incRpcCounter();
-                ret = await S.nostr.readUserMetadataEx(SearchUsersDlg.defaultSearchText,
-                    SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05, true, null);
-                // console.log("SaveNostrEventResponse: " + S.util.prettyPrint(ret));
+                await S.nostr.readUserMetadataEx(SearchUsersDlg.defaultSearchText,
+                    SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05, true, nostrEvent);
             }
             finally {
                 S.rpcUtil.decRpcCounter();
             }
             this.close();
-            if (ret?.accntNodeIds?.length > 0) {
-                new UserProfileDlg(ret.accntNodeIds[0], null).open();
+
+            if (nostrEvent.val) {
+                new UserProfileDlg(null, nostrEvent.val.pubkey).open();
+            }
+            else {
+                S.util.showMessage("Unable to load user info", "Warning");
             }
         }
         else {
