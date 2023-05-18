@@ -137,7 +137,7 @@ export class Quanta {
 
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "allUsers");
 
-            // todo-0: need to test this: When I tried to put the protocolFilter initialization
+            // todo-1: need to test this: When I tried to put the protocolFilter initialization
             // in here it has an issue, so that calls into quesstion if this code is working.
             dispatch("InitState", async (s: AppState) => {
                 if (mobileMode) {

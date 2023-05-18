@@ -267,7 +267,7 @@ export class User {
             // When user has perhaps requested a NostrId on the URL we'll end up here where we need to get the Nostr
             // data and display it.
             //
-            // todo-0: Currently we always try to pull loadNostrId immediately from a relay here, but we could
+            // todo-1: Currently we always try to pull loadNostrId immediately from a relay here, but we could
             // do a lookup for it on the server for it during the initial URL request to load the page
             // and if the node happened to be found for this event, we'd set initialNodeId or whatever's required to
             // load that ID for the already-existing node.

@@ -368,7 +368,7 @@ export class Nostr {
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
-                // todo-0: put this val in a var, and there's a few other hard coded vals like this too
+                // todo-1: put this val in a var, and there's a few other hard coded vals like this too
                 if (events.length > 50) {
                     console.warn("stopping after max thread events: " + events.length);
                     return;
@@ -711,7 +711,7 @@ export class Nostr {
             kinds: [Kind.Metadata]
         };
 
-        // todo-0: querying only from our own relays is not technically correct here: The metadataQueue entries really need
+        // todo-1: querying only from our own relays is not technically correct here: The metadataQueue entries really need
         // to have the specific relays discovered on each user instead
         const events = await this.queryRelays(this.getMyRelays(), query, true, true);
         if (events) {
@@ -872,10 +872,6 @@ export class Nostr {
         const query: any = {
             authors: userKeys,
             kinds,
-
-            // I think with out time range in place if we get more than this limit, there's the chance
-            // we'll loose records and never get them all unless this limit is increased or the timerange
-            // is rolled back early enough. Needs more thought (todo-0)
             limit: 50
         };
 
@@ -1345,8 +1341,6 @@ export class Nostr {
             else {
                 if (ret?.saveCount) {
                     dispatch("SetNostrNewMessageCount", s => {
-                        // todo-0: check the server just to be sure this 'saveCount' is correct. I can't remember how experimental
-                        // that was or if it's indeed 'perfect' or not.
                         s.nostrNewMessageCount = ret.saveCount;
                     });
                 }
