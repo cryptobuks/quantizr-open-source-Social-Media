@@ -33,15 +33,9 @@ https://github.com/nbd-wtf/nostr-tools
 */
 
 export class Nostr {
-    // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net"; // "wss://relay.damus.io/";
-    // TEST_USER_KEY: string = "35d26e4690cbe1a898af61cc3515661eb5fa763b57bd0b42e45099c8b32fd50f";
-
-    // TEST_RELAY_URL: string = "wss://nostr-pub.wellorder.net\nwss://nos.lol\nwss://relay.damus.io";
-    // TEST_USER_KEY: string = "1qguf67wjaq05snx0nfwgrpnhls8a94stquu58lzpnr0q2355u45sjs9fsr"; // "32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245";
-
-    sk: string = null; // secret key, hex string
-    pk: string = null; // public key, hex string
-    npub: string = null; // npub (of public key)
+    sk: string = null; // our secret key, hex string
+    pk: string = null; // our public key, hex string
+    npub: string = null; // our npub (of public key)
 
     // We maintain this set of all encountered relays as they're found so that if we ever need to look
     // up something and have no known relay we can at least try these. Potentially we could save these
@@ -57,45 +51,12 @@ export class Nostr {
     bigQueryRunning: boolean = false;
     queryCounter: number = 0;
 
-    // This can be run from Admin Console
+    // This will be non-null once we query for it, and only set back to null if this browser instance
+    // knows it's added a new friend
+    myFriends: J.FriendInfo[] = null;
+
+    // This can be run from Admin Console (currently not used)
     test = async () => {
-        // this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false, false, null);
-
-        // this.testNpub();
-
-        // await this.getEvent(["wss://relay.snort.social"], "20cfef67ce5fd1a99e2bb7993be0e0cc3ad59fb78fc8898bc998c1864b8a08e2", false);
-
-        // const event = await this.getEvent(["wss://relay.snort.social",
-        //     "wss://nostr-pub.wellorder.net",
-        //     "wss://nos.lol",
-        //     "wss://relay.damus.io"
-        // ],
-        //     // "nostr:note1px3tv34c0mh8qxwslnpsqye36jr5hgqes67kls5w9p29zk4ye94qjtu2tn",
-        //     "73fe45d89cf4872ea17ee0fb232ea1b31543c327cee9c264188cd14c6c146a30",
-        //     false);
-        // if (event) {
-        //     console.log("test(). event=" + S.util.prettyPrint(event));
-        //     this.dumpEventRefs(event);
-        // }
-
-        // this.sendMessageToUser("Hi Clay!", ["wss://relay.snort.social"], "npub1r0ccr27yxfm20lacgqfl8xwt4vl4j3ggs7nc29nkll6sthdk742stk6qn7");
-
-        // this.testNpub();
-        // await this.readPosts(this.TEST_USER_KEY, this.TEST_RELAY_URL, 1680899831);
-
-        // await this.updateProfile();
-        // await this.readUserMetadata(this.TEST_USER_KEY, this.TEST_RELAY_URL, false);
-        // console.log("SaveCount: " + res.saveCount);
-
-        // this.saveEvent();
-        // this.createEvent();
-
-        // Object from original examples:
-        // await this.getEvent(this.TEST_RELAY_URL, "d7dd5eb3ab747e16f8d0212d53032ea2a7cadef53837e5a6c66d42849fcb9027");
-
-        // Object posted from Quanta
-        // await this.getEvent(this.TEST_RELAY_URL, "fec9091d99d8aa4dc1d544563cecb587fea5c3ccb744ca668c8b4021daced097");
-        // await this.publishEvent();
     }
 
     decrypt = async (sk: string, pk: string, cipherText: string) => {
@@ -867,10 +828,6 @@ export class Nostr {
     // "since": <an integer unix timestamp, events must be newer than this to pass>,
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
-    //
-    // todo-000: This query should be targeted to if we're doing a 'to/from' or 'to me' etc we use
-    // the actual authors and "#e" tags to narrow the scope to JUST those, and if there's nothing
-    // about "me" (global query) get then do NOT include the DMs in the filter
     readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean, includeDms: boolean): Promise<J.SaveNostrEventResponse> => {
         if (!this.checkInit()) return;
         userKeys = userKeys.map(u => this.translateNip19(u));
@@ -1160,7 +1117,7 @@ export class Nostr {
 
         // keep track of what we've just sent to server.
         events.forEach(e => {
-            // todo-00: for now don't ever put Metadata records in 'persistedEvents', until we fix the bug where this
+            // todo-0: for now we don't put Metadata records in 'persistedEvents', until we fix the bug where this
             // caching short-circuits our User Search Dialog breaking ability to lookup users.
             if (e.kind !== Kind.Metadata) {
                 this.persistedEvents.add(e.id);
@@ -1276,29 +1233,32 @@ export class Nostr {
         let ret: J.SaveNostrEventResponse = null;
         try {
             this.bigQueryRunning = true;
-            let lastUsersQueryTime: number = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME);
-            if (!lastUsersQueryTime) {
-                lastUsersQueryTime = 0;
-            }
-            const lastUsersQueryKey: string = await S.localDB.getVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY);
-            const curTime = Math.floor(Date.now() / 1000);
 
-            const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
-                nodeId: null,
-                type: "friends",
-                subType: J.Constant.NETWORK_NOSTR
-            }, background);
+            if (!this.myFriends) {
+                // todo-0: this caching should be outside of Nostr scope and done just in general
+                // for all places in the code we access uers lists.
+                const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
+                    nodeId: null,
+                    type: "friends",
+                    subType: J.Constant.NETWORK_NOSTR
+                }, background);
 
-            // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
-            if (!res.people || res.people.length === 0) {
-                console.debug("No friends defined.");
-                return;
+                // console.log("readPostsFromFriends: " + S.util.prettyPrint(res.people));
+                if (res.people?.length > 0) {
+                    this.myFriends = res.people;
+                }
+                else {
+                    this.myFriends = []; // set to empty array so we don't query again.
+                    console.debug("No friends defined.");
+                    return;
+                }
             }
+
             const userNames: string[] = [];
             const relaysSet: Set<String> = new Set<String>();
 
             // scan all people to build list of users (PublicKeys) and relays to read from
-            for (const person of res.people) {
+            for (const person of this.myFriends) {
                 if (!S.nostr.isNostrUserName(person.userName)) continue;
                 userNames.push(person.userName.substring(1));
                 const personRelays = this.getRelays(person.relays);
@@ -1318,26 +1278,7 @@ export class Nostr {
             if (userNames.length > 0 && relaysArray.length > 0) {
                 console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
             }
-
-            const thisQueryKey = this.makeQueryKey(userNames, relaysArray);
-            let since = -1;
-
-            // if this is the same users and relays we last queried (key matches) then we set the
-            // 'since' query time, so we only get new stuff we didn't already see
-            if (thisQueryKey === lastUsersQueryKey) {
-                if (lastUsersQueryTime > 0 && (curTime - lastUsersQueryTime) < 30) {
-                    console.log("Skipping Nostr query. Identical query was less that 30 secs ago.");
-                    return;
-                }
-                since = lastUsersQueryTime;
-            }
-            else {
-                S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_KEY, thisQueryKey);
-            }
-
-            S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
-            console.log("readPosts: since=" + since);
-            ret = await this.readPosts(userNames, relaysArray, since, background, includeDms);
+            ret = await this.readPosts(userNames, relaysArray, -1, background, includeDms);
         }
         finally {
             this.bigQueryRunning = false;

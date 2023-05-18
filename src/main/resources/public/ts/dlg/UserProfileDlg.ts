@@ -274,6 +274,9 @@ export class UserProfileDlg extends DialogBase {
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
+        // todo-1: would be better to have a pubsub for this kind of event for decoupling.
+        // Set myFriends to null to force requery.
+        S.nostr.myFriends = null;
         this.reload();
     }
 
@@ -377,6 +380,10 @@ export class UserProfileDlg extends DialogBase {
 
             // We 'could' get their posts now, but this is unnecessary.
             // this.readNostrPosts();
+
+            // todo-1: would be better to have a pubsub for this kind of event for decoupling.
+            // Set myFriends to null to force requery.
+            S.nostr.myFriends = null;
         }
     }
 

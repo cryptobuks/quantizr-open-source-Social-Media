@@ -165,8 +165,6 @@ public class NodeEditService extends ServiceBase {
 
 		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
-			// todo-00: need to set "e" tag correctly here, if this is a nostr node, so it will be sent
-			// on the outbound object to other servers.
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
 
