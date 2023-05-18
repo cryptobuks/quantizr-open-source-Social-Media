@@ -165,7 +165,7 @@ public class NodeEditService extends ServiceBase {
 
 		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
-			// todo-00: need to set "e" tag correctly here, if this is a nostr node, so it will be sent 
+			// todo-00: need to set "e" tag correctly here, if this is a nostr node, so it will be sent
 			// on the outbound object to other servers.
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
 		}
@@ -237,12 +237,20 @@ public class NodeEditService extends ServiceBase {
 			ArrayList<ArrayList<String>> tags = new ArrayList<>();
 			ArrayList<String> element = new ArrayList<String>();
 
-			// I'm using old style of "e" for now, at proof this works, because I don't want to mess with
+			// I'm using old style of "e" for now, at proof this works, because I don't want to deal with
 			// having to put a relay in here yet.
 			element.add("e");
 			element.add(nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID).substring(1));
 			tags.add(element);
 			newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
+
+			// if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user tries
+			// to remove the public setting from and then save it, the system will reject that and tell the user
+			// that only DMs are able to be private in Nostr.
+			if (!newNode.getType().equals(NodeType.NOSTR_ENC_DM.s())) {
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+			}
 		}
 
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
@@ -750,8 +758,7 @@ public class NodeEditService extends ServiceBase {
 
 			if (forceSendToPublic || node.getAc() != null) {
 				// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-				if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && 
-				node.getType().equals(NodeType.COMMENT.s())) {
+				if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
 					SubNode _parent = parent;
 					if (_parent == null) {
 						_parent = read.getParent(ms, node, false);

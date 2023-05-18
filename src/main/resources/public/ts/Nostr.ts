@@ -881,7 +881,7 @@ export class Nostr {
             // I think with out time range in place if we get more than this limit, there's the chance
             // we'll loose records and never get them all unless this limit is increased or the timerange
             // is rolled back early enough. Needs more thought (todo-0)
-            limit: 500
+            limit: 50
         };
         if (since !== -1) {
             query.since = since;
