@@ -868,23 +868,38 @@ export class Nostr {
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
     //
-    readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean): Promise<J.SaveNostrEventResponse> => {
+    // todo-000: This query should be targeted to if we're doing a 'to/from' or 'to me' etc we use
+    // the actual authors and "#e" tags to narrow the scope to JUST those, and if there's nothing
+    // about "me" (global query) get then do NOT include the DMs in the filter
+    readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean, includeDms: boolean): Promise<J.SaveNostrEventResponse> => {
         if (!this.checkInit()) return;
         userKeys = userKeys.map(u => this.translateNip19(u));
 
+        // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
+        const kinds = [Kind.Text];
+        if (includeDms) {
+            kinds.push(Kind.EncryptedDirectMessage);
+        }
+
         const query: any = {
             authors: userKeys,
-
-            // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
-            kinds: [Kind.Text, Kind.EncryptedDirectMessage],
+            kinds,
 
             // I think with out time range in place if we get more than this limit, there's the chance
             // we'll loose records and never get them all unless this limit is increased or the timerange
             // is rolled back early enough. Needs more thought (todo-0)
             limit: 50
         };
-        if (since !== -1) {
-            query.since = since;
+
+        // our "QueryKey (LOCALDB_NOSTR_LAST_USER_QUERY_KEY) needs to be updated if we're going to use 'since', so for now
+        // the since optimization is disabled here. Or else we just need two QueryKeys, where one is for
+        // DM-inclusive query and the other isn't
+        // if (since !== -1) {
+        //     query.since = since;
+        // }
+
+        if (includeDms) {
+            query["#p"] = [this.pk];
         }
 
         let ret = null;
@@ -1249,7 +1264,7 @@ export class Nostr {
         console.log("PROFILE: " + S.util.prettyPrint(profile));
     }
 
-    readPostsFromFriends = async (background: boolean = false): Promise<void> => {
+    queryNetwork = async (background: boolean = false, includeDms: boolean): Promise<void> => {
         if (!this.checkInit()) return;
 
         if (this.bigQueryRunning) {
@@ -1322,7 +1337,7 @@ export class Nostr {
 
             S.localDB.setVal(C.LOCALDB_NOSTR_LAST_USER_QUERY_TIME, curTime);
             console.log("readPosts: since=" + since);
-            ret = await this.readPosts(userNames, relaysArray, since, background);
+            ret = await this.readPosts(userNames, relaysArray, since, background, includeDms);
         }
         finally {
             this.bigQueryRunning = false;

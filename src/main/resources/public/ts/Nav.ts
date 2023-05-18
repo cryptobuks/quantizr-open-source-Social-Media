@@ -468,13 +468,16 @@ export class Nav {
         const ast = getAs();
         if (ast.protocolFilter === J.Constant.NETWORK_NOSTR) {
             switch (props.name) {
-                case J.Constant.FEED_PUB:
-                case J.Constant.FEED_TOFROMME:
                 case J.Constant.FEED_MY_MENTIONS:
+                case J.Constant.FEED_TOFROMME:
                 case J.Constant.FEED_TOME:
+                    S.nostr.queryNetwork(true, true);
+                    break;
+
+                case J.Constant.FEED_PUB:
                 case J.Constant.FEED_FROMFRIENDS:
                     // do not 'await' here. Let this run in background
-                    S.nostr.readPostsFromFriends(true);
+                    S.nostr.queryNetwork(true, false);
                     break;
 
                 default:

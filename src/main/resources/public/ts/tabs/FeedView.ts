@@ -11,7 +11,6 @@ import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Spinner } from "../comp/core/Spinner";
@@ -51,14 +50,15 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             });
         }
 
-        let newItems = null;
+        const newItems: any = null;
 
-        if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
-            newItems = new Icon({
-                className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
-                title: "New content available. Refresh!"
-            });
-        }
+        // todo-0: this is giving false positives at least in Nostr feed view so for now I'll disable this.
+        // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
+        //     newItems = new Icon({
+        //         className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
+        //         title: "New content available. Refresh!"
+        //     });
+        // }
 
         /* If the user has 'tagged' one or more of their Friends Nodes (by setting a tag value in the editor)
         by editing one of their friends nodes, then we show a dropdown letting the user quickly choose which

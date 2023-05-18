@@ -53,6 +53,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         }
         else {
             return new Divc({ className: "tabSubOptions" }, [
+                // todo-0: the "My Mentions" for Nostr is showing nothing, and that appears to be a bug
                 ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
                 ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
                 ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),

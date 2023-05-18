@@ -53,6 +53,9 @@ public class CallProcessor extends ServiceBase {
 		 * which CAN even happen simply from using a different browser that hasn't had the signature key
 		 * imported into it. And also all the flow around how this can be encountered during login/logout
 		 * needs to be tested and more well thought out.
+		 * 
+		 * todo-000: I'm noticing the signature storage on the browser memory breaks (vanishes) every few months
+		 * and then we get new key auto-generated for admin, and then stuff starts going badly wrong. FIX THIS!
 		 */
 		if (authSig && sc.isAdmin()) {
 			SessionContext.authSig();
