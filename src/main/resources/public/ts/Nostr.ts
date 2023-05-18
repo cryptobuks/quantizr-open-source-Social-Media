@@ -713,7 +713,7 @@ export class Nostr {
 
         // todo-0: querying only from our own relays is not technically correct here: The metadataQueue entries really need
         // to have the specific relays discovered on each user instead
-        const events = await this.queryRelays(this.getMyRelays(), query, true);
+        const events = await this.queryRelays(this.getMyRelays(), query, true, true);
         if (events) {
             console.log("Result of processMetadataQueue Lookup: " + S.util.prettyPrint(events));
         }
@@ -1069,12 +1069,12 @@ export class Nostr {
         });
     }
 
-    queryRelays = async (relays: string[], query: any, background: boolean = false): Promise<Event[]> => {
+    queryRelays = async (relays: string[], query: any, background: boolean = false, silent: boolean = false): Promise<Event[]> => {
         if (relays.length === 1) {
-            return await this.singleRelayQuery(relays[0], query, background);
+            return await this.singleRelayQuery(relays[0], query, background, silent);
         }
         else {
-            return await this.multiRelayQuery(relays, query, background);
+            return await this.multiRelayQuery(relays, query, background, silent);
         }
     }
 
@@ -1419,10 +1419,10 @@ export class Nostr {
         return relays;
     }
 
-    private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false): Promise<Event[]> {
+    private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false, silent: boolean = false): Promise<Event[]> {
         if (!this.checkInit()) return;
         try {
-            this.nostrQueryBegin(background);
+            if (!silent) this.nostrQueryBegin(background);
             const relay = await this.openRelay(relayUrl);
             const ret = await relay.list([query]);
             relay.close();
@@ -1430,11 +1430,11 @@ export class Nostr {
             return ret;
         }
         finally {
-            this.nostrQueryEnd(background);
+            if (!silent) this.nostrQueryEnd(background);
         }
     }
 
-    private async multiRelayQuery(relays: string[], query: any, background: boolean = false): Promise<Event[]> {
+    private async multiRelayQuery(relays: string[], query: any, background: boolean = false, silent: boolean = false): Promise<Event[]> {
         if (!this.checkInit()) return;
         if (!relays) return null;
 
@@ -1460,14 +1460,14 @@ export class Nostr {
         // })
 
         try {
-            this.nostrQueryBegin(background);
+            if (!silent) this.nostrQueryBegin(background);
             const ret = await pool.list(relays, [query]);
             pool.close(relays);
             this.cacheEvents(ret);
             return ret;
         }
         finally {
-            this.nostrQueryEnd(background);
+            if (!silent) this.nostrQueryEnd(background);
         }
     }
 
