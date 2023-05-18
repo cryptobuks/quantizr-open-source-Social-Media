@@ -43,8 +43,10 @@ export class Nostr {
     knownRelays: Set<string> = new Set<string>();
 
     // hold any data we've already encountered so we can avoid looking in relays when possible
-    metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==event id)
-    textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==user's pubkey)
+    metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==user's pubkey)
+    metadataQueue: Set<string> = new Set<string>(); // Holds pending pubkeys whose metadata is pending being rendered in the DOM
+    textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==events id)
+    dispInfoCache: Map<string, any> = new Map<string, any>(); // cache for rapid injecting of user info during react renders
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
     persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
@@ -54,6 +56,10 @@ export class Nostr {
     // This will be non-null once we query for it, and only set back to null if this browser instance
     // knows it's added a new friend
     myFriends: J.FriendInfo[] = null;
+
+    backgroundQueue = setInterval(async () => {
+        await this.processMetadataQueue();
+    }, 1200);
 
     // This can be run from Admin Console (currently not used)
     test = async () => {
@@ -143,6 +149,10 @@ export class Nostr {
         }
     }
 
+    cacheEvents = (events: Event[]) => {
+        events?.forEach(e => this.cacheEvent(e));
+    }
+
     cacheEvent = (event: Event): void => {
         switch (event.kind) {
             case Kind.EncryptedDirectMessage:
@@ -153,7 +163,7 @@ export class Nostr {
                 this.textCache.set(event.id, event);
                 break;
             case Kind.Metadata:
-                if (this.metadataCache.size > 1000) {
+                if (this.metadataCache.size > 2000) {
                     this.metadataCache.clear();
                 }
                 this.metadataCache.set(event.pubkey, event);
@@ -580,6 +590,7 @@ export class Nostr {
             // console.log("getEvent: " + S.util.prettyPrint(events));
 
             if (events?.length > 0) {
+                this.cacheEvents(events);
                 return events[0];
             }
             else {
@@ -690,6 +701,34 @@ export class Nostr {
         return val;
     }
 
+    processMetadataQueue = async () => {
+        if (this.metadataQueue.size === 0) return;
+        const authors: string[] = Array.from(this.metadataQueue);
+        this.metadataQueue.clear();
+
+        const query: any = {
+            authors,
+            kinds: [Kind.Metadata]
+        };
+
+        // todo-0: querying only from our own relays is not technically correct here: The metadataQueue entries really need
+        // to have the specific relays discovered on each user instead
+        const events = await this.queryRelays(this.getMyRelays(), query, true);
+        if (events) {
+            console.log("Result of processMetadataQueue Lookup: " + S.util.prettyPrint(events));
+        }
+
+        if (events?.length > 0) {
+            // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
+            // we had queued and the page will now render the names.
+            dispatch("ForceRefreshMetadata", s => { });
+        }
+
+        // For now let's NOT persist every username we find, but this *would* work.
+        // Persist these without using an await
+        // this.persistEvents(events, true);
+    }
+
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
         if (!this.checkInit()) return;
         const relays = this.getRelays(getAs().userProfile.relays);
@@ -714,16 +753,6 @@ export class Nostr {
             await this.persistEvents(events, background);
         }
 
-        // todo-0: need ability to have the server update any parts of the page where there's a node
-        // that's being displayed without the full metadata having been queried yet. We should theoretically
-        // be able to use the same code we use for like updating all pages when some node gets deleted, to be able
-        // to traverse all GUI components and inject at least the Avatar and Friendly Username directly into all
-        // in-browser memory and then just force page to rerender, and all this new metadata we just recieved should
-        // instantly become correct on the page.
-        //
-        // For now the main 'symptom' we see of not doing this is that when we do a "Thread View" of a node and some
-        // of the rows are in that threadview without full metadata we have to click them to get the metadata (avatar, etc)
-        // by essentially opening up the UserProfileDlg of the owner of the row.
         return null;
     }
 
@@ -909,9 +938,8 @@ export class Nostr {
         let isPublic = false;
         let relaysStr = "";
         let shareToPubKey = null;
+        let nostrShareCount = 0;
 
-        // todo-0: detect if we're sending a DM and have 'multiple' people in this ACL (or public) because
-        // that's always invalid
         node.ac.forEach(acl => {
             if (acl.principalName === J.PrincipalName.PUBLIC) {
                 isPublic = true;
@@ -919,6 +947,7 @@ export class Nostr {
             else if (acl.nostrNpub) {
                 shareToPubKey = this.translateNip19(acl.nostrNpub);
                 tags.push(["p", shareToPubKey]);
+                nostrShareCount++;
                 npubs.push(acl.nostrNpub);
                 if (relaysStr) {
                     relaysStr += "\n";
@@ -951,6 +980,10 @@ export class Nostr {
         const kind = node.type === J.NodeType.NOSTR_ENC_DM ? Kind.EncryptedDirectMessage : Kind.Text;
         let content = clearText;
         if (kind === Kind.EncryptedDirectMessage) {
+            if (nostrShareCount > 0) {
+                console.warn("Warning: Nostr DMs can only share to one person.");
+                return null;
+            }
             // console.log("Nostr Encrypting outbound conent: " + content);
             content = await nip04.encrypt(this.sk, shareToPubKey, content);
             // console.log("Nostr Cipher conent: " + content);
@@ -993,6 +1026,8 @@ export class Nostr {
             let relay: Relay = null;
             let pool: SimplePool = null;
             let poolRemainder = 0;
+
+            this.cacheEvent(event);
 
             if (relays.length === 1) {
                 relay = await this.openRelay(relays[0]);
@@ -1083,7 +1118,6 @@ export class Nostr {
 
         let idx = 0;
         events.forEach(event => {
-            this.cacheEvent(event);
             console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
             if (!this.checkEvent(event)) {
                 console.log("eventCheck Failed.");
@@ -1123,6 +1157,7 @@ export class Nostr {
         return res;
     }
 
+    /* Called by the markdown component renderer to process the content display for this node */
     replaceNostrRefs = (node: J.NodeInfo, val: string): string => {
         if (!this.hasNostrTags(node) || !node.nostrPubKey) return val;
 
@@ -1135,12 +1170,29 @@ export class Nostr {
             // console.log("REFS=" + S.util.prettyPrint(references));
             references.forEach((ref: any) => {
                 if (ref.profile) {
-                    // todo-0: need a background thread that queues up these pubkeys, and queries for them
-                    // first on the server, and secondarily on relays until it can eventually render with
-                    // the actual username in this span, and also be sure they're cached on the client too
                     const elmId = Comp.getNextId();
-                    const keyAbbrev = ref.profile.pubkey.substring(0, 10);
-                    val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
+
+                    const dispInfo = this.dispInfoCache.get(ref.profile.pubkey);
+                    if (dispInfo) {
+                        val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                    }
+                    else {
+                        const metadataEvent = this.metadataCache.get(ref.profile.pubkey);
+
+                        // if we have the metadata cached we can render it immediately
+                        if (metadataEvent) {
+                            const dispInfo = this.getMetadataRefDisplayText(metadataEvent);
+                            this.dispInfoCache.set(ref.profile.pubkey, dispInfo);
+                            val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                        }
+                        // else render the placeholder, and add to queue for async rendering.
+                        else {
+                            this.metadataQueue.add(ref.profile.pubkey);
+                            const keyAbbrev = ref.profile.pubkey.substring(0, 10);
+                            val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
+                        }
+                    }
+
                     setTimeout(() => {
                         const e: HTMLElement = document.getElementById(elmId);
                         if (e) {
@@ -1166,6 +1218,14 @@ export class Nostr {
             S.util.logErr(ex, "Failed processing Nostr Refs on: " + S.util.prettyPrint(node));
         }
         return val;
+    }
+
+    getMetadataRefDisplayText = (event: any): { display: string, title: string } => {
+        const ev = JSON.parse(event.content);
+        if (!ev) return { display: "", title: "" };
+        const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
+        const display = S.domUtil.escapeHtml(ev.displayName || ev.display_name || ev.name || ev.username);
+        return { display, title };
     }
 
     /* Creates an unsigned event */
@@ -1229,8 +1289,6 @@ export class Nostr {
             this.bigQueryRunning = true;
 
             if (!this.myFriends) {
-                // todo-0: this caching should be outside of Nostr scope and done just in general
-                // for all places in the code we access uers lists.
                 const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
                     nodeId: null,
                     type: "friends",
@@ -1368,6 +1426,7 @@ export class Nostr {
             const relay = await this.openRelay(relayUrl);
             const ret = await relay.list([query]);
             relay.close();
+            this.cacheEvents(ret);
             return ret;
         }
         finally {
@@ -1404,6 +1463,7 @@ export class Nostr {
             this.nostrQueryBegin(background);
             const ret = await pool.list(relays, [query]);
             pool.close(relays);
+            this.cacheEvents(ret);
             return ret;
         }
         finally {

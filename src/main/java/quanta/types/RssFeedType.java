@@ -23,7 +23,6 @@ public class RssFeedType extends TypeBase {
         String feedSrc = node.getStr(NodeProp.RSS_FEED_SRC);
 
         // if no content or it's encrypted return
-        // todo-0: make this check for NOSTR enc type too
         if (feedSrc == null || feedSrc.startsWith(Constant.ENC_TAG.s()))
             return;
 

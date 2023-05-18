@@ -1026,7 +1026,7 @@ public class UserManagerService extends ServiceBase {
 				if (StringUtils.isEmpty(relays)) {
 					SubNode root = read.getDbRoot();
 					relays = root.getStr(NodeProp.NOSTR_RELAYS);
-					userNode.set(NodeProp.NOSTR_RELAYS, relays);
+					userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(relays));
 				}
 				userProfile.setRelays(relays);
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));

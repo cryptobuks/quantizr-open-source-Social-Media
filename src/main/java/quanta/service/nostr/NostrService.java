@@ -59,7 +59,7 @@ public class NostrService extends ServiceBase {
 		arun.run(as -> {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
 			if (userNode != null) {
-				userNode.set(NodeProp.NOSTR_RELAYS, req.getRelays());
+				userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(req.getRelays()));
 				update.save(as, userNode);
 				res.setSuccess(true);
 			}
@@ -167,7 +167,7 @@ public class NostrService extends ServiceBase {
 
 			String relays = event.getRelays();
 			if (!StringUtils.isEmpty(relays)) {
-				nostrAccnt.set(NodeProp.NOSTR_RELAYS, relays);
+				nostrAccnt.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(relays));
 			}
 
 			// this should be updating thru the call to apCache.saveNotify(node) in
@@ -178,10 +178,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	// parses the new-line delimited string of relays, and returns a string with the same ones
-	// but guarantees no duplicates.
-	// todo-0: we need to call this for when users upload their own relays thru the SettingsView
-	private String removeDuplicateRelays(String relays) {
+	public String removeDuplicateRelays(String relays) {
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(relays, "\n\r\t ", false);
 		HashSet<String> relaySet = new HashSet<>();
@@ -289,7 +286,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary &&& */
+	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
 	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode,
 			IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
