@@ -928,8 +928,12 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
         ObjectId lastNodeId = null;
 
+        // It's too confusing (and undesirable really) to remove blocked users from the thread view because 
+        // it creates the appearance that the app is malfunctioning when you try to view a thread and nothing shows
+        // up yet you know this is obviously a conversation that's missing.
+        //
         HashSet<ObjectId> blockedUserIds = new HashSet<>();
-        userFeed.getBlockedUserIds(blockedUserIds, null);
+        // userFeed.getBlockedUserIds(blockedUserIds, null);
 
         // todo-1: This is an unfinished work in progress. I was unable to find any foreign posts
         // that put any messages in their 'replies' collection, or at least when I query collections

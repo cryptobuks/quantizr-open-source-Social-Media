@@ -174,9 +174,6 @@ public class MongoAuth extends ServiceBase {
 			// add `parent.owner` to the ACL
 			child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
-			// todo-0: what if user specified to send to BOTH AP and Nostr? Can we combine both
-			// of these logics into same outbound node? Some would have "@name" (for AP) and some would be
-			// @npub12345678 for Nostr in the content.
 			if (nostr.isNostrNode(parent)) {
 				processNostrForNewNode(parent, child);
 			} else {
