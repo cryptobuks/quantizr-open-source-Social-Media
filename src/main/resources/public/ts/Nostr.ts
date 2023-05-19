@@ -1295,7 +1295,13 @@ export class Nostr {
             console.log("metadata has no content: " + S.util.prettyPrint(event));
             return null;
         }
-        const ev = JSON.parse(event.content);
+        let ev = null;
+        try {
+            ev = JSON.parse(event.content);
+        }
+        catch (e) {
+            S.util.logErr(e, "Unable to parse metatata content from :" + S.util.prettyPrint(event));
+        }
         if (!ev) return null;
         const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
         const display = S.domUtil.escapeHtml(ev.displayName || ev.display_name || ev.name || ev.username);
