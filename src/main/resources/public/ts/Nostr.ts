@@ -290,7 +290,7 @@ export class Nostr {
     }
 
     // gets relays to use for logged in users or anon ysers
-    getSessionRelays = (): string => {
+    getSessionRelaysStr = (): string => {
         const ast = getAs();
         // todo-00: Need to consolidate ast.config and S.quanta.configRes all into 'ast'
 
@@ -358,7 +358,7 @@ export class Nostr {
             if (!event) {
                 console.log("Last resort. Querying with *our* relays");
                 const localPool = new SimplePool();
-                const localRelays = this.getRelays(this.getSessionRelays());
+                const localRelays = this.getMyRelays();
                 try {
                     event = await this.getEvent(eventRepliedTo, localPool, localRelays);
                 }
@@ -541,7 +541,7 @@ export class Nostr {
         const event = await this.getEvent(nostrId, null, this.getMyRelays());
         const e = new Val<Event>();
         if (event) {
-            await this.readUserMetadata(event.pubkey, this.getSessionRelays(), false, false, e);
+            await this.readUserMetadata(event.pubkey, this.getSessionRelaysStr(), false, false, e);
         }
 
         let report = "Event: \n" + S.util.prettyPrint(event);
@@ -742,7 +742,7 @@ export class Nostr {
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
-        const relays = this.getRelays(this.getSessionRelays());
+        const relays = this.getMyRelays();
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
             return;
@@ -775,7 +775,7 @@ export class Nostr {
 
         // if we didn't find the metadata fallback to using our own relays to try.
         if (!e.val) {
-            ret = await this.readUserMetadata(user, this.getSessionRelays(), isNip05, persist, e, background);
+            ret = await this.readUserMetadata(user, this.getSessionRelaysStr(), isNip05, persist, e, background);
         }
 
         if (outEvent) {
@@ -1003,7 +1003,7 @@ export class Nostr {
         event.sig = signEvent(event, this.sk);
         this.cacheEvent(event);
 
-        relays.push(...this.getRelays((relaysStr || "") + "\n" + (this.getSessionRelays() || "")));
+        relays.push(...this.getRelays((relaysStr || "") + "\n" + (this.getSessionRelaysStr() || "")));
         return event;
     }
 
@@ -1382,7 +1382,7 @@ export class Nostr {
     }
 
     getMyRelays = (): string[] => {
-        return this.getRelays(this.getSessionRelays());
+        return this.getRelays(this.getSessionRelaysStr());
     }
 
     isNostrNode = (node: J.NodeInfo) => {
@@ -1405,7 +1405,7 @@ export class Nostr {
 
     private async getRelaysForUser(node: J.NodeInfo) {
         if (getAs().isAnonUser) {
-            return this.getRelays(this.getSessionRelays());
+            return this.getMyRelays();
         }
 
         let relays: string[] = this.userRelaysCache.get(node.ownerId);

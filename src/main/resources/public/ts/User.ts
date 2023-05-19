@@ -280,7 +280,7 @@ export class User {
                 }
 
                 // load relays saved in config or else use ones defined by this user.
-                const relays: string[] = S.nostr.getRelays((S.nostr.getSessionRelays() || "") + "\n" + (S.quanta.configRes.loadNostrIdRelays || ""));
+                const relays: string[] = S.nostr.getRelays((S.nostr.getSessionRelaysStr() || "") + "\n" + (S.quanta.configRes.loadNostrIdRelays || ""));
                 S.quanta.configRes.loadNostrIdRelays = null;
 
                 if (!relays || relays.length === 0) {
