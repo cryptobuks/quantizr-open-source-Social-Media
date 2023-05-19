@@ -27,7 +27,8 @@ export class NodeUtil {
                 S.props.getPropStr(J.NodeProp.NOSTR_USER_NAME, node);
 
             if (!name) {
-                name = nip19.npubEncode(node.owner.substring(1));
+                const pubKey = node.owner.substring(1);
+                name = nip19.npubEncode(pubKey);
                 if (name) {
                     name = name.substring(0, 13) + "...";
                 }

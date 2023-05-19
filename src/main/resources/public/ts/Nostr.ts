@@ -804,13 +804,17 @@ export class Nostr {
                 // todo-0: consider a strategy where we do save these since we know there's already a node
                 // on the server owned by this metadata.
                 // If pk not already cached, then queue it up for being cached
-                if (!this.metadataCache.has(user.pk)) {
-                    this.metadataQueue.add(user.pk);
-                }
+                this.addToMetadataQueue(user.pk);
             }
         }
 
         return null;
+    }
+
+    addToMetadataQueue = (pubKey: string) => {
+        if (!this.metadataCache.has(pubKey)) {
+            this.metadataQueue.add(pubKey);
+        }
     }
 
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
@@ -1230,9 +1234,7 @@ export class Nostr {
                     // else render a placeholder and queue up the pubkey to be queries asynchronously
                     else {
                         // console.log("***** QUEUED: PK: "+ref.profile.pubkey);
-                        if (!this.metadataCache.has(ref.profile.pubkey)) {
-                            this.metadataQueue.add(ref.profile.pubkey);
-                        }
+                        this.addToMetadataQueue(ref.profile.pubkey);
                         const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
                     }

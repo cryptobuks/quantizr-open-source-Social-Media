@@ -70,7 +70,7 @@ export class Search {
             nostrNodeIds: null
         });
 
-        console.log("res=" + S.util.prettyPrint(res));
+        // console.log("res=" + S.util.prettyPrint(res));
 
         // if we dead-ended on a nostr item we didn't have on server...load the data, and then attempt 'getNodeThreadView' again.
         if (res.nostrDeadEnd) {

@@ -60,7 +60,7 @@ export class SearchByNostrDlg extends DialogBase {
         }
 
         if (event) {
-            console.log("EVENT FOUND: " + S.util.prettyPrint(event));
+            // console.log("EVENT FOUND: " + S.util.prettyPrint(event));
             this.close();
         }
         else {
