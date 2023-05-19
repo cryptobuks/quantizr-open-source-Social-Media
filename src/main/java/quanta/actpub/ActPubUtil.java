@@ -928,13 +928,6 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
         ObjectId lastNodeId = null;
 
-        // It's too confusing (and undesirable really) to remove blocked users from the thread view because 
-        // it creates the appearance that the app is malfunctioning when you try to view a thread and nothing shows
-        // up yet you know this is obviously a conversation that's missing.
-        //
-        HashSet<ObjectId> blockedUserIds = new HashSet<>();
-        // userFeed.getBlockedUserIds(blockedUserIds, null);
-
         // todo-1: This is an unfinished work in progress. I was unable to find any foreign posts
         // that put any messages in their 'replies' collection, or at least when I query collections
         // I get back an empty array of items for whatever reason.
@@ -968,9 +961,6 @@ public class ActPubUtil extends ServiceBase {
                         List<NodeInfo> children = new LinkedList<>();
 
                         for (SubNode child : iter) {
-                            if (blockedUserIds.contains(child.getOwner()))
-                                continue;
-
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, //
@@ -998,9 +988,6 @@ public class ActPubUtil extends ServiceBase {
                         iter = read.findNodesByProp(ms, NodePath.USERS_PATH + //
                                 "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(), replyTargetId);
                         for (SubNode child : iter) {
-                            if (blockedUserIds.contains(child.getOwner()))
-                                continue;
-
                             // if we didn't already add above, add now
                             if (!childIds.contains(child.getIdStr())) {
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
@@ -1080,12 +1067,6 @@ public class ActPubUtil extends ServiceBase {
                 }
 
                 node = parent;
-                if (node != null) {
-                    if (blockedUserIds.contains(node.getOwner())) {
-                        node = null;
-                    }
-                }
-
                 if (node == null) {
                     topReached = true;
                 }
