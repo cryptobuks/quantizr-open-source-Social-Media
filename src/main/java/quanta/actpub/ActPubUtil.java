@@ -66,7 +66,7 @@ public class ActPubUtil extends ServiceBase {
     @Autowired
     private ActPubLog apLog;
 
-    private static final int MAX_THREAD_NODES = 6;
+    private static final int MAX_THREAD_NODES = 200;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static

@@ -1,11 +1,11 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { IconButton } from "../comp/core/IconButton";
+import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
@@ -54,8 +54,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                     },
                     title: "Go back..."
                 }, "bigMarginLeft "),
-                !this.data.props.endReached ? new Button("More History...", () => { this.moreHistory() },
-                    { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
+                !this.data.props.endReached ? new Span("Thread was truncated. Too long.", { className: "float-end alert alert-warning" }) : null,
 
                 new Clearfix()
             ]),
@@ -90,12 +89,6 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
 
         this.setChildren(children);
         return true;
-    }
-
-    moreHistory = () => {
-        const results = this.data?.props?.results;
-        if (!results || results.length === 0) return;
-        S.srch.showThreadAddMore(results[0]);
     }
 
     /* overridable (don't use arrow function) */

@@ -59,57 +59,6 @@ export class Search {
         }
     }
 
-    showThreadAddMore = async (node: J.NodeInfo) => {
-        let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId: node.id,
-            loadOthers: true,
-            nostrNodeIds: null
-        });
-
-        // if we dead-ended on a nostr item we didn't have on server yet, then nostrDeadEnd is set in the results..
-        // This triggers us to load the data, and then attempt 'getNodeThreadView' again.
-        //
-        // todo-00: I added this code path for the "load more" of Nostr threads, but I need to test it more
-        // Note: Here's a sufficiently big thread to test with: NostrId: 16ad19f4111bca4af14fc48f2bace38edc2790e7601cd59ce0f69d3b7e932ba7
-        if (res.nostrDeadEnd) {
-            // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
-            // we resume from the actual 'node' we're trying to get Thread of.
-            const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
-            const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(resumeFromNode);
-
-            res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-                nodeId: node.id,
-                loadOthers: true,
-                nostrNodeIds: chainInfo?.eventNodeIds
-            });
-        }
-
-        if (res.nodes?.length > 0) {
-            dispatch("RenderThreadResults", s => {
-                S.domUtil.focusId(C.TAB_THREAD);
-                S.tabUtil.tabScroll(C.TAB_THREAD, 0);
-                const data = ThreadTab.inst;
-                if (!data) return;
-
-                s.threadViewNodeId = node.id;
-                data.openGraphComps = [];
-
-                // remove the last element, which will be a duplicate.
-                const moreResults = res.nodes.slice(0, -1);
-
-                data.props.results = [...moreResults, ...data.props.results];
-                data.props.endReached = res.topReached;
-                S.tabUtil.selectTabStateOnly(data.id);
-            });
-        }
-        else {
-            dispatch("RenderThreadResults", s => {
-                if (!ThreadTab.inst) return;
-                ThreadTab.inst.props.endReached = true;
-            });
-        }
-    }
-
     showThread = async (node: J.NodeInfo) => {
         console.log("search.showThread()");
         // First call the server in case it has enough data already to render the Thread, in which case
