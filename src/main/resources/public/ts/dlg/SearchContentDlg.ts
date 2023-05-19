@@ -152,10 +152,14 @@ export class SearchContentDlg extends DialogBase {
                                 SearchContentDlg.dlgState.sortField = val;
                                 SearchContentDlg.dlgState.sortDir = sortDir;
 
-                                this.mergeState<LS>({
+                                const newState: LS = {
                                     sortField: val,
                                     sortDir
-                                });
+                                }
+                                if (val === J.NodeProp.PRIORITY_FULL) {
+                                    newState.requirePriority = true;
+                                }
+                                this.mergeState<LS>(newState);
                             },
                             getValue: (): string => this.getState<LS>().sortField
                         })

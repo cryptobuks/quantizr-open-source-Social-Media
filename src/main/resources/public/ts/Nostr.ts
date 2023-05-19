@@ -292,7 +292,7 @@ export class Nostr {
     // gets relays to use for logged in users or anon ysers
     getSessionRelays = (): string => {
         const ast = getAs();
-        // todo-0: Need to consolidate ast.config and S.quanta.configRes all into 'ast'
+        // todo-00: Need to consolidate ast.config and S.quanta.configRes all into 'ast'
 
         // console.log("configRes: " + S.util.prettyPrint(configRes));
         if (ast.userProfile?.relays) {
