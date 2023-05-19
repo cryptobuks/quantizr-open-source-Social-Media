@@ -826,9 +826,9 @@ export class Nostr {
         };
 
         const events = await this.queryRelays(relays, query, background);
-        if (events) {
-            console.log("Result of Metadata Lookup: " + S.util.prettyPrint(events));
-        }
+        // if (events) {
+        //     console.log("Result of Metadata Lookup: " + S.util.prettyPrint(events));
+        // }
 
         if (events?.length > 0) {
             const event: any = events[0];
@@ -1177,24 +1177,28 @@ export class Nostr {
 
                     const dispInfo = this.dispInfoCache.get(ref.profile.pubkey);
                     if (dispInfo) {
-                        val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                        val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
                     }
                     else {
                         const metadataEvent = this.metadataCache.get(ref.profile.pubkey);
                         let done = false;
+                        let allowQueue = true;
                         // if we have the metadata cached we can render it immediately
                         if (metadataEvent) {
                             const dispInfo = this.getMetadataRefDisplayText(metadataEvent);
                             if (dispInfo) {
                                 this.dispInfoCache.set(ref.profile.pubkey, dispInfo);
-                                val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                                val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
                                 done = true;
+                            }
+                            else {
+                                allowQueue = false;
                             }
                         }
 
                         // else render the placeholder, and add to queue for async rendering.
                         if (!done) {
-                            this.metadataQueue.add(ref.profile.pubkey);
+                            if (allowQueue) this.metadataQueue.add(ref.profile.pubkey);
                             const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                             val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
                         }
@@ -1228,7 +1232,10 @@ export class Nostr {
     }
 
     getMetadataRefDisplayText = (event: any): { display: string, title: string } => {
-        if (!event?.content) return null;
+        if (!event?.content) {
+            console.log("metadata has no content: " + S.util.prettyPrint(event));
+            return null;
+        }
         const ev = JSON.parse(event.content);
         if (!ev) return null;
         const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
