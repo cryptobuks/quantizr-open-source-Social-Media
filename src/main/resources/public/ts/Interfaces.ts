@@ -2,6 +2,12 @@ import * as J from "./JavaIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
 
+export class NostrMetadataDispInfo {
+    display: string;
+    title: string;
+    picture: string;
+}
+
 export enum FullScreenType {
     // eslint-disable-next-line no-unused-vars
     NONE, IMAGE, GRAPH, CALENDAR

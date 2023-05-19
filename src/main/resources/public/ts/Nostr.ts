@@ -23,6 +23,7 @@ import { Val } from "./Val";
 import { Comp } from "./comp/base/Comp";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SetNostrPrivateKeyDlg } from "./dlg/SetNostrPrivateKeyDlg";
+import { NostrMetadataDispInfo } from "./Interfaces";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -45,8 +46,9 @@ export class Nostr {
     // hold any data we've already encountered so we can avoid looking in relays when possible
     metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==user's pubkey)
     metadataQueue: Set<string> = new Set<string>(); // Holds pending pubkeys whose metadata is pending being rendered in the DOM
+    persistMetadataForKeys: Set<string> = new Set<string>(); // Holds pubkeys for which we DO want to persist the metadata once found
     textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==events id)
-    dispInfoCache: Map<string, any> = new Map<string, any>(); // cache for rapid injecting of user info during react renders
+    dispInfoCache: Map<string, NostrMetadataDispInfo> = new Map<string, NostrMetadataDispInfo>(); // cache for rapid injecting of user info during react renders
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
     persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
@@ -744,9 +746,11 @@ export class Nostr {
             dispatch("ForceRefreshMetadata", s => { });
         }
 
-        // For now let's NOT persist every username we find, but this *would* work.
+        // Any events that exist in persistMetatataForKeys gets persisted here.
         // Persist these without using an await
-        // this.persistEvents(events, true);
+        const eventsToPersist = events.filter(event => this.persistMetadataForKeys.has(event.pubkey));
+        this.persistMetadataForKeys.clear();
+        this.persistEvents(eventsToPersist, true);
     }
 
     updateAllNodesMetadata = () => {
@@ -784,14 +788,12 @@ export class Nostr {
             }
             else {
                 // we need to cache even empty data, so we don't repeat the attempt to get it again.
-                this.dispInfoCache.set(event.pubkey, { display: null, title: null });
+                this.dispInfoCache.set(event.pubkey, { display: null, title: null, picture: null });
             }
         }
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
-        // todo-0: Should we combine all relays together and query ALL these users in one query?
-
         // -----------------------------------------------------------------
         // DO NOT DELETE
         // This code works, but it is inefficient and so for now let's not do this and we'll instead just
@@ -822,19 +824,20 @@ export class Nostr {
         if (userInfo.users?.length > 0) {
             for (const user of userInfo.users) {
                 console.log("Queueing PK pushed from server: " + user.pk);
-                // todo-0: consider a strategy where we do save these since we know there's already a node
-                // on the server owned by this metadata.
                 // If pk not already cached, then queue it up for being cached
-                this.addToMetadataQueue(user.pk);
+                this.addToMetadataQueue(user.pk, true);
             }
         }
 
         return null;
     }
 
-    addToMetadataQueue = (pubKey: string) => {
+    addToMetadataQueue = (pubKey: string, persist: boolean) => {
         if (!this.metadataCache.has(pubKey)) {
             this.metadataQueue.add(pubKey);
+            if (persist) {
+                this.persistMetadataForKeys.add(pubKey);
+            }
         }
     }
 
@@ -1255,7 +1258,7 @@ export class Nostr {
                     // else render a placeholder and queue up the pubkey to be queries asynchronously
                     else {
                         // console.log("***** QUEUED: PK: "+ref.profile.pubkey);
-                        this.addToMetadataQueue(ref.profile.pubkey);
+                        this.addToMetadataQueue(ref.profile.pubkey, false);
                         const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
                     }
@@ -1287,8 +1290,7 @@ export class Nostr {
         return val;
     }
 
-    // todo-00: make a typoe for this return value
-    getMetadataDisplayInfo = (event: any): { display: string, title: string, picture: string } => {
+    getMetadataDisplayInfo = (event: any): NostrMetadataDispInfo => {
         if (!event?.content) {
             console.log("metadata has no content: " + S.util.prettyPrint(event));
             return null;
