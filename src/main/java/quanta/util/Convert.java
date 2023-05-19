@@ -121,33 +121,33 @@ public class Convert extends ServiceBase {
 		String apImage = null;
 		String owner = PrincipalName.ADMIN.s();
 
-		SubNode userNode = ThreadLocals.getCachedNode(node.getOwner());
-		if (userNode == null) {
-			userNode = read.getOwner(ms, node, false);
-			if (userNode != null) {
-				ThreadLocals.cacheNode(userNode);
+		SubNode ownerAccnt = ThreadLocals.getCachedNode(node.getOwner());
+		if (ownerAccnt == null) {
+			ownerAccnt = read.getOwner(ms, node, false);
+			if (ownerAccnt != null) {
+				ThreadLocals.cacheNode(ownerAccnt);
 			}
 		}
 
-		if (userNode != null) {
-			nameProp = userNode.getStr(NodeProp.USER);
+		if (ownerAccnt != null) {
+			nameProp = ownerAccnt.getStr(NodeProp.USER);
 
-			Attachment userAtt = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+			Attachment userAtt = ownerAccnt.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 			if (userAtt != null) {
 				avatarVer = userAtt.getBin();
 			}
 
-			displayName = user.getFriendlyNameFromNode(userNode);
-			nostrPubKey = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
-			apAvatar = userNode.getStr(NodeProp.USER_ICON_URL);
-			apImage = userNode.getStr(NodeProp.USER_BANNER_URL);
+			displayName = user.getFriendlyNameFromNode(ownerAccnt);
+			nostrPubKey = ownerAccnt.getStr(NodeProp.NOSTR_USER_NPUB);
+			apAvatar = ownerAccnt.getStr(NodeProp.USER_ICON_URL);
+			apImage = ownerAccnt.getStr(NodeProp.USER_BANNER_URL);
 			owner = nameProp;
 
 			if (nostr.isNostrNode(node) && nameProp.startsWith(".")) {
 				// nostrId will be the name wit the "." prefix removed
 				String nostrId = nameProp.substring(1);
-				String relays = userNode.getStr(NodeProp.NOSTR_RELAYS);
-				if (userNode.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
+				String relays = ownerAccnt.getStr(NodeProp.NOSTR_RELAYS);
+				if (ownerAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
 					log.debug("Queueing client to update metadata for nostr user: " + nostrPubKey);
 					ThreadLocals.getNewNostrUsers().put(nostrId, new NostrUserInfo(nostrId, null, relays));
 				}
@@ -206,7 +206,7 @@ public class Convert extends ServiceBase {
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
 		if (plugin != null) {
-			plugin.convert(ms, nodeInfo, node, userNode, getFollowers);
+			plugin.convert(ms, nodeInfo, node, ownerAccnt, getFollowers);
 		}
 
 		// allow client to know if this node is not yet saved by user
