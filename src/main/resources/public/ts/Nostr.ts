@@ -731,9 +731,14 @@ export class Nostr {
         // }
 
         if (events?.length > 0) {
+            const mapByPk: Map<string, Event> = new Map<string, Event>();
             for (const event of events) {
+                mapByPk.set(event.pubkey, event);
                 this.cacheMetadataEvent(event);
             }
+
+            this.updateAllNodesMetadata();
+
             // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
             // we had queued and the page will now render the names.
             dispatch("ForceRefreshMetadata", s => { });
@@ -742,6 +747,22 @@ export class Nostr {
         // For now let's NOT persist every username we find, but this *would* work.
         // Persist these without using an await
         // this.persistEvents(events, true);
+    }
+
+    updateAllNodesMetadata = () => {
+        const ast = getAs();
+        ast.tabData.forEach(td => {
+            td.processNode(ast, node => {
+                if (this.isNostrUserName(node.owner)) {
+                    const pubKey = node.owner.substring(1);
+                    const dispInfo = this.dispInfoCache.get(pubKey);
+                    if (dispInfo?.display) {
+                        node.displayName = dispInfo.display;
+                        node.apAvatar = dispInfo.picture;
+                    }
+                }
+            })
+        });
     }
 
     cacheMetadataEvent = (event: Event) => {
@@ -1266,7 +1287,8 @@ export class Nostr {
         return val;
     }
 
-    getMetadataDisplayInfo = (event: any): { display: string, title: string } => {
+    // todo-00: make a typoe for this return value
+    getMetadataDisplayInfo = (event: any): { display: string, title: string, picture: string } => {
         if (!event?.content) {
             console.log("metadata has no content: " + S.util.prettyPrint(event));
             return null;
@@ -1276,7 +1298,7 @@ export class Nostr {
         const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
         const display = S.domUtil.escapeHtml(ev.displayName || ev.display_name || ev.name || ev.username);
         if (!display) return null;
-        return { display, title };
+        return { display, title, picture: ev.picture };
     }
 
     /* Creates an unsigned event */

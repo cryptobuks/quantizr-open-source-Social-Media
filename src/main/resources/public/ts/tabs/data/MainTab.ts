@@ -62,6 +62,10 @@ export class MainTab implements TabIntf<any> {
         });
     }
 
+    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+        ust.node.children?.forEach(n => func(n));
+    }
+
     getTabSubOptions = (): Div => {
         const ast = getAs();
         return new Divc({ className: "tabSubOptions" }, [

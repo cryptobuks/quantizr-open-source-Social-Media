@@ -47,4 +47,8 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
+
+    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+        this.props.results?.forEach(n => func(n));
+    }
 }

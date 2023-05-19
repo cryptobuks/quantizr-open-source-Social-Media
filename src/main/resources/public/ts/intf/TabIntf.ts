@@ -40,6 +40,7 @@ export interface TabIntf<PT = any, TT = any> {
     findNode(nodeId: string): J.NodeInfo;
     nodeDeleted(ust: AppState, nodeId: string): void;
     replaceNode(ust: AppState, newNode: J.NodeInfo): void;
+    processNode(ust: AppState, func: (node: J.NodeInfo) => void): void;
 
     props: PT;
 

@@ -37,4 +37,7 @@ export class RSSTab implements TabIntf<any> {
 
     replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
     }
+
+    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    }
 }

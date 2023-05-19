@@ -42,6 +42,10 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         });
     }
 
+    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+        this.props.feedResults?.forEach(n => func(n));
+    }
+
     getTabSubOptions = (): Div => {
         const ast = getAs();
         if (this.props?.feedFilterRootNode) {
