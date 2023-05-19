@@ -714,9 +714,9 @@ export class Nostr {
         // todo-1: querying only from our own relays is not technically correct here: The metadataQueue entries really need
         // to have the specific relays discovered on each user instead
         const events = await this.queryRelays(this.getMyRelays(), query, true, true);
-        if (events) {
-            console.log("Result of processMetadataQueue Lookup: " + S.util.prettyPrint(events));
-        }
+        // if (events) {
+        //     console.log("Result of processMetadataQueue Lookup: " + S.util.prettyPrint(events));
+        // }
 
         if (events?.length > 0) {
             // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
@@ -1112,9 +1112,9 @@ export class Nostr {
         // map key is 'pk'.
         const userSet: Map<String, J.NostrUserInfo> = new Map<String, J.NostrUserInfo>();
 
-        let idx = 0;
+        // let idx = 0;
         events.forEach(event => {
-            console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
+            // console.log("PERSIST EVENT[" + (idx++) + "]: " + S.util.prettyPrint(event));
             if (!this.checkEvent(event)) {
                 console.log("eventCheck Failed.");
             }
@@ -1139,7 +1139,7 @@ export class Nostr {
         });
 
         const userInfo: J.NostrUserInfo[] = Array.from(userSet.values());
-        console.log("saveNostrEvents has this userInfo: " + S.util.prettyPrint(userInfo));
+        // console.log("saveNostrEvents has this userInfo: " + S.util.prettyPrint(userInfo));
 
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
@@ -1149,7 +1149,7 @@ export class Nostr {
 
         // keep track of what we've just sent to server.
         events.forEach(e => this.persistedEvents.add(e.id));
-        console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
+        // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
     }
 
@@ -1221,7 +1221,7 @@ export class Nostr {
     }
 
     getMetadataRefDisplayText = (event: any): { display: string, title: string } => {
-        if (!event?.conent) return null;
+        if (!event?.content) return null;
         const ev = JSON.parse(event.content);
         if (!ev) return null;
         const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
@@ -1329,9 +1329,9 @@ export class Nostr {
                 console.warn("no relays to read from.");
             }
 
-            if (userNames.length > 0 && relaysArray.length > 0) {
-                console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
-            }
+            // if (userNames.length > 0 && relaysArray.length > 0) {
+            //     console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
+            // }
             ret = await this.readPosts(userNames, relaysArray, -1, background, includeDms);
         }
         finally {
