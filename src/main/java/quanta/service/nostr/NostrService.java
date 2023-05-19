@@ -304,13 +304,6 @@ public class NostrService extends ServiceBase {
 		} else {
 			// any time we get a node, and see it's metadata has never been queried for we cache that up to
 			// happen asap
-
-			// NOTE: Doing this would be theoretically correct, but we don't really need it afaik, and also
-			// currently
-			// there's no way to stop the client from getting queued up with multiple requests to query relays
-			// for the same data as different request threads come thru and activate this code before the DB
-			// has yet been update. (duplication of work is possible if I turn this on now)
-			// todo-000: once this code is tested remove the comment just above
 			if (nostrAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
 				ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
 			}

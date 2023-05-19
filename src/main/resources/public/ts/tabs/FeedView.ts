@@ -182,7 +182,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
         else if (!this.data.props.feedResults || this.data.props.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
-            // todo-000: This was a NPE for anon users, because ast.userProfile is null. Need to search for other potential places we have same bug.
             if (ast.userProfile?.blockedWords) {
                 children.push(new Div("Note: The 'Blocked Words' defined in your Settings can affect this view."));
             }

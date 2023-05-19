@@ -1307,8 +1307,10 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	/*
-	 * Looks like this code can often 'discover' users that have a node in the system, but just never
-	 * got their metadata requested for updating by the server push technique (todo-0)
+	 * todo-00: This code can often 'discover' users that have a node in the system, but just never
+	 * got their metadata requested for updating by the server push technique, and also we need to include
+	 * all the "p" tag persons on the node if this is a Nostr Node, and include them in the people returned
+	 * but all this needs to be tested in Nostr and has not yet been.
 	 */
 	public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
 		GetPeopleResponse res = new GetPeopleResponse();
