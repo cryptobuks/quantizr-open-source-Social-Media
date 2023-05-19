@@ -100,24 +100,26 @@ export class Nostr {
         const currentMetaPayload = this.createMetaPayload();
         const currentMeta = this.createMetadataEvent(currentMetaPayload);
 
-        // we need to scan one relay at a time to verify we have our identity on each one.
-        relays.forEach(async (relay: string) => {
-            const eventVal = new Val<Event>();
+        if (relays.length > 0) {
+            // we need to scan one relay at a time to verify we have our identity on each one.
+            for (const relay of relays) {
+                const eventVal = new Val<Event>();
 
-            // try to read the metadata from the relay
-            await S.nostr.readUserMetadata(this.pk, relay, false, false, eventVal);
+                // try to read the metadata from the relay
+                await S.nostr.readUserMetadata(this.pk, relay, false, false, eventVal);
 
-            // if the relay didn't have matching metadata we need to publish it to this relay
-            if (!this.metadataMatches(currentMetaPayload, eventVal.val)) {
-                console.log("Pushing new meta to relay: " + relay);
+                // if the relay didn't have matching metadata we need to publish it to this relay
+                if (!this.metadataMatches(currentMetaPayload, eventVal.val)) {
+                    console.log("Pushing new meta to relay: " + relay);
 
-                // don't await for this, we can let them all run in parallel
-                this.publishEvent(currentMeta, relay);
+                    // don't await for this, we can let them all run in parallel
+                    this.publishEvent(currentMeta, relay);
+                }
+                else {
+                    console.log("Meta is up to date on relay: " + relay);
+                }
             }
-            else {
-                console.log("Meta is up to date on relay: " + relay);
-            }
-        });
+        }
     }
 
     metadataMatches(meta: J.NostrMetadata, event: Event): boolean {
@@ -742,16 +744,20 @@ export class Nostr {
         }
 
         const events: Event[] = [];
-        userInfo.users?.forEach(async (user) => {
-            console.log("SERVER REQ. USER LOAD: " + user);
 
-            const eventVal = new Val<Event>();
-            await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
+        // todo-0: Should we combine all relays together and query ALL these users in one query?
+        if (userInfo.users?.length > 0) {
+            for (const user of userInfo.users) {
+                // console.log("SERVER REQ. USER LOAD: " + S.util.prettyPrint(user));
 
-            if (eventVal.val) {
-                events.push(eventVal.val);
+                const eventVal = new Val<Event>();
+                await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
+
+                if (eventVal.val) {
+                    events.push(eventVal.val);
+                }
             }
-        });
+        }
 
         if (events.length > 0) {
             await this.persistEvents(events, background);

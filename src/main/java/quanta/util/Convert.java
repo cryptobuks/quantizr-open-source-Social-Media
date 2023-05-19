@@ -147,8 +147,20 @@ public class Convert extends ServiceBase {
 				// nostrId will be the name wit the "." prefix removed
 				String nostrId = nameProp.substring(1);
 				String relays = ownerAccnt.getStr(NodeProp.NOSTR_RELAYS);
+
 				if (ownerAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
 					log.debug("Queueing client to update metadata for nostr user: " + nostrPubKey);
+
+					/* Queueing up these nostrIds causes them to be sent down to the browser to be queries
+					 * and then the info is saved to the server once known, however that happens in the 
+					 * background and initially when the page renders there might be some "User Info" (username & avatar)
+					 * that is missing on the page, until it gets resolved. They way they get resolved on the browser
+					 * page is by the fact that nostr.ts has a metadataQueue which accumulates any 'unknown metadata users'
+					 * and then querys for them, and then simply re-renders the page. Any component that renders a 
+					 * nostr (username+avatar) must be smart enough to notice the missing data, and then try to render it
+					 * from the nostr metadataCache immediately or else queue it into metadataQueue so that the
+					 * page re-renders correctly shortly thereafter.
+					 */
 					ThreadLocals.getNewNostrUsers().put(nostrId, new NostrUserInfo(nostrId, null, relays));
 				}
 			}

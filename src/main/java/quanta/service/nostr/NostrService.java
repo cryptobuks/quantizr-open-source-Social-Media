@@ -309,10 +309,11 @@ public class NostrService extends ServiceBase {
 			// currently
 			// there's no way to stop the client from getting queued up with multiple requests to query relays
 			// for the same data as different request threads come thru and activate this code before the DB
-			// has yet been update. (dupliation of work is possible if I turn this on now)
-			// if (nostrAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
-			// ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
-			// }
+			// has yet been update. (duplication of work is possible if I turn this on now)
+			// todo-000: once this code is tested remove the comment just above
+			if (nostrAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
+				ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
+			}
 		}
 
 		if (postsNode != null) {

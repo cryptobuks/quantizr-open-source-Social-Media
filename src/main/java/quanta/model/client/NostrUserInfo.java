@@ -11,7 +11,7 @@ public class NostrUserInfo {
     private String npub;
 
     // only used when this object is part of a server side push to send down to client to populate and
-    // save user, in part of a 
+    // save user
     private String relays;
 
     public NostrUserInfo(String pk, String npub, String relays) {
