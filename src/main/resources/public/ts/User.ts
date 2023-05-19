@@ -193,7 +193,6 @@ export class User {
 
             // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
-
                 await S.nostr.initKeys(usr);
 
                 await promiseDispatch("unknownPubKeys", s => {
@@ -281,7 +280,7 @@ export class User {
                 }
 
                 // load relays saved in config or else use ones defined by this user.
-                const relays: string[] = S.nostr.getRelays((ast.userProfile?.relays || "") + "\n" + (S.quanta.configRes.loadNostrIdRelays || ""));
+                const relays: string[] = S.nostr.getRelays((S.nostr.getSessionRelays() || "") + "\n" + (S.quanta.configRes.loadNostrIdRelays || ""));
                 S.quanta.configRes.loadNostrIdRelays = null;
 
                 if (!relays || relays.length === 0) {

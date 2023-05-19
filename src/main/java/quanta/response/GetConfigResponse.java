@@ -18,4 +18,7 @@ public class GetConfigResponse extends ResponseBase {
     private String initialNodeId;
     private String loadNostrId;
     private String loadNostrIdRelays;
+
+    // these are the 'system defined' relays so that anonymous users can query for info.
+    private String nostrRelays;
 }

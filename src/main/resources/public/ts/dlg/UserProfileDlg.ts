@@ -240,7 +240,8 @@ export class UserProfileDlg extends DialogBase {
     readNostrPosts = () => {
         const state = this.getState<LS>();
         if (state.userProfile.nostrNpub) {
-            let relays = S.nostr.getRelays(state.userProfile.relays);
+            // todo-000: rename this pattern to getDefaultRelays()
+            let relays = S.nostr.getRelays(S.nostr.getSessionRelays());
             relays = S.nostr.addMyRelays(relays);
             console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
             S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false);
@@ -248,15 +249,15 @@ export class UserProfileDlg extends DialogBase {
     }
 
     createNostrInfoDiv = (nostrId: string): Comp => {
-        const ast = getAs();
         const children = [
             new Div("Nostr ID: "),
             new Div(nostrId, { className: "marginLeft" })
         ];
 
-        if (ast.userProfile.relays) {
+        const state = this.getState<LS>();
+        if (state.userProfile.relays) {
             children.push(new Div("Relays: "));
-            const relays = S.nostr.getRelays(ast.userProfile.relays);
+            const relays = S.nostr.getRelays(S.nostr.getSessionRelays());
             if (relays) {
                 relays.forEach(r => {
                     children.push(new Div(r, { className: "marginLeft" }));

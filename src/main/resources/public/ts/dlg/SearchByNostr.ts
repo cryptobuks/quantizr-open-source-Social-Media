@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -45,7 +44,7 @@ export class SearchByNostrDlg extends DialogBase {
         try {
             S.rpcUtil.incRpcCounter();
             const find = S.nostr.translateNip19(SearchByNostrDlg.defaultSearchText);
-            const relays = S.nostr.getRelays(getAs().userProfile.relays);
+            const relays = S.nostr.getRelays(S.nostr.getSessionRelays());
             event = await S.nostr.getEvent(find, null, relays);
             if (event) {
                 const res = await S.nostr.persistEvents([event]);

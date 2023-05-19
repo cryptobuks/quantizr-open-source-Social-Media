@@ -28,12 +28,13 @@ export class NodeCompMarkdown extends Html {
     constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
         super(null, { key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
+        const ast = getAs();
 
         // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
         this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
 
-        if (!getAs().mobileMode) {
+        if (!ast.mobileMode) {
             const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "contentWide" : "contentNarrow";
             this.attribs.className = "mkCont " + widthStyle;
         }
@@ -53,7 +54,10 @@ export class NodeCompMarkdown extends Html {
         /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
         if (S.props.isEncrypted(node) || node.type === J.NodeType.NOSTR_ENC_DM) {
             att.content = "[Encrypted]";
-            att.pendingDecrypt = content;
+
+            if (!ast.isAnonUser) {
+                att.pendingDecrypt = content;
+            }
         }
         /* otherwise it's not encrypted and we display the normal way */
         else {

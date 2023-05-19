@@ -121,7 +121,6 @@ export class Nostr {
     }
 
     metadataMatches(meta: J.NostrMetadata, event: Event): boolean {
-        if (!this.checkInit()) return;
         if (!event) {
             return false;
         }
@@ -240,7 +239,6 @@ export class Nostr {
     // Builds all the nodes in the thread (by traversing up the tree of replies) going back in time towards
     // the original post.
     loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
-        if (!this.checkInit()) return;
         console.log("nostr.loadReplyChain() for node: " + S.util.prettyPrint(node));
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) {
@@ -289,6 +287,23 @@ export class Nostr {
             S.rpcUtil.decRpcCounter();
             pool?.close(this.toRelayArray(relaySet));
         }
+    }
+
+    // gets relays to use for logged in users or anon ysers
+    getSessionRelays = (): string => {
+        const ast = getAs();
+        // todo-0: Need to consolidate ast.config and S.quanta.configRes all into 'ast'
+
+        // console.log("configRes: " + S.util.prettyPrint(configRes));
+        if (ast.userProfile?.relays) {
+            return ast.userProfile.relays;
+        }
+
+        if (ast.config?.relays) {
+            return ast.config.relays;
+        }
+
+        return S.quanta.configRes.nostrRelays;
     }
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
@@ -343,7 +358,7 @@ export class Nostr {
             if (!event) {
                 console.log("Last resort. Querying with *our* relays");
                 const localPool = new SimplePool();
-                const localRelays = this.getRelays(getAs().userProfile.relays);
+                const localRelays = this.getRelays(this.getSessionRelays());
                 try {
                     event = await this.getEvent(eventRepliedTo, localPool, localRelays);
                 }
@@ -410,7 +425,6 @@ export class Nostr {
 
     // Returns the tags array entry that represents what the Event is a reply to, or null of not a reply
     getRepliedToItem = (tags: string[][]): string[] => {
-        if (!this.checkInit()) return null;
         if (!Array.isArray(tags)) {
             // console.log("no tags array.");
             return null;
@@ -522,13 +536,12 @@ export class Nostr {
     }
 
     queryAndDisplayNodeInfo = async (node: J.NodeInfo) => {
-        if (!this.checkInit()) return;
         let nostrId = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
         nostrId = nostrId.substring(1);
         const event = await this.getEvent(nostrId, null, this.getMyRelays());
         const e = new Val<Event>();
         if (event) {
-            await this.readUserMetadata(event.pubkey, getAs().userProfile.relays, false, false, e);
+            await this.readUserMetadata(event.pubkey, this.getSessionRelays(), false, false, e);
         }
 
         let report = "Event: \n" + S.util.prettyPrint(event);
@@ -557,7 +570,6 @@ export class Nostr {
     we DO ensure all the mentioned relays *are* added to it if not already in it.
     */
     getEvent = async (id: string, pool: SimplePool, relays: string[]): Promise<Event> => {
-        if (!this.checkInit()) return;
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -730,8 +742,7 @@ export class Nostr {
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
-        if (!this.checkInit()) return;
-        const relays = this.getRelays(getAs().userProfile.relays);
+        const relays = this.getRelays(this.getSessionRelays());
         if (relays.length === 0) {
             console.log("loadUserMetadata ignored. No relays.");
             return;
@@ -759,13 +770,12 @@ export class Nostr {
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
     readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
-        if (!this.checkInit()) return;
         const e = new Val<Event>();
         let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e, background);
 
         // if we didn't find the metadata fallback to using our own relays to try.
         if (!e.val) {
-            ret = await this.readUserMetadata(user, getAs().userProfile.relays, isNip05, persist, e, background);
+            ret = await this.readUserMetadata(user, this.getSessionRelays(), isNip05, persist, e, background);
         }
 
         if (outEvent) {
@@ -780,7 +790,6 @@ export class Nostr {
     // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
     readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
-        if (!this.checkInit()) return;
         console.log("Getting Metadata for Identity: " + user);
         let relays = this.getRelays(relayUrl);
         let profile = null;
@@ -860,7 +869,6 @@ export class Nostr {
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
     readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean, includeDms: boolean): Promise<J.SaveNostrEventResponse> => {
-        if (!this.checkInit()) return;
         userKeys = userKeys.map(u => this.translateNip19(u));
 
         // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
@@ -925,7 +933,6 @@ export class Nostr {
     * The actual 'node' may have encrypted content, so we always rely on clearText instead for 'content'
     */
     prepareOutboundEvent = async (node: J.NodeInfo, clearText: string, relays: string[]): Promise<Event> => {
-        if (!this.checkInit()) return;
         if (!node || !node.ac || node.ac.length === 0) return null;
         // console.log("Prepare Outbound for Node: " + S.util.prettyPrint(node));
         const tags: string[][] = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node) || [];
@@ -996,7 +1003,7 @@ export class Nostr {
         event.sig = signEvent(event, this.sk);
         this.cacheEvent(event);
 
-        relays.push(...this.getRelays((relaysStr || "") + "\n" + (getAs().userProfile.relays) || ""));
+        relays.push(...this.getRelays((relaysStr || "") + "\n" + (this.getSessionRelays() || "")));
         return event;
     }
 
@@ -1278,8 +1285,6 @@ export class Nostr {
     }
 
     queryNetwork = async (background: boolean = false, includeDms: boolean): Promise<void> => {
-        if (!this.checkInit()) return;
-
         if (this.bigQueryRunning) {
             console.log("Avoiding large concurrent queries.");
             return;
@@ -1370,7 +1375,7 @@ export class Nostr {
     }
 
     getMyRelays = (): string[] => {
-        return this.getRelays(getAs().userProfile.relays);
+        return this.getRelays(this.getSessionRelays());
     }
 
     isNostrNode = (node: J.NodeInfo) => {
@@ -1392,7 +1397,10 @@ export class Nostr {
     }
 
     private async getRelaysForUser(node: J.NodeInfo) {
-        if (!this.checkInit()) return;
+        if (getAs().isAnonUser) {
+            return this.getRelays(this.getSessionRelays());
+        }
+
         let relays: string[] = this.userRelaysCache.get(node.ownerId);
 
         // if not found in cache get from server
@@ -1420,7 +1428,6 @@ export class Nostr {
     }
 
     private async singleRelayQuery(relayUrl: string, query: any, background: boolean = false, silent: boolean = false): Promise<Event[]> {
-        if (!this.checkInit()) return;
         try {
             if (!silent) this.nostrQueryBegin(background);
             const relay = await this.openRelay(relayUrl);
@@ -1435,7 +1442,6 @@ export class Nostr {
     }
 
     private async multiRelayQuery(relays: string[], query: any, background: boolean = false, silent: boolean = false): Promise<Event[]> {
-        if (!this.checkInit()) return;
         if (!relays) return null;
 
         // update knownRelays set.

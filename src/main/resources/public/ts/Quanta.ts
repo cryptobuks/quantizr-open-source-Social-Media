@@ -101,6 +101,7 @@ export class Quanta {
         this.configRes = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
             appGuid: Quanta.appGuid
         }, true);
+        // console.log("GetConfigResponse: " + S.util.prettyPrint(this.configRes));
     }
 
     parseUrlParams = () => {

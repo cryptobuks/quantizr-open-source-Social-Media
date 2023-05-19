@@ -673,7 +673,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
 	public @ResponseBody Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
 
-		return callProc.run("getPeople", true, true, req, session, ms -> {
+		return callProc.run("getPeople", false, false, req, session, ms -> {
 			GetPeopleResponse ret = null;
 			if (req.getNodeId() != null) {
 				ret = user.getPeopleOnNode(ms, req.getNodeId());
@@ -1489,6 +1489,10 @@ public class AppController extends ServiceBase implements ErrorController {
 		res.setSessionTimeoutMinutes(prop.getSessionTimeoutMinutes());
 		res.setBrandingAppName(prop.getConfigText("brandingAppName"));
 		res.setRequireCrypto(prop.isRequireCrypto());
+
+		SubNode root = read.getDbRoot();
+		String relays = root.getStr(NodeProp.NOSTR_RELAYS);
+		res.setNostrRelays(relays);
 		return res;
 	}
 
