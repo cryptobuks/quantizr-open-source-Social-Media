@@ -976,7 +976,7 @@ export class Nostr {
         const kind = node.type === J.NodeType.NOSTR_ENC_DM ? Kind.EncryptedDirectMessage : Kind.Text;
         let content = clearText;
         if (kind === Kind.EncryptedDirectMessage) {
-            if (nostrShareCount > 0) {
+            if (nostrShareCount > 1) {
                 console.warn("Warning: Nostr DMs can only share to one person.");
                 return null;
             }
@@ -1174,15 +1174,19 @@ export class Nostr {
                     }
                     else {
                         const metadataEvent = this.metadataCache.get(ref.profile.pubkey);
-
+                        let done = false;
                         // if we have the metadata cached we can render it immediately
                         if (metadataEvent) {
                             const dispInfo = this.getMetadataRefDisplayText(metadataEvent);
-                            this.dispInfoCache.set(ref.profile.pubkey, dispInfo);
-                            val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                            if (dispInfo) {
+                                this.dispInfoCache.set(ref.profile.pubkey, dispInfo);
+                                val = val.replace(ref.text, `<span class='nostrLink' title='${dispInfo.title}' id='${elmId}'>@${dispInfo.display}</span>`);
+                                done = true;
+                            }
                         }
+
                         // else render the placeholder, and add to queue for async rendering.
-                        else {
+                        if (!done) {
                             this.metadataQueue.add(ref.profile.pubkey);
                             const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                             val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
@@ -1217,10 +1221,12 @@ export class Nostr {
     }
 
     getMetadataRefDisplayText = (event: any): { display: string, title: string } => {
+        if (!event?.conent) return null;
         const ev = JSON.parse(event.content);
-        if (!ev) return { display: "", title: "" };
+        if (!ev) return null;
         const title = S.domUtil.escapeHtml(ev.displayName + ": " + ev.about);
         const display = S.domUtil.escapeHtml(ev.displayName || ev.display_name || ev.name || ev.username);
+        if (!display) return null;
         return { display, title };
     }
 

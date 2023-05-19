@@ -62,6 +62,10 @@ export class Props {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== J.PrincipalName.PUBLIC);
     }
 
+    hasNonPublicNostrShares = (node: J.NodeInfo): boolean => {
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId?.startsWith("."));
+    }
+
     hasMentions = (node: J.NodeInfo): boolean => {
         const tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
         let ret = false;

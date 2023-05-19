@@ -47,7 +47,8 @@ export class EditNodeDlgUtil {
         const editNode = ast.editNode;
 
         // if trying to send non-public node over Nostr. Disallow it for now, unless a DM type (which we do allow). Until we have encryptio support.
-        if (editNode.type !== J.NodeType.NOSTR_ENC_DM && ast.protocolFilter === J.Constant.NETWORK_NOSTR && !S.props.isPublic(editNode) && S.props.hasNonPublicShares(editNode)) {
+        if (editNode.type !== J.NodeType.NOSTR_ENC_DM && ast.protocolFilter === J.Constant.NETWORK_NOSTR && //
+            !S.props.isPublic(editNode) && S.props.hasNonPublicNostrShares(editNode)) {
             S.util.showMessage("WARNING: Only Nostr DMs can be sent as private.", "Nostr Warning");
             return false;
         }

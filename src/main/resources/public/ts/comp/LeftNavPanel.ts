@@ -54,7 +54,7 @@ export class LeftNavPanel extends Div {
             ? (ast.myNewMessageCount + " new posts") : "";
 
         const nostrMessages = ast.nostrNewMessageCount > 0
-            ? (ast.nostrNewMessageCount + " new Nostr notes") : "";
+            ? (ast.nostrNewMessageCount + " new posts") : "";
 
         // todo-2: this is a hack to keep the new incomming "chat" messages (Node Feed) from tricking
         // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
