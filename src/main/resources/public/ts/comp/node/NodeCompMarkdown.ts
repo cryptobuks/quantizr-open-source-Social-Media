@@ -174,7 +174,7 @@ export class NodeCompMarkdown extends Html {
                 });
             }
             else {
-                setTimeout(async () => {
+                setTimeout(() => {
                     this.decrypt();
                 }, 10);
             }

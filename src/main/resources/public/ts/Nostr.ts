@@ -66,17 +66,22 @@ export class Nostr {
     }
 
     decrypt = async (sk: string, pk: string, cipherText: string) => {
-        // get hash of the encrypted data
-        const cipherHash: string = S.util.hashOfString(cipherText);
-        let clearText = S.quanta.decryptCache.get(cipherHash);
-        // if we have already decrypted this data return the result.
-        if (clearText) {
+        try {
+            // get hash of the encrypted data
+            const cipherHash: string = S.util.hashOfString(cipherText);
+            let clearText = S.quanta.decryptCache.get(cipherHash);
+            // if we have already decrypted this data return the result.
+            if (clearText) {
+                return clearText;
+            }
+
+            clearText = await nip04.decrypt(sk, pk, cipherText);
+            S.quanta.decryptCache.set(cipherHash, clearText);
             return clearText;
         }
-
-        clearText = await nip04.decrypt(sk, pk, cipherText);
-        S.quanta.decryptCache.set(cipherHash, clearText);
-        return clearText;
+        catch (e) {
+            return null;
+        }
     }
 
     checkInit = (): boolean => {
@@ -726,6 +731,9 @@ export class Nostr {
         // }
 
         if (events?.length > 0) {
+            for (const event of events) {
+                this.cacheMetadataEvent(event);
+            }
             // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
             // we had queued and the page will now render the names.
             dispatch("ForceRefreshMetadata", s => { });
@@ -736,31 +744,70 @@ export class Nostr {
         // this.persistEvents(events, true);
     }
 
-    loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo, background: boolean = false): Promise<void> => {
-        const relays = this.getMyRelays();
-        if (relays.length === 0) {
-            console.log("loadUserMetadata ignored. No relays.");
-            return;
+    cacheMetadataEvent = (event: Event) => {
+        let dispInfo = this.dispInfoCache.get(event.pubkey);
+        const cachedEvent = this.metadataCache.get(event.pubkey);
+
+        // if caches already exist, nothing to do here
+        if (dispInfo && cachedEvent) return;
+
+        if (!cachedEvent) {
+            this.metadataCache.set(event.pubkey, event);
         }
 
-        const events: Event[] = [];
-
-        // todo-0: Should we combine all relays together and query ALL these users in one query?
-        if (userInfo.users?.length > 0) {
-            for (const user of userInfo.users) {
-                // console.log("SERVER REQ. USER LOAD: " + S.util.prettyPrint(user));
-
-                const eventVal = new Val<Event>();
-                await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
-
-                if (eventVal.val) {
-                    events.push(eventVal.val);
-                }
+        // if we have the metadata cached we can render it immediately
+        if (!dispInfo) {
+            dispInfo = this.getMetadataDisplayInfo(event);
+            if (dispInfo) {
+                this.dispInfoCache.set(event.pubkey, dispInfo);
+            }
+            else {
+                // we need to cache even empty data, so we don't repeat the attempt to get it again.
+                this.dispInfoCache.set(event.pubkey, { display: null, title: null });
             }
         }
+    }
 
-        if (events.length > 0) {
-            await this.persistEvents(events, background);
+    loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
+        // todo-0: Should we combine all relays together and query ALL these users in one query?
+
+        // -----------------------------------------------------------------
+        // DO NOT DELETE
+        // This code works, but it is inefficient and so for now let's not do this and we'll instead just
+        // assume our set of relays is good enough and query for all users at once on our own relays
+        // const relays = this.getMyRelays();
+        // if (relays.length === 0) {
+        //     console.log("loadUserMetadata ignored. No relays.");
+        //     return;
+        // }
+        // const events: Event[] = [];
+        // if (userInfo.users?.length > 0) {
+        //     for (const user of userInfo.users) {
+        //         // console.log("SERVER REQ. USER LOAD: " + S.util.prettyPrint(user));
+
+        //         const eventVal = new Val<Event>();
+        //         await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
+
+        //         if (eventVal.val) {
+        //             events.push(eventVal.val);
+        //         }
+        //     }
+        // }
+        // if (events.length > 0) {
+        //     await this.persistEvents(events, background);
+        // }
+        // -----------------------------------------------------------------
+
+        if (userInfo.users?.length > 0) {
+            for (const user of userInfo.users) {
+                console.log("Queueing PK pushed from server: " + user.pk);
+                // todo-0: consider a strategy where we do save these since we know there's already a node
+                // on the server owned by this metadata.
+                // If pk not already cached, then queue it up for being cached
+                if (!this.metadataCache.has(user.pk)) {
+                    this.metadataQueue.add(user.pk);
+                }
+            }
         }
 
         return null;
@@ -1109,9 +1156,9 @@ export class Nostr {
         // remove any events we know we've already persisted
         events = events.filter(e => {
             const persisted = this.persistedEvents.has(e.id);
-            if (persisted) {
-                console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
-            }
+            // if (persisted) {
+            //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
+            // }
             return !persisted;
         });
 
@@ -1173,34 +1220,21 @@ export class Nostr {
             references.forEach((ref: any) => {
                 if (ref.profile) {
                     const elmId = Comp.getNextId();
-
                     const dispInfo = this.dispInfoCache.get(ref.profile.pubkey);
-                    if (dispInfo) {
+
+                    // if we know the dispInfo render it.
+                    if (dispInfo?.display) {
+                        // console.log("***** QUEUE DONE: PK: "+ref.profile.pubkey);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
                     }
+                    // else render a placeholder and queue up the pubkey to be queries asynchronously
                     else {
-                        const metadataEvent = this.metadataCache.get(ref.profile.pubkey);
-                        let done = false;
-                        let allowQueue = true;
-                        // if we have the metadata cached we can render it immediately
-                        if (metadataEvent) {
-                            const dispInfo = this.getMetadataRefDisplayText(metadataEvent);
-                            if (dispInfo) {
-                                this.dispInfoCache.set(ref.profile.pubkey, dispInfo);
-                                val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
-                                done = true;
-                            }
-                            else {
-                                allowQueue = false;
-                            }
+                        // console.log("***** QUEUED: PK: "+ref.profile.pubkey);
+                        if (!this.metadataCache.has(ref.profile.pubkey)) {
+                            this.metadataQueue.add(ref.profile.pubkey);
                         }
-
-                        // else render the placeholder, and add to queue for async rendering.
-                        if (!done) {
-                            if (allowQueue) this.metadataQueue.add(ref.profile.pubkey);
-                            const keyAbbrev = ref.profile.pubkey.substring(0, 10);
-                            val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
-                        }
+                        const keyAbbrev = ref.profile.pubkey.substring(0, 10);
+                        val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
                     }
 
                     setTimeout(() => {
@@ -1230,7 +1264,7 @@ export class Nostr {
         return val;
     }
 
-    getMetadataRefDisplayText = (event: any): { display: string, title: string } => {
+    getMetadataDisplayInfo = (event: any): { display: string, title: string } => {
         if (!event?.content) {
             console.log("metadata has no content: " + S.util.prettyPrint(event));
             return null;
