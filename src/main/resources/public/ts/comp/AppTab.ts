@@ -39,6 +39,7 @@ export class AppTab<PT = any, TT = any> extends Div {
     }
 
     scrollToNode = (nodeId: string): void => {
+        if (!nodeId) return;
         const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(this.data, nodeId));
         if (elm) {
             this.scrollToElm(elm);

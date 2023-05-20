@@ -60,14 +60,11 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
-        console.log("search.showThread()");
         // First call the server in case it has enough data already to render the Thread, in which case
         // we don't need to load any events from relays via client
-        console.log("Calling Server: getNodeThreadView");
         let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
-            loadOthers: true,
-            nostrNodeIds: null
+            loadOthers: true
         });
 
         // console.log("res=" + S.util.prettyPrint(res));
@@ -77,13 +74,12 @@ export class Search {
             // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
             // we resume from the actual 'node' we're trying to get Thread of.
             const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
-            const chainInfo: J.SaveNostrEventResponse = await S.nostr.loadReplyChain(resumeFromNode);
+            await S.nostr.loadReplyChain(resumeFromNode, 2);
 
             console.log("Dead End Repaired: Calling Server again: getNodeThreadView");
             res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
                 nodeId: node.id,
-                loadOthers: true,
-                nostrNodeIds: chainInfo?.eventNodeIds
+                loadOthers: true
             });
         }
 
@@ -98,13 +94,13 @@ export class Search {
                 if (!data) return;
 
                 s.threadViewFromTab = s.activeTab;
-                s.threadViewNodeId = node.id;
+                s.threadViewNodeId = node;
                 data.openGraphComps = [];
 
                 data.props.results = res.nodes;
 
                 // if apReplies then we set endReached to 'true' always.
-                data.props.endReached = res.topReached;
+                data.props.endReached = res.topReached && !res.nostrDeadEnd;
                 S.tabUtil.selectTabStateOnly(data.id);
             });
         }

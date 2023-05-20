@@ -247,7 +247,7 @@ export class Nostr {
 
     // Builds all the nodes in the thread (by traversing up the tree of replies) going back in time towards
     // the original post.
-    loadReplyChain = async (node: J.NodeInfo): Promise<J.SaveNostrEventResponse> => {
+    loadReplyChain = async (node: J.NodeInfo, maxQueries: number): Promise<J.SaveNostrEventResponse> => {
         console.log("nostr.loadReplyChain() for node: " + S.util.prettyPrint(node));
         const tags: any = S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node);
         if (!Array.isArray(tags)) {
@@ -282,7 +282,7 @@ export class Nostr {
             relaySet = new Set<string>(relays);
 
             // now recursively walk up the the entire thread one reply back at a time.
-            await this.traverseUpReplyChain(events, tags, pool, relaySet);
+            await this.traverseUpReplyChain(events, tags, pool, relaySet, maxQueries);
 
             if (!events || events.length === 0) {
                 console.log("No reply info found.");
@@ -310,7 +310,8 @@ export class Nostr {
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to
     // be only looking at the relays we will find parts of this thread on.
-    private traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>): Promise<void> => {
+    private traverseUpReplyChain = async (events: Event[], tags: string[][], pool: SimplePool, relaySet: Set<string>,
+        queriesLeft: number): Promise<void> => {
         console.log("nostr.traverseUpReplyChain: via tags " + S.util.prettyPrint(tags));
         // get the array representing what event (with 'tags' in it) is a reply to.
         const repliedToArray: string[] = this.getRepliedToItem(tags);
@@ -385,15 +386,15 @@ export class Nostr {
                 // add to front of array so the chronological ordering is top down.
                 events.unshift(event);
 
-                // todo-1: put this val in a var, and there's a few other hard coded vals like this too
-                if (events.length > 50) {
-                    console.warn("stopping after max thread events: " + events.length);
-                    return;
-                }
-
                 if (Array.isArray(event.tags)) {
-                    console.log("Event has tags, so we try try to go up the chain now.");
-                    await this.traverseUpReplyChain(events, event.tags, pool, relaySet);
+                    if (queriesLeft === 0) {
+                        // console.log("Enough Notes were gotten, but there are more to get");
+                        return;
+                    }
+                    else {
+                        console.log("Event has tags, so we try try to go up the chain now.");
+                        await this.traverseUpReplyChain(events, event.tags, pool, relaySet, --queriesLeft);
+                    }
                 }
             }
             else {

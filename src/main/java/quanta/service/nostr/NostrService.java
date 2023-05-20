@@ -136,18 +136,25 @@ public class NostrService extends ServiceBase {
 
 			Date timestamp = new Date(event.getTimestamp() * 1000);
 
-			NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
-			// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
+			try {
+				NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
+				// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
 
-			// Note: We can safely call all these setters and the 'dirty node' handling is smart enough to only
-			// do a DB Write if something has changed.
-			nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
-			nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
-			nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
-			nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
-			nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
-			nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
-			nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+				// Note: We can safely call all these setters and the 'dirty node' handling is smart enough to only
+				// do a DB Write if something has changed.
+				nostrAccnt.set(NodeProp.DISPLAY_NAME, metadata.getDisplayName());
+				nostrAccnt.set(NodeProp.NOSTR_NAME, metadata.getName());
+				nostrAccnt.set(NodeProp.NOSTR_USER_NAME, metadata.getUsername());
+				nostrAccnt.set(NodeProp.NOSTR_NIP05, metadata.getNip05());
+				nostrAccnt.set(NodeProp.USER_ICON_URL, metadata.getPicture());
+				nostrAccnt.set(NodeProp.USER_BANNER_URL, metadata.getBanner());
+				nostrAccnt.set(NodeProp.USER_BIO, metadata.getAbout());
+				nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
+			} catch (Exception e) {
+				// ignore failed json objects for now.
+				log.debug("Unable to parse content json for nostr event: " + XString.prettyPrint(event));
+			}
+
 			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, event.getTimestamp());
 
 			// note: we always need to be able to generate KEY so don't ever let the client upload
@@ -156,8 +163,6 @@ public class NostrService extends ServiceBase {
 
 			// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
 			// username itself is the pubkey with a '.' prefix.
-
-			nostrAccnt.set(NodeProp.NOSTR_USER_WEBSITE, metadata.getWebsite());
 
 			nostrAccnt.setCreateTime(timestamp);
 			nostrAccnt.setModifyTime(timestamp);
@@ -197,7 +202,8 @@ public class NostrService extends ServiceBase {
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
 
-		// todo-00: Should be caching nostrAccnt into a global cache that's cleared like every 3 mins so that when someone
+		// todo-00: Should be caching nostrAccnt into a global cache that's cleared like every 3 mins so
+		// that when someone
 		// edits their bio infomration the update is noticed within 3 mins.
 		SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 		if (nostrAccnt != null) {

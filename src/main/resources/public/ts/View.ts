@@ -255,7 +255,7 @@ export class View {
     }
 
     scrollToNode = (node: J.NodeInfo = null, delay: number = 100) => {
-        if (!Comp.allowScrollSets) return;
+        if (!Comp.allowScrollSets || !node) return;
 
         const func = () => {
             setTimeout(() => {
