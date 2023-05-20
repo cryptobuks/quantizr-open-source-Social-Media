@@ -205,7 +205,7 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
-                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
+                    !ast.isAnonUser && ast.protocolFilter === J.Constant.NETWORK_NOSTR && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Secure DM", this.sendSecureDM, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
@@ -292,7 +292,7 @@ export class UserProfileDlg extends DialogBase {
      * NOTE: There's two different URL formats here because there's two different ways to access
      * a named node (which are: via url, or via a parameter on the url)
      */
-    openUserHomePage = (state: any, nodeName: string) => {
+    openUserHomePage = (state: LS, nodeName: string) => {
         // let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
         // window.open(url, "_blank");
         this.close();

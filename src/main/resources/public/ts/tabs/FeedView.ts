@@ -303,7 +303,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
     /* overridable (don't use arrow function) */
     renderHeading(): CompIntf {
-        return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "tabTitle" });
+        return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
@@ -339,14 +339,14 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     break;
 
                 case J.Constant.FEED_PUB:
-                    subHeading = "Federated";
+                    subHeading = "Public Feed";
                     break;
 
                 default: break;
             }
         }
 
-        return subHeading ? ": " + subHeading : "";
+        return subHeading ? subHeading : "";
     }
 
     clearSearch = () => {

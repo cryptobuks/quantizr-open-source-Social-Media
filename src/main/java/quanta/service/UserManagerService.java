@@ -1576,7 +1576,8 @@ public class UserManagerService extends ServiceBase {
 	public String getUserAccountsReport(MongoSession ms) {
 		ms = ThreadLocals.ensure(ms);
 		int localUserCount = 0;
-		int foreignUserCount = 0;
+		int foreignNostrCount = 0;
+		int foreignApCount = 0;
 
 		StringBuilder sb = new StringBuilder();
 		Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, true, true);
@@ -1585,15 +1586,19 @@ public class UserManagerService extends ServiceBase {
 			String userName = accountNode.getStr(NodeProp.USER);
 			if (userName != null) {
 				// if account is a 'foreign server' one, then clean it up
-				if (userName.contains("@")) {
-					foreignUserCount++;
+				if (userName.startsWith(".")) {
+					foreignNostrCount++;
+				}
+				else if (userName.contains("@")) {
+					foreignApCount++;
 				} else {
 					localUserCount++;
 				}
 			}
 		}
-		sb.append("Local User Count: " + localUserCount + "\n");
-		sb.append("Foreign User Count: " + foreignUserCount + "\n");
+		sb.append("Local Users: " + localUserCount + "\n");
+		sb.append("Foreign ActPub Users: " + foreignApCount + "\n");
+		sb.append("Foreign Nostr Users: " + foreignNostrCount + "\n");
 		return sb.toString();
 	}
 
