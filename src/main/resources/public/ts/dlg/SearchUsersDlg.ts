@@ -69,7 +69,7 @@ export class SearchUsersDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
             }),
-            new RadioButton("Nostr User", false, "optionsGroup", null, {
+            new RadioButton("Nostr User (hex or npub)", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_NOSTR });

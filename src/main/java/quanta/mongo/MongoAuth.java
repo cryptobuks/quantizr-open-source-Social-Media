@@ -186,13 +186,6 @@ public class MongoAuth extends ServiceBase {
 		ArrayList<ArrayList<String>> tags = (ArrayList) parent.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
 
 		shareToAllNostrUsers(tags, child);
-
-		/*
-		 * todo-0: just like the ActPub version does we need to have had the client convert all the "p" tags
-		 * for this new node and send up some kind of mapping to convert from "hex key" to "npub" value so
-		 * we can insert all the "mentions" into the content here. (see how it's done for ActPub below)
-		 * Would just be setting the content to just all those mentions.
-		 */
 	}
 
 	public void shareToAllNostrUsers(ArrayList<ArrayList<String>> tags, SubNode child) {
