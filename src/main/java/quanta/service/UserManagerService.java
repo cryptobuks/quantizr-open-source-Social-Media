@@ -1026,7 +1026,9 @@ public class UserManagerService extends ServiceBase {
 				if (StringUtils.isEmpty(relays)) {
 					SubNode root = read.getDbRoot();
 					relays = root.getStr(NodeProp.NOSTR_RELAYS);
-					userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(relays));
+					if (!StringUtils.isEmpty(relays)) {
+						userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(relays));
+					}
 				}
 				userProfile.setRelays(relays);
 				userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
@@ -1588,8 +1590,7 @@ public class UserManagerService extends ServiceBase {
 				// if account is a 'foreign server' one, then clean it up
 				if (userName.startsWith(".")) {
 					foreignNostrCount++;
-				}
-				else if (userName.contains("@")) {
+				} else if (userName.contains("@")) {
 					foreignApCount++;
 				} else {
 					localUserCount++;

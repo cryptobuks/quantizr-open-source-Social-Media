@@ -942,8 +942,8 @@ export class Nostr {
     // "since": <an integer unix timestamp, events must be newer than this to pass>,
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
-    readPosts = async (userKeys: string[], relays: string[], since: number, background: boolean, includeDms: boolean): Promise<J.SaveNostrEventResponse> => {
-        userKeys = userKeys.map(u => this.translateNip19(u));
+    readPosts = async (authors: string[], relays: string[], since: number, background: boolean, includeDms: boolean, limit: number): Promise<J.SaveNostrEventResponse> => {
+        authors = authors.map(u => this.translateNip19(u));
 
         // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
         const kinds = [Kind.Text];
@@ -952,9 +952,9 @@ export class Nostr {
         }
 
         const query: any = {
-            authors: userKeys,
+            authors,
             kinds,
-            limit: 50
+            limit
         };
 
         // our "QueryKey (LOCALDB_NOSTR_LAST_USER_QUERY_KEY) needs to be updated if we're going to use 'since', so for now
@@ -1409,7 +1409,7 @@ export class Nostr {
             // if (userNames.length > 0 && relaysArray.length > 0) {
             //     console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
             // }
-            ret = await this.readPosts(userNames, relaysArray, -1, background, includeDms);
+            ret = await this.readPosts(userNames, relaysArray, -1, background, includeDms, 100);
         }
         finally {
             this.bigQueryRunning = false;

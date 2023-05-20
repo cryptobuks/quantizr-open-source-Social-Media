@@ -243,7 +243,7 @@ export class UserProfileDlg extends DialogBase {
             let relays = S.nostr.getMyRelays();
             relays = S.nostr.addMyRelays(relays);
             console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
-            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false);
+            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false, 500);
         }
     }
 
