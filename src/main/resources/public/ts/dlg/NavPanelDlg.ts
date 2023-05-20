@@ -14,13 +14,11 @@ export class NavPanelDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [new RightNavPanel()];
     }
-
-    override domRemoveEvent = () => {
-        NavPanelDlg.inst = null;
-    }
 }
 
 PubSub.sub(C.PUBSUB_closeNavPanel, (payload: string) => {
-    NavPanelDlg.inst?.close();
-    NavPanelDlg.inst = null;
+    if (NavPanelDlg.inst) {
+        NavPanelDlg.inst.close();
+        NavPanelDlg.inst = null;
+    }
 });

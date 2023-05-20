@@ -176,6 +176,7 @@ export class RightNavPanel extends Div {
                             !ast.isAnonUser ? new Icon({
                                 className: "fa fa-gear fa-lg marginRight clickable",
                                 onClick: () => {
+                                    PubSub.pub(C.PUBSUB_closeNavPanel);
                                     SettingsTab.tabSelected = true;
                                     S.tabUtil.selectTab(C.TAB_SETTINGS);
                                 },
