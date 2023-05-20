@@ -565,6 +565,36 @@ export class Nostr {
         });
     }
 
+    /* To find any other nodes that mention this node, we can do this.
+    WARNING: This code ended up not being need [yet] and has not been tested.
+    */
+    getEventMentions = async (node: J.NodeInfo): Promise<Event> => {
+        const relays = this.getMyRelays();
+        debugger;
+        const id = this.translateNip19(node.nostrPubKey);
+
+        // query for up to 10 events just so we can get the latest one
+        const query: any = {};
+        query["#e"] = [id];
+
+        try {
+            S.rpcUtil.incRpcCounter();
+            const events = await this.queryRelays(relays, query);
+            console.log("Associated Events: " + S.util.prettyPrint(events));
+            if (events?.length > 0) {
+                this.cacheEvents(events);
+                return events[0];
+            }
+            else {
+                console.log("Unable to load event: " + id + " (searched " + relays.length + " relays)");
+                return null;
+            }
+        }
+        finally {
+            S.rpcUtil.decRpcCounter();
+        }
+    }
+
     /* persistResponse.res will contain the data saved on the server, but we accept null for persistResonse
     to indicate that no persistence on the server should be done,
 
@@ -833,6 +863,7 @@ export class Nostr {
     }
 
     addToMetadataQueue = (pubKey: string, persist: boolean) => {
+        // todo-000: This definitely needs to be local IndexDB cach here!
         if (!this.metadataCache.has(pubKey)) {
             this.metadataQueue.add(pubKey);
             if (persist) {
