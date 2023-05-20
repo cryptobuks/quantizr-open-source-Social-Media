@@ -1236,7 +1236,7 @@ export class Nostr {
 
     /* Called by the markdown component renderer to process the content display for this node */
     replaceNostrRefs = (node: J.NodeInfo, val: string): string => {
-        if (!this.hasNostrTags(node) || !node.nostrPubKey) return val;
+        if (!this.hasNostrTags(node)) return val;
 
         try {
             const event = this.makeUnsignedEventFromNode(node);
@@ -1313,7 +1313,7 @@ export class Nostr {
     makeUnsignedEventFromNode = (node: J.NodeInfo): any => {
         const event: any = {
             kind: 1,
-            pubkey: this.translateNip19(node.nostrPubKey),
+            pubkey: node.nostrPubKey ? this.translateNip19(node.nostrPubKey) : null,
             created_at: node.lastModified / 1000,
             tags: S.props.getPropObj(J.NodeProp.NOSTR_TAGS, node) || [],
             content: node.content

@@ -1050,9 +1050,15 @@ export class Util {
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
         let ret = null;
         if (S.nostr.isNostrUserName(ac.principalName)) {
-            const pubKey = ac.principalName.substring(1);
-            const npub = nip19.npubEncode(pubKey);
-            ret = npub.substring(1, 13);
+            if (ac.displayName) {
+                return ac.displayName;
+            }
+            // I think this else branch may be 'dead' now? (never called)
+            else {
+                const pubKey = ac.principalName.substring(1);
+                const npub = nip19.npubEncode(pubKey);
+                ret = npub.substring(1, 13);
+            }
         }
         else {
             ret = ac.principalName;

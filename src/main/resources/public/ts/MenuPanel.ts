@@ -321,7 +321,7 @@ export class MenuPanel extends Div {
 
                 new MenuItemSeparator(), //
                 new MenuItem("By Fediverse URL", MenuPanel.searchByFediUrl), //
-                new MenuItem("By Nostr Resource", MenuPanel.searchByNostr), //
+                new MenuItem("By Nostr ID", MenuPanel.searchByNostr), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
