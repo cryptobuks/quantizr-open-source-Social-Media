@@ -48,8 +48,10 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                             S.tabUtil.selectTab(ast.threadViewFromTab);
                             setTimeout(() => {
                                 const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
-                                data.inst?.scrollToNode(ast.threadViewNodeId?.id);
-                            }, 700);
+                                if (ast.threadViewNodeId && data.inst) {
+                                    data.inst.scrollToNode(ast.threadViewNodeId.id);
+                                }
+                            }, 500);
                         }
                     },
                     title: "Go back..."

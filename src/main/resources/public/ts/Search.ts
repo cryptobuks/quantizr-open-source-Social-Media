@@ -93,7 +93,10 @@ export class Search {
                 const data = ThreadTab.inst;
                 if (!data) return;
 
-                s.threadViewFromTab = s.activeTab;
+                // update threadViewFromTab only if NOT currently comming from thread tab itself
+                if (s.activeTab !== C.TAB_THREAD) {
+                    s.threadViewFromTab = s.activeTab;
+                }
                 s.threadViewNodeId = node;
                 data.openGraphComps = [];
 

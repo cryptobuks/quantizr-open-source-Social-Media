@@ -5,7 +5,7 @@ import { S } from "./Singletons";
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
-    debug: boolean = true;
+    debug: boolean = false;
     db: IDBDatabase = null; // only used if KEEP_DB_OPEN
 
     /* Name of logged in user or 'null' if anonymous (user not logged in) */
