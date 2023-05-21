@@ -8,9 +8,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +44,9 @@ import quanta.util.val.Val;
 @Slf4j
 public class NostrService extends ServiceBase {
 
+	// cache is cleared every 3mins so it can pick up user changes
+	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
+
 	public static final ObjectMapper mapper = new ObjectMapper();
 	{
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -51,6 +56,12 @@ public class NostrService extends ServiceBase {
 	static final int KIND_Metadata = 0;
 	static final int KIND_Text = 1;
 	static final int KIND_EncryptedDirectMessage = 4;
+
+	// every 3 min
+	@Scheduled(fixedDelay = 3 * 60 * 1000)
+    public void userRefresh() {
+		nostrUserNodesByPubKey.clear();
+	}
 
 	public SaveNostrSettingsResponse saveNostrSettings(SaveNostrSettingsRequest req) {
 		SaveNostrSettingsResponse res = new SaveNostrSettingsResponse();
@@ -123,7 +134,7 @@ public class NostrService extends ServiceBase {
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
-			SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk()); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 			if (nostrAccnt != null) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
 				// if the npub is owned by a local user we're done, and no need to create the foreign holder account
@@ -199,13 +210,27 @@ public class NostrService extends ServiceBase {
 		return sb.toString();
 	}
 
+	private SubNode getLocalUserByNostrPubKey(MongoSession as, String pubKey) {
+		// try to get from cache first
+		SubNode nostrAccnt = nostrUserNodesByPubKey.get(pubKey);
+		if (nostrAccnt != null)
+			return nostrAccnt;
+
+		// else we need to query and then cache
+		nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
+		if (nostrAccnt != null) {
+			nostrUserNodesByPubKey.put(pubKey, nostrAccnt);
+		}
+		return nostrAccnt;
+	}
+
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
 
 		// todo-00: Should be caching nostrAccnt into a global cache that's cleared like every 3 mins so
 		// that when someone
 		// edits their bio infomration the update is noticed within 3 mins.
-		SubNode nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk()); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
 					+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
@@ -269,7 +294,7 @@ public class NostrService extends ServiceBase {
 	}
 
 	public SubNode getAccountByNostrPubKey(MongoSession as, String pubKey) {
-		SubNode accntNode = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
+		SubNode accntNode =  getLocalUserByNostrPubKey(as, pubKey); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
 
 		// if account wasn't found as a local user's public key try a foreign one.
 		if (accntNode == null) {
