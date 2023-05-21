@@ -46,12 +46,8 @@ export class Nostr {
     domRenderPending: boolean = false;
 
     persistMetadataForKeys: Set<string> = new Set<string>(); // Holds pubkeys for which we DO want to persist the metadata once found
-
-    // todo-0: store these in the local DB too.
-    textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==events id)
     dispInfoCache: Map<string, NostrMetadataDispInfo> = new Map<string, NostrMetadataDispInfo>(); // cache for rapid injecting of user info during react renders
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
-    persistedEvents: Set<string> = new Set<string>(); // keeps track of what we've already posted to server
 
     bigQueryRunning: boolean = false;
     queryCounter: number = 0;
@@ -65,6 +61,8 @@ export class Nostr {
     }, 1200);
 
     DB_METADATA_PREFIX = "ncm-";
+    DB_TEXT_EVENT_PREFIX = "tep-";
+    DB_PERSISTED_PREFIX = "nper-";
 
     // This can be run from Admin Console (currently not used)
     test = async () => {
@@ -168,10 +166,7 @@ export class Nostr {
         switch (event.kind) {
             case Kind.EncryptedDirectMessage:
             case Kind.Text:
-                if (this.textCache.size > 1000) {
-                    this.textCache.clear();
-                }
-                this.textCache.set(event.id, event);
+                S.localDB.setVal(this.DB_TEXT_EVENT_PREFIX + event.id, event);
                 break;
             case Kind.Metadata:
                 S.localDB.setVal(this.DB_METADATA_PREFIX + event.pubkey, event);
@@ -606,7 +601,7 @@ export class Nostr {
         id = this.translateNip19(id);
 
         // return the cached event if we have it.
-        const cachedEvent = this.textCache.get(id);
+        const cachedEvent = S.localDB.getVal(this.DB_TEXT_EVENT_PREFIX + id);
         if (cachedEvent) {
             return cachedEvent;
         }
@@ -805,7 +800,7 @@ export class Nostr {
         dispatch("ForceRefreshMetadata", s => { });
     }
 
-    // todo-0: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
+    // todo-1: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
     // and run it all in a transaction
     cacheMetadataEvent = async (event: Event) => {
         const cachedEvent = await S.localDB.getVal(this.DB_METADATA_PREFIX + event.pubkey);
@@ -860,7 +855,7 @@ export class Nostr {
 
         if (userInfo.users?.length > 0) {
             for (const user of userInfo.users) {
-                console.log("Queueing PK pushed from server: " + user.pk);
+                // console.log("Queueing PK pushed from server: " + user.pk);
                 // If pk not already cached, then queue it up for being cached
                 this.addToMetadataQueue(user.pk, true);
             }
@@ -1226,11 +1221,11 @@ export class Nostr {
 
         // remove any events we know we've already persisted
         events = events.filter(e => {
-            const persisted = this.persistedEvents.has(e.id);
-            // if (persisted) {
+            const ev = S.localDB.getVal(this.DB_PERSISTED_PREFIX + e.id);
+            // if (ev) {
             //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
             // }
-            return !persisted;
+            return !ev;
         });
 
         // map key is 'pk'.
@@ -1272,7 +1267,7 @@ export class Nostr {
         }, background);
 
         // keep track of what we've just sent to server.
-        events.forEach(e => this.persistedEvents.add(e.id));
+        events.forEach(e => S.localDB.setVal(this.DB_PERSISTED_PREFIX + e.id, true));
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
     }

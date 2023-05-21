@@ -157,7 +157,6 @@ export class LocalDB {
 
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
-    // todo-0: make this method private. We can alway call thru 'getVal()' as the public method
     public readObject = async (k: string): Promise<IndexedDBObj> => {
         return new Promise<IndexedDBObj>((resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
@@ -194,9 +193,7 @@ export class LocalDB {
 
         // bumping up DB with a 'true' arg here is required in order to generate a new store
         await this.openDB(newStore);
-
-        // todo-0: remove this line, soon.
-        await S.localDB.dumpStore();
+        // await S.localDB.dumpStore();
     }
 
     makeStoreName = () => {
