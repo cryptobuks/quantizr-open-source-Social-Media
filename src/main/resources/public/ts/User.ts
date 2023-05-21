@@ -110,7 +110,6 @@ export class User {
 
                 if (res && !res.success) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
                 }
 
                 if (usingCredentials) {
@@ -130,7 +129,6 @@ export class User {
             catch (e) {
                 S.util.logErr(e);
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
                 await this.anonInitialRender();
             }
         }
@@ -156,7 +154,6 @@ export class User {
 
         if (updateLocalDb) {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
         }
 
         S.quanta.loggingOut = true;
@@ -178,8 +175,7 @@ export class User {
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0"),
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON)
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0")
         ]);
     }
 
@@ -202,20 +198,15 @@ export class User {
                     s.unknownPubSigKey = res.unknownPubSigKey;
                 });
 
-                S.localDB.userName = usr;
+                S.localDB.setUser(usr);
                 if (usr) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
-                    // set this user for the 'anon' case also meaning it'll be default when user it not logged in
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr, J.PrincipalName.ANON);
                 }
 
                 if (pwd) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
-                    // set this pwd for the 'anon' case also meaning it'll be default when user it not logged in
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd, J.PrincipalName.ANON);
                 }
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", J.PrincipalName.ANON);
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
@@ -335,7 +326,6 @@ export class User {
             // if we tried a login and it wasn't from a login dialog then just blow away the login state
             // so that any kind of page refresh is guaranteed to just show login dialog and not try to login
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
 
             if (!calledFromLoginDlg) {
                 this.userLogin();

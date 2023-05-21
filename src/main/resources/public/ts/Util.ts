@@ -732,7 +732,7 @@ export class Util {
     switchBrowsingMode = () => {
         dispatch("SwitchBrowsingMode", s => {
             s.mobileMode = !s.mobileMode;
-            S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false", "allUsers");
+            S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false");
         });
     }
 
@@ -937,14 +937,14 @@ export class Util {
     setStateVarsUsingLoginResponse = async (res: J.LoginResponse) => {
         if (!res) return;
 
-        const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
+        const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX);
         let voice2 = voice;
 
         if (S.speech.USE_VOICE2) {
-            voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX, "allUsers");
+            voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX);
         }
 
-        const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
+        const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE);
 
         await promiseDispatch("LoginResponse", s => {
             s.userProfile = res.userProfile;

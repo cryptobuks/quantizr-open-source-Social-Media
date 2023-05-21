@@ -2,6 +2,11 @@ import * as J from "./JavaIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
 
+export class IndexedDBObj {
+    k: string;
+    v: any;
+}
+
 export class NostrMetadataDispInfo {
     display: string;
     title: string;

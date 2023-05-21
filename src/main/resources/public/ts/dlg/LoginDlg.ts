@@ -62,10 +62,10 @@ export class LoginDlg extends DialogBase {
         // and ignore the password field.
         if ((!this.pwdState.getValue() || S.util.ctrlKeyCheck()) && usr) {
             // this is kind of ugly but we need to set localDb userName for keys to generate properly
-            S.localDB.userName = usr;
+            S.localDB.setUser(usr);
 
             // lookup the password based on known user
-            const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD, usr);
+            const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
             if (pwd) {
                 // put password in the password field
                 this.pwdState.setValue(pwd);

@@ -136,7 +136,7 @@ export class Quanta {
                 return;
             }
 
-            const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "allUsers");
+            const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE);
 
             // todo-1: need to test this: When I tried to put the protocolFilter initialization
             // in here it has an issue, so that calls into quesstion if this code is working.
@@ -255,7 +255,7 @@ export class Quanta {
                 S.rpcUtil.SESSION_TIMEOUT_MINS = this.configRes.sessionTimeoutMinutes || 30;
                 S.rpcUtil.sessionTimeRemainingMillis = S.rpcUtil.SESSION_TIMEOUT_MINS * 60_000;
 
-                const network = await S.localDB.getVal(C.LOCALDB_NETWORK_SELECTION, "allUsers");
+                const network = await S.localDB.getVal(C.LOCALDB_NETWORK_SELECTION);
 
                 dispatch("configUpdates", s => {
                     s.config = this.configRes.config || {};

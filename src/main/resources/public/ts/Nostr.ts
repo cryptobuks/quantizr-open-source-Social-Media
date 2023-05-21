@@ -202,7 +202,7 @@ export class Nostr {
         this.sk = sk;
         this.pk = getPublicKey(this.sk);
         this.npub = nip19.npubEncode(this.pk);
-        await S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, sk, userName);
+        await S.localDB.setVal(C.LOCALDB_NOSTR_PRIVATE_KEY, sk);
 
         this.printKeys();
     }
@@ -213,7 +213,7 @@ export class Nostr {
         if (this.pk) return;
 
         // Yes this is bad practice to save key this way, but this is just a prototype!
-        this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY, userName);
+        this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY);
         if (!this.sk) {
             await this.generateNewKey(userName, false);
         }
@@ -571,7 +571,6 @@ export class Nostr {
     */
     getEventMentions = async (node: J.NodeInfo): Promise<Event> => {
         const relays = this.getMyRelays();
-        debugger;
         const id = this.translateNip19(node.nostrPubKey);
 
         // query for up to 10 events just so we can get the latest one
@@ -864,7 +863,8 @@ export class Nostr {
     }
 
     addToMetadataQueue = (pubKey: string, persist: boolean) => {
-        // todo-000: This definitely needs to be local IndexDB cach here!
+        // todo-000: This definitely needs to be local IndexDB cach here! Think about using a DB that's
+        // specific to each kind of cache
         if (!this.metadataCache.has(pubKey)) {
             this.metadataQueue.add(pubKey);
             if (persist) {

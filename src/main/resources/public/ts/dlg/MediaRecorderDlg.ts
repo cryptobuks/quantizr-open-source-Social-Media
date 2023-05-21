@@ -82,7 +82,7 @@ export class MediaRecorderDlg extends DialogBase {
                 // take the first one here
                 if (!audioInput) {
                     audioInput = device.deviceId;
-                    S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, getAs().userName);
+                    S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput);
                 }
 
                 // add to data for dropdown
@@ -93,7 +93,7 @@ export class MediaRecorderDlg extends DialogBase {
                 // take the first one here
                 if (!videoInput) {
                     videoInput = device.deviceId;
-                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, getAs().userName);
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput);
                 }
 
                 // add to data for dropdown
@@ -149,7 +149,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string) => {
-                S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, getAs().userName);
+                S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val);
                 this.mergeState<LS>({ audioInput: val });
                 setTimeout(() => {
                     this.resetStream();
@@ -162,7 +162,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (this.videoMode) {
             videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
                 setValue: (val: string) => {
-                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, getAs().userName);
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val);
                     this.mergeState<LS>({ videoInput: val });
 
                     setTimeout(() => {

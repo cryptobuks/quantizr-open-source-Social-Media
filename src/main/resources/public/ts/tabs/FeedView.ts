@@ -284,7 +284,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         setValue: (val: string) => {
                             dispatch("setProtocol", s => {
                                 s.protocolFilter = val;
-                                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val, "allUsers");
+                                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val);
                             });
                             S.srch.refreshFeed();
                         },
