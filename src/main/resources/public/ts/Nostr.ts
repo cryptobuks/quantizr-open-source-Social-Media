@@ -601,7 +601,7 @@ export class Nostr {
         id = this.translateNip19(id);
 
         // return the cached event if we have it.
-        const cachedEvent = S.localDB.getVal(this.DB_TEXT_EVENT_PREFIX + id);
+        const cachedEvent = await S.localDB.getVal(this.DB_TEXT_EVENT_PREFIX + id);
         if (cachedEvent) {
             return cachedEvent;
         }
@@ -1220,8 +1220,8 @@ export class Nostr {
         if (!events || events.length === 0) return;
 
         // remove any events we know we've already persisted
-        events = events.filter(e => {
-            const ev = S.localDB.getVal(this.DB_PERSISTED_PREFIX + e.id);
+        events = events.filter(async (e) => {
+            const ev = await S.localDB.getVal(this.DB_PERSISTED_PREFIX + e.id);
             // if (ev) {
             //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
             // }
@@ -1267,7 +1267,7 @@ export class Nostr {
         }, background);
 
         // keep track of what we've just sent to server.
-        events.forEach(e => S.localDB.setVal(this.DB_PERSISTED_PREFIX + e.id, true));
+        events.forEach(async e => await S.localDB.setVal(this.DB_PERSISTED_PREFIX + e.id, true));
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
     }
