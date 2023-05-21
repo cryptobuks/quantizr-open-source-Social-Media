@@ -1,22 +1,24 @@
 import { IndexedDBObj } from "./Interfaces";
 import { S } from "./Singletons";
+import * as J from "./JavaIntf";
 
 // We need to prefix the store name and not the individual keys.
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
-    debug: boolean = false;
-    db: IDBDatabase = null; // only used if KEEP_DB_OPEN
+    debug: boolean = true; // todo-00: set back to false.
+    db: IDBDatabase = null;
+
+    // todo-0: rename these vars
+    STORE_NOSTR_MD = "nostr-md";
+    STORE_NOSTR_TXT = "nostr-txt";
+    STORE_NOSTR_PERSIST = "nostr-persist";
+    STORE_DEFAULT = "store";
 
     /* Name of logged in user or 'null' if anonymous (user not logged in) */
-    userName: string;
-    storeName = "store";
+    userName: string = J.PrincipalName.ANON;
     allStoreNames: Set<string> = new Set<string>();
-    dbVersion: number = 0;
-    static DB_NAME = "db";
-
-    /* WARNING: boosting the version will WIPE OUT the old database, and create a brand new one */
-    // static VERSION = 2;
+    dbVersion: number = 1;
 
     static ACCESS_READWRITE: IDBTransactionMode = "readwrite";
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
@@ -29,31 +31,21 @@ export class LocalDB {
 
         return new Promise<IDBDatabase>((resolve, reject) => {
             if (this.debug) {
-                console.log("opening IndexedDB")
+                console.log("opening IndexedDB: userName=" + this.userName);
             }
             let req: IDBOpenDBRequest = null;
             if (bumpVersion) {
-                req = indexedDB.open(LocalDB.DB_NAME, this.dbVersion + 1);
+                req = indexedDB.open(this.userName, this.dbVersion + 1);
             }
             else {
-                req = indexedDB.open(LocalDB.DB_NAME);
+                req = indexedDB.open(this.userName);
             }
 
             req.onupgradeneeded = () => {
-                this.storeName = this.makeStoreName();
-                if (this.debug) {
-                    console.log("IndexedDb: onupgradeneeded: Creating store " + this.storeName);
-                }
-
-                try {
-                    if (!this.allStoreNames.has(this.storeName)) {
-                        console.log("createObjectStore: " + this.storeName);
-                        req.result.createObjectStore(this.storeName, { keyPath: LocalDB.KEY_NAME });
-                    }
-                }
-                catch (e) {
-                    // ignoring. we get this if store alrady exists.
-                }
+                this.createStore(req.result, this.STORE_NOSTR_MD);
+                this.createStore(req.result, this.STORE_NOSTR_TXT);
+                this.createStore(req.result, this.STORE_NOSTR_PERSIST);
+                this.createStore(req.result, this.STORE_DEFAULT);
             };
 
             req.onsuccess = () => {
@@ -82,19 +74,29 @@ export class LocalDB {
         });
     }
 
+    createStore = (db: IDBDatabase, storeName: string) => {
+        // this try/catch is important to ignore times the store already exists, like upgrading the DB.
+        try {
+            db.createObjectStore(storeName, { keyPath: LocalDB.KEY_NAME });
+        }
+        catch (e) {
+            // ignoring. we get this if store alrady exists.
+        }
+    }
+
     /* Runs a transaction by first opening the database, and then running the transaction */
-    private runTrans = async (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
+    private runTrans = async (access: IDBTransactionMode, storeName: string, runner: (store: IDBObjectStore) => void) => {
         // if keeping db open and we have it open, then use it.
         if (!this.db) {
             this.db = await this.openDB();
         }
 
         if (this.debug) {
-            console.log("runTrans on store: " + this.storeName);
+            console.log("runTrans on store: " + storeName);
         }
 
-        const tx = this.db.transaction(this.storeName, access);
-        const store = tx.objectStore(this.storeName);
+        const tx = this.db.transaction(storeName, access);
+        const store = tx.objectStore(storeName);
 
         if (store) {
             runner(store);
@@ -116,30 +118,33 @@ export class LocalDB {
     }
 
     // gets the value stored under the key (like a simple map/keystore)
-    public getVal = async (k: string): Promise<any> => {
-        const obj: IndexedDBObj = await this.readObject(k);
+    public getVal = async (k: string, storeName: string = null): Promise<any> => {
+        if (!storeName) storeName = this.STORE_DEFAULT;
+        const obj: IndexedDBObj = await this.readObject(k, storeName);
         const ret = obj?.v;
         if (this.debug) {
-            console.log("Queried for k=" + k + " and found " + S.util.prettyPrint(ret));
+            console.log("Queried for user: " + this.userName + " k=" + k + " and found " + S.util.prettyPrint(ret));
         }
         return ret;
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    public setVal = async (k: string, v: any) => {
-        await this.writeObject({ k, v });
+    public setVal = async (k: string, v: any, storeName: string = null) => {
+        if (!storeName) storeName = this.STORE_DEFAULT;
+        await this.writeObject({ k, v }, storeName);
         if (this.debug) {
-            console.log("Saved for k=" + k + " val " + v);
+            console.log("Saved for user: " + this.userName + " k=" + k + " val=" + v);
         }
     }
 
-    public writeObject = async (obj: IndexedDBObj): Promise<void> => {
+    public writeObject = async (obj: IndexedDBObj, storeName: string = null): Promise<void> => {
+        if (!storeName) storeName = this.STORE_DEFAULT;
         if (!obj.k) {
             console.error("key property 'k' is missing from object: " + S.util.prettyPrint(obj));
             return;
         }
         return new Promise<void>(async (resolve, reject) => {
-            this.runTrans(LocalDB.ACCESS_READWRITE,
+            this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
                 (store: IDBObjectStore) => {
                     if (this.debug) {
                         console.log("writeObj: " + S.util.prettyPrint(obj));
@@ -157,9 +162,11 @@ export class LocalDB {
 
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
-    public readObject = async (k: string): Promise<IndexedDBObj> => {
+    public readObject = async (k: string, storeName: string = null): Promise<IndexedDBObj> => {
         return new Promise<IndexedDBObj>((resolve, reject) => {
-            this.runTrans(LocalDB.ACCESS_READONLY,
+            if (!storeName) storeName = this.STORE_DEFAULT;
+
+            this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {
                     // NOTE: name is the "keyPath" value.
                     const req = store.get(k);
@@ -174,10 +181,8 @@ export class LocalDB {
         });
     }
 
-    // Setting user makes is use a store named like "store-${userName}". This is not very straightforward
-    // however becasue we have to detect if this is a NEW store name, and if so bump up the DB version which
-    // is required to get IndexedDb to run the upgrade method so we can create the new store.
-    public setUser = async (userName: string): Promise<void> => {
+    // Our DB is determined by the user, so if we set a newUser that will trigger a new DB to be opened
+    public setUser = async (userName: string) => {
         // closes last DB and sets the userName so any future DB calls will reopen with new user.
         if (this.userName === userName) return;
 
@@ -189,20 +194,13 @@ export class LocalDB {
             this.db = null;
         }
         this.userName = userName;
-        const newStore = !this.allStoreNames.has(this.makeStoreName());
-
-        // bumping up DB with a 'true' arg here is required in order to generate a new store
-        await this.openDB(newStore);
+        // await this.openDB();
         // await S.localDB.dumpStore();
     }
 
-    makeStoreName = () => {
-        return this.userName ? ("store" + "-" + this.userName) : "store";
-    }
-
-    public dumpStore = async (): Promise<void> => {
+    public dumpStore = async (storeName: string): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
-            this.runTrans(LocalDB.ACCESS_READONLY,
+            this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {
                     const req = store.getAll();
                     req.onsuccess = () => {

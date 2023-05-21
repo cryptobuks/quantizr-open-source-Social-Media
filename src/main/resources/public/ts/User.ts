@@ -77,6 +77,7 @@ export class User {
 
         const usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+        // console.log("refreshLogin: user=" + usr + " pwd=" + pwd);
         const usingCredentials: boolean = usr && pwd;
 
         /*
@@ -144,7 +145,7 @@ export class User {
         }
     }
 
-    logout = async (updateLocalDb: any) => {
+    logout = async () => {
         if (getAs().isAnonUser) {
             return;
         }
@@ -152,9 +153,12 @@ export class User {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
-        if (updateLocalDb) {
-            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-        }
+        // set user to know they're logged out
+        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+
+        // set anon user to know they're logged out
+        S.localDB.setUser(J.PrincipalName.ANON);
+        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
         S.quanta.loggingOut = true;
         try {
@@ -172,6 +176,8 @@ export class User {
         window.location.href = window.location.origin;
     }
 
+    // todo-0: this should delete the ENTIRE LocalDB store instead
+    // todo-0: also need User Settings buttong to clear the DB
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
@@ -198,11 +204,20 @@ export class User {
                     s.unknownPubSigKey = res.unknownPubSigKey;
                 });
 
+                // Setting CREDS before switching DB user"
+                if (usr) {
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
+                }
+                if (pwd) {
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+                }
+                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
+
+                // Setting CREDS after switching DB user
                 S.localDB.setUser(usr);
                 if (usr) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                 }
-
                 if (pwd) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
                 }
@@ -357,10 +372,6 @@ export class User {
 
     userLogin = async () => {
         new LoginDlg().open();
-    }
-
-    userLogout = () => {
-        this.logout(true);
     }
 
     userSignup = () => {

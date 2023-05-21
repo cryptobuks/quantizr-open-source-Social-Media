@@ -41,7 +41,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.sectionTitle("Account"),
                 new HorizontalLayout([
                     new Divc({ className: "accountSettingsCol" }, [
-                        this.settingsLink("Logout", S.user.userLogout), //
+                        this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Storage Space", () => new ManageStorageDlg().open())

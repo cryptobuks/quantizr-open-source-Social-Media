@@ -60,10 +60,6 @@ export class Nostr {
         await this.processMetadataQueue();
     }, 1200);
 
-    DB_METADATA_PREFIX = "ncm-";
-    DB_TEXT_EVENT_PREFIX = "tep-";
-    DB_PERSISTED_PREFIX = "nper-";
-
     // This can be run from Admin Console (currently not used)
     test = async () => {
     }
@@ -166,10 +162,10 @@ export class Nostr {
         switch (event.kind) {
             case Kind.EncryptedDirectMessage:
             case Kind.Text:
-                S.localDB.setVal(this.DB_TEXT_EVENT_PREFIX + event.id, event);
+                S.localDB.setVal(event.id, event, S.localDB.STORE_NOSTR_TXT);
                 break;
             case Kind.Metadata:
-                S.localDB.setVal(this.DB_METADATA_PREFIX + event.pubkey, event);
+                S.localDB.setVal(event.pubkey, event, S.localDB.STORE_NOSTR_MD);
                 break;
             default:
                 console.warn("Event not cached: " + event.id + " kind=" + event.kind);
@@ -601,7 +597,7 @@ export class Nostr {
         id = this.translateNip19(id);
 
         // return the cached event if we have it.
-        const cachedEvent = await S.localDB.getVal(this.DB_TEXT_EVENT_PREFIX + id);
+        const cachedEvent = await S.localDB.getVal(id, S.localDB.STORE_NOSTR_TXT);
         if (cachedEvent) {
             return cachedEvent;
         }
@@ -803,9 +799,9 @@ export class Nostr {
     // todo-1: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
     // and run it all in a transaction
     cacheMetadataEvent = async (event: Event) => {
-        const cachedEvent = await S.localDB.getVal(this.DB_METADATA_PREFIX + event.pubkey);
+        const cachedEvent = await S.localDB.getVal(event.pubkey, S.localDB.STORE_NOSTR_MD);
         if (!cachedEvent) {
-            await S.localDB.setVal(this.DB_METADATA_PREFIX + event.pubkey, event);
+            await S.localDB.setVal(event.pubkey, event, S.localDB.STORE_NOSTR_MD);
         }
 
         this.getDispInfoFromEvent(event);
@@ -865,7 +861,7 @@ export class Nostr {
     }
 
     addToMetadataQueue = async (pubKey: string, persist: boolean) => {
-        const cachedMd = await S.localDB.getVal(this.DB_METADATA_PREFIX + pubKey);
+        const cachedMd = await S.localDB.getVal(pubKey, S.localDB.STORE_NOSTR_MD);
         if (!cachedMd) {
             this.metadataQueue.add(pubKey);
             if (persist) {
@@ -1221,7 +1217,7 @@ export class Nostr {
 
         // remove any events we know we've already persisted
         events = events.filter(async (e) => {
-            const ev = await S.localDB.getVal(this.DB_PERSISTED_PREFIX + e.id);
+            const ev = await S.localDB.getVal(e.id, S.localDB.STORE_NOSTR_PERSIST);
             // if (ev) {
             //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
             // }
@@ -1267,7 +1263,7 @@ export class Nostr {
         }, background);
 
         // keep track of what we've just sent to server.
-        events.forEach(async e => await S.localDB.setVal(this.DB_PERSISTED_PREFIX + e.id, true));
+        events.forEach(async e => await S.localDB.setVal(e.id, true, S.localDB.STORE_NOSTR_PERSIST));
         // console.log("PERSIST EVENTS Resp: " + S.util.prettyPrint(res));
         return res;
     }

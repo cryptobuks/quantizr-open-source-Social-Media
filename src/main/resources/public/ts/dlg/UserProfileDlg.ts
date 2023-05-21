@@ -227,7 +227,7 @@ export class UserProfileDlg extends DialogBase {
                     }) : null,
 
                     new ButtonBar([
-                        !this.readOnly ? new Button("Logout", S.user.userLogout) : null,
+                        !this.readOnly ? new Button("Logout", S.user.logout) : null,
                         new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary")
                     ], "float-end")
                 ], "marginTop")
@@ -243,7 +243,9 @@ export class UserProfileDlg extends DialogBase {
             let relays = S.nostr.getMyRelays();
             relays = S.nostr.addMyRelays(relays);
             console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
-            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false, 200);
+
+            // getting more than 50 is currently just too slow
+            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false, 50);
         }
     }
 
