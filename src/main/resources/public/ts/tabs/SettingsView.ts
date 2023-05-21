@@ -45,7 +45,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
-                        this.settingsLink("Clear Browser Storage", S.localDB.clearStores)
+                        this.settingsLink("Clear Browser Storage", async () => {
+                            await S.localDB.clearStores();
+                            S.util.showMessage("Browser Storage cleared successfully");
+                        })
                     ]),
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),

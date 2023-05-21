@@ -20,7 +20,7 @@ export class User {
         dlg = new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Close Account");
         await dlg.open();
         if (dlg.yes) {
-            await this.deleteAllUserLocalDbEntries();
+            await S.localDB.clearStores();
             await S.rpcUtil.rpc<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
 
             /* Remove warning dialog to ask user about leaving the page */
@@ -174,15 +174,6 @@ export class User {
         S.quanta.authToken = null;
         S.quanta.userName = null;
         window.location.href = window.location.origin;
-    }
-
-    // todo-0: this should delete the ENTIRE LocalDB store instead
-    // todo-0: also need User Settings buttong to clear the DB
-    deleteAllUserLocalDbEntries = (): Promise<any> => {
-        return Promise.all([
-            S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0")
-        ]);
     }
 
     showUserProfileByNostrKey = (identity: string) => {

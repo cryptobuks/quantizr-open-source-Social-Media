@@ -6,10 +6,9 @@ import * as J from "./JavaIntf";
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
-    debug: boolean = true; // todo-00: set back to false.
+    debug: boolean = false;
     db: IDBDatabase = null;
 
-    // todo-0: rename these vars
     STORE_NOSTR_MD = "nostr-md";
     STORE_NOSTR_TXT = "nostr-txt";
     STORE_NOSTR_PERSIST = "nostr-persist";
@@ -74,27 +73,34 @@ export class LocalDB {
         });
     }
 
-    clearStores = () => {
-        this.clearStore(this.STORE_NOSTR_MD);
-        this.clearStore(this.STORE_NOSTR_TXT);
-        this.clearStore(this.STORE_NOSTR_PERSIST);
-        this.clearStore(this.STORE_DEFAULT);
+    clearStores = (): Promise<void[]> => {
+        return Promise.all([
+            this.clearStore(this.STORE_NOSTR_MD),
+            this.clearStore(this.STORE_NOSTR_TXT),
+            this.clearStore(this.STORE_NOSTR_PERSIST),
+            this.clearStore(this.STORE_DEFAULT)
+        ]);
     }
 
-    clearStore = (storeName: string) => {
-        this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
-            (store: IDBObjectStore) => {
-                if (this.debug) {
-                    console.log("clearing store: " + storeName);
-                }
-                const req = store.clear();
-                req.onsuccess = () => {
-                    console.log("store " + storeName + " clear Ok")
-                };
-                req.onerror = () => {
-                    console.log("store " + storeName + "clear Failed")
-                };
-            });
+    clearStore = (storeName: string): Promise<void> => {
+        // don't await, just return promise
+        return new Promise<void>(async (resolve, reject) => {
+            this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
+                (store: IDBObjectStore) => {
+                    if (this.debug) {
+                        console.log("clearing store: " + storeName);
+                    }
+                    const req = store.clear();
+                    req.onsuccess = () => {
+                        console.log("store " + storeName + " clear Ok");
+                        resolve();
+                    };
+                    req.onerror = () => {
+                        console.log("store " + storeName + "clear Failed");
+                        resolve();
+                    };
+                });
+        });
     }
 
     createStore = (db: IDBDatabase, storeName: string) => {
