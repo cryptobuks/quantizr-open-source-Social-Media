@@ -8,8 +8,7 @@ public enum Constant {
     SEARCH_TYPE_USER_LOCAL("userLocal"), 
     SEARCH_TYPE_USER_ALL("userAll"), 
     SEARCH_TYPE_USER_FOREIGN("userForeign"), 
-    SEARCH_TYPE_USER_NOSTR("userNostr"), 
-    SEARCH_TYPE_USER_NOSTR_NIP05("userNostrNip05"),
+    SEARCH_TYPE_USER_NOSTR("userNostr"),
 
     ENC_TAG("<[ENC]>"),
 

@@ -111,7 +111,7 @@ export class Nostr {
                 const eventVal = new Val<Event>();
 
                 // try to read the metadata from the relay
-                await S.nostr.readUserMetadata(this.pk, relay, false, false, eventVal);
+                await S.nostr.readUserMetadata(this.pk, relay, false, eventVal);
 
                 // if the relay didn't have matching metadata we need to publish it to this relay
                 if (!this.metadataMatches(currentMetaPayload, eventVal.val)) {
@@ -540,7 +540,7 @@ export class Nostr {
         const event = await this.getEvent(nostrId, null, this.getMyRelays());
         const e = new Val<Event>();
         if (event) {
-            await this.readUserMetadata(event.pubkey, this.getSessionRelaysStr(), false, false, e);
+            await this.readUserMetadata(event.pubkey, this.getSessionRelaysStr(), false, e);
         }
 
         let report = "Event: \n" + S.util.prettyPrint(event);
@@ -881,14 +881,14 @@ export class Nostr {
     }
 
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
-    readUserMetadataEx = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
+    readUserMetadataEx = async (user: string, relayUrl: string, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
         const e = new Val<Event>();
-        let ret = await this.readUserMetadata(user, relayUrl, isNip05, persist, e, background);
+        let ret = await this.readUserMetadata(user, relayUrl, persist, e, background);
 
         // if we didn't find the metadata fallback to using our own relays to try.
         if (!e.val) {
-            ret = await this.readUserMetadata(user, this.getSessionRelaysStr(), isNip05, persist, e, background);
+            ret = await this.readUserMetadata(user, this.getSessionRelaysStr(), persist, e, background);
         }
 
         if (outEvent) {
@@ -901,9 +901,10 @@ export class Nostr {
     // isNip05 must be set to true if 'user' is a nip05.
     //
     // If output argument 'outEvent' is passed as non-null then the event is sent back in 'outEvent.val'
-    readUserMetadata = async (user: string, relayUrl: string, isNip05: boolean, persist: boolean, outEvent: Val<Event>,
+    readUserMetadata = async (user: string, relayUrl: string, persist: boolean, outEvent: Val<Event>,
         background: boolean = false): Promise<J.SaveNostrEventResponse> => {
         console.log("Getting Metadata for Identity: " + user);
+        const isNip05 = user.indexOf("@") !== -1 || user.indexOf(":") !== -1;
         let relays = this.getRelays(relayUrl);
         let profile = null;
         if (isNip05) {

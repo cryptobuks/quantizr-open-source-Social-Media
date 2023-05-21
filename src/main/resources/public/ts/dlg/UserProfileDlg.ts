@@ -315,7 +315,7 @@ export class UserProfileDlg extends DialogBase {
 
                 // read this user using their relays or our own for.
                 await S.nostr.readUserMetadataEx(res.userProfile.userName.substring(1),
-                    res.userProfile.relays, false, true, null);
+                    res.userProfile.relays, true, null);
 
                 res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: this.userNodeId,

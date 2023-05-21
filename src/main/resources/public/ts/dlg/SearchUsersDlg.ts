@@ -42,7 +42,6 @@ export class SearchUsersDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const isNostr = this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_NOSTR;
-        const isNostrNip05 = this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05;
 
         const adminOptions = new RadioButtonGroup([
             getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
@@ -53,7 +52,7 @@ export class SearchUsersDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_ALL
             }) : null,
-            new RadioButton("Local Users", true, "optionsGroup", null, {
+            new RadioButton("Local User", true, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
@@ -61,7 +60,7 @@ export class SearchUsersDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL
             }),
-            new RadioButton("Foreign Users", false, "optionsGroup", null, {
+            new RadioButton("Foreign User", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
@@ -69,40 +68,20 @@ export class SearchUsersDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
             }),
-            new RadioButton("Nostr User (hex or npub)", false, "optionsGroup", null, {
+            new RadioButton("Nostr User (hex, npub, or NIP-05)", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_NOSTR });
                     }
                 },
                 getValue: (): boolean => isNostr
-            }),
-            new RadioButton("Nostr User (NIP-05)", false, "optionsGroup", null, {
-                setValue: (checked: boolean) => {
-                    if (checked) {
-                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05 });
-                    }
-                },
-                getValue: (): boolean => isNostrNip05
             })
-
         ], "marginBottom marginTop");
-
-        let userLabel;
-        if (isNostr) {
-            userLabel = "Nostr User (npub or hex)";
-        }
-        else if (isNostrNip05) {
-            userLabel = "Nostr NIP-05";
-        }
-        else {
-            userLabel = "User Name";
-        }
 
         return [
             new Diva([
-                this.searchTextField = new TextField({ label: userLabel, enter: this.search, val: this.searchTextState }),
-                isNostr || isNostrNip05 ? new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5) : null,
+                this.searchTextField = new TextField({ label: "User", enter: this.search, val: this.searchTextState }),
+                isNostr ? new TextArea("Nostr Relays", { rows: 5 }, this.nostrRelayState, null, false, 5) : null,
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -126,14 +105,12 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultNostrRelay = this.nostrRelayState.getValue();
         const searchType = this.getState<LS>().searchType;
 
-        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR || //
-            searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05) {
-
+        if (searchType === J.Constant.SEARCH_TYPE_USER_NOSTR) {
             const nostrEvent = new Val<Event>();
             try {
                 S.rpcUtil.incRpcCounter();
                 await S.nostr.readUserMetadataEx(SearchUsersDlg.defaultSearchText,
-                    SearchUsersDlg.defaultNostrRelay, searchType === J.Constant.SEARCH_TYPE_USER_NOSTR_NIP05, true, nostrEvent);
+                    SearchUsersDlg.defaultNostrRelay, true, nostrEvent);
             }
             finally {
                 S.rpcUtil.decRpcCounter();

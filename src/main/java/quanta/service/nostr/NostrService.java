@@ -226,10 +226,6 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
-
-		// todo-00: Should be caching nostrAccnt into a global cache that's cleared like every 3 mins so
-		// that when someone
-		// edits their bio infomration the update is noticed within 3 mins.
 		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk()); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
