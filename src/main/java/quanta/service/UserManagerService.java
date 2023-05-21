@@ -229,44 +229,10 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		String existingNpub = userNode.getStr(NodeProp.NOSTR_USER_NPUB);
-		if (existingNpub == null) {
-			userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);
-		}
-
-		String existingNostrPubKey = userNode.getStr(NodeProp.NOSTR_USER_PUBKEY);
-		if (existingNostrPubKey == null) {
-			userNode.set(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
-		}
-
-		/*
-		 * NOTE: For user to forcably change their public keys, they have to use the menu option for doing
-		 * that, it won't happen here, automatically because their current browser may have different keys
-		 * than their current keys. In other words we only set keys if we don't have the key yet (i.e. will
-		 * not overwrite existing key here)
-		 */
-		String pubEncKey = userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
-		if (pubEncKey == null) {
-			if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
-				log.debug("USER_PREF_PUBLIC_KEY changed during login");
-			}
-		} else {
-			if (!pubEncKey.equals(asymEncKey)) {
-				res.setUnknownPubEncKey(true);
-			}
-		}
-
-		// ditto, note just above, same applies to this key
-		String pubSigKey = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-		if (pubSigKey == null) {
-			if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
-				log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
-			}
-		} else {
-			if (!pubSigKey.equals(sigKey)) {
-				res.setUnknownPubSigKey(true);
-			}
-		}
+		userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);
+		userNode.set(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
+		userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
+		userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
 
 		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
 

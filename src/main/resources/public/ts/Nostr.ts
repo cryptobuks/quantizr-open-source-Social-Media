@@ -88,6 +88,7 @@ export class Nostr {
     }
 
     publishUserMetadata = async (): Promise<void> => {
+        console.log("Updating Nostr Metadata to relays.");
         if (!this.checkInit()) return;
 
         // get the relays string for this user
@@ -114,13 +115,13 @@ export class Nostr {
 
                 // if the relay didn't have matching metadata we need to publish it to this relay
                 if (!this.metadataMatches(currentMetaPayload, eventVal.val)) {
-                    console.log("Pushing new meta to relay: " + relay);
+                    console.log("RELAY UPDATE: Pushing new meta to relay: " + relay);
 
                     // don't await for this, we can let them all run in parallel
-                    this.publishEvent(currentMeta, relay);
+                    await this.publishEvent(currentMeta, relay);
                 }
                 else {
-                    console.log("Meta is up to date on relay: " + relay);
+                    console.log("RELAY UPDATE: Meta is up to date on relay: " + relay);
                 }
             }
         }
@@ -200,6 +201,10 @@ export class Nostr {
 
     // Initializes our keys, and returns the npub key
     initKeys = async (userName: string): Promise<void> => {
+        if (userName === J.PrincipalName.ANON) {
+            console.log("not using nostr keys: user=" + userName);
+            return;
+        }
         // if already initialized do nothing.
         if (this.pk) return;
 

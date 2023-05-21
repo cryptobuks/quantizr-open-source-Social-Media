@@ -1,4 +1,3 @@
-import { getAs } from "./AppContext";
 import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -24,9 +23,6 @@ Original way I had for creating a hash-based key from a password:
 export class Crypto {
     readonly avail: boolean = !!(crypto?.subtle);
     warningShown: boolean = false;
-
-    static userWarnedAboutPubEncKey: boolean = false;
-    static userWarnedAboutPubSigKey: boolean = false;
 
     // cache the keys here for faster access.
     privateEncKey: CryptoKey = null;
@@ -268,6 +264,7 @@ export class Crypto {
 
     // todo-1: need to make this require the password and username to be more secure.
     initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
+        console.log("Crypto.initKeys");
         if (user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
             return;
@@ -656,10 +653,6 @@ export class Crypto {
      * and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
-        if (getAs().unknownPubEncKey) {
-            console.warn("Unrecognized key");
-            return { cipherText: null, cipherKey: null }
-        }
         publicKey = publicKey || await this.getPublicEncKey();
 
         // generate random symmetric key
@@ -864,16 +857,7 @@ export class Crypto {
             this.cryptoWarning();
             return false;
         }
-        let ret = true;
-        if (getAs().unknownPubSigKey) {
-            ret = false;
-            // warn user only once
-            if (!Crypto.userWarnedAboutPubSigKey) {
-                Crypto.userWarnedAboutPubSigKey = true;
-                this.showEncryptionKeyProblem("Signature Key", "Signature");
-            }
-        }
-        return ret;
+        return true;
     }
 
     encKeyOk = () => {
@@ -881,16 +865,7 @@ export class Crypto {
             this.cryptoWarning();
             return false;
         }
-        let ret = true;
-        if (getAs().unknownPubEncKey) {
-            ret = false;
-            // warn user only once
-            if (!Crypto.userWarnedAboutPubEncKey) {
-                Crypto.userWarnedAboutPubEncKey = true;
-                this.showEncryptionKeyProblem("Encryption Key", "Encryption");
-            }
-        }
-        return ret;
+        return true;
     }
 
     showEncryptionKeyProblem = (keyName: string, featureName: string) => {

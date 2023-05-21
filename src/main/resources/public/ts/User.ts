@@ -95,6 +95,7 @@ export class User {
                 if (S.crypto.avail) {
                     await S.crypto.initKeys(callUsr, false, false, false, "all");
                 }
+                await S.nostr.initKeys(callUsr);
 
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
@@ -186,15 +187,6 @@ export class User {
 
             // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
-                await S.nostr.initKeys(usr);
-
-                await promiseDispatch("unknownPubKeys", s => {
-                    // we capture these 'unknowns' here, but we only issue a warning to user only later on
-                    // if/when the crypto is actually attempted to be used.
-                    s.unknownPubEncKey = res.unknownPubEncKey;
-                    s.unknownPubSigKey = res.unknownPubSigKey;
-                });
-
                 // Setting CREDS before switching DB user"
                 if (usr) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);

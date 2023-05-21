@@ -20,8 +20,4 @@ public class LoginResponse extends ResponseBase {
 	private String anonUserLandingPageNode;
 	private UserPreferences userPreferences;
 	private boolean allowFileSystemSearch;
-
-	// comes back to caller as TRUE if the keys were not the same as the keys stored on the server.
-	private boolean unknownPubEncKey;
-	private boolean unknownPubSigKey;
 }

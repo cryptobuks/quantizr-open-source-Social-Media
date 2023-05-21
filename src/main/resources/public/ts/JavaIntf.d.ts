@@ -908,8 +908,6 @@ export interface LoginResponse extends ResponseBase {
     anonUserLandingPageNode: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
-    unknownPubEncKey: boolean;
-    unknownPubSigKey: boolean;
 }
 
 export interface LogoutResponse extends ResponseBase {

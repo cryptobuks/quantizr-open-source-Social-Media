@@ -90,8 +90,8 @@ export class EditNodeDlg extends DialogBase {
         let encryptCheckboxVal = false;
         if (S.crypto.avail) {
             // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
-            signCheckboxVal = !ast.unknownPubSigKey && ast.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, ast.editNode);
-            encryptCheckboxVal = !ast.unknownPubEncKey && S.props.isEncrypted(ast.editNode);
+            signCheckboxVal = ast.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, ast.editNode);
+            encryptCheckboxVal = S.props.isEncrypted(ast.editNode);
         }
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
@@ -120,7 +120,7 @@ export class EditNodeDlg extends DialogBase {
 
         /* This 'encrypt' will trigger this node to be encrypted whenever we're replying to
         an encrypted node. (i.e. the parent of this node is encrypted) */
-        if (encrypt && !ast.unknownPubEncKey) {
+        if (encrypt) {
             setTimeout(() => {
                 this.utl.setEncryption(this, true);
             }, 500);
