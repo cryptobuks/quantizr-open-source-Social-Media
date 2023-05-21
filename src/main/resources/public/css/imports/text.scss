@@ -121,8 +121,10 @@
     display: inline-block;
     margin-bottom: $smallGap;
     margin-left: 20px;
-    padding: $tinyGap;
+    padding: 4px 6px 4px 6px;
     border: 1px solid gray;
+    border-radius: $border-radius;
+    font-family: 'Courier New', Courier, monospace;
     cursor: pointer;
 }
 

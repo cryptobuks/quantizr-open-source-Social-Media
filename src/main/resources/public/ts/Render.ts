@@ -318,7 +318,20 @@ export class Render {
         const byIdUrl = window.location.origin + "?id=" + node.id;
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
-        children.push(new Heading(5, "By ID"), //
+        if (S.nostr.isNostrNode(node)) {
+            let nostrId = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
+            if (nostrId) {
+                nostrId = nostrId.substring(1);
+                children.push(new Heading(6, "Nostr ID"), //
+                    new Div(nostrId, {
+                        className: "linkDisplay",
+                        title: "Click -> Copy to clipboard",
+                        onClick: () => this.copyLinkToClipboard(nostrId)
+                    }));
+            }
+        }
+
+        children.push(new Heading(6, "By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",
                 title: "Click -> Copy to clipboard",
@@ -326,7 +339,7 @@ export class Render {
             }));
 
         const markdownByIdUrl = "[Link](?id=" + node.id + ")";
-        children.push(new Heading(5, "By ID (Markdown)"), //
+        children.push(new Heading(6, "By ID (Markdown)"), //
             new Div(markdownByIdUrl, {
                 className: "linkDisplay",
                 title: "Click -> Copy to clipboard",
@@ -335,7 +348,7 @@ export class Render {
 
         if (node.name) {
             const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
-            children.push(new Heading(5, "By Name"), //
+            children.push(new Heading(6, "By Name"), //
                 new Div(byNameUrl, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
@@ -343,7 +356,7 @@ export class Render {
                 }));
 
             const markdownByNameUrl = "[Link](" + S.nodeUtil.getPathPartForNamedNode(node) + ")";
-            children.push(new Heading(5, "By Name (Markdown)"), //
+            children.push(new Heading(6, "By Name (Markdown)"), //
                 new Div(markdownByNameUrl, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
@@ -374,7 +387,7 @@ export class Render {
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;
                     linkGroup.addChildren([
-                        new Heading(5, "View By Id"), //
+                        new Heading(6, "View By Id"), //
                         new Div(attByIdUrl, {
                             className: "linkDisplay",
                             title: "Click -> Copy to clipboard",
@@ -384,7 +397,7 @@ export class Render {
 
                     const downloadAttByIdUrl = attByIdUrl + "?download=y";
                     linkGroup.addChildren([
-                        new Heading(5, "Download By Id"), //
+                        new Heading(6, "Download By Id"), //
                         new Div(downloadAttByIdUrl, {
                             className: "linkDisplay",
                             title: "Click -> Copy to clipboard",
@@ -395,7 +408,7 @@ export class Render {
                     if (node.name) {
                         const attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
                         linkGroup.addChildren([
-                            new Heading(5, "View By Name"), //
+                            new Heading(6, "View By Name"), //
                             new Div(attByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
@@ -405,7 +418,7 @@ export class Render {
 
                         const downloadAttByNameUrl = attByNameUrl + "?download=y";
                         linkGroup.addChildren([
-                            new Heading(5, "Download By Name"), //
+                            new Heading(6, "Download By Name"), //
                             new Div(downloadAttByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
@@ -417,7 +430,7 @@ export class Render {
                     // il = IpfsLink
                     if (att.il) {
                         linkGroup.addChildren([
-                            new Heading(5, "IPFS LINK"), //
+                            new Heading(6, "IPFS LINK"), //
                             new Div("ipfs://" + att.il, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
@@ -439,7 +452,7 @@ export class Render {
 
         const ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
         if (ipfsCid) {
-            children.push(new Heading(5, "IPFS CID"), //
+            children.push(new Heading(6, "IPFS CID"), //
                 new Div("ipfs://" + ipfsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
@@ -449,7 +462,7 @@ export class Render {
 
         const ipnsCid = S.props.getPropStr(J.NodeProp.IPNS_CID, node);
         if (ipnsCid) {
-            children.push(new Heading(5, "IPNS Name"), //
+            children.push(new Heading(6, "IPNS Name"), //
                 new Div("ipns://" + ipnsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
