@@ -74,6 +74,29 @@ export class LocalDB {
         });
     }
 
+    clearStores = () => {
+        this.clearStore(this.STORE_NOSTR_MD);
+        this.clearStore(this.STORE_NOSTR_TXT);
+        this.clearStore(this.STORE_NOSTR_PERSIST);
+        this.clearStore(this.STORE_DEFAULT);
+    }
+
+    clearStore = (storeName: string) => {
+        this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
+            (store: IDBObjectStore) => {
+                if (this.debug) {
+                    console.log("clearing store: " + storeName);
+                }
+                const req = store.clear();
+                req.onsuccess = () => {
+                    console.log("store " + storeName + " clear Ok")
+                };
+                req.onerror = () => {
+                    console.log("store " + storeName + "clear Failed")
+                };
+            });
+    }
+
     createStore = (db: IDBDatabase, storeName: string) => {
         // this try/catch is important to ignore times the store already exists, like upgrading the DB.
         try {

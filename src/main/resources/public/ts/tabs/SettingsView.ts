@@ -44,7 +44,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
-                        this.settingsLink("Storage Space", () => new ManageStorageDlg().open())
+                        this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
+                        this.settingsLink("Clear Browser Storage", S.localDB.clearStores)
                     ]),
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),
