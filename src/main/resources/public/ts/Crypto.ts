@@ -1,4 +1,5 @@
 import { getAs } from "./AppContext";
+import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -130,6 +131,8 @@ export class Crypto {
             privateKey = await this.getPrivateSigKey();
         }
 
+        if (!privateKey) return null;
+
         const sigBuf: ArrayBuffer = await crypto.subtle.sign(this.SIG_ALGO,
             privateKey,
             new TextEncoder().encode(data));
@@ -160,10 +163,10 @@ export class Crypto {
         const clearText = "Encrypt this string.";
 
         // test symetric encryption
-        const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+        const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
         if (obj) {
             // simple encrypt/decrypt
-            const key: CryptoKey = obj.val;
+            const key: CryptoKey = obj.v;
             const encHex = await this.symEncryptString(key, clearText);
             const unencText = await this.symDecryptString(key, encHex);
             S.util.assert(clearText === unencText, "Symmetric decrypt");
@@ -187,19 +190,19 @@ export class Crypto {
         let ret: boolean = false;
 
         // test public key encryption
-        const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+        const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_ASYMKEY);
         if (obj) {
             // results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
 
             // simple encrypt/decrypt
-            const encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
-            const unencText = await this.asymDecryptString(obj.val.privateKey, encHex);
+            const encHex = await this.asymEncryptString(obj.v.publicKey, clearText);
+            const unencText = await this.asymDecryptString(obj.v.privateKey, encHex);
             S.util.assert(clearText === unencText, "Asym encryption");
 
             // Export keys to a string format
-            const publicKeyStr = await crypto.subtle.exportKey("jwk", obj.val.publicKey);
+            const publicKeyStr = await crypto.subtle.exportKey("jwk", obj.v.publicKey);
             // console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
-            const privateKeyStr = await crypto.subtle.exportKey("jwk", obj.val.privateKey);
+            const privateKeyStr = await crypto.subtle.exportKey("jwk", obj.v.privateKey);
             // console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
 
             const publicKey = await crypto.subtle.importKey("jwk", publicKeyStr, {
@@ -358,26 +361,26 @@ export class Crypto {
     }
 
     getPrivateKey = async (storeName: string): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(storeName);
-        if (!val || !val.val) {
+        const val: IndexedDBObj = await S.localDB.readObject(storeName);
+        if (!val || !val.v) {
             console.error("Unable to get private key.");
             return null;
         }
         else {
             // console.log("getPrivateKey returning: " + S.util.prettyPrint(val.val.privateKey));
-            return val.val.privateKey;
+            return val.v.privateKey;
         }
     }
 
     getPublicKey = async (storeName: string): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(storeName);
-        if (!val || !val.val) {
+        const val: IndexedDBObj = await S.localDB.readObject(storeName);
+        if (!val || !val.v) {
             console.error("Unable to get public key.");
             return null;
         }
         else {
             // console.log("getPublicKey returning: " + S.util.prettyPrint(val.val.publicKey));
-            return val.val.publicKey;
+            return val.v.publicKey;
         }
     }
 
@@ -386,14 +389,14 @@ export class Crypto {
             return;
         }
 
-        const val: any = await S.localDB.readObject(this.STORE_SYMKEY);
+        const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
         if (!val) {
             forceUpdate = true;
         }
 
         if (val && !forceUpdate) {
             if (this.logKeys) {
-                const cryptoKey: CryptoKey = val.val;
+                const cryptoKey: CryptoKey = val.v;
                 await crypto.subtle.exportKey("jwk", cryptoKey);
                 // let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
                 // console.log("symkey: " + S.util.toJson(symKeyStr));
@@ -421,12 +424,12 @@ export class Crypto {
             /* Check to see if there is a key stored, and if not force it to be created
                val.val is the EncryptionKeyPair here.
             */
-            const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
+            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
             if (!val) {
                 forceUpdate = true;
             }
             else {
-                keyPair = val.val;
+                keyPair = val.v;
             }
         }
 
@@ -441,8 +444,8 @@ export class Crypto {
         }
 
         if (!keyPair) {
-            const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
-            keyPair = val.val;
+            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
+            keyPair = val.v;
         }
 
         if (!pubKeyStr) {
@@ -468,12 +471,12 @@ export class Crypto {
             /* Check to see if there is a key stored, and if not force it to be created
                val.val is the EncryptionKeyPair here.
             */
-            const val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_ASYMKEY);
             if (!val) {
                 forceUpdate = true;
             }
             else {
-                keyPair = val.val;
+                keyPair = val.v;
             }
         }
 
@@ -493,8 +496,8 @@ export class Crypto {
         }
 
         if (!keyPair) {
-            const val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-            keyPair = val.val;
+            const val: IndexedDBObj = await S.localDB.readObject(this.STORE_ASYMKEY);
+            keyPair = val.v;
         }
 
         if (!pubKeyStr) {
@@ -517,9 +520,9 @@ export class Crypto {
     exportAsymKeys = async (): Promise<string> => {
         if (!this.avail) return null;
         let ret = "";
-        const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+        const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_ASYMKEY);
         if (obj) {
-            const keyPair: EncryptionKeyPair = obj.val;
+            const keyPair: EncryptionKeyPair = obj.v;
 
             const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
@@ -540,9 +543,9 @@ export class Crypto {
     exportSymKey = async (): Promise<string> => {
         if (!this.avail) return null;
         let ret = "";
-        const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+        const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
         if (obj) {
-            const key: CryptoKey = obj.val;
+            const key: CryptoKey = obj.v;
             const dat = await crypto.subtle.exportKey("jwk", key);
             ret = S.util.prettyPrint(dat);
             // todo-3: no PEM export for Symmetric key?
@@ -559,9 +562,9 @@ export class Crypto {
         if (!this.avail) return null;
         let ret = "";
 
-        const obj: any = await S.localDB.readObject(this.STORE_SIGKEY);
+        const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
         if (obj) {
-            const keyPair: EncryptionKeyPair = obj.val;
+            const keyPair: EncryptionKeyPair = obj.v;
 
             const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
@@ -617,9 +620,9 @@ export class Crypto {
      */
     symEncryptString = async (key: CryptoKey, data: string): Promise<string> => {
         if (!key) {
-            const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+            const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
-                key = obj.val;
+                key = obj.v;
             }
         }
         return this.encryptString(key, this.SYM_ALGO, data);
@@ -740,9 +743,9 @@ export class Crypto {
 
     symDecryptString = async (key: CryptoKey, encHex: string): Promise<string> => {
         if (!key) {
-            const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+            const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
-                key = obj.val;
+                key = obj.v;
             }
         }
         return this.decryptString(key, this.SYM_ALGO, encHex);

@@ -118,12 +118,19 @@ export class LocalDB {
     // gets the value stored under the key (like a simple map/keystore)
     public getVal = async (k: string): Promise<any> => {
         const obj: IndexedDBObj = await this.readObject(k);
-        return obj?.v;
+        const ret = obj?.v;
+        if (this.debug) {
+            console.log("Queried for k=" + k + " and found " + S.util.prettyPrint(ret));
+        }
+        return ret;
     }
 
     // stores the value under this key  (like a simple map/keystore)
     public setVal = async (k: string, v: any) => {
         await this.writeObject({ k, v });
+        if (this.debug) {
+            console.log("Saved for k=" + k + " val " + v);
+        }
     }
 
     public writeObject = async (obj: IndexedDBObj): Promise<void> => {
@@ -134,6 +141,9 @@ export class LocalDB {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
+                    if (this.debug) {
+                        console.log("writeObj: " + S.util.prettyPrint(obj));
+                    }
                     const req = store.put(obj);
                     req.onsuccess = () => {
                         resolve();
@@ -147,6 +157,7 @@ export class LocalDB {
 
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
+    // todo-0: make this method private. We can alway call thru 'getVal()' as the public method
     public readObject = async (k: string): Promise<IndexedDBObj> => {
         return new Promise<IndexedDBObj>((resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,

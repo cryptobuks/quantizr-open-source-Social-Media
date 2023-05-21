@@ -42,11 +42,12 @@ export class Nostr {
     // up something and have no known relay we can at least try these. Potentially we could save these
     // on the server maybe specific to the given user? Or should we hold ONLY in local/browser storage?
     knownRelays: Set<string> = new Set<string>();
-
-    // hold any data we've already encountered so we can avoid looking in relays when possible
-    metadataCache: Map<string, Event> = new Map<string, Event>(); // Kind.Metata (map key==user's pubkey)
     metadataQueue: Set<string> = new Set<string>(); // Holds pending pubkeys whose metadata is pending being rendered in the DOM
+    domRenderPending: boolean = false;
+
     persistMetadataForKeys: Set<string> = new Set<string>(); // Holds pubkeys for which we DO want to persist the metadata once found
+
+    // todo-0: store these in the local DB too.
     textCache: Map<string, Event> = new Map<string, Event>(); // Kind.Text (map key==events id)
     dispInfoCache: Map<string, NostrMetadataDispInfo> = new Map<string, NostrMetadataDispInfo>(); // cache for rapid injecting of user info during react renders
     userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
@@ -62,6 +63,8 @@ export class Nostr {
     backgroundQueue = setInterval(async () => {
         await this.processMetadataQueue();
     }, 1200);
+
+    DB_METADATA_PREFIX = "ncm-";
 
     // This can be run from Admin Console (currently not used)
     test = async () => {
@@ -161,7 +164,7 @@ export class Nostr {
         events?.forEach(e => this.cacheEvent(e));
     }
 
-    cacheEvent = (event: Event): void => {
+    cacheEvent = (event: Event) => {
         switch (event.kind) {
             case Kind.EncryptedDirectMessage:
             case Kind.Text:
@@ -171,10 +174,7 @@ export class Nostr {
                 this.textCache.set(event.id, event);
                 break;
             case Kind.Metadata:
-                if (this.metadataCache.size > 2000) {
-                    this.metadataCache.clear();
-                }
-                this.metadataCache.set(event.pubkey, event);
+                S.localDB.setVal(this.DB_METADATA_PREFIX + event.pubkey, event);
                 break;
             default:
                 console.warn("Event not cached: " + event.id + " kind=" + event.kind);
@@ -746,7 +746,13 @@ export class Nostr {
     }
 
     processMetadataQueue = async () => {
-        if (this.metadataQueue.size === 0) return;
+        if (this.metadataQueue.size === 0) {
+            if (this.domRenderPending) {
+                this.domRenderPending = false;
+                this.updateAllNodesMetadata();
+            }
+            return;
+        }
         const authors: string[] = Array.from(this.metadataQueue);
         this.metadataQueue.clear();
 
@@ -770,10 +776,6 @@ export class Nostr {
             }
 
             this.updateAllNodesMetadata();
-
-            // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
-            // we had queued and the page will now render the names.
-            dispatch("ForceRefreshMetadata", s => { });
         }
 
         // Any events that exist in persistMetatataForKeys gets persisted here.
@@ -797,30 +799,35 @@ export class Nostr {
                 }
             })
         });
+
+        // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
+        // we had queued and the page will now render the names.
+        dispatch("ForceRefreshMetadata", s => { });
     }
 
-    cacheMetadataEvent = (event: Event) => {
-        let dispInfo = this.dispInfoCache.get(event.pubkey);
-        const cachedEvent = this.metadataCache.get(event.pubkey);
-
-        // if caches already exist, nothing to do here
-        if (dispInfo && cachedEvent) return;
-
+    // todo-0: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
+    // and run it all in a transaction
+    cacheMetadataEvent = async (event: Event) => {
+        const cachedEvent = await S.localDB.getVal(this.DB_METADATA_PREFIX + event.pubkey);
         if (!cachedEvent) {
-            this.metadataCache.set(event.pubkey, event);
+            await S.localDB.setVal(this.DB_METADATA_PREFIX + event.pubkey, event);
         }
+
+        this.getDispInfoFromEvent(event);
+    }
+
+    getDispInfoFromEvent = (event: Event): NostrMetadataDispInfo => {
+        let dispInfo = this.dispInfoCache.get(event.pubkey);
 
         // if we have the metadata cached we can render it immediately
         if (!dispInfo) {
             dispInfo = this.getMetadataDisplayInfo(event);
-            if (dispInfo) {
-                this.dispInfoCache.set(event.pubkey, dispInfo);
+            if (!dispInfo) {
+                dispInfo = { display: null, title: null, picture: null };
             }
-            else {
-                // we need to cache even empty data, so we don't repeat the attempt to get it again.
-                this.dispInfoCache.set(event.pubkey, { display: null, title: null, picture: null });
-            }
+            this.dispInfoCache.set(event.pubkey, dispInfo);
         }
+        return dispInfo;
     }
 
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
@@ -862,14 +869,18 @@ export class Nostr {
         return null;
     }
 
-    addToMetadataQueue = (pubKey: string, persist: boolean) => {
-        // todo-000: This definitely needs to be local IndexDB cach here! Think about using a DB that's
-        // specific to each kind of cache
-        if (!this.metadataCache.has(pubKey)) {
+    addToMetadataQueue = async (pubKey: string, persist: boolean) => {
+        const cachedMd = await S.localDB.getVal(this.DB_METADATA_PREFIX + pubKey);
+        if (!cachedMd) {
             this.metadataQueue.add(pubKey);
             if (persist) {
                 this.persistMetadataForKeys.add(pubKey);
             }
+        }
+        else {
+            // if we have the cacheMd we we can memory cache the dispInfo and trigger the dom to rerender
+            this.domRenderPending = true;
+            this.getDispInfoFromEvent(cachedMd);
         }
     }
 
@@ -1277,19 +1288,19 @@ export class Nostr {
                 return val;
             }
             // console.log("REFS=" + S.util.prettyPrint(references));
-            references.forEach((ref: any) => {
+            for (const ref of references) {
                 if (ref.profile) {
                     const elmId = Comp.getNextId();
                     const dispInfo = this.dispInfoCache.get(ref.profile.pubkey);
 
                     // if we know the dispInfo render it.
                     if (dispInfo?.display) {
-                        // console.log("***** QUEUE DONE: PK: "+ref.profile.pubkey);
+                        // console.log("***** QUEUE DONE: PK: " + ref.profile.pubkey);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
                     }
                     // else render a placeholder and queue up the pubkey to be queries asynchronously
                     else {
-                        // console.log("***** QUEUED: PK: "+ref.profile.pubkey);
+                        // console.log("***** QUEUED: PK: " + ref.profile.pubkey);
                         this.addToMetadataQueue(ref.profile.pubkey, false);
                         const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
@@ -1314,7 +1325,7 @@ export class Nostr {
                 else if (ref.address) {
                     // todo-1: add support for address
                 }
-            });
+            }
         }
         catch (ex) {
             S.util.logErr(ex, "Failed processing Nostr Refs on: " + S.util.prettyPrint(node));
