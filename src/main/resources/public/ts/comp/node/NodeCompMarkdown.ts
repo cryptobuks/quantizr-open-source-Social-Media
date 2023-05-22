@@ -12,6 +12,8 @@ interface LS {
 export class NodeCompMarkdown extends Html {
     // detects URLs in a string (from Stack Overflow, not fully vetted yet)
     static urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    // todo-1: see nips 21, 27, 19 (not currently used)
     static nostrRegex = /(nostr:[^\s]+)/g;
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
