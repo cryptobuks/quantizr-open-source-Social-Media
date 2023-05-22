@@ -46,6 +46,20 @@ export class Render {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
+    // DO NOT DELETE: #inline-image-rendering
+    // There's another part of the code
+    // (see forceRender) that I want to be ABLE to bring back
+    // which relies on this code
+    // forceRender = false;
+    // backgroundQueue = setInterval(() => {
+    //     if (this.forceRender) {
+    //         this.forceRender = false;
+
+    //         // todo-0: would be better if we can just force a render of less of the page?
+    //         dispatch("forceRender", s => { })
+    //     }
+    // }, 500);
+
     constructor() {
         highlightjs.highlightAll();
     }

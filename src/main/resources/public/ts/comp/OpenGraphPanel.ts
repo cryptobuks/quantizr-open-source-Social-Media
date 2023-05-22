@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
@@ -66,27 +66,33 @@ export class OpenGraphPanel extends Div {
                     };
                     // observer.disconnect();
                     S.quanta.openGraphData.set(this.url, og);
-                    this.processOgImage(this.url, og);
-                    if (!elm.isConnected) return;
+                    // this.processOgImage(this.url, og); // <-- DO NOT DELETE
+                    if (!elm.isConnected) {
+                        return;
+                    }
                     this.mergeState<LS>({ og });
                 });
             }
         }
         else {
-            this.processOgImage(this.url, og);
+            // this.processOgImage(this.url, og); // <-- DO NOT DELETE
             this.mergeState<LS>({ og });
         }
         this.loadNext();
     }
 
-    processOgImage = (url: string, og: J.OpenGraph) => {
-        if (og.mime?.startsWith("image/")) {
-            if (!S.quanta.imageUrls.has(url)) {
-                S.quanta.imageUrls.add(url);
-                setTimeout(() => dispatch("renderOgImg", s => { }), 250);
-            }
-        }
-    }
+    // DO NOT DELETE (#inline-image-rendering)
+    // This can support injecting images directly into the location where they're mentioned in
+    // the text but we're not doing this for now because we have a cleaner way to render images by having
+    // them all be at the end of the content just like normal non-Image OpenGraph does.
+    // processOgImage = (url: string, og: J.OpenGraph) => {
+    //     if (og.mime?.startsWith("image/")) {
+    //         if (!S.quanta.imageUrls.has(url)) {
+    //             S.quanta.imageUrls.add(url);
+    //             S.render.forceRender = true;
+    //         }
+    //     }
+    // }
 
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
     performance optimization to help the user experience and is not a core part of the logic for
@@ -117,14 +123,16 @@ export class OpenGraphPanel extends Div {
                                     };
                                 }
                                 S.quanta.openGraphData.set(o.url, og);
-                                this.processOgImage(o.url, og);
-                                if (!o.getRef()) return;
+                                // this.processOgImage(o.url, og); // <-- DO NOT DELETE
+                                if (!o.getRef()) {
+                                    return;
+                                }
                                 o.mergeState({ og });
                             });
                         }
                     }
                     else {
-                        this.processOgImage(o.url, og);
+                        // this.processOgImage(o.url, og); // <-- DO NOT DELETE
                         o.mergeState({ og });
                     }
                 }
@@ -143,10 +151,10 @@ export class OpenGraphPanel extends Div {
             return true;
         }
 
-        // console.log("MIME: " + state.og.mime);
+        // see #inline-image-rendering
         if (state.og.mime?.startsWith("image/")) {
-            // images are rendered by inserting <img> tag directly into markdown
-            return null;
+            this.setChildren([new Img({ src: this.url, className: "insImgInRow" })]);
+            return true;
         }
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */

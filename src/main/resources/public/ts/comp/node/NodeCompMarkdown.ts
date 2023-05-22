@@ -83,7 +83,10 @@ export class NodeCompMarkdown extends Html {
         // }
 
         val = S.render.injectSubstitutions(node, content);
-        val = this.replaceOgImgFileNames(val);
+
+        // #inline-image-rendering
+        // val = this.replaceOgImgFileNames(val); // <-- DO NOT DELETE
+
         val = S.nostr.replaceNostrRefs(node, val);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
@@ -93,23 +96,23 @@ export class NodeCompMarkdown extends Html {
         return val;
     }
 
-    /* It's kind of ugly here to see the URLs disappearing as the image is loaded
-    so think about a way to fix that. Maybe render nothing for urls until we know
-    their mime type or OpenGraph result...because it's better for things to magically
-    appear on the screen than to disappear */
-    replaceOgImgFileNames = (val: string): string => {
-        // find all the urls in the val, and remove the ones that we know are doing go
-        // be rendered as plain Images when OpenGraph rendering is complete.
-        return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
-            if (S.quanta.imageUrls.has(url)) {
-                // todo-1: we can add 'click to expand' functionality here.
-                return `<img src='${url}' class='insImgInRow'>`;
-            }
-            else {
-                return url;
-            }
-        });
-    }
+    // DO NOT DELETE (#inline-image-rendering)
+    // replaceOgImgFileNames = (val: string): string => {
+    //     // find all the urls in the val, and remove the ones that we know are doing go
+    //     // be rendered as plain Images when OpenGraph rendering is complete.
+    //     return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
+    //         if (S.quanta.imageUrls.has(url)) {
+    //             // todo-1: we can add 'click to expand' functionality here.
+    //             // It's probably better to render the image but LEAVE the 'url' in front of it
+    //             // because that's addative to the page, and the scrollbars will behave much better
+    //             // in cases where the page is only growing and nothing ever shifts UP.
+    //             return url + `<img src='${url}' class='insImgInRow'>`;
+    //         }
+    //         else {
+    //             return url;
+    //         }
+    //     });
+    // }
 
     parseAnchorTags = (val: string, content: string) => {
         if (val.indexOf("<") === -1 ||
