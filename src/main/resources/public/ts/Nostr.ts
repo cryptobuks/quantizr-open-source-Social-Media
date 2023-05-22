@@ -597,7 +597,7 @@ export class Nostr {
     'pool' arg is optional and if not passed then relays will be used for making a new pool. When pool is passed in
     we DO ensure all the mentioned relays *are* added to it if not already in it.
     */
-    getEvent = async (id: string, pool: SimplePool, relays: string[], background: boolean=false): Promise<Event> => {
+    getEvent = async (id: string, pool: SimplePool, relays: string[], background: boolean = false): Promise<Event> => {
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -1327,7 +1327,7 @@ export class Nostr {
                         const e = document.getElementById(elmId);
                         if (e) {
                             e.addEventListener("click", () => {
-                                S.nostr.searchId(ref.event.id, ref.event.relays);
+                                S.nostr.searchId(ref.event.id, ref.event.relays, false, node);
                             });
                         }
                     }, 750);
@@ -1657,7 +1657,7 @@ export class Nostr {
     }
 
     // relays is optional and can be null or empty
-    searchId = async (eventId: string, relays: string[] = null, background: boolean = false) => {
+    searchId = async (eventId: string, relays: string[] = null, background: boolean = false, sourceNode: J.NodeInfo=null) => {
         let event = null;
         try {
             if (!background) S.rpcUtil.incRpcCounter();
@@ -1672,6 +1672,14 @@ export class Nostr {
                 const res = await S.nostr.persistEvents([event], background, true);
                 if (res?.eventNodeIds?.length > 0) {
                     const desc = "For ID: " + eventId;
+
+                    if (sourceNode) {
+                        dispatch("settingSearchViewFromVals", s => {
+                            s.searchViewFromTab = s.activeTab;
+                            s.searchViewFromNode = sourceNode;
+                        });
+                    }
+
                     await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
                         false, 0, true, null, null, false, false, false);
                 }

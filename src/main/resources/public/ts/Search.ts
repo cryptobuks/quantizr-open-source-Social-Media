@@ -97,7 +97,7 @@ export class Search {
                 if (s.activeTab !== C.TAB_THREAD) {
                     s.threadViewFromTab = s.activeTab;
                 }
-                s.threadViewNode = node;
+                s.threadViewFromNode = node;
                 data.openGraphComps = [];
 
                 data.props.results = res.nodes;

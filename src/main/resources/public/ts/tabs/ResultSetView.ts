@@ -58,10 +58,22 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
 
-                // &&&
-                this.data.props.node && this.showContentHeading
+                (ast.searchViewFromTab || this.data.props.node) && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
-                        onClick: () => S.view.jumpToId(this.data.props.node.id),
+                        onClick: () => {
+                            if (this.data.props.node) {
+                                S.view.jumpToId(this.data.props.node.id);
+                            }
+                            else if (ast.searchViewFromTab) {
+                                S.tabUtil.selectTab(ast.searchViewFromTab);
+                                setTimeout(() => {
+                                    const data: TabIntf = S.tabUtil.getAppTabData(ast.searchViewFromTab);
+                                    if (ast.searchViewFromNode && data.inst) {
+                                        data.inst.scrollToNode(ast.searchViewFromNode.id);
+                                    }
+                                }, 500);
+                            }
+                        },
                         title: "Back to Folders View"
                     }, "bigMarginLeft") : null,
                 this.getFloatRightHeaderComp()

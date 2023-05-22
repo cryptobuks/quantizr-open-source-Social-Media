@@ -172,11 +172,16 @@ export class AppState {
     showNodeLinksInGraph: boolean = true;
     attractionLinksInGraph: boolean = true;
 
-    // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
-    threadViewNode: J.NodeInfo = null;
+    // holds node of the current conversation thread leaf node. The one the thread view was 'executed' on.
+    threadViewFromNode: J.NodeInfo = null;
 
     // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
     threadViewFromTab: string = null;
+
+    searchViewFromNode: J.NodeInfo = null; // rename to searchViewFromNode
+
+    // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
+    searchViewFromTab: string = null;
 
     repliesViewNodeId: string = null;
     repliesViewFromTab: string = null;
