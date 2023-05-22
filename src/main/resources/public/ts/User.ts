@@ -190,11 +190,11 @@ export class User {
 
                 // Setting CREDS on 'anon' user means when user comes back to this page it automatically can log them in
                 S.localDB.setUser(J.PrincipalName.ANON);
-                this.setLoginVars(usr, pwd, "1");
+                await this.setLoginVars(usr, pwd, "1");
 
                 // Setting CREDS after switching DB user
                 S.localDB.setUser(usr);
-                this.setLoginVars(usr, pwd, "1");
+                await this.setLoginVars(usr, pwd, "1");
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
