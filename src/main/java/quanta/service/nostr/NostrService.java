@@ -66,9 +66,11 @@ public class NostrService extends ServiceBase {
 		nostrUserNodesByPubKey.clear();
 	}
 
-	// every 30 seconds (todo-0: boost up to 30, not 5)
-	@Scheduled(fixedDelay = 5 * 1000)
+	// every 10 seconds
+	@Scheduled(fixedDelay = 10 * 1000)
 	public void verifyEvents() {
+		if (eventsPendingVerify.isEmpty()) return;
+
 		ConcurrentHashMap<ObjectId, NostrEvent> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
 		eventsPendingVerify.clear();
 
@@ -138,7 +140,7 @@ public class NostrService extends ServiceBase {
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				break;
 			default:
-				// todo-0: for now we treat all unknown nodes as text, but we need to do something in the DB to
+				// todo-1: for now we treat all unknown nodes as text, but we need to do something in the DB to
 				// indicate this is NOT a known type.
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
