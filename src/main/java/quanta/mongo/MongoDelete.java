@@ -171,6 +171,11 @@ public class MongoDelete extends ServiceBase {
 		return res.getDeletedCount();
 	}
 
+	// deletes without checking any security
+	public void adminDelete(ObjectId id) {
+		ops.remove(new Query().addCriteria(new Criteria("id").is(id)));
+	}
+
 	/**
 	 * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only, so when we delete one
 	 * ore more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans

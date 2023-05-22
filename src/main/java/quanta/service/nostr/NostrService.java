@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.common.util.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,6 +48,7 @@ public class NostrService extends ServiceBase {
 
 	// cache is cleared every 3mins so it can pick up user changes
 	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
+	public final ConcurrentHashMap<ObjectId, NostrEvent> eventsPendingVerify = new ConcurrentHashMap<>();
 
 	public static final ObjectMapper mapper = new ObjectMapper();
 	{
@@ -61,6 +64,21 @@ public class NostrService extends ServiceBase {
 	@Scheduled(fixedDelay = 3 * 60 * 1000)
 	public void userRefresh() {
 		nostrUserNodesByPubKey.clear();
+	}
+
+	// every 30 seconds (todo-0: boost up to 30, not 5)
+	@Scheduled(fixedDelay = 5 * 1000)
+	public void verifyEvents() {
+		ConcurrentHashMap<ObjectId, NostrEvent> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
+		eventsPendingVerify.clear();
+
+		// todo-1: eventually we can do a batch operation here for the set to delete
+		for (Map.Entry<ObjectId, NostrEvent> entry : workingMap.entrySet()) {
+			if (!NostrCrypto.verifyEvent(entry.getValue())) {
+				log.debug("NostrEvent SIG FAIL: REMOVING: " + XString.prettyPrint(entry.getValue()));
+				delete.adminDelete(entry.getKey());
+			}
+		}
 	}
 
 	public SaveNostrSettingsResponse saveNostrSettings(SaveNostrSettingsRequest req) {
@@ -98,12 +116,6 @@ public class NostrService extends ServiceBase {
 
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-				// todo-0 this is VERY slow? run in background and have it delete after the fact if sig is bad
-				if (!NostrCrypto.verifyEvent(event)) {
-					log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
-					continue;
-				}
-
 				// log.debug("NostrEvent: " + XString.prettyPrint(event));
 				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 			}
@@ -126,7 +138,7 @@ public class NostrService extends ServiceBase {
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				break;
 			default:
-				// todo-0: for now treat all unknown nodes as text, but we need to do something in the DB to
+				// todo-0: for now we treat all unknown nodes as text, but we need to do something in the DB to
 				// indicate this is NOT a known type.
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
@@ -136,6 +148,16 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
+
+		/*
+		 * Note: we can't do this verify async (in worker thread) like we do with events, because if the
+		 * event is invalid we would have no way to rollback to prior definition of this users info
+		 */
+		if (!NostrCrypto.verifyEvent(event)) {
+			log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
+			return;
+		}
+
 		try {
 			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
 			if (nostrAccnt != null) {
@@ -290,10 +312,12 @@ public class NostrService extends ServiceBase {
 		update.save(as, newNode, false);
 		eventNodeIds.add(newNode.getIdStr());
 		saveCount.inc();
+
+		eventsPendingVerify.put(newNode.getId(), event);
 	}
 
 	public SubNode getAccountByNostrPubKey(MongoSession as, String pubKey) {
-		SubNode accntNode = getLocalUserByNostrPubKey(as, pubKey); 
+		SubNode accntNode = getLocalUserByNostrPubKey(as, pubKey);
 
 		// if account wasn't found as a local user's public key try a foreign one.
 		if (accntNode == null) {
