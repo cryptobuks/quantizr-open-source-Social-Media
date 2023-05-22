@@ -52,6 +52,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.UserProfile;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
@@ -1407,8 +1408,11 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getUserProfile", false, false, req, session, ms -> {
 			GetUserProfileResponse res = new GetUserProfileResponse();
-			res.setUserProfile(user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false));
-			res.setSuccess(true);
+			UserProfile userProfile = user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false);
+			if (userProfile != null) {
+				res.setUserProfile(userProfile);
+				res.setSuccess(true);
+			}
 			return res;
 		});
 	}

@@ -173,7 +173,7 @@ public class MongoDelete extends ServiceBase {
 
 	// deletes without checking any security
 	public void adminDelete(ObjectId id) {
-		ops.remove(new Query().addCriteria(new Criteria("id").is(id)));
+		ops.remove(new Query().addCriteria(new Criteria("id").is(id)), SubNode.class);
 	}
 
 	/**

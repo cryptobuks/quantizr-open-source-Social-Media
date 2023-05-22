@@ -1428,6 +1428,9 @@ public class UserManagerService extends ServiceBase {
 				FriendInfo fi = buildPersonInfoFromFriendNode(ms, friendNode);
 				if (fi != null) {
 					friends.add(fi);
+				} else {
+					log.debug("Friend account node is missing. Cleaning up friend id: " + friendNode.getId().toHexString());
+					delete.adminDelete(friendNode.getId());
 				}
 			}
 			res.setPeople(friends);
@@ -1446,18 +1449,13 @@ public class UserManagerService extends ServiceBase {
 			fi.setTags(friendNode.getTags());
 			fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.USER_ICON_URL));
 
-			SubNode userNode = read.getUserNodeByUserName(null, userName);
-			if (userNode != null) {
-				String displayName = getFriendlyNameFromNode(userNode);
-				fi.setDisplayName(displayName);
-
-				fi.setRelays(userNode.getStr(NodeProp.NOSTR_RELAYS));
-			}
-
 			String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 			SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
 			if (friendAccountNode != null) {
+				fi.setDisplayName(getFriendlyNameFromNode(friendAccountNode));
+				fi.setRelays(friendAccountNode.getStr(NodeProp.NOSTR_RELAYS));
+
 				// if a local user use BIN property on node (account node BIN property is the Avatar)
 				if (userName.indexOf("@") == -1) {
 					Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -1473,6 +1471,8 @@ public class UserManagerService extends ServiceBase {
 					}
 
 				}
+			} else {
+				return null;
 			}
 			fi.setUserNodeId(userNodeId);
 		}
