@@ -597,7 +597,7 @@ export class Nostr {
     'pool' arg is optional and if not passed then relays will be used for making a new pool. When pool is passed in
     we DO ensure all the mentioned relays *are* added to it if not already in it.
     */
-    getEvent = async (id: string, pool: SimplePool, relays: string[]): Promise<Event> => {
+    getEvent = async (id: string, pool: SimplePool, relays: string[], background: boolean=false): Promise<Event> => {
         // console.log("getEvent: nostrId=" + id);
         id = this.translateNip19(id);
 
@@ -614,7 +614,7 @@ export class Nostr {
         };
 
         try {
-            S.rpcUtil.incRpcCounter();
+            if (!background) S.rpcUtil.incRpcCounter();
             let events = null;
 
             // if a pool was provided use it.
@@ -639,7 +639,7 @@ export class Nostr {
             }
         }
         finally {
-            S.rpcUtil.decRpcCounter();
+            if (!background) S.rpcUtil.decRpcCounter();
         }
     }
 
@@ -1657,19 +1657,19 @@ export class Nostr {
     }
 
     // relays is optional and can be null or empty
-    searchId = async (eventId: string, relays: string[] = null) => {
+    searchId = async (eventId: string, relays: string[] = null, background: boolean = false) => {
         let event = null;
         try {
-            S.rpcUtil.incRpcCounter();
+            if (!background) S.rpcUtil.incRpcCounter();
             const find = S.nostr.translateNip19(eventId);
             if (!relays || relays.length === 0) {
                 relays = S.nostr.getMyRelays();
             }
-            event = await S.nostr.getEvent(find, null, relays);
+            event = await S.nostr.getEvent(find, null, relays, background);
             if (event) {
                 // Note: we must do a forceResend=true here to be sure we can get back the eventNodeId from the
                 // server because we don't cache that on the client.
-                const res = await S.nostr.persistEvents([event], false, true);
+                const res = await S.nostr.persistEvents([event], background, true);
                 if (res?.eventNodeIds?.length > 0) {
                     const desc = "For ID: " + eventId;
                     await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
@@ -1681,7 +1681,7 @@ export class Nostr {
             }
         }
         finally {
-            S.rpcUtil.decRpcCounter();
+            if (!background) S.rpcUtil.decRpcCounter();
         }
         return event;
     }
