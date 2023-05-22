@@ -187,24 +187,14 @@ export class User {
 
             // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
-                // Setting CREDS before switching DB user"
-                if (usr) {
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
-                }
-                if (pwd) {
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
-                }
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
+
+                // Setting CREDS on 'anon' user means when user comes back to this page it automatically can log them in
+                S.localDB.setUser(J.PrincipalName.ANON);
+                this.setLoginVars(usr, pwd, "1");
 
                 // Setting CREDS after switching DB user
                 S.localDB.setUser(usr);
-                if (usr) {
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
-                }
-                if (pwd) {
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
-                }
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
+                this.setLoginVars(usr, pwd, "1");
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
@@ -329,6 +319,16 @@ export class User {
                 this.userLogin();
             }
         }
+    }
+
+    setLoginVars = async (usr: string, pwd: string, loginState: string) => {
+        if (usr) {
+            await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
+        }
+        if (pwd) {
+            await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
+        }
+        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, loginState);
     }
 
     checkMessages = async () => {
