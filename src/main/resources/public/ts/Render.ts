@@ -54,8 +54,6 @@ export class Render {
     // backgroundQueue = setInterval(() => {
     //     if (this.forceRender) {
     //         this.forceRender = false;
-
-    //         // todo-0: would be better if we can just force a render of less of the page?
     //         dispatch("forceRender", s => { })
     //     }
     // }, 500);

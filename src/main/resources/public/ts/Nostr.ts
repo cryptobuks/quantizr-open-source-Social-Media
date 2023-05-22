@@ -1327,9 +1327,7 @@ export class Nostr {
                         const e = document.getElementById(elmId);
                         if (e) {
                             e.addEventListener("click", () => {
-                                // todo-0: we should pass the 'event.relays' down into 'searchId' and use ONLY those relays
-                                // if we have any relays.
-                                S.nostr.searchId(ref.event.id);
+                                S.nostr.searchId(ref.event.id, ref.event.relays);
                             });
                         }
                     }, 750);
@@ -1658,12 +1656,15 @@ export class Nostr {
         await dlg.open();
     }
 
-    searchId = async (eventId: string) => {
+    // relays is optional and can be null or empty
+    searchId = async (eventId: string, relays: string[] = null) => {
         let event = null;
         try {
             S.rpcUtil.incRpcCounter();
             const find = S.nostr.translateNip19(eventId);
-            const relays = S.nostr.getMyRelays();
+            if (!relays || relays.length === 0) {
+                relays = S.nostr.getMyRelays();
+            }
             event = await S.nostr.getEvent(find, null, relays);
             if (event) {
                 // Note: we must do a forceResend=true here to be sure we can get back the eventNodeId from the
