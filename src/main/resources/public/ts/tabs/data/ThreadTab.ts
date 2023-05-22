@@ -23,7 +23,7 @@ export class ThreadTab implements TabIntf<ThreadRSInfo> {
         ThreadTab.inst = this;
     }
 
-    isVisible = () => { return !!getAs().threadViewNodeId; };
+    isVisible = () => { return !!getAs().threadViewNode; };
 
     constructView = (data: TabIntf) => new ThreadView(data);
     getTabSubOptions = (): Div => { return null; };
