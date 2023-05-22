@@ -29,6 +29,11 @@ public class AsyncExec extends ServiceBase {
         run(new ThreadLocalsContext(), runnable);
     }
 
+    /*
+     * todo-0: when something throws an exception in this method we can't tell WHERE it truly came from
+     * so we need to pass a callstack thread into this or a name or something that lets us know what
+     * operation it's running.
+     */
     private void run(ThreadLocalsContext tlc, Runnable runnable) {
         executor.execute(new Runnable() {
             public void run() {

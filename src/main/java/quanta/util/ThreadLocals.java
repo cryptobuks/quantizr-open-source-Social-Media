@@ -103,7 +103,9 @@ public class ThreadLocals {
 	}
 
 	public static void setSC(SessionContext sc) {
-		sessionContext.set(sc);
+		if (sessionContext != null) {
+			sessionContext.set(sc);
+		}
 		initMongoSession(sc);
 	}
 
