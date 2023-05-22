@@ -197,8 +197,8 @@ export class UserProfileDlg extends DialogBase {
 
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", async () => {
-                        this.readNostrPosts();
                         if (this.currentlyEditingWarning()) return;
+                        await this.readNostrPosts();
                         this.openUserHomePage(state, "posts");
                     }), //
 
@@ -237,7 +237,7 @@ export class UserProfileDlg extends DialogBase {
         return children;
     }
 
-    readNostrPosts = () => {
+    readNostrPosts = async (onlyDmsToMe: boolean = false) => {
         const state = this.getState<LS>();
         if (state.userProfile.nostrNpub) {
             let relays = S.nostr.getMyRelays();
@@ -245,7 +245,7 @@ export class UserProfileDlg extends DialogBase {
             console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
 
             // getting more than 50 is currently just too slow
-            S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, false, 50);
+            await S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, onlyDmsToMe, 50);
         }
     }
 
@@ -310,7 +310,7 @@ export class UserProfileDlg extends DialogBase {
 
         if (res?.userProfile) {
             // if we get back a userprofile that's a nostr one but with no nostrTimestamp we need load it from
-            // relay now becasue lack of a timestamp indicates we've never read from relay.
+            // relay now because lack of a timestamp indicates we've never read from relay.
             if (res.userProfile.nostrTimestamp === 0 && S.nostr.isNostrUserName(res.userProfile.userName)) {
 
                 // read this user using their relays or our own for.
@@ -414,8 +414,11 @@ export class UserProfileDlg extends DialogBase {
         }, 10);
     }
 
-    previousMessages = () => {
+    previousMessages = async () => {
         if (this.currentlyEditingWarning()) return;
+
+        await this.readNostrPosts(true);
+
         this.close();
         setTimeout(() => {
             const state: any = this.getState<LS>();

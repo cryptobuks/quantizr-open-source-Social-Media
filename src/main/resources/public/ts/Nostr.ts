@@ -982,12 +982,12 @@ export class Nostr {
     // "since": <an integer unix timestamp, events must be newer than this to pass>,
     // "until": <an integer unix timestamp, events must be older than this to pass>,
     // "limit": <maximum number of events to be returned in the initial query>
-    readPosts = async (authors: string[], relays: string[], since: number, background: boolean, includeDms: boolean, limit: number): Promise<J.SaveNostrEventResponse> => {
+    readPosts = async (authors: string[], relays: string[], since: number, background: boolean, dmsToMe: boolean, limit: number): Promise<J.SaveNostrEventResponse> => {
         authors = authors.map(u => this.translateNip19(u));
 
         // WARNING: When adding new kinds here don't forget to update NostrService.java#saveEvent()
         const kinds = [Kind.Text];
-        if (includeDms) {
+        if (dmsToMe) {
             kinds.push(Kind.EncryptedDirectMessage);
         }
 
@@ -1004,7 +1004,7 @@ export class Nostr {
         //     query.since = since;
         // }
 
-        if (includeDms) {
+        if (dmsToMe) {
             query["#p"] = [this.pk];
         }
 
@@ -1409,7 +1409,7 @@ export class Nostr {
         console.log("PROFILE: " + S.util.prettyPrint(profile));
     }
 
-    queryNetwork = async (background: boolean = false, includeDms: boolean): Promise<void> => {
+    queryNetwork = async (background: boolean = false, dmsToMe: boolean): Promise<void> => {
         if (this.bigQueryRunning) {
             console.log("Avoiding large concurrent queries.");
             return;
@@ -1462,7 +1462,7 @@ export class Nostr {
             // if (userNames.length > 0 && relaysArray.length > 0) {
             //     console.log("Reading users from " + relaysArray.length + " relays. List=" + S.util.prettyPrint(userNames));
             // }
-            ret = await this.readPosts(userNames, relaysArray, -1, background, includeDms, 100);
+            ret = await this.readPosts(userNames, relaysArray, -1, background, dmsToMe, 100);
         }
         finally {
             this.bigQueryRunning = false;
