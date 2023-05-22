@@ -59,7 +59,7 @@ public class NostrService extends ServiceBase {
 
 	// every 3 min
 	@Scheduled(fixedDelay = 3 * 60 * 1000)
-    public void userRefresh() {
+	public void userRefresh() {
 		nostrUserNodesByPubKey.clear();
 	}
 
@@ -98,7 +98,7 @@ public class NostrService extends ServiceBase {
 
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-
+				// todo-0 this is VERY slow? run in background and have it delete after the fact if sig is bad
 				if (!NostrCrypto.verifyEvent(event)) {
 					log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
 					continue;
@@ -126,6 +126,9 @@ public class NostrService extends ServiceBase {
 				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				break;
 			default:
+				// todo-0: for now treat all unknown nodes as text, but we need to do something in the DB to
+				// indicate this is NOT a known type.
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
 				break;
 		}
@@ -134,7 +137,7 @@ public class NostrService extends ServiceBase {
 	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		try {
-			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk()); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
 			if (nostrAccnt != null) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
 				// if the npub is owned by a local user we're done, and no need to create the foreign holder account
@@ -226,7 +229,7 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
-		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk()); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), event.getPk(), false);
+		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
 					+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
@@ -290,7 +293,7 @@ public class NostrService extends ServiceBase {
 	}
 
 	public SubNode getAccountByNostrPubKey(MongoSession as, String pubKey) {
-		SubNode accntNode =  getLocalUserByNostrPubKey(as, pubKey); // read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
+		SubNode accntNode = getLocalUserByNostrPubKey(as, pubKey); 
 
 		// if account wasn't found as a local user's public key try a foreign one.
 		if (accntNode == null) {

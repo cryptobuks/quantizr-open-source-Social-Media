@@ -40,24 +40,24 @@ export class SearchByNostrDlg extends DialogBase {
         }
 
         SearchByNostrDlg.defaultSearchText = this.searchTextState.getValue();
-        let event = null;
-        try {
-            S.rpcUtil.incRpcCounter();
-            const find = S.nostr.translateNip19(SearchByNostrDlg.defaultSearchText);
-            const relays = S.nostr.getMyRelays();
-            event = await S.nostr.getEvent(find, null, relays);
-            if (event) {
-                const res = await S.nostr.persistEvents([event]);
-                if (res?.eventNodeIds?.length > 0) {
-                    const desc = "For ID: " + SearchByNostrDlg.defaultSearchText;
-                    await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
-                        false, 0, true, null, null, false, false, false);
-                }
-            }
-        }
-        finally {
-            S.rpcUtil.decRpcCounter();
-        }
+        const event = await S.nostr.searchId(SearchByNostrDlg.defaultSearchText)
+        // try {
+        //     S.rpcUtil.incRpcCounter();
+        //     const find = S.nostr.translateNip19(SearchByNostrDlg.defaultSearchText);
+        //     const relays = S.nostr.getMyRelays();
+        //     event = await S.nostr.getEvent(find, null, relays);
+        //     if (event) {
+        //         const res = await S.nostr.persistEvents([event]);
+        //         if (res?.eventNodeIds?.length > 0) {
+        //             const desc = "For ID: " + SearchByNostrDlg.defaultSearchText;
+        //             await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
+        //                 false, 0, true, null, null, false, false, false);
+        //         }
+        //     }
+        // }
+        // finally {
+        //     S.rpcUtil.decRpcCounter();
+        // }
 
         if (event) {
             // console.log("EVENT FOUND: " + S.util.prettyPrint(event));

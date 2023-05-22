@@ -1217,18 +1217,20 @@ export class Nostr {
         return ret;
     }
 
-    persistEvents = async (events: Event[], background: boolean = false): Promise<J.SaveNostrEventResponse> => {
+    persistEvents = async (events: Event[], background: boolean = false, forceResend: boolean = false): Promise<J.SaveNostrEventResponse> => {
         if (!this.checkInit()) return;
         if (!events || events.length === 0) return;
 
-        // remove any events we know we've already persisted
-        events = events.filter(async (e) => {
-            const ev = await S.localDB.getVal(e.id, S.localDB.STORE_NOSTR_PERSIST);
-            // if (ev) {
-            //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
-            // }
-            return !ev;
-        });
+        if (!forceResend) {
+            // remove any events we know we've already persisted
+            events = events.filter(async (e) => {
+                const ev = await S.localDB.getVal(e.id, S.localDB.STORE_NOSTR_PERSIST);
+                // if (ev) {
+                //     console.log("filtering out e.id " + e.id + " from events to persist. Already persisted it.");
+                // }
+                return !ev;
+            });
+        }
 
         // map key is 'pk'.
         const userSet: Map<String, J.NostrUserInfo> = new Map<String, J.NostrUserInfo>();
@@ -1303,21 +1305,34 @@ export class Nostr {
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);
                     }
 
+                    // note: HTML Sanitizer won't allow onClick in text so we do it this way.
                     setTimeout(() => {
-                        const e: HTMLElement = document.getElementById(elmId);
+                        const e = document.getElementById(elmId);
                         if (e) {
                             e.addEventListener("click", () => {
                                 S.user.showUserProfileByNostrKey(ref.profile.pubkey);
                             });
                         }
-                    }, 1000);
+                    }, 750);
                 }
                 else if (ref.event) {
-                    const text = ref.text.substring(6);
-                    const shortId = text.substring(5, 13) + "...";
+                    const elmId = Comp.getNextId();
+                    const shortId = ref.event.id.substring(0, 8) + "...";
                     // Note: 'nostr-note' class in here is so that our OpenGraph link detector can ignore this and leave
                     // it as a regular anchor tag link
-                    val = val.replace(ref.text, `<a href='${window.location.origin}?nostrId=${ref.event.id}&refNodeId=${node.ownerId}' class='nostr-note nostrLink' target='_blank'>[Note ${shortId}]</a>`);
+                    val = val.replace(ref.text, `<span id='${elmId}' class="nostr-note nostrLink">[Note ${shortId}]</span>`);
+
+                    // note: HTML Sanitizer won't allow onClick in text so we do it this way.
+                    setTimeout(() => {
+                        const e = document.getElementById(elmId);
+                        if (e) {
+                            e.addEventListener("click", () => {
+                                // todo-0: we should pass the 'event.relays' down into 'searchId' and use ONLY those relays
+                                // if we have any relays.
+                                S.nostr.searchId(ref.event.id);
+                            });
+                        }
+                    }, 750);
                 }
                 else if (ref.address) {
                     // todo-1: add support for address
@@ -1641,5 +1656,32 @@ export class Nostr {
     editPrivateKey = async (): Promise<void> => {
         const dlg = new SetNostrPrivateKeyDlg();
         await dlg.open();
+    }
+
+    searchId = async (eventId: string) => {
+        let event = null;
+        try {
+            S.rpcUtil.incRpcCounter();
+            const find = S.nostr.translateNip19(eventId);
+            const relays = S.nostr.getMyRelays();
+            event = await S.nostr.getEvent(find, null, relays);
+            if (event) {
+                // Note: we must do a forceResend=true here to be sure we can get back the eventNodeId from the
+                // server because we don't cache that on the client.
+                const res = await S.nostr.persistEvents([event], false, true);
+                if (res?.eventNodeIds?.length > 0) {
+                    const desc = "For ID: " + eventId;
+                    await S.srch.search(null, "node.id", res.eventNodeIds[0], null, desc, null, false,
+                        false, 0, true, null, null, false, false, false);
+                }
+            }
+            else {
+                S.util.showMessage("Could not find NostrId from relays: " + eventId, "Nostr", true);
+            }
+        }
+        finally {
+            S.rpcUtil.decRpcCounter();
+        }
+        return event;
     }
 }
