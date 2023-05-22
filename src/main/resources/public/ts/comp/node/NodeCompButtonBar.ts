@@ -29,7 +29,7 @@ export class NodeCompButtonBar extends Div {
         }
 
         let sharedIcon: Icon;
-        let openButton: Button;
+        let openButton: IconButton;
         let selCheckbox: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
@@ -94,10 +94,11 @@ export class NodeCompButtonBar extends Div {
         if (this.node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || ast.userPrefs.editMode)) {
-            openButton = new Button(null, S.nav.openNodeById, {
+            openButton = new IconButton("fa-folder-open", "Open", {
                 [C.NODE_ID_ATTR]: this.node.id,
-                title: "Open Node"
-            }, "btn-primary", "fa-folder-open");
+                onClick: S.nav.openNodeById,
+                title: "Explore content of this node"
+            }, "btn-primary");
         }
 
         /*
