@@ -616,7 +616,7 @@ export class Nav {
         });
     }
 
-    messagesFromMeToUser = (user: string) => {
+    messagesFromMeToUser = (user: string, displayName: string) => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -627,6 +627,7 @@ export class Nav {
             feedFilterFromMe: false,
             // WARNING: When setting feedFilterToUser, the other filter options should be false!! They're mutually exclusive in that way.
             feedFilterToUser: user,
+            feedFilterToDisplayName: displayName,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,

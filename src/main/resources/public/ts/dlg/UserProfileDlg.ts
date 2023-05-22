@@ -422,7 +422,7 @@ export class UserProfileDlg extends DialogBase {
         this.close();
         setTimeout(() => {
             const state: any = this.getState<LS>();
-            S.nav.messagesFromMeToUser(state.userProfile.userName);
+            S.nav.messagesFromMeToUser(state.userProfile.userName, state.userProfile.displayName);
         }, 10);
     }
 

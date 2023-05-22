@@ -10,6 +10,7 @@ export class FeedViewProps {
     feedFilterMyMentions = false;
     feedFilterFromMe = false;
     feedFilterToUser: string = null;
+    feedFilterToDisplayName: string = null;
     feedFilterToPublic = true;
     feedFilterLocalServer = false;
     applyAdminBlocks: true;

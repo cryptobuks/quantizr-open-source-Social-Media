@@ -309,8 +309,11 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
         let subHeading = null;
 
-        if (data.props.feedFilterToUser) {
-            subHeading = "Interactions with " + data.props.feedFilterToUser;
+        if (data.props.feedFilterToDisplayName) {
+            subHeading = "Interactions with " + data.props.feedFilterToDisplayName; // &&&
+        }
+        else if (data.props.feedFilterToUser) {
+            subHeading = "Interactions with " + data.props.feedFilterToUser; // &&&
         }
         else {
             switch (data.props.name) {
