@@ -224,7 +224,7 @@ export class DomUtil {
                 body: formData,
                 headers: {
                     Bearer: S.quanta.authToken || "",
-                    Sig: S.quanta.userSignature || ""
+                    Sig: S.crypto.userSignature || ""
                 }
             })
                 .then((res: any) => {
@@ -270,7 +270,7 @@ export class DomUtil {
             body: formData,
             headers: {
                 Bearer: S.quanta.authToken || "",
-                Sig: S.quanta.userSignature || ""
+                Sig: S.crypto.userSignature || ""
             }
         });
 

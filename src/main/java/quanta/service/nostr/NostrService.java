@@ -194,9 +194,11 @@ public class NostrService extends ServiceBase {
 			}
 
 			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, event.getTimestamp());
-
-			// note: we always need to be able to generate KEY so don't ever let the client upload
-			// an nip05 web url to save to this. Always send up the key.
+			
+			// WARNING: It's tempting to think this pubkey needs to be here but for foreign nodes their username
+			// is basically ".${pubkey}" (a dot followed by the hex of their pubkey), so we don't store it on the node
+			// in a property by itself.
+			// nostrAccnt.set(NodeProp.NOSTR_USER_PUBKEY, event.getPk());
 			nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
 
 			// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the

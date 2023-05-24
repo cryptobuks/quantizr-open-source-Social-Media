@@ -198,14 +198,14 @@ export class LocalDB {
             this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {
                     // NOTE: name is the "keyPath" value.
-                    const req = store.get(k);
-                    req.onsuccess = () => {
-                        resolve(req.result);
-                    };
-                    req.onerror = () => {
-                        console.warn("readObject failed: k=" + k);
-                        resolve(null);
-                    };
+                        const req = store.get(k);
+                        req.onsuccess = () => {
+                            resolve(req.result);
+                        };
+                        req.onerror = () => {
+                            console.warn("readObject failed: k=" + k);
+                            resolve(null);
+                        };
                 });
         });
     }
@@ -223,8 +223,11 @@ export class LocalDB {
             this.db = null;
         }
         this.userName = userName;
-        // await this.openDB();
-        // await S.localDB.dumpStore();
+
+        // we need a pubsub mechanism here so this nostr logic is decoupled
+        S.quanta.invalidateKeys()
+        await this.openDB();
+        await S.quanta.initKeys(userName);
     }
 
     public dumpStore = async (storeName: string): Promise<void> => {

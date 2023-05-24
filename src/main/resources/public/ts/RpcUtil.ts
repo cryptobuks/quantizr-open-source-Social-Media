@@ -70,7 +70,7 @@ export class RpcUtil {
                     S.quanta.setOverlay(true);
                 }
 
-                if (this.logRpc && !S.quanta.userSignature) {
+                if (this.logRpc && !S.crypto.userSignature) {
                     console.warn("Request will have no signature.");
                 }
 
@@ -85,7 +85,7 @@ export class RpcUtil {
                     headers: {
                         "Content-Type": "application/json",
                         Bearer: S.quanta.authToken || "",
-                        Sig: S.quanta.userSignature || ""
+                        Sig: S.crypto.userSignature || ""
                     },
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

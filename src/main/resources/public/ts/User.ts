@@ -92,18 +92,15 @@ export class User {
             }
         } else {
             try {
-                if (S.crypto.avail) {
-                    await S.crypto.initKeys(callUsr, false, false, false, "all");
-                }
-                await S.nostr.initKeys(callUsr);
+                await S.quanta.initKeys(callUsr);
 
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
                     dst: S.util.daylightSavingsTime,
-                    sigKey: S.quanta.sigKey,
-                    asymEncKey: S.quanta.asymEncKey,
+                    sigKey: S.crypto.sigKey,
+                    asymEncKey: S.crypto.asymEncKey,
                     nostrNpub: S.nostr.npub,
                     nostrPubKey: S.nostr.pk
 
@@ -147,10 +144,6 @@ export class User {
     }
 
     logout = async () => {
-        if (getAs().isAnonUser) {
-            return;
-        }
-
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -160,6 +153,10 @@ export class User {
         // set anon user to know they're logged out
         S.localDB.setUser(J.PrincipalName.ANON);
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+
+        if (getAs().isAnonUser) {
+            return;
+        }
 
         S.quanta.loggingOut = true;
         try {

@@ -43,7 +43,7 @@ import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
 @Component
-@Slf4j 
+@Slf4j
 public class CryptoService extends ServiceBase {
 	public static final ObjectMapper mapper = new ObjectMapper();
 
@@ -75,10 +75,15 @@ public class CryptoService extends ServiceBase {
 				}
 
 				String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+				// log.debug("*************** (verify) Setting key on user nodeId: " + ownerAccntNode.getIdStr() + " to "
+				// 		+ pubKeyJson);
+
 				if (pubKeyJson == null) {
 					log.debug("User Account didn't have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr() + " They own nodeId="
 							+ node.getIdStr());
 					return false;
+				} else {
+					// log.debug("Verifying with key: " + pubKeyJson);
 				}
 
 				pubKey = parseJWK(pubKeyJson, ownerAccntNode);
@@ -91,9 +96,9 @@ public class CryptoService extends ServiceBase {
 			String strToSign = getNodeSigData(node);
 
 			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
-			if (!verified) {
-				// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
-			}
+			// if (!verified) {
+			// 	log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
+			// }
 			return verified;
 		} catch (Exception e) {
 			ExUtil.error(log, "crypto sig failed on " + node.getIdStr(), e);
@@ -208,7 +213,7 @@ public class CryptoService extends ServiceBase {
 			log.warn("Unknown workload id: " + req.getWorkloadId());
 		}
 	}
-
+	
 	public void signSubGraph(MongoSession ms, SessionContext sc, SignSubGraphRequest req) {
 		SubNode parent = read.getNode(ms, req.getNodeId());
 		if (parent == null) {
@@ -234,7 +239,8 @@ public class CryptoService extends ServiceBase {
 
 		ops.stream(query, SubNode.class).forEachRemaining(node -> {
 			// make sure session is still alive
-			if (failed.getVal() || !sc.isLive()) return;
+			if (failed.getVal() || !sc.isLive())
+				return;
 
 			// create new push object lazily
 			if (pushInfo.getVal() == null) {
@@ -258,7 +264,8 @@ public class CryptoService extends ServiceBase {
 		});
 
 		// make sure session is still alive
-		if (failed.getVal() || !sc.isLive()) return;
+		if (failed.getVal() || !sc.isLive())
+			return;
 
 		// send the accumulated remainder
 		if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
@@ -268,7 +275,8 @@ public class CryptoService extends ServiceBase {
 			}
 
 			// make sure session is still alive
-			if (failed.getVal() || !sc.isLive()) return;
+			if (failed.getVal() || !sc.isLive())
+				return;
 		}
 
 		push.sendServerPushInfo(sc, new PushPageMessage(
@@ -284,7 +292,7 @@ public class CryptoService extends ServiceBase {
 		long totalTime = 0;
 		long sleepTime = 100;
 
-		// we wait for up to 30 seconds for the browser to sign the nodes, before we will give up and 
+		// we wait for up to 30 seconds for the browser to sign the nodes, before we will give up and
 		// return false;
 		while (totalTime < 30000 && sc.isLive() && sigPendingQueue.contains(pushInfo.getWorkloadId())) {
 			Util.sleep(sleepTime);

@@ -53,10 +53,6 @@ export class Quanta {
     userName: string = J.PrincipalName.ANON;
     authToken: string;
     loggingOut: boolean;
-    asymEncKey: string;
-
-    userSignature: string;
-    sigKey: string;
 
     // WARNING: Call S.util.ctrlKeyCheck() to check for ctrlKey and NOT just the state of this.
     // (I should've just used a timer to set back to false, but instead for now it's checked by calling ctrlKeyCheck)
@@ -94,6 +90,18 @@ export class Quanta {
             forceRenderParent: false,
             jumpToRss: false
         });
+    }
+
+    invalidateKeys = () => {
+        S.nostr.invalidateKeys();
+        S.crypto.invalidateKeys();
+    }
+
+    initKeys = async (user: string) => {
+        if (S.crypto.avail) {
+            await S.crypto.initKeys(user, false, false, false, "all");
+        }
+        await S.nostr.initKeys(user);
     }
 
     loadConfig = async () => {

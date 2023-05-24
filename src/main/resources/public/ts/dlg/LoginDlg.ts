@@ -59,11 +59,12 @@ export class LoginDlg extends DialogBase {
             usr = J.PrincipalName.ADMIN;
         }
 
+        S.localDB.setUser(usr);
+
         // if the password field is empty, or CTRL key is down, and a username is provided, then get the password from the browser
         // and ignore the password field.
         if ((!this.pwdState.getValue() || S.util.ctrlKeyCheck()) && usr) {
             // this is kind of ugly but we need to set localDb userName for keys to generate properly
-            S.localDB.setUser(usr);
 
             // lookup the password based on known user
             const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
@@ -80,18 +81,15 @@ export class LoginDlg extends DialogBase {
 
         const pwd = this.pwdState.getValue();
         if (usr && pwd) {
-            if (S.crypto.avail) {
-                await S.crypto.initKeys(usr, false, false, false, "all");
-            }
-            await S.nostr.initKeys(usr);
+            await S.quanta.initKeys(usr);
 
             const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime,
-                sigKey: S.quanta.sigKey,
-                asymEncKey: S.quanta.asymEncKey,
+                sigKey: S.crypto.sigKey,
+                asymEncKey: S.crypto.asymEncKey,
                 nostrNpub: S.nostr.npub,
                 nostrPubKey: S.nostr.pk
             }, false, true);

@@ -413,6 +413,14 @@ public class NodeSearchService extends ServiceBase {
 		Iterable<SubNode> iter = null;
 		boolean strictFiltering = false;
 
+		int publicCount = 0;
+		int publicWriteCount = 0;
+		int adminOwnedCount = 0;
+		int userShareCount = 0;
+		int signedNodeCount = 0;
+		int unsignedNodeCount = 0;
+		int failedSigCount = 0;
+
 		/*
 		 * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
 		 * a bunch of options but just the public feed query
@@ -465,6 +473,19 @@ public class NodeSearchService extends ServiceBase {
 			ms = ThreadLocals.ensure(ms);
 			SubNode searchRoot = read.getNode(ms, req.getNodeId());
 
+			if (req.isSignatureVerify()) {
+				String sig = searchRoot.getStr(NodeProp.CRYPTO_SIG);
+				if (sig != null) {
+					signedNodeCount++;
+					if (!crypto.nodeSigVerify(searchRoot, sig)) {
+						failedSigCount++;
+					}
+				} else {
+					log.debug("UNSIGNED: " + XString.prettyPrint(searchRoot));
+					unsignedNodeCount++;
+				}
+			}
+
 			Sort sort = null;
 			int limit = 0;
 			if (req.isTrending()) {
@@ -478,14 +499,6 @@ public class NodeSearchService extends ServiceBase {
 			boolean doAuth = wordMap != null || tagMap != null || mentionMap != null;
 			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth);
 		}
-
-		int publicCount = 0;
-		int publicWriteCount = 0;
-		int adminOwnedCount = 0;
-		int userShareCount = 0;
-		int signedNodeCount = 0;
-		int unsignedNodeCount = 0;
-		int failedSigCount = 0;
 
 		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
 		HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;

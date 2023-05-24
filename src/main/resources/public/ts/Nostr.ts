@@ -64,6 +64,12 @@ export class Nostr {
     test = async () => {
     }
 
+    invalidateKeys = () => {
+        this.sk = null;
+        this.pk = null;
+        this.npub = null;
+    }
+
     decrypt = async (sk: string, pk: string, cipherText: string) => {
         try {
             // get hash of the encrypted data
@@ -206,7 +212,7 @@ export class Nostr {
             return;
         }
         // if already initialized do nothing.
-        if (this.pk) return;
+        if (this.pk && this.sk) return;
 
         // Yes this is bad practice to save key this way, but this is just a prototype!
         this.sk = await S.localDB.getVal(C.LOCALDB_NOSTR_PRIVATE_KEY);
@@ -1657,7 +1663,7 @@ export class Nostr {
     }
 
     // relays is optional and can be null or empty
-    searchId = async (eventId: string, relays: string[] = null, background: boolean = false, sourceNode: J.NodeInfo=null) => {
+    searchId = async (eventId: string, relays: string[] = null, background: boolean = false, sourceNode: J.NodeInfo = null) => {
         let event = null;
         try {
             if (!background) S.rpcUtil.incRpcCounter();

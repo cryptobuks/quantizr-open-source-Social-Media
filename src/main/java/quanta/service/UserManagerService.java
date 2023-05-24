@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
+import opennlp.tools.util.StringUtil;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
@@ -229,10 +230,14 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		userNode.set(NodeProp.NOSTR_USER_NPUB, nostrNpub);
-		userNode.set(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
-		userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
-		userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
+		if (!StringUtil.isEmpty(nostrNpub)) userNode.setIfNotExist(NodeProp.NOSTR_USER_NPUB, nostrNpub);
+		if (!StringUtil.isEmpty(nostrPubKey)) userNode.setIfNotExist(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
+		if (!StringUtil.isEmpty(asymEncKey)) userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
+		if (!StringUtil.isEmpty(sigKey)) userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
+
+		// log.debug("*************** (login) Setting key on user nodeId: " + userNode.getIdStr() + " to " + sigKey);
+
+		ThreadLocals.getSC().pubSigKey = null;
 
 		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
 
@@ -514,6 +519,7 @@ public class UserManagerService extends ServiceBase {
 				if (!StringUtils.isEmpty(req.getSigKey())) {
 					// force pubSigKey to regenerate as needed by setting to null
 					ThreadLocals.getSC().pubSigKey = null;
+					// log.debug("*************** (saveKeys) Setting key on user nodeId: " + userNode.getIdStr() + " to " + req.getSigKey());
 					userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
 				}
 

@@ -679,6 +679,14 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	public void setIfNotExist(NodeProp nt, Object val) {
+		if (!props().containsKey(nt.s())) {
+			set(nt.s(), val);
+		}
+	}
+
+	@Transient
+	@JsonIgnore
 	public boolean set(String key, Object val) {
 		synchronized (propLock) {
 			if (props == null) {

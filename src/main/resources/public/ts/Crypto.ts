@@ -75,6 +75,10 @@ export class Crypto {
     vector: Uint8Array = null;
     logKeys: boolean = false;
 
+    sigKey: string = null;
+    asymEncKey: string = null;
+    userSignature: string = null;
+
     constructor() {
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https)
         web address plus also localhost */
@@ -95,6 +99,16 @@ export class Crypto {
         */
         // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
+    }
+
+    invalidateKeys = () => {
+        this.sigKey = null;
+        this.userSignature = null;
+
+        this.privateEncKey = null;
+        this.publicEncKey = null;
+        this.privateSigKey = null;
+        this.publicSigKey = null;
     }
 
     /* Runs a full test of all encryption code.
@@ -290,9 +304,14 @@ export class Crypto {
         if (keyType === "all" || keyType === "sig") {
             newSigKey = await this.initSigKeys(forceUpdate);
             newUserSignature = await S.crypto.sign(null, user);
+
+            S.crypto.sigKey = newSigKey;
+            S.crypto.userSignature = newUserSignature;
+            // console.log("newSigKey: user=" + user + " key=" + newSigKey);
         }
 
         if (republish && (newAsymEncKey || newSigKey)) {
+            // console.log("Pushing PublicKeys");
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
@@ -305,12 +324,12 @@ export class Crypto {
                 // note, even though we only update these if successful on the server the client side will still definitely
                 // have the new keys in the LocalDB already
                 if (newAsymEncKey) {
-                    S.quanta.asymEncKey = newAsymEncKey;
+                    S.crypto.asymEncKey = newAsymEncKey;
                 }
 
                 if (newSigKey) {
-                    S.quanta.sigKey = newSigKey;
-                    S.quanta.userSignature = newUserSignature;
+                    S.crypto.sigKey = newSigKey;
+                    S.crypto.userSignature = newUserSignature;
                 }
 
                 if (showConfirm) {
@@ -323,12 +342,12 @@ export class Crypto {
         }
         else {
             if (newAsymEncKey) {
-                S.quanta.asymEncKey = newAsymEncKey;
+                S.crypto.asymEncKey = newAsymEncKey;
             }
 
             if (newSigKey) {
-                S.quanta.sigKey = newSigKey;
-                S.quanta.userSignature = newUserSignature;
+                S.crypto.sigKey = newSigKey;
+                S.crypto.userSignature = newUserSignature;
             }
         }
     }
@@ -418,14 +437,17 @@ export class Crypto {
         let pubKeyStr: string = null;
 
         if (!forceUpdate) {
+            // console.log("force update key");
             /* Check to see if there is a key stored, and if not force it to be created
                val.val is the EncryptionKeyPair here.
             */
             const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
             if (!val) {
+                // console.log("Forcing sig key update: key not found.");
                 forceUpdate = true;
             }
             else {
+                // console.log("key found ok for user " + S.localDB.userName);
                 keyPair = val.v;
             }
         }
@@ -437,18 +459,21 @@ export class Crypto {
 
             const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(pubKeyDat);
-            // console.log("Exporting key string: " + pubKeyStr);
+            console.log("Exporting key string jwk: " + pubKeyStr);
         }
 
         if (!keyPair) {
             const val: IndexedDBObj = await S.localDB.readObject(this.STORE_SIGKEY);
             keyPair = val.v;
+            // console.log("tried to get sigkey");
         }
 
         if (!pubKeyStr) {
             const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(publicKeyDat);
+            // console.log("jwk: " + pubKeyStr);
         }
+
         return pubKeyStr;
     }
 
