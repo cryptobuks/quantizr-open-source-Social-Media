@@ -14,8 +14,8 @@
         "noImplicitOverride": true,
         "noEmitOnError": true,
         "allowJs": true,
-        "noUnusedLocals": true
-
+        "noUnusedLocals": true,
+        "suppressImplicitAnyIndexErrors": true
         // "traceResolution": true (for tracing module loading, for diagnostics)
     },
     "include": [

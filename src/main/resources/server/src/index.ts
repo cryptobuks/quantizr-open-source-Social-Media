@@ -1,6 +1,6 @@
 import express from 'express';
 import { SimplePool } from 'nostr-tools';
-import 'websocket-polyfill'
+import 'websocket-polyfill';
 
 console.log("Express Server starting: TSERVER_API_KEY=" + process.env.TSERVER_API_KEY);
 
@@ -14,6 +14,13 @@ app.use(express.json());
 
 app.get('/', (req: any, res: any, next: any) => {
     res.send("Quanta TServer ok!");
+});
+
+// todo-0: add api key check
+// work in progress.
+app.post('/nostr-verify', async (req: any, res: any, next: any) => {
+    console.log("nostr-verify: body=" + JSON.stringify(req.body, null, 4));
+    return res.send(req.body);
 });
 
 app.post('/nostr-query', async (req: any, res: any, next: any) => {
