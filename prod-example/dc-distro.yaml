@@ -109,6 +109,9 @@ services:
                 cory:${testPassword}:${devEmail},
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
+
+            nostrCurationAccounts: >-
+                admin
     
             throttleTime: "0"
             spring.config.location: "classpath:/application.properties" 

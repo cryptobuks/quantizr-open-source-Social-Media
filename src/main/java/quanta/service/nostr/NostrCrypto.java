@@ -16,7 +16,7 @@ import quanta.model.client.NostrEventWrapper;
  * 
  * https://github.com/tcheeric/nostr-java
  * 
- * todo-000: need to be doing all event verification via TypeScript (TServer) and delete this
+ * todo-1: need to be doing all event verification via TypeScript (TServer) and delete this
  * class and Pair/Point classes.
  */
 

@@ -281,30 +281,22 @@ public class SystemService extends ServiceBase {
 
 		HashSet<String> authorsSet = new HashSet<>();
 
-		GetPeopleResponse adminFriends = arun.run(as -> {
-			GetPeopleResponse ret1 = user.getPeople(as, PrincipalName.ADMIN.s(), "friends", Constant.NETWORK_NOSTR.s());
-			return ret1;
-		});
+		arun.run(as -> {
+			// For all nostr curation users gather their nostr friends' pubkeys into authorsSet
+			final List<String> curationUsers = XString.tokenize(prop.getNostrCurationAccounts(), ",", true);
+			if (curationUsers != null) {
+				for (String cuser : curationUsers) {
+					GetPeopleResponse adminFriends = user.getPeople(as, cuser, "friends", Constant.NETWORK_NOSTR.s());
 
-		if (adminFriends != null && adminFriends.getPeople() != null) {
-			for (FriendInfo fi : adminFriends.getPeople()) {
-				authorsSet.add(fi.getUserName().substring(1));
+					if (adminFriends != null && adminFriends.getPeople() != null) {
+						for (FriendInfo fi : adminFriends.getPeople()) {
+							authorsSet.add(fi.getUserName().substring(1));
+						}
+					}
+				}
 			}
-		}
-
-		GetPeopleResponse userFriends = arun.run(as -> {
-			// todo-000: Currently hard-coding clay, but we need this to be a config parameter which allows a 
-			// comma-delimited set of users to be 'curated from' here, and then 'admin' will merely be one of those
-			// users and an optional one.
-			GetPeopleResponse ret1 = user.getPeople(as, "clay", "friends", Constant.NETWORK_NOSTR.s());
-			return ret1;
+			return null;
 		});
-
-		if (userFriends != null && userFriends.getPeople() != null) {
-			for (FriendInfo fi : userFriends.getPeople()) {
-				authorsSet.add(fi.getUserName().substring(1));
-			}
-		}
 
 		if (authorsSet.size() == 0) {
 			return "No friends on admin account to query for";
@@ -339,8 +331,8 @@ public class SystemService extends ServiceBase {
 		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
 		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
 
-		ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
-				new ParameterizedTypeReference<List<NostrEvent>>() {});
+		ResponseEntity<List<NostrEvent>> response =
+				restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<NostrEvent>>() {});
 
 		IntVal saveCount = new IntVal(0);
 		HashSet<String> accountNodeIds = new HashSet<>();
@@ -348,7 +340,7 @@ public class SystemService extends ServiceBase {
 		int eventCount = response.getBody().size();
 		arun.run(as -> {
 			for (NostrEvent event : response.getBody()) {
-				log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
+				// log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
 
 				NostrEventWrapper ne = new NostrEventWrapper();
 				ne.setEvent(event);

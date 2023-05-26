@@ -106,6 +106,10 @@ services:
                 cory:${testPassword}:${devEmail},
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
+
+            nostrCurationAccounts: >-
+                admin,
+                bob
     
             testPassword: "${testPassword}"
             throttleTime: "0"

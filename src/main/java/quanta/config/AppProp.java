@@ -252,6 +252,10 @@ public class AppProp {
 		return env.getProperty("testUserAccounts");
 	}
 
+	public String getNostrCurationAccounts() {
+		return env.getProperty("nostrCurationAccounts");
+	}
+
 	public String getMongoAdminUserName() {
 		return env.getProperty("mongoAdminUserName");
 	}
