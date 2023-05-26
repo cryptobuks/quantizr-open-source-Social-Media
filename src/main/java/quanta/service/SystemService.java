@@ -286,8 +286,10 @@ public class SystemService extends ServiceBase {
 			return ret1;
 		});
 
-		for (FriendInfo fi : adminFriends.getPeople()) {
-			authorsSet.add(fi.getUserName().substring(1));
+		if (adminFriends != null && adminFriends.getPeople() != null) {
+			for (FriendInfo fi : adminFriends.getPeople()) {
+				authorsSet.add(fi.getUserName().substring(1));
+			}
 		}
 
 		GetPeopleResponse userFriends = arun.run(as -> {
@@ -297,8 +299,14 @@ public class SystemService extends ServiceBase {
 			return ret1;
 		});
 
-		for (FriendInfo fi : userFriends.getPeople()) {
-			authorsSet.add(fi.getUserName().substring(1));
+		if (userFriends != null && userFriends.getPeople() != null) {
+			for (FriendInfo fi : userFriends.getPeople()) {
+				authorsSet.add(fi.getUserName().substring(1));
+			}
+		}
+
+		if (authorsSet.size() == 0) {
+			return "No friends on admin account to query for";
 		}
 
 		List<String> authors = new LinkedList<>(authorsSet);
