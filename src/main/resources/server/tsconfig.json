@@ -1,4 +1,4 @@
-// todo-0: currently we have different set of compiler settings than the webpack build has and we need
+// todo-1: currently we have different set of compiler settings than the webpack build has and we need
 // to be using same TSC settings everywhere if we can
 {
   "compilerOptions": {

@@ -23,7 +23,7 @@ services:
         image: mongo:4.0
 
     # I'm Disabling IPFS for now, because it always just runs for a while and then just mysteriously terminates.
-    # Need to investigate asap (todo-0)
+    # Need to investigate asap (todo-1)
     # ipfs-distro: 
     #     # https://hub.docker.com/r/ipfs/kubo/
     #     image: ipfs/kubo:release

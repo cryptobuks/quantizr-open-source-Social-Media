@@ -108,7 +108,6 @@ public class MongoDelete extends ServiceBase {
 	 * 'node.hasChildren' will remain correct. So there's no reason to worry about damaging the
 	 * 'correctness' of 'hasChildren' for this scenario
 	 */
-	// todo-00: add separate method for deleting old nostr posts
 	public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
 		Query q = new Query();
 		LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
