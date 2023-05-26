@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "esnext",
+        "target": "es6", // WARNING: Don't try esnext here. Things like 'obj.prop?.val' throw exception which are valid
         "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
         "moduleResolution": "node",
