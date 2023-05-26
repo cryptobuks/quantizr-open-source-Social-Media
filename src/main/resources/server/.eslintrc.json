@@ -1,0 +1,62 @@
+{
+    "env": {
+        "es6": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "standard"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react", 
+        "@typescript-eslint"
+    ],
+    "settings": {
+        "react": {
+          "version": "detect"
+        }
+    },
+    "rules": {
+        "node/handle-callback-err": "off",
+        "multiline-ternary": "off",
+        "no-unreachable-loop": "off",
+        "node/no-callback-literal": "off",
+        "no-empty": "off",
+        // all the above added after upgrading to latest version and I may not keep.
+
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        
+        // "semi": ["error", "always"],
+        "semi": "off",
+
+        // "indent": ["error", 4],
+        "camelcase": "off",
+        "padded-blocks": "off",
+        "space-before-function-paren": "off",
+        "brace-style": "off",
+        "no-return-assign": "off",
+        "no-async-promise-executor": "off",
+        "handle-callback-err": "off",
+        "no-useless-escape": "off",
+        "no-useless-constructor": "off",
+        "no-undef": "off",
+        "no-unneeded-ternary": "off",
+        "standard/no-callback-literal": "off",
+        "valid-typeof": "off",
+        "no-useless-return": "off",
+        "prefer-promise-reject-errors": "off",
+        "indent": "off",
+        "no-use-before-define": "off",
+        "no-debugger": "off",
+        "keyword-spacing": "off",
+        "space-infix-ops": "off",
+        "object-property-newline": "off"
+      }
+}

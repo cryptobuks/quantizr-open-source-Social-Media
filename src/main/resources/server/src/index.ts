@@ -13,29 +13,29 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req: any, res: any, next: any) => {
-  res.send("Quanta TServer is alive!");
+    res.send("Quanta TServer ok!");
 });
 
 app.post('/nostr-query', async (req: any, res: any, next: any) => {
-  try {
-    if (req.body.apiKey !== process.env.TSERVER_API_KEY) {
-      return res.send({ status: "Bad API KEY" });
-    }
+    try {
+        if (req.body.apiKey !== process.env.TSERVER_API_KEY) {
+            return res.send({ status: "Bad API KEY" });
+        }
 
-    const pool = new SimplePool();
-    let ret = await pool.list(req.body.relays, [req.body.query]);
-    if (!ret || ret.length == 0) {
-      ret = [];
+        const pool = new SimplePool();
+        let ret = await pool.list(req.body.relays, [req.body.query]);
+        if (!ret || ret.length == 0) {
+            ret = [];
+        }
+        pool.close(req.body.relays);
+        return res.send(ret);
     }
-    pool.close(req.body.relays);
-    return res.send(ret);
-  }
-  catch (error) {
-    return next(error);
-  }
+    catch (error) {
+        return next(error);
+    }
 });
 
 const port = process.env.TSERVER_PORT || 4003
 app.listen(port, () => {
-  console.log('server running on port ' + port);
+    console.log('server running on port ' + port);
 });

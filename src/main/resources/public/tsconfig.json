@@ -1,15 +1,12 @@
-// WARNING: Be careful renaming this file. If it's not named 'tsconfig.json' the VSCode won't find it,
-// and things like the missing 'strictNullChecks=false' will cause thousands of errors to get identified
-// which are not errors
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "esnext",
         "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
         "moduleResolution": "node",
-        "jsx": "react",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
+        "jsx": "react",
         "noImplicitAny": true,
         "alwaysStrict": true,
         "removeComments": true,

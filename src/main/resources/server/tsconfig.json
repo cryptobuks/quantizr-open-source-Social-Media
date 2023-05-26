@@ -1,17 +1,15 @@
-// todo-1: currently we have different set of compiler settings than the webpack build has and we need
-// to be using same TSC settings everywhere if we can
 {
   "compilerOptions": {
-    "target": "esnext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
+    "target": "esnext",
     "lib": ["esnext"],
-    "module": "esnext" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */,
+    "module": "esnext",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "outDir": "./build" /* Redirect output structure to the directory. */,
-    "strict": true /* Enable all strict type-checking options. */,
-    "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
-    "baseUrl": "./src" /* Base directory to resolve non-absolute module names. */,
-    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
-    "skipLibCheck": true /* Skip type checking of declaration files. */,
-    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+    "outDir": "./build",
+    "strict": true,
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   }
 }
