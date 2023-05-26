@@ -565,7 +565,7 @@ export class DomUtil {
        to replace on your whole web page */
     public highlightText = (rootElm: HTMLElement, text: string) => {
         if (text.startsWith("\"") && text.endsWith("\"")) {
-            text = text.replaceAll("\"", "");
+            text = text.replace("\"", "");
         }
         const reg = this.escapeRegEx(text);
         const regex = new RegExp(reg, "i"); // case insensitive search
