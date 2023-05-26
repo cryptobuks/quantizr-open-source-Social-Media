@@ -824,10 +824,6 @@ public class UserManagerService extends ServiceBase {
 		AddFriendResponse res = new AddFriendResponse();
 		String userDoingAction = ThreadLocals.getSC().getUserName();
 
-		if (userDoingAction.equals(PrincipalName.ADMIN.s())) {
-			throw new RuntimeException("Don't follow from admin account.");
-		}
-
 		final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
 
 		// If just following one user do it synchronously and send back the response
@@ -1409,7 +1405,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	// NOTE: subType = null | "nostr"
-	public GetPeopleResponse getPeople(MongoSession ms, String type, String subType) {
+	public GetPeopleResponse getPeople(MongoSession ms, String userName, String type, String subType) {
 		GetPeopleResponse res = new GetPeopleResponse();
 
 		String nodeType = null;
@@ -1426,7 +1422,7 @@ public class UserManagerService extends ServiceBase {
 		} else {
 			throw new RuntimeException("Invalid type: " + type);
 		}
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, null, true, moreCriteria);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, userName, true, moreCriteria);
 
 		if (friendNodes != null) {
 			List<FriendInfo> friends = new LinkedList<>();

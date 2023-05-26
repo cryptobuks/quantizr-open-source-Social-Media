@@ -120,12 +120,19 @@ services:
             metaHost: "${quanta_domain}" 
             allowFileSystemSearch: "false"
             actPubEnabled: "false"
+
+            # tserver-tag
+            nostrDaemonEnabled: "false"
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
+
+            # tserver-tag
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
             # mail.port: ""
             # mail.user: "your mail user" 
@@ -140,6 +147,29 @@ services:
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
 
+        depends_on:
+            - mongo-distro
+            # - ipfs-distro
+
+    # tserver-tag
+    tserver-distro:
+        image: ${TSERVER_IMAGE}
+        build:
+            context: ./src/main/resources/server
+            dockerfile: ./Dockerfile
+        hostname: tserver-host
+        networks:
+            bridge:
+                aliases:
+                    - tserver-host
+        volumes:
+            - ./src/main/resources/server/src:/home/node/app/src
+            - ./src/main/resources/server/nodemon.json:/home/node/app/nodemon.json
+        ports:
+            - "${TSERVER_PORT}:${TSERVER_PORT}"
+        environment:
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
         depends_on:
             - mongo-distro
             # - ipfs-distro

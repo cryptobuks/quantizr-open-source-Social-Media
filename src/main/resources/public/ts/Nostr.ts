@@ -480,6 +480,8 @@ export class Nostr {
         };
 
         event.id = getEventHash(event);
+
+        // todo-0: signEvent is deprecated
         event.sig = signEvent(event, this.sk);
         this.cacheEvent(event);
         // console.log("NEW EVENT: " + S.util.prettyPrint(event));

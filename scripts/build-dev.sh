@@ -65,6 +65,9 @@ dockerUp
 serviceCheck ${docker_stack}_quanta-dev
 serviceCheck ${docker_stack}_mongo-dev
 
+# tserver-tag
+serviceCheck ${docker_stack}_tserver-dev
+
 if [[ -z ${ipfsEnabled} ]]; then  
     echo "ipfs not in use"
 else

@@ -11,8 +11,11 @@ source ./define-functions.sh
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
-export QUANTA_VER=2.13
+export QUANTA_VER=2.14
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
+
+# tserver-tag
+export TSERVER_IMAGE=tserver-dev-${QUANTA_VER}
 export DOCKER_TAG=quanta-dev-${QUANTA_VER}
 
 # Must be the folder where the Quantizr project is located. The root of the source folders.
@@ -60,6 +63,9 @@ export XMX=2g
 # Configure MongoDB-specific variables
 export MONGO_HOST=mongo-host-dev
 export MONGO_PORT=27016
+
+# tserver-tag
+export TSERVER_PORT=4002
 
 # NOTE: This file gets *generated* by the build.
 export MONGOD_CONF=${PRJROOT}/mongod-dev.conf

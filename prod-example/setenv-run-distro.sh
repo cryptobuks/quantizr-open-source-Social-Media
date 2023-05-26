@@ -3,9 +3,12 @@ source ./define-functions.sh
 
 # we make up any prod version we want here. It won't matter. This image is built on and private to the prod instance
 # and ultimtely determined by whatever JAR is present plus all the config settings.
-export QUANTA_VER=2.13
+export QUANTA_VER=2.14
 export DOCKER_TAG=quanta-${QUANTA_VER}
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
+
+# tserver-tag
+export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 
 export DEPLOY_TARGET=$PWD
@@ -49,6 +52,9 @@ export MONGO_DATA=/var/lib/mongodb
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
+
+# tserver-tag
+export TSERVER_PORT=4000
 
 export DOCKER_DOWN_DELAY=30s
 export DOCKER_UP_DELAY=20s

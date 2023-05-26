@@ -2,7 +2,7 @@
 
 source ./define-functions.sh
 
-export QUANTA_VER=2.13
+export QUANTA_VER=2.14
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 # Uncomment either option 1 or option 2
@@ -10,6 +10,7 @@ export DOCKER_TAG=quanta-${QUANTA_VER}
 # OPTION 1) To pull from Docker Hub
 #
 # export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
+# export TSERVER_IMAGE=subnode/repo:tserver-${QUANTA_VER}
 # export JAR_FILE=
 # ----------------------------------------------------------------
 # OPTION 2) To Build Image from a local JAR
@@ -19,6 +20,9 @@ export DOCKER_TAG=quanta-${QUANTA_VER}
 #    and it will be able to run from the local repo cache, or drop in an updated jar any time
 #    and run again to once again put the jar into the repo and upgrade to that latest jar.
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
+
+# tserver-tag
+export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 # ================================================================
 
@@ -53,6 +57,9 @@ export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
+
+# tserver-tag
+export TSERVER_PORT=4002
 
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=20s

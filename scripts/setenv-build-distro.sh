@@ -8,11 +8,14 @@ THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export QUANTA_VER=2.13
+export QUANTA_VER=2.14
 
 # always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
 # builds we run on our machine should ever target to the 'subnode/repo:'
 export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
+
+# tserver-tag
+export TSERVER_IMAGE=subnode/repo:tserver-${QUANTA_VER}
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 export SCRIPTS=${PRJROOT}/scripts
@@ -58,6 +61,9 @@ export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
+
+# tserver-tag
+export TSERVER_PORT=4000
 
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=15s

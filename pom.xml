@@ -67,6 +67,7 @@
 
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
+							<exclude>server/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -306,6 +307,7 @@
 
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
+							<exclude>server/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -501,6 +503,7 @@
 
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
+							<exclude>server/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -659,6 +662,7 @@
 
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
+							<exclude>server/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 

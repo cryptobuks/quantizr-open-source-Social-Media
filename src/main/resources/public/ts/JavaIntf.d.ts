@@ -80,6 +80,16 @@ export interface NostrEvent {
     relays: string;
 }
 
+export interface NostrEventEx {
+    id: string;
+    sig: string;
+    pubkey: string;
+    kind: number;
+    content: string;
+    tags: string[][];
+    created_at: number;
+}
+
 export interface NostrMetadata {
     name: string;
     username: string;
@@ -90,6 +100,12 @@ export interface NostrMetadata {
     nip05: string;
     reactions: boolean;
     display_name: string;
+}
+
+export interface NostrQuery {
+    authors: string[];
+    kinds: number[];
+    limit: number;
 }
 
 export interface NostrUserInfo {

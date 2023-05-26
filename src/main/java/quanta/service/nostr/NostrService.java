@@ -69,7 +69,8 @@ public class NostrService extends ServiceBase {
 	// every 10 seconds
 	@Scheduled(fixedDelay = 10 * 1000)
 	public void verifyEvents() {
-		if (eventsPendingVerify.isEmpty()) return;
+		if (eventsPendingVerify.isEmpty())
+			return;
 
 		ConcurrentHashMap<ObjectId, NostrEvent> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
 		eventsPendingVerify.clear();
@@ -108,18 +109,9 @@ public class NostrService extends ServiceBase {
 		HashSet<String> accountNodeIds = new HashSet<>();
 		List<String> eventNodeIds = new ArrayList<>();
 
-		// build userInfoMap for efficient lookups
-		HashMap<String, NostrUserInfo> userInfoMap = new HashMap<>();
-		if (req.getUserInfo() != null) {
-			req.getUserInfo().forEach(ui -> {
-				userInfoMap.put(ui.getPk(), ui);
-			});
-		}
-
 		arun.run(as -> {
 			for (NostrEvent event : req.getEvents()) {
-				// log.debug("NostrEvent: " + XString.prettyPrint(event));
-				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
+				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 			}
 			return null;
 		});
@@ -129,20 +121,20 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	private void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
+	public void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+			IntVal saveCount) {
 		switch (event.getKind()) {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
 				break;
 			case KIND_EncryptedDirectMessage:
 			case KIND_Text:
-				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 				break;
 			default:
 				// todo-1: for now we treat all unknown nodes as text, but we need to do something in the DB to
 				// indicate this is NOT a known type.
-				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount, userInfoMap);
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
 				break;
 		}
@@ -194,11 +186,14 @@ public class NostrService extends ServiceBase {
 			}
 
 			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, event.getTimestamp());
-			
-			// WARNING: It's tempting to think this pubkey needs to be here but for foreign nodes their username
-			// is basically ".${pubkey}" (a dot followed by the hex of their pubkey), so we don't store it on the node
-			// in a property by itself.
-			// nostrAccnt.set(NodeProp.NOSTR_USER_PUBKEY, event.getPk());
+
+			/*
+			 * WARNING: It's tempting to think this pubkey needs to be here but for foreign nodes their username
+			 * is basically ".${pubkey}" (a dot followed by the hex of their pubkey), so we don't store it on
+			 * the node in a property by itself.
+			 * 
+			 * nostrAccnt.set(NodeProp.NOSTR_USER_PUBKEY, event.getPk());
+			 */
 			nostrAccnt.set(NodeProp.NOSTR_USER_NPUB, event.getNpub());
 
 			// IMPORTANT: WE don't save a NOSTR_USER_PUBKEY on these foreign nodes because the
@@ -254,7 +249,7 @@ public class NostrService extends ServiceBase {
 	}
 
 	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			IntVal saveCount, HashMap<String, NostrUserInfo> userInfoMap) {
+			IntVal saveCount) {
 		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)

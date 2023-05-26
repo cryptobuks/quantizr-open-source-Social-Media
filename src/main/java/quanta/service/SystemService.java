@@ -4,15 +4,28 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoDatabase;
 import lombok.extern.slf4j.Slf4j;
+import quanta.actpub.APConst;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -20,23 +33,41 @@ import quanta.filter.AuditFilter;
 import quanta.filter.HitFilter;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
+import quanta.model.client.NodeProp;
+import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrQuery;
+import quanta.model.client.PrincipalName;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.response.FriendInfo;
+import quanta.response.GetPeopleResponse;
 import quanta.response.PushPageMessage;
 import quanta.util.Const;
+import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.IntVal;
 
 /**
  * Service methods for System related functions. Admin functions.
  */
 
 @Component
-@Slf4j 
+@Slf4j
 public class SystemService extends ServiceBase {
+
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
+	public static final ObjectMapper mapper = new ObjectMapper();
+	{
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+
 	public String rebuildIndexes() {
 		ThreadLocals.requireAdmin();
 
@@ -131,7 +162,7 @@ public class SystemService extends ServiceBase {
 	public String validateDb() {
 		String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName, //
 				new Document("validate", "nodes")//
-				.append("full", true));
+						.append("full", true));
 
 		ret += "\n\ndbStats: " + runMongoDbCommand(MongoAppConfig.databaseName, //
 				new Document("dbStats", 1).append("scale", 1024));
@@ -222,9 +253,101 @@ public class SystemService extends ServiceBase {
 			sb.append(arg + "\n");
 		}
 
+		sb.append("\nNostr Query TServer:\n" + nostrQueryUpdate() + "\n");
+
 		// Run command inside container
 		// sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
 		return sb.toString();
+	}
+
+	// tserver-tag
+	@Scheduled(fixedDelay = 30 * DateUtil.MINUTE_MILLIS)
+	public String nostrQueryUpdate() {
+		if (!prop.isNostrDaemonEnabled()) {
+			return "nostrDeamon not enabled";
+		}
+
+		HashMap<String, Object> message = new HashMap<>();
+
+		SubNode root = read.getDbRoot();
+		String relays = root.getStr(NodeProp.NOSTR_RELAYS);
+		List<String> relayList = XString.tokenize(relays, "\n\r", true);
+		message.put("relays", relayList);
+
+		log.debug("nostrQueryUpdate: relays: " + XString.prettyPrint(relayList));
+
+		HashSet<String> authorsSet = new HashSet<>();
+
+		GetPeopleResponse adminFriends = arun.run(as -> {
+			GetPeopleResponse ret1 = user.getPeople(as, PrincipalName.ADMIN.s(), "friends", Constant.NETWORK_NOSTR.s());
+			return ret1;
+		});
+
+		for (FriendInfo fi : adminFriends.getPeople()) {
+			authorsSet.add(fi.getUserName().substring(1));
+		}
+
+		GetPeopleResponse userFriends = arun.run(as -> {
+			// todo-0: getting from user "clay" is a temporary hack until I have a way to populate admin account
+			// with enough Nostr people for a decent curated feed.
+			GetPeopleResponse ret1 = user.getPeople(as, "clay", "friends", Constant.NETWORK_NOSTR.s());
+			return ret1;
+		});
+
+		for (FriendInfo fi : userFriends.getPeople()) {
+			authorsSet.add(fi.getUserName().substring(1));
+		}
+
+		List<String> authors = new LinkedList<>(authorsSet);
+
+		message.put("authors", authors);
+		List<Integer> kinds = new LinkedList<>();
+		kinds.add(1);
+		NostrQuery query = new NostrQuery();
+		query.setAuthors(authors);
+		query.setKinds(kinds);
+		query.setLimit(200);
+		message.put("query", query);
+
+		// tserver-tag (put TSERVER_API_KEY in secrets file)
+		message.put("apiKey", prop.getTServerApiKey());
+
+		String body = XString.prettyPrint(message);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(List.of(APConst.MTYPE_JSON));
+		headers.setContentType(APConst.MTYPE_JSON);
+
+		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
+
+		ResponseEntity<List<NostrEventEx>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
+				new ParameterizedTypeReference<List<NostrEventEx>>() {});
+
+		IntVal saveCount = new IntVal(0);
+		HashSet<String> accountNodeIds = new HashSet<>();
+		List<String> eventNodeIds = new ArrayList<>();
+		int eventCount = response.getBody().size();
+		arun.run(as -> {
+			for (NostrEventEx event : response.getBody()) {
+				log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
+
+				NostrEvent ev = new NostrEvent();
+				ev.setId(event.getId());
+				ev.setSig(event.getSig());
+				ev.setKind(event.getKind());
+				ev.setPk(event.getPubkey());
+				ev.setTimestamp(event.getCreatedAt());
+				ev.setTags(event.getTags());
+				ev.setContent(event.getContent());
+
+				nostr.saveEvent(as, ev, accountNodeIds, eventNodeIds, saveCount);
+			}
+			return null;
+		});
+
+		return "NostrQueryUpdate: relays=" + relayList.size() + " people=" + authors.size() + " eventCount=" + eventCount
+				+ " newCount=" + saveCount.getVal();
 	}
 
 	// For now this is for server restart notify, but will eventually be a general broadcast messenger.

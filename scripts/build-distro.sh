@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # *********** Special Hack for Clay Ferguson's machine (everyone else delete this!)
-docker stack rm quanta-stack-distro
-sudo rm -r /home/clay/ferguson/distro-test
-mkdir /home/clay/ferguson/distro-test
+# docker stack rm quanta-stack-distro
+# sudo rm -r /home/clay/ferguson/distro-test
+# mkdir /home/clay/ferguson/distro-test
 # *********************************************************************************
 
 # =================================================================================================
@@ -45,6 +45,10 @@ cp ${PRJROOT}/dc-distro.yaml                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile                        ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh                     ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
+
+# tserver-tag
+mkdir -p ${DEPLOY_TARGET}/src/main/resources/server
+cp -R ${PRJROOT}/src/main/resources/server/ ${DEPLOY_TARGET}/src/main/resources/
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
@@ -109,10 +113,10 @@ tar -zcvf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
 verifySuccess "TAR create: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
 
 # *********** Special Hack for Clay Ferguson's machine (everyone else delete this!)
-cp ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz /home/clay/ferguson/distro-test
-cd /home/clay/ferguson/distro-test
-tar -xf quanta${QUANTA_VER}.tar.gz
-cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar /home/clay/ferguson/distro-test/quanta-distro
+# cp ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz /home/clay/ferguson/distro-test
+# cd /home/clay/ferguson/distro-test
+# tar -xf quanta${QUANTA_VER}.tar.gz
+# cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar /home/clay/ferguson/distro-test/quanta-distro
 # **********************************************************************************
 
 echo

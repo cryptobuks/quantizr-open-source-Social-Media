@@ -124,12 +124,20 @@ services:
             
             allowFileSystemSearch: "false"
             actPubEnabled: "true"
+
+            # tserver-tag
+            nostrDaemonEnabled: "false"
+
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
+
+            # tserver-tag
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
@@ -150,6 +158,29 @@ services:
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
 
+        depends_on:
+            - mongo-distro
+            # - ipfs-distro
+
+    # tserver-tag
+    tserver-distro:
+        image: ${TSERVER_IMAGE}
+        build:
+            context: ./src/main/resources/server
+            dockerfile: ./Dockerfile
+        hostname: tserver-host
+        networks:
+            bridge:
+                aliases:
+                    - tserver-host
+        volumes:
+            - ./src/main/resources/server/src:/home/node/app/src
+            - ./src/main/resources/server/nodemon.json:/home/node/app/nodemon.json
+        ports:
+            - "${TSERVER_PORT}:${TSERVER_PORT}"
+        environment:
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
         depends_on:
             - mongo-distro
             # - ipfs-distro
