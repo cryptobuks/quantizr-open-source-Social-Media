@@ -122,7 +122,7 @@ services:
             actPubEnabled: "false"
 
             # tserver-tag
-            nostrDaemonEnabled: "false"
+            nostrDaemonEnabled: "${nostrDaemonEnabled}"
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
