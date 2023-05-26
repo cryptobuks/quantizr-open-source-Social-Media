@@ -60,10 +60,6 @@ export class Nostr {
         await this.processMetadataQueue();
     }, 1200);
 
-    // This can be run from Admin Console (currently not used)
-    test = async () => {
-    }
-
     invalidateKeys = () => {
         this.sk = null;
         this.pk = null;

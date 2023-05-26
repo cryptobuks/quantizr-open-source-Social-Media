@@ -50,14 +50,12 @@ export class AdminView extends AppTab<any, AdminView> {
 
             new Divc({ className: "marginLeft" }, [
                 this.sectionTitle("Analytics"),
-
                 // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
                 this.settingsLink("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null)), //
                 this.settingsLink("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
 
                 this.sectionTitle("Utils"),
-
                 this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                 this.settingsLink("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
                 this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
@@ -72,7 +70,6 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace()),
 
                 this.sectionTitle("Database"),
-
                 this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                 this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
                 this.settingsLink("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null)), //
@@ -82,7 +79,6 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)), //
 
                 this.sectionTitle("ActivityPub"),
-
                 this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                 this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL), //
                 this.settingsLink("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null)), //
@@ -90,8 +86,10 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
                 this.settingsLink("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null)),
 
-                this.sectionTitle("Testing"),
+                this.sectionTitle("Nostr"),
+                this.settingsLink("Nostr Maintenance", () => S.view.runServerCommand("nostrMaintenance", null, "Nostr Maintenance Response", null)), //
 
+                this.sectionTitle("Testing"),
                 this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
                 this.settingsLink("Send Email", () => S.util.sendTestEmail()),
                 this.settingsLink("Server Log Text", () => S.util.sendLogText()),
@@ -117,10 +115,7 @@ export class AdminView extends AppTab<any, AdminView> {
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
                     const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                     tts.speak(sayThis);
-                }),
-
-                this.sectionTitle("Nostr Prototype"),
-                this.settingsLink("Run Nostr Test", S.nostr.test) //
+                })
             ])
         ]);
         return true;

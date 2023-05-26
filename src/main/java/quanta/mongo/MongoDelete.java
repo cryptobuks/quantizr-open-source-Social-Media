@@ -122,6 +122,19 @@ public class MongoDelete extends ServiceBase {
 		return res.getDeletedCount();
 	}
 
+	public long deleteOldNostrPosts(int monthsOld, MongoSession ms) {
+		Query q = new Query();
+		LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
+		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\.") //
+				.and(SubNode.MODIFY_TIME).lt(date);
+
+		q.addCriteria(crit);
+		DeleteResult res = ops.remove(q, SubNode.class);
+		return res.getDeletedCount();
+	}
+
 	/*
 	 * This is a way to cleanup old records, but it's not needed yet.
 	 * 

@@ -1981,14 +1981,24 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    public String maintainForeignUsers() {
+    public String maintainActPubUsers() {
         if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
         return arun.run(as -> {
-            log.debug("Starting AP Large Delete...");
+            log.debug("Starting ActPub cleanup...");
             long delCount = delete.deleteOldActPubPosts(4, as);
-            String message = "AP Maintence Complete. Deleted " + String.valueOf(delCount) + " old posts.";
+            String message = "AP Maintenance Complete. Deleted " + String.valueOf(delCount) + " old posts.";
+            log.debug(message);
+            return message;
+        });
+    }
+
+    public String maintainNostrUsers() {
+        return arun.run(as -> {
+            log.debug("Starting Nostr cleanup...");
+            long delCount = delete.deleteOldNostrPosts(4, as);
+            String message = "Nostr Maintenance Complete. Deleted " + String.valueOf(delCount) + " old posts.";
             log.debug(message);
             return message;
         });
