@@ -2,11 +2,11 @@
 
 # Quanta Web Platform
 
-### Content Management, Micro Blogging, and Social Media
-
+### A new Kind of Content Management, with Social Media support
+ 
 Welcome to the Fediverse!
 
-Quanta is a new kind of social media and content management platform. Connect to the Fediverse with unique and powerful features like wikis, micro-blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
+Quanta is a new kind of Social Media and Content Management platform, with uniquely powerful features for wikis, micro-blogging, document collaboration and publishing, secure messaging with (E2E Encryption), video/audio recording & sharing, file sharing, a podcatcher, and much more. Fediverse (Social Media) support includes both ActivityPub and Nostr Protocols.
 
 Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture where you always have complete control of your own data.
 
@@ -28,8 +28,8 @@ See [./distro/README.md](./distro/README.md) for details on how to build and/or 
 
 Quanta is a browser-based SPA (Single Page App), that works on both mobile and desktop browsers. 
 
-The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS front end. Deployed and installed via docker (docker compose), MongoDB as the data store, as well as the GO Lang version of IPFS.
+The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS front end. Deployed and installed via docker (docker compose), MongoDB as the primary data store, and an option for running an IPFS Gateway.
 
-## Search Tags
+### Keywords
 
-Social Media Platform, Decentralized, Fediverse, IPFS, ActivityPub, Web3.0, Mastodon/Pleroma, IPFS, MongoDB, docker compose, Java, TypesScript, ReactJS, HTML+SCSS, SpringBoot, Podcasting, RSS, Encrpytion, E2E Encryption, Secure Messaging, Blogging Platform, Wikis, CMS, Corporate Collaboration, Full-Text search, Lucene
+Decentralized, Social Media, Fediverse, ActivityPub, Nostr, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, docker, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
