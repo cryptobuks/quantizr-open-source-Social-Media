@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class NostrEventEx {
+public class NostrEvent {
     private String id;
     private String sig;
     private String pubkey;

@@ -24,7 +24,7 @@ import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrEvent;
 import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrMetadata;
 import quanta.model.client.NostrUserInfo;
@@ -154,7 +154,7 @@ public class NostrService extends ServiceBase {
 		}
 
 		try {
-			NostrEventEx nevent = event.getEvent();
+			NostrEvent nevent = event.getEvent();
 			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 			if (nostrAccnt != null) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
@@ -252,7 +252,7 @@ public class NostrService extends ServiceBase {
 
 	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount) {
-		NostrEventEx nevent = event.getEvent();
+		NostrEvent nevent = event.getEvent();
 		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)

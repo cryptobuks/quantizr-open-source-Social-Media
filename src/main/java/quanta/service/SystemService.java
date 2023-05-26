@@ -37,7 +37,7 @@ import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NostrEventWrapper;
-import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrEvent;
 import quanta.model.client.NostrQuery;
 import quanta.model.client.PrincipalName;
 import quanta.model.ipfs.file.IPFSObjectStat;
@@ -339,15 +339,15 @@ public class SystemService extends ServiceBase {
 		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
 		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
 
-		ResponseEntity<List<NostrEventEx>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
-				new ParameterizedTypeReference<List<NostrEventEx>>() {});
+		ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
+				new ParameterizedTypeReference<List<NostrEvent>>() {});
 
 		IntVal saveCount = new IntVal(0);
 		HashSet<String> accountNodeIds = new HashSet<>();
 		List<String> eventNodeIds = new ArrayList<>();
 		int eventCount = response.getBody().size();
 		arun.run(as -> {
-			for (NostrEventEx event : response.getBody()) {
+			for (NostrEvent event : response.getBody()) {
 				log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
 
 				NostrEventWrapper ne = new NostrEventWrapper();

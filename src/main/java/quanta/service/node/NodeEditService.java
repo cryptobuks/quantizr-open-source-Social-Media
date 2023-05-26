@@ -32,7 +32,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrEvent;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.file.IPFSDirStat;
@@ -621,7 +621,7 @@ public class NodeEditService extends ServiceBase {
 		 * it's TAGS and OBJECT_ID onto the node
 		 */
 		if (req.getNostrEvent() != null) {
-			NostrEventEx nevent = req.getNostrEvent().getEvent();
+			NostrEvent nevent = req.getNostrEvent().getEvent();
 			node.set(NodeProp.NOSTR_TAGS, nevent.getTags());
 			node.set(NodeProp.OBJECT_ID, "." + nevent.getId());
 		}

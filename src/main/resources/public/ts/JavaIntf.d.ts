@@ -68,7 +68,7 @@ export interface NodeLink {
     n: string;
 }
 
-export interface NostrEventEx {
+export interface NostrEvent {
     id: string;
     sig: string;
     pubkey: string;
@@ -79,7 +79,7 @@ export interface NostrEventEx {
 }
 
 export interface NostrEventWrapper {
-    event: NostrEventEx;
+    event: NostrEvent;
     npub: string;
     relays: string;
 }
