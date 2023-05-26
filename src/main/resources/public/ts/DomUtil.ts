@@ -48,12 +48,12 @@ export class DomUtil {
         if (!id) return;
         Comp.focusElmId = id;
         setTimeout(() => {
-            const elm: HTMLElement = this.domElm(id);
+            const elm = this.domElm(id);
             if (elm) {
                 /* This is a fix to a focus bug using the 'safest' way to do this without any redesign.
                  If the current focus is on an 'editor' then don't let this logic focus AWAY
                  from the editor. That breaks user input/keyboard. */
-                if (S.quanta.currentFocusId?.startsWith(C.ID_PREFIX_EDIT) && //
+                if (S.quanta.currentFocusId && S.quanta.currentFocusId.startsWith(C.ID_PREFIX_EDIT) && //
                     document.getElementById(S.quanta.currentFocusId)) {
                     return;
                 }
