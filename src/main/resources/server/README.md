@@ -1,9 +1,8 @@
 # Quanta NodeJS Server
 
-Quanta will eventually have a NodeJS server running alongside the SpringBoot/Java server, and this project is the beginnings of this capability. The reason for this is primarily so that all our new Nostr code that needs to be able to run server-side can be written in TypeScript instad of Java.
+Quanta runs this NodeJS server alongside the SpringBoot/Java server. Currently the only reason for this NodeJS server is so that we can have all our Nostr code be in pure TypeScript, or at least the parts of it related to curating a public feed. All of the E2E Encryption, Signing, and Keys is still done *only* in the browser.
 
-Also eventually there will be the capability of running a "Quanta Lite" version of Quanta where the NodeJS server may be the *only* server side component running, and it will be able to have a small subset of Quanta
-capabilities, but still be a runnable "Quata" app.
+Future Plans: Eventually there will be the capability of running a "Quanta Lite" version of Quanta where the NodeJS server may be the *only* server side component running (no Java SpringBoot at all), and it will be able to have a small subset of Quanta capabilities that are available in the Java server.
 
 ### Start the dev server
 

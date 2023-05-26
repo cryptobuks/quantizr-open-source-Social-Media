@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 /*
  * This is the exact NostrEvent format we will get from servers
  * 
- * todo-0: We need to convert the NostrEvent over to this object and not consolidate into one.
+ * todo-000: We need to convert the NostrEvent over to this object and not consolidate into one.
  */
 public class NostrEventEx {
     private String id;

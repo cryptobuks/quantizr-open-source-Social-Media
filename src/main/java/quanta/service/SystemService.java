@@ -293,8 +293,9 @@ public class SystemService extends ServiceBase {
 		}
 
 		GetPeopleResponse userFriends = arun.run(as -> {
-			// todo-0: getting from user "clay" is a temporary hack until I have a way to populate admin account
-			// with enough Nostr people for a decent curated feed.
+			// todo-000: Currently hard-coding clay, but we need this to be a config parameter which allows a 
+			// comma-delimited set of users to be 'curated from' here, and then 'admin' will merely be one of those
+			// users and an optional one.
 			GetPeopleResponse ret1 = user.getPeople(as, "clay", "friends", Constant.NETWORK_NOSTR.s());
 			return ret1;
 		});
