@@ -10,4 +10,5 @@ public class NostrQuery {
     private List<String> authors;
     private List<Integer> kinds;
     private Integer limit;
+    private Long since;
 }

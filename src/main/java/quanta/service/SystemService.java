@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,6 +62,8 @@ import quanta.util.val.IntVal;
 @Component
 @Slf4j
 public class SystemService extends ServiceBase {
+
+	long lastNostrQueryTime = 0L;
 
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 	public static final ObjectMapper mapper = new ObjectMapper();
@@ -306,7 +309,13 @@ public class SystemService extends ServiceBase {
 		NostrQuery query = new NostrQuery();
 		query.setAuthors(authors);
 		query.setKinds(kinds);
-		query.setLimit(200);
+		query.setLimit(100);
+
+		if (lastNostrQueryTime != 0L) {
+			query.setSince(lastNostrQueryTime / 1000);
+		}
+		lastNostrQueryTime = new Date().getTime();
+
 		message.put("query", query);
 
 		// tserver-tag (put TSERVER_API_KEY in secrets file)

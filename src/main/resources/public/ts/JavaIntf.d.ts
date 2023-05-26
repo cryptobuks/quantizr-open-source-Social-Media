@@ -106,6 +106,7 @@ export interface NostrQuery {
     authors: string[];
     kinds: number[];
     limit: number;
+    since: number;
 }
 
 export interface NostrUserInfo {

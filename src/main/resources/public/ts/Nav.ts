@@ -474,10 +474,14 @@ export class Nav {
                     S.nostr.queryNetwork(true, true);
                     break;
 
-                case J.Constant.FEED_PUB:
                 case J.Constant.FEED_FROMFRIENDS:
                     // do not 'await' here. Let this run in background
                     S.nostr.queryNetwork(true, false);
+                    break;
+
+                case J.Constant.FEED_PUB:
+                    // for public feed, do nothing. The TServer deamon will take care of making sure
+                    // a decent curated feed exists
                     break;
 
                 default:
