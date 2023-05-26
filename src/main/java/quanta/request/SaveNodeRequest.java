@@ -1,7 +1,7 @@
 package quanta.request;
 
 import quanta.model.NodeInfo;
-import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventWrapper;
 import quanta.request.base.RequestBase;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +13,6 @@ public class SaveNodeRequest extends RequestBase {
 
 	// if we're saving a nostr event this will be non-null and mainly used so we can verify it's 
 	// signature before saving the OBJECT_ID onto the node.
-	private NostrEvent nostrEvent;
+	private NostrEventWrapper nostrEvent;
 	boolean saveToActPub;
 }

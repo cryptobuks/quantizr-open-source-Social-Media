@@ -1392,17 +1392,10 @@ export class Nostr {
         }
     }
 
-    makeNostrEvent = (event: Event): J.NostrEvent => {
+    makeNostrEvent = (event: Event): J.NostrEventWrapper => {
         if (!event) return null;
         return {
-            id: event.id,
-            sig: event.sig,
-            pk: event.pubkey,
-            kind: event.kind,
-            content: event.content,
-            tags: event.tags,
-            timestamp: event.created_at,
-
+            event,
             // note: npub on this Event is Quanta-specific
             npub: (event as any).npub,
             relays: (event as any).relays

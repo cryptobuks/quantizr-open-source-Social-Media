@@ -24,7 +24,8 @@ import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrMetadata;
 import quanta.model.client.NostrUserInfo;
 import quanta.model.client.PrincipalName;
@@ -48,7 +49,7 @@ public class NostrService extends ServiceBase {
 
 	// cache is cleared every 3mins so it can pick up user changes
 	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
-	public final ConcurrentHashMap<ObjectId, NostrEvent> eventsPendingVerify = new ConcurrentHashMap<>();
+	public final ConcurrentHashMap<ObjectId, NostrEventWrapper> eventsPendingVerify = new ConcurrentHashMap<>();
 
 	public static final ObjectMapper mapper = new ObjectMapper();
 	{
@@ -72,11 +73,11 @@ public class NostrService extends ServiceBase {
 		if (eventsPendingVerify.isEmpty())
 			return;
 
-		ConcurrentHashMap<ObjectId, NostrEvent> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
+		ConcurrentHashMap<ObjectId, NostrEventWrapper> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
 		eventsPendingVerify.clear();
 
 		// todo-1: eventually we can do a batch operation here for the set to delete
-		for (Map.Entry<ObjectId, NostrEvent> entry : workingMap.entrySet()) {
+		for (Map.Entry<ObjectId, NostrEventWrapper> entry : workingMap.entrySet()) {
 			if (!NostrCrypto.verifyEvent(entry.getValue())) {
 				log.debug("NostrEvent SIG FAIL: REMOVING: " + XString.prettyPrint(entry.getValue()));
 				delete.adminDelete(entry.getKey());
@@ -110,7 +111,7 @@ public class NostrService extends ServiceBase {
 		List<String> eventNodeIds = new ArrayList<>();
 
 		arun.run(as -> {
-			for (NostrEvent event : req.getEvents()) {
+			for (NostrEventWrapper event : req.getEvents()) {
 				saveEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
 			}
 			return null;
@@ -121,9 +122,9 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	public void saveEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+	public void saveEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount) {
-		switch (event.getKind()) {
+		switch (event.getEvent().getKind()) {
 			case KIND_Metadata:
 				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
 				break;
@@ -140,7 +141,7 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, IntVal saveCount) {
+	private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 
 		/*
@@ -153,21 +154,22 @@ public class NostrService extends ServiceBase {
 		}
 
 		try {
-			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
+			NostrEventEx nevent = event.getEvent();
+			SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 			if (nostrAccnt != null) {
 				accountNodeIds.add(nostrAccnt.getIdStr());
 				// if the npub is owned by a local user we're done, and no need to create the foreign holder account
 				return;
 			}
 
-			nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), event.getRelays(), null, saveCount);
+			nostrAccnt = getOrCreateNostrAccount(as, nevent.getPubkey(), event.getRelays(), null, saveCount);
 			if (nostrAccnt == null)
 				return;
 
-			Date timestamp = new Date(event.getTimestamp() * 1000);
+			Date timestamp = new Date(nevent.getCreatedAt() * 1000);
 
 			try {
-				NostrMetadata metadata = mapper.readValue(event.getContent(), NostrMetadata.class);
+				NostrMetadata metadata = mapper.readValue(nevent.getContent(), NostrMetadata.class);
 				// log.debug("Nostr METADATA OBJ: " + XString.prettyPrint(metadata));
 
 				// Note: We can safely call all these setters and the 'dirty node' handling is smart enough to only
@@ -185,7 +187,7 @@ public class NostrService extends ServiceBase {
 				log.debug("Unable to parse content json for nostr event: " + XString.prettyPrint(event));
 			}
 
-			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, event.getTimestamp());
+			nostrAccnt.set(NodeProp.NOSTR_USER_TIMESTAMP, nevent.getCreatedAt());
 
 			/*
 			 * WARNING: It's tempting to think this pubkey needs to be here but for foreign nodes their username
@@ -248,9 +250,10 @@ public class NostrService extends ServiceBase {
 		return nostrAccnt;
 	}
 
-	private void saveNostrTextEvent(MongoSession as, NostrEvent event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
 			IntVal saveCount) {
-		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, event.getPk());
+		NostrEventEx nevent = event.getEvent();
+		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 		if (nostrAccnt != null) {
 			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
 					+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
@@ -258,7 +261,7 @@ public class NostrService extends ServiceBase {
 			return;
 		}
 
-		SubNode nostrNode = getNodeByNostrId(as, event.getId(), false);
+		SubNode nostrNode = getNodeByNostrId(as, nevent.getId(), false);
 		if (nostrNode != null) {
 			eventNodeIds.add(nostrNode.getIdStr());
 			// log.debug("Nostr ID Existed: " + event.getId());
@@ -266,9 +269,9 @@ public class NostrService extends ServiceBase {
 		}
 
 		Val<SubNode> postsNode = new Val<>();
-		nostrAccnt = getOrCreateNostrAccount(as, event.getPk(), null, postsNode, saveCount);
+		nostrAccnt = getOrCreateNostrAccount(as, nevent.getPubkey(), null, postsNode, saveCount);
 		if (nostrAccnt == null) {
-			log.debug("Unable to get account: " + event.getPk());
+			log.debug("Unable to get account: " + nevent.getPubkey());
 			return;
 		}
 
@@ -279,7 +282,7 @@ public class NostrService extends ServiceBase {
 		}
 
 		String newType;
-		switch (event.getKind()) {
+		switch (nevent.getKind()) {
 			case KIND_EncryptedDirectMessage:
 				newType = NodeType.NOSTR_ENC_DM.s();
 				break;
@@ -292,19 +295,19 @@ public class NostrService extends ServiceBase {
 				newType, 0L, CreateNodeLocation.LAST, null, //
 				nostrAccnt.getOwner(), true, true);
 
-		if (event.getKind() != KIND_EncryptedDirectMessage) {
+		if (nevent.getKind() != KIND_EncryptedDirectMessage) {
 			acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		}
 
-		newNode.setContent(event.getContent());
-		newNode.set(NodeProp.OBJECT_ID, "." + event.getId());
+		newNode.setContent(nevent.getContent());
+		newNode.set(NodeProp.OBJECT_ID, "." + nevent.getId());
 
-		if (event.getTags() != null) {
-			newNode.set(NodeProp.NOSTR_TAGS, event.getTags());
-			auth.shareToAllNostrUsers(event.getTags(), newNode);
+		if (nevent.getTags() != null) {
+			newNode.set(NodeProp.NOSTR_TAGS, nevent.getTags());
+			auth.shareToAllNostrUsers(nevent.getTags(), newNode);
 		}
 
-		Date timestamp = new Date(event.getTimestamp() * 1000);
+		Date timestamp = new Date(nevent.getCreatedAt() * 1000);
 		newNode.setCreateTime(timestamp);
 		newNode.setModifyTime(timestamp);
 

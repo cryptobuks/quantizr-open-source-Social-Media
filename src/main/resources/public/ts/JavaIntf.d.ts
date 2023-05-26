@@ -68,18 +68,6 @@ export interface NodeLink {
     n: string;
 }
 
-export interface NostrEvent {
-    id: string;
-    sig: string;
-    pk: string;
-    kind: number;
-    content: string;
-    tags: string[][];
-    timestamp: number;
-    npub: string;
-    relays: string;
-}
-
 export interface NostrEventEx {
     id: string;
     sig: string;
@@ -88,6 +76,12 @@ export interface NostrEventEx {
     content: string;
     tags: string[][];
     created_at: number;
+}
+
+export interface NostrEventWrapper {
+    event: NostrEventEx;
+    npub: string;
+    relays: string;
 }
 
 export interface NostrMetadata {
@@ -562,12 +556,12 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
-    nostrEvent: NostrEvent;
+    nostrEvent: NostrEventWrapper;
     saveToActPub: boolean;
 }
 
 export interface SaveNostrEventRequest extends RequestBase {
-    events: NostrEvent[];
+    events: NostrEventWrapper[];
     userInfo: NostrUserInfo[];
 }
 

@@ -8,12 +8,16 @@ import java.util.Arrays;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.extern.slf4j.Slf4j;
-import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventEx;
+import quanta.model.client.NostrEventWrapper;
 
 /*
  * The code for verifying signatures and the Pair/Point classes came directly from here:
  * 
  * https://github.com/tcheeric/nostr-java
+ * 
+ * todo-000: need to be doing all event verification via TypeScript (TServer) and delete this
+ * class and Pair/Point classes.
  */
 
 @Slf4j
@@ -22,9 +26,10 @@ public class NostrCrypto {
     private static ObjectWriter jsonWriter = jsonMapper.writer();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-    public static boolean verifyEvent(NostrEvent event) {
-        return verifyEventProps(event.getId(), event.getPk(), event.getTimestamp(), event.getKind(), event.getContent(),
-                event.getTags(), event.getSig());
+    public static boolean verifyEvent(NostrEventWrapper event) {
+        NostrEventEx nevent = event.getEvent();
+        return verifyEventProps(nevent.getId(), nevent.getPubkey(), nevent.getCreatedAt(), nevent.getKind(), nevent.getContent(),
+                nevent.getTags(), nevent.getSig());
     }
 
     public static boolean verifyEventProps(String id, String pubKey, Long createdAt, Integer kind, String content,

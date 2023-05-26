@@ -32,6 +32,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.NostrEventEx;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.file.IPFSDirStat;
@@ -620,8 +621,9 @@ public class NodeEditService extends ServiceBase {
 		 * it's TAGS and OBJECT_ID onto the node
 		 */
 		if (req.getNostrEvent() != null) {
-			node.set(NodeProp.NOSTR_TAGS, req.getNostrEvent().getTags());
-			node.set(NodeProp.OBJECT_ID, "." + req.getNostrEvent().getId());
+			NostrEventEx nevent = req.getNostrEvent().getEvent();
+			node.set(NodeProp.NOSTR_TAGS, nevent.getTags());
+			node.set(NodeProp.OBJECT_ID, "." + nevent.getId());
 		}
 
 		// if not encrypted remove ENC_KEY too. It won't be doing anything in this case.

@@ -36,7 +36,7 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrEventEx;
 import quanta.model.client.NostrQuery;
 import quanta.model.client.PrincipalName;
@@ -350,16 +350,10 @@ public class SystemService extends ServiceBase {
 			for (NostrEventEx event : response.getBody()) {
 				log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
 
-				NostrEvent ev = new NostrEvent();
-				ev.setId(event.getId());
-				ev.setSig(event.getSig());
-				ev.setKind(event.getKind());
-				ev.setPk(event.getPubkey());
-				ev.setTimestamp(event.getCreatedAt());
-				ev.setTags(event.getTags());
-				ev.setContent(event.getContent());
+				NostrEventWrapper ne = new NostrEventWrapper();
+				ne.setEvent(event);
 
-				nostr.saveEvent(as, ev, accountNodeIds, eventNodeIds, saveCount);
+				nostr.saveEvent(as, ne, accountNodeIds, eventNodeIds, saveCount);
 			}
 			return null;
 		});
