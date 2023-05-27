@@ -1,5 +1,3 @@
-// disabling calendar (breaking changes in new version - todo-0)
-// import EventInput from "@fullcalendar/react";
 import { marked } from "marked";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
@@ -653,22 +651,22 @@ export class Util {
         console.log(message + " Time=" + (endTime - startTime));
     }
 
-    // disabling calendar (breaking changes in new version - todo-0)
-    // buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {
-    //     if (!items) return [];
-    //     const ret: EventInput[] = [];
+    // todo-1: put typesafety back on this return value array
+    buildCalendarData = (items: J.CalendarItem[]): any[] => {
+        if (!items) return [];
+        const ret: any[] = [];
 
-    //     items.forEach(v => {
-    //         ret.push({
-    //             id: v.id,
-    //             title: v.title,
-    //             start: v.start,
-    //             end: v.end
-    //         });
-    //     });
+        items.forEach(v => {
+            ret.push({
+                id: v.id,
+                title: v.title,
+                start: v.start,
+                end: v.end
+            });
+        });
 
-    //     return ret;
-    // }
+        return ret;
+    }
 
     markdown = (val: string): any => {
         if (!val) return "";

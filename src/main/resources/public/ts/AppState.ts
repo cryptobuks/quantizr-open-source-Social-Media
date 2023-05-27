@@ -1,6 +1,3 @@
-// disabling calendar (breaking changes in new version - todo-0)
-// import { EventInput } from "@fullcalendar/react";
-
 import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
@@ -86,8 +83,8 @@ export class AppState {
     graphSearchText: string = null;
     highlightText: string = null;
 
-    // disabling calendar (breaking changes in new version - todo-0)
-    // calendarData: EventInput[];
+    // todo-1: put typesafety back on this array
+    calendarData: any[];
     calendarShowWeekends: boolean = false;
 
     fullScreenImageSize: string = C.FULL_SCREEN_MAX_WIDTH;

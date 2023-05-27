@@ -288,12 +288,6 @@ export class Render {
 
     /* nodeId is parent node to query for calendar content */
     showCalendar = async (nodeId: string) => {
-
-        // latest npm module has breaking changes that must be fixed in order to bring back calendar.
-        alert("Calendar feature is temporarily disabled.");
-        const x = true;
-        if (x) return;
-
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
@@ -312,8 +306,7 @@ export class Render {
             s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
 
             if (res) console.log("has res");
-            // disabling calendar (breaking changes in new version - todo-0)
-            // s.calendarData = S.util.buildCalendarData(res.items);
+            s.calendarData = S.util.buildCalendarData(res.items);
         });
     }
 
