@@ -9,6 +9,7 @@ import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
+// import { isWds } from "quanta-common";
 
 export class Quanta {
     urlParamView: string = null;
@@ -128,6 +129,7 @@ export class Quanta {
     }
 
     initApp = async () => {
+        // console.log("isWDS=" + isWds("WDS"));
         console.log("quanta.initApp()");
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
