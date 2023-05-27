@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "nostr-tools": "^1.8.4",
+    "nostr-tools": "^1.11.1",
     "websocket-polyfill": "^0.0.3"
   }
 }

@@ -12,7 +12,7 @@ import {
     nip19,
     parseReferences,
     relayInit,
-    signEvent,
+    getSignature,
     validateEvent, verifySignature
 } from "nostr-tools";
 import { dispatch, getAs } from "./AppContext";
@@ -476,9 +476,7 @@ export class Nostr {
         };
 
         event.id = getEventHash(event);
-
-        // note: signEvent is deprecate (use getSignature instead)
-        event.sig = signEvent(event, this.sk);
+        event.sig = getSignature(event, this.sk);
         this.cacheEvent(event);
         // console.log("NEW EVENT: " + S.util.prettyPrint(event));
         return event;
@@ -514,7 +512,7 @@ export class Nostr {
         };
 
         event.id = getEventHash(event);
-        event.sig = signEvent(event, this.sk);
+        event.sig = getSignature(event, this.sk);
         this.cacheEvent(event);
         console.log("NEW METADATA EVENT: " + S.util.prettyPrint(event));
         return event;
@@ -1118,7 +1116,7 @@ export class Nostr {
             content
         };
         event.id = getEventHash(event);
-        event.sig = signEvent(event, this.sk);
+        event.sig = getSignature(event, this.sk);
         this.cacheEvent(event);
 
         relays.push(...this.getRelays((relaysStr || "") + "\n" + (this.getSessionRelaysStr() || "")));
