@@ -1,4 +1,5 @@
-import { EventInput } from "@fullcalendar/react";
+// disabling calendar (breaking changes in new version - todo-0)
+// import EventInput from "@fullcalendar/react";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
@@ -994,10 +995,11 @@ export class Edit {
 
     removeNodesFromCalendarData = (selNodesArray: string[]) => {
         dispatch("UpdateCalendarData", s => {
-            selNodesArray.forEach(id => {
-                if (!s.calendarData) return;
-                s.calendarData = s.calendarData.filter((item: EventInput) => item.id !== id);
-            });
+            // disabling calendar (breaking changes in new version - todo-0)
+            // selNodesArray.forEach(id => {
+            //     if (!s.calendarData) return;
+            //     s.calendarData = s.calendarData.filter((item: EventInput) => item.id !== id);
+            // });
         });
     }
 
