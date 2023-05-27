@@ -177,7 +177,7 @@
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v16.13.0</nodeVersion>
+									<nodeVersion>v18.16.0</nodeVersion>
 								</configuration>
 								<phase>generate-resources</phase>
 							</execution> 
@@ -435,7 +435,7 @@
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v16.13.0</nodeVersion>
+									<nodeVersion>v18.16.0</nodeVersion>
 
 									<!-- optional: with node version greater than 4.0.0 will use npm provided by node distribution 
 									<npmVersion>5.8.0</npmVersion>
@@ -583,7 +583,7 @@
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v16.13.0</nodeVersion>
+									<nodeVersion>v18.16.0</nodeVersion>
 
 									<!-- optional: with node version greater than 4.0.0 will use npm provided by node distribution 
 							<npmVersion>5.8.0</npmVersion>
