@@ -16,12 +16,6 @@ The following test instance is open to the public, so anyone can sign up and bro
 
 https://quanta.wiki
 
-## Quanta Youtube Channel
-
-[Watch the Playlist!](https://www.youtube.com/playlist?list=PLQD3WR1NH3Ko-iQUx7gdb5aI83maeM4Va)
-
-*Demo/Tutorial videos on how to use Quanta.*
-
 ## How to Build/Deploy
 
 See [./distro/README.md](./distro/README.md) for details on how to build and/or run a Quanta instance. 
