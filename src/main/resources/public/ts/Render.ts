@@ -192,7 +192,7 @@ export class Render {
                     // NOTE: This 'hljs-copy' is picked up by the Html components and that's where the magic is done,
                     // to make this 'copy text to clipboard' icon work.
                     return `<i class='hljs-copy fa fa-clipboard fa-lg float-end clickable' title='Copy to Clipboard (${lang.name})'></i>` +
-                        highlightjs.highlight(language, code).value;
+                        highlightjs.highlight(code, { language, ignoreIllegals: true }).value;
                 }
                 else {
                     return code;
