@@ -80,6 +80,7 @@ export interface NostrEvent {
 
 export interface NostrEventWrapper {
     event: NostrEvent;
+    nodeId: string;
     npub: string;
     relays: string;
 }

@@ -6,7 +6,6 @@ import { dispatch, getAs } from "../AppContext";
 /* ========= WARNING =========
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
 */
-// disabling calendar (breaking changes in new version - todo-0)
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";

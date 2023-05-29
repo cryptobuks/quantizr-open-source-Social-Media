@@ -65,7 +65,6 @@ import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateFriendNodeResponse;
 import quanta.service.AclService;
-import quanta.service.nostr.NostrCrypto;
 import quanta.types.TypeBase;
 import quanta.util.Convert;
 import quanta.util.SubNodeUtil;
@@ -243,7 +242,8 @@ public class NodeEditService extends ServiceBase {
 			tags.add(element);
 			newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
 
-			// if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user tries
+			// if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user
+			// tries
 			// to remove the public setting from and then save it, the system will reject that and tell the user
 			// that only DMs are able to be private in Nostr.
 			if (!newNode.getType().equals(NodeType.NOSTR_ENC_DM.s())) {
@@ -509,7 +509,8 @@ public class NodeEditService extends ServiceBase {
 	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		if (req.getNostrEvent() != null) {
-			if (!NostrCrypto.verifyEvent(req.getNostrEvent())) {
+			List<String> failedIds = nostr.nostrVerify(ms, Arrays.asList(req.getNostrEvent()));
+			if (failedIds != null && failedIds.size() > 0) {
 				throw new RuntimeException("Signature failed on event.");
 			}
 		}

@@ -3,18 +3,24 @@ package quanta.service.nostr;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +44,7 @@ import quanta.response.NewNostrUsersPushInfo;
 import quanta.response.SaveNostrEventResponse;
 import quanta.response.SaveNostrSettingsResponse;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
@@ -45,11 +52,11 @@ import quanta.util.val.Val;
 @Component
 @Slf4j
 public class NostrService extends ServiceBase {
-
 	// cache is cleared every 3mins so it can pick up user changes
 	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
 	public final ConcurrentHashMap<ObjectId, NostrEventWrapper> eventsPendingVerify = new ConcurrentHashMap<>();
 
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 	public static final ObjectMapper mapper = new ObjectMapper();
 	{
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -75,13 +82,16 @@ public class NostrService extends ServiceBase {
 		ConcurrentHashMap<ObjectId, NostrEventWrapper> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
 		eventsPendingVerify.clear();
 
-		// todo-1: eventually we can do a batch operation here for the set to delete
-		for (Map.Entry<ObjectId, NostrEventWrapper> entry : workingMap.entrySet()) {
-			if (!NostrCrypto.verifyEvent(entry.getValue())) {
-				log.debug("NostrEvent SIG FAIL: REMOVING: " + XString.prettyPrint(entry.getValue()));
-				delete.adminDelete(entry.getKey());
+		List<NostrEventWrapper> events = new LinkedList<>(workingMap.values());
+		arun.run(as -> {
+			List<String> failedIds = nostr.nostrVerify(as, events);
+			if (failedIds != null) {
+				for (String id : failedIds) {
+					delete.adminDelete(new ObjectId(id));
+				}
 			}
-		}
+			return null;
+		});
 	}
 
 	public SaveNostrSettingsResponse saveNostrSettings(SaveNostrSettingsRequest req) {
@@ -140,14 +150,44 @@ public class NostrService extends ServiceBase {
 		}
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, IntVal saveCount) {
+	/*
+	 * returns a list of all bad nodeIds (failed verifies) or empty if all events pass signature check
+	 */
+	public List<String> nostrVerify(MongoSession as, List<NostrEventWrapper> events) {
+		HashMap<String, Object> message = new HashMap<>();
+		message.put("events", events);
+
+		// tserver-tag (put TSERVER_API_KEY in secrets file)
+		message.put("apiKey", prop.getTServerApiKey());
+		String body = XString.prettyPrint(message);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(List.of(APConst.MTYPE_JSON));
+		headers.setContentType(APConst.MTYPE_JSON);
+
+		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-verify";
+
+		ResponseEntity<List<String>> response =
+				restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<String>>() {});
+
+		// we get back a list of all IDs that failed to verify
+		List<String> failedIds = response.getBody();
+		// log.debug("FailedIDs: " + XString.prettyPrint(failedIds));
+
+		return failedIds;
+	}
+
+	private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+			IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 
 		/*
 		 * Note: we can't do this verify async (in worker thread) like we do with events, because if the
 		 * event is invalid we would have no way to rollback to prior definition of this users info
 		 */
-		if (!NostrCrypto.verifyEvent(event)) {
+		List<String> failedIds = nostr.nostrVerify(as, Arrays.asList(event));
+		if (failedIds != null && failedIds.size() > 0) {
 			log.debug("NostrEvent SIG FAIL: " + XString.prettyPrint(event));
 			return;
 		}
@@ -249,8 +289,8 @@ public class NostrService extends ServiceBase {
 		return nostrAccnt;
 	}
 
-	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
-			IntVal saveCount) {
+	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+			List<String> eventNodeIds, IntVal saveCount) {
 		NostrEvent nevent = event.getEvent();
 		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 		if (nostrAccnt != null) {

@@ -1268,7 +1268,7 @@ export class Nostr {
 
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
-            events: events.map(e => this.makeNostrEvent(e)),
+            events: events.map(e => this.makeNostrEvent(e, null)),
             userInfo
         }, background);
 
@@ -1386,13 +1386,14 @@ export class Nostr {
         }
     }
 
-    makeNostrEvent = (event: Event): J.NostrEventWrapper => {
+    makeNostrEvent = (event: Event, nodeId: string): J.NostrEventWrapper => {
         if (!event) return null;
         return {
             event,
             // note: npub on this Event is Quanta-specific
             npub: (event as any).npub,
-            relays: (event as any).relays
+            relays: (event as any).relays,
+            nodeId
         };
     }
 

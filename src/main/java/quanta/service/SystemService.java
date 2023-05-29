@@ -36,10 +36,9 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrEvent;
+import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrQuery;
-import quanta.model.client.PrincipalName;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
@@ -297,6 +296,7 @@ public class SystemService extends ServiceBase {
 			}
 			return null;
 		});
+
 
 		if (authorsSet.size() == 0) {
 			return "No friends on admin account to query for";

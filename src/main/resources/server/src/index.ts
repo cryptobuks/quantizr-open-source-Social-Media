@@ -1,6 +1,26 @@
 import express from 'express';
-import { SimplePool } from 'nostr-tools';
+import { SimplePool, validateEvent, verifySignature } from 'nostr-tools';
 import 'websocket-polyfill';
+
+// warning: for now, these two interfaces are duplicates and identical copies of what's compiled
+// into the webpack bundle also.
+
+interface NostrEvent {
+    id: string;
+    sig: string;
+    pubkey: string;
+    kind: number;
+    content: string;
+    tags: string[][];
+    created_at: number;
+}
+
+interface NostrEventWrapper {
+    event: NostrEvent;
+    nodeId: string;
+    npub: string;
+    relays: string;
+}
 
 console.log("Express Server starting: TSERVER_API_KEY=" + process.env.TSERVER_API_KEY);
 
@@ -16,11 +36,20 @@ app.get('/', (req: any, res: any, next: any) => {
     res.send("Quanta TServer ok!");
 });
 
-// todo-0: add api key check
-// work in progress.
 app.post('/nostr-verify', async (req: any, res: any, next: any) => {
-    console.log("nostr-verify: body=" + JSON.stringify(req.body, null, 4));
-    return res.send(req.body);
+    // console.log("nostr-verify: req body=" + JSON.stringify(req.body, null, 4));
+    const events: NostrEventWrapper[] = req.body.events;
+    const ids: string[] = [];
+    for (const event of events) {
+        if (!validateEvent(event.event) || !verifySignature(event.event)) {
+            ids.push(event.nodeId);
+        }
+        else {
+            // console.log("Verified: event " + event.event.id);
+        }
+    }
+    // console.log("nostr-verify: response ids=" + JSON.stringify(ids, null, 4));
+    return res.send(ids);
 });
 
 app.post('/nostr-query', async (req: any, res: any, next: any) => {

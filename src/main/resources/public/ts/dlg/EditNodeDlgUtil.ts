@@ -116,7 +116,7 @@ export class EditNodeDlgUtil {
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode,
             saveToActPub: ast.protocolFilter === J.Constant.NETWORK_ACTPUB,
-            nostrEvent: S.nostr.makeNostrEvent(nostrEvent)
+            nostrEvent: S.nostr.makeNostrEvent(nostrEvent, editNode.id)
         });
 
         if (!res?.success) {
