@@ -1,6 +1,7 @@
 import highlightjs from "highlight.js";
 import "highlight.js/styles/dark.css";
 import { marked } from "marked";
+import { markedHighlight } from "marked-highlight";
 import { toArray } from "react-emoji-render";
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
@@ -59,6 +60,7 @@ export class Render {
     // }, 500);
 
     constructor() {
+        // https://github.com/highlightjs/highlight.js
         highlightjs.highlightAll();
     }
 
@@ -166,7 +168,7 @@ export class Render {
             // console.log(`marked.link [${href}][${title}][${text}]`);
 
             if (href.indexOf("mailto:") === 0) {
-                // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that.
+                // todo-1: markdown thinks a fediverse username is a 'mailto' because the syntax looks like that.
                 return `<span class="userNameInContent">${text}</span>`;
             }
 
@@ -181,9 +183,25 @@ export class Render {
         // https://marked.js.org/using_advanced#highlight
         marked.setOptions({
             renderer: this.markedRenderer,
+            gfm: true,
+            breaks: false,
+            pedantic: false,
+            smartypants: false,
 
-            // processes the "fenced code blocks? (three backticks above and below the block)
-            highlight: (code, language) => {
+            // this stops the markdown from trying to make strings that look like an email address from having
+            // any mailto assumptions about them which is good becasue most of the time they're gonna be
+            // ActivityPub users and not email
+            mangle: false,
+            headerIds: false
+
+            // SANITIZE PARAM IS DEPRECATED (LEAVE THIS NOTE HERE)
+            // Search for 'DOMPurify.sanitize' to see how we do it currently.
+            // sanitize: true
+        });
+
+        marked.use(markedHighlight({
+            langPrefix: "hljs language-",
+            highlight(code, language) {
                 if (!language) language = "plaintext";
                 const lang = highlightjs.getLanguage(language);
 
@@ -197,20 +215,8 @@ export class Render {
                 else {
                     return code;
                 }
-            },
-
-            langPrefix: "hljs language-", // highlight.js css expects a top-level 'hljs' class.
-
-            gfm: true,
-            breaks: false,
-            pedantic: false,
-            // smartLists: true, // latest version didn't seem to have this object.
-            smartypants: false
-
-            // SANITIZE PARAM IS DEPRECATED (LEAVE THIS NOTE HERE)
-            // Search for 'DOMPurify.sanitize' to see how we do it currently.
-            // sanitize: true
-        });
+            }
+        }));
 
         // DO NOT DELETE: this works.
         // const langs = highlightjs.listLanguages();
