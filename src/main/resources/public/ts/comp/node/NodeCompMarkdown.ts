@@ -204,7 +204,7 @@ export class NodeCompMarkdown extends Html {
         }
         else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
             const pubKey = S.props.getClientPropStr(J.NodeProp.NOSTR_USER_PUBKEY, this.node);
-            clearText = await S.nostr.decrypt(S.nostr.sk, pubKey, state.pendingDecrypt);
+            clearText = await S.nostr.decrypt(pubKey, state.pendingDecrypt);
         }
 
         // console.log("Decrypted to " + clearText);

@@ -34,6 +34,9 @@ https://github.com/nbd-wtf/nostr-tools
 */
 
 export class Nostr {
+    // nip07 feature is not yet complete
+    enableNip07 = false;
+
     sk: string = null; // our secret key, hex string
     pk: string = null; // our public key, hex string
     npub: string = null; // our npub (of public key)
@@ -66,7 +69,7 @@ export class Nostr {
         this.npub = null;
     }
 
-    decrypt = async (sk: string, pk: string, cipherText: string) => {
+    decrypt = async (pk: string, cipherText: string) => {
         try {
             // get hash of the encrypted data
             const cipherHash: string = S.util.hashOfString(cipherText);
@@ -76,7 +79,7 @@ export class Nostr {
                 return clearText;
             }
 
-            clearText = await nip04.decrypt(sk, pk, cipherText);
+            clearText = await nip04.decrypt(this.sk, pk, cipherText);
             S.quanta.decryptCache.set(cipherHash, clearText);
             return clearText;
         }
@@ -467,7 +470,7 @@ export class Nostr {
 
     // Creates a test event (Social Media post) that we can send to a relay
     createEvent = (): any => {
-        const event: any = {
+        let event: any = {
             kind: Kind.Text,
             created_at: Math.floor(Date.now() / 1000),
             tags: [],
@@ -475,11 +478,25 @@ export class Nostr {
             pubkey: this.pk
         };
 
-        event.id = getEventHash(event);
-        event.sig = getSignature(event, this.sk);
+        event = this.signEvent(event);
         this.cacheEvent(event);
         // console.log("NEW EVENT: " + S.util.prettyPrint(event));
         return event;
+    }
+
+    signEvent = (event: Event): Event => {
+        const nostr = (window as any).nostr;
+        if (this.enableNip07 && nostr) {
+            // This code branch was experimental and it does work.
+            // console.log("Signing with Plugin (NIP-07)");
+            return nostr.signEvent(event);
+        }
+        else {
+            // console.log("Signing with Browser Key");
+            event.id = getEventHash(event);
+            event.sig = getSignature(event, this.sk);
+            return event;
+        }
     }
 
     createMetaPayload = (): J.NostrMetadata => {
@@ -503,7 +520,7 @@ export class Nostr {
 
     // Creates the Nostr Metadata event for this user
     createMetadataEvent = (meta: J.NostrMetadata): any => {
-        const event: any = {
+        let event: any = {
             kind: Kind.Metadata,
             created_at: Math.floor(Date.now() / 1000),
             tags: [],
@@ -511,8 +528,7 @@ export class Nostr {
             pubkey: this.pk
         };
 
-        event.id = getEventHash(event);
-        event.sig = getSignature(event, this.sk);
+        event = this.signEvent(event);
         this.cacheEvent(event);
         console.log("NEW METADATA EVENT: " + S.util.prettyPrint(event));
         return event;
@@ -1108,15 +1124,14 @@ export class Nostr {
             // console.log("Nostr Cipher conent: " + content);
         }
 
-        const event: any = {
+        let event: any = {
             kind,
             pubkey: this.pk,
             created_at: Math.floor(Date.now() / 1000),
             tags,
             content
         };
-        event.id = getEventHash(event);
-        event.sig = getSignature(event, this.sk);
+        event = this.signEvent(event);
         this.cacheEvent(event);
 
         relays.push(...this.getRelays((relaysStr || "") + "\n" + (this.getSessionRelaysStr() || "")));
