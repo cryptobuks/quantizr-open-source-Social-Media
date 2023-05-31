@@ -48,9 +48,14 @@ export class Nostr {
     metadataQueue: Set<string> = new Set<string>(); // Holds pending pubkeys whose metadata is pending being rendered in the DOM
     domRenderPending: boolean = false;
 
-    persistMetadataForKeys: Set<string> = new Set<string>(); // Holds pubkeys for which we DO want to persist the metadata once found
-    dispInfoCache: Map<string, NostrMetadataDispInfo> = new Map<string, NostrMetadataDispInfo>(); // cache for rapid injecting of user info during react renders
-    userRelaysCache: Map<string, string[]> = new Map<string, string[]>(); // (map key==Quanta UserAccount NodeId)
+    // Holds pubkeys for which we DO want to persist the metadata once found
+    persistMetadataForKeys: Set<string> = new Set<string>();
+
+    // cache for rapid injecting of user info during react renders
+    dispInfoCache: Map<string, NostrMetadataDispInfo> = new Map<string, NostrMetadataDispInfo>();
+
+    // (map key==Quanta UserAccount NodeId)
+    userRelaysCache: Map<string, string[]> = new Map<string, string[]>();
 
     bigQueryRunning: boolean = false;
     queryCounter: number = 0;
@@ -799,15 +804,13 @@ export class Nostr {
 
     updateAllNodesMetadata = () => {
         const ast = getAs();
-        let renderNeeded = false;
         ast.tabData.forEach(td => {
             td.processNode(ast, node => {
                 if (this.isNostrUserName(node.owner)) {
                     const pubKey = node.owner.substring(1);
                     const dispInfo = this.dispInfoCache.get(pubKey);
-                    if (dispInfo?.display && (node.displayName !== dispInfo.display ||
+                    if (dispInfo && (node.displayName !== dispInfo.display ||
                         node.apAvatar !== dispInfo.picture)) {
-                        renderNeeded = true;
                         node.displayName = dispInfo.display;
                         node.apAvatar = dispInfo.picture;
                     }
@@ -815,11 +818,9 @@ export class Nostr {
             })
         });
 
-        if (renderNeeded) {
-            // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
-            // we had queued and the page will now render the names.
-            dispatch("ForceRefreshMetadata", s => { });
-        }
+        // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
+        // we had queued and the page will now render the names.
+        dispatch("ForceRefreshMetadata", s => { });
     }
 
     // todo-1: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
@@ -830,10 +831,10 @@ export class Nostr {
             await S.localDB.setVal(event.pubkey, event, S.localDB.STORE_NOSTR_MD);
         }
 
-        this.getDispInfoFromEvent(event);
+        this.cacheDispInfoForEvent(event);
     }
 
-    getDispInfoFromEvent = (event: Event): NostrMetadataDispInfo => {
+    cacheDispInfoForEvent = (event: Event): NostrMetadataDispInfo => {
         let dispInfo = this.dispInfoCache.get(event.pubkey);
 
         // if we have the metadata cached we can render it immediately
@@ -847,34 +848,11 @@ export class Nostr {
         return dispInfo;
     }
 
+    /* This handles the server push where the server is sending down a list of userinfo that needs to
+    be queued up for querying, on the client.
+    (todo-0: NOTE: We could now do this entirely in tserver on server side)
+    */
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
-        // -----------------------------------------------------------------
-        // DO NOT DELETE
-        // This code works, but it is inefficient and so for now let's not do this and we'll instead just
-        // assume our set of relays is good enough and query for all users at once on our own relays
-        // const relays = this.getMyRelays();
-        // if (relays.length === 0) {
-        //     console.log("loadUserMetadata ignored. No relays.");
-        //     return;
-        // }
-        // const events: Event[] = [];
-        // if (userInfo.users?.length > 0) {
-        //     for (const user of userInfo.users) {
-        //         // console.log("SERVER REQ. USER LOAD: " + S.util.prettyPrint(user));
-
-        //         const eventVal = new Val<Event>();
-        //         await S.nostr.readUserMetadataEx(user.pk, user.relays, false, false, eventVal, background);
-
-        //         if (eventVal.val) {
-        //             events.push(eventVal.val);
-        //         }
-        //     }
-        // }
-        // if (events.length > 0) {
-        //     await this.persistEvents(events, background);
-        // }
-        // -----------------------------------------------------------------
-
         if (userInfo.users?.length > 0) {
             for (const user of userInfo.users) {
                 // console.log("Queueing PK pushed from server: " + user.pk);
@@ -887,18 +865,23 @@ export class Nostr {
     }
 
     addToMetadataQueue = async (pubKey: string, persist: boolean) => {
+        // try to get metadata from local store
         const cachedMd = await S.localDB.getVal(pubKey, S.localDB.STORE_NOSTR_MD);
+
+        // if not found in local store add it to metadataQueue for async retrieval
         if (!cachedMd) {
+            // console.log("queued for query: " + pubKey);
             this.metadataQueue.add(pubKey);
             if (persist) {
                 this.persistMetadataForKeys.add(pubKey);
             }
         }
+        // if we got from local store chen cach into the 'dispInfo' memory variable
         else {
-            // if we have the cacheMd we we can memory cache the dispInfo and trigger the dom to rerender
-            this.domRenderPending = true;
-            this.getDispInfoFromEvent(cachedMd);
+            // console.log("found in store: " + pubKey);
+            this.cacheDispInfoForEvent(cachedMd);
         }
+        this.domRenderPending = true;
     }
 
     /* Tries to read from 'relayUrl' first and falls back to current user's relays if it fails */
@@ -1313,13 +1296,13 @@ export class Nostr {
                     const dispInfo = this.dispInfoCache.get(ref.profile.pubkey);
 
                     // if we know the dispInfo render it.
-                    if (dispInfo?.display) {
+                    if (dispInfo) {
                         // console.log("***** QUEUE DONE: PK: " + ref.profile.pubkey);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>@${dispInfo.display}</span>`);
                     }
                     // else render a placeholder and queue up the pubkey to be queries asynchronously
                     else {
-                        // console.log("***** QUEUED: PK: " + ref.profile.pubkey);
+                        // console.log("QUEUED PK: " + ref.profile.pubkey);
                         this.addToMetadataQueue(ref.profile.pubkey, false);
                         const keyAbbrev = ref.profile.pubkey.substring(0, 10);
                         val = val.replace(ref.text, `<span class='nostrLink' id='${elmId}'>[User ${keyAbbrev}]</span>`);

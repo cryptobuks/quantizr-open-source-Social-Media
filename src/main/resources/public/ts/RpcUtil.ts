@@ -7,7 +7,7 @@ export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
     logRpc: boolean = false;
-    logRpcShort: boolean = true;
+    logRpcShort: boolean = false;
     timer: any = null;
     unauthMessageShowing: boolean = false;
 
