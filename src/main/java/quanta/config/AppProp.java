@@ -29,7 +29,7 @@ import quanta.util.XString;
  * accessible immediately to be used by other beans before all are fully initialized.
  */
 @Component
-@Slf4j 
+@Slf4j
 public class AppProp {
 	@Autowired
 	private Environment env;

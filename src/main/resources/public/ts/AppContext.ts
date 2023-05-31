@@ -1,8 +1,8 @@
 import { createContext, useReducer } from "react";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { S } from "./Singletons";
 import { PubSub } from "./PubSub";
+import { S } from "./Singletons";
 
 /* Redux Replacement!!
 
@@ -99,6 +99,7 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
         // dispatch any pending actions first.
         dispatchLaterList.forEach(d => dispatcher(d));
         dispatchLaterList = [];
+        // console.log("DISP: " + type);
 
         dispatcher({ type, func });
     }

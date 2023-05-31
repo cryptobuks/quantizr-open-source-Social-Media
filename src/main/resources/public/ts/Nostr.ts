@@ -61,7 +61,7 @@ export class Nostr {
 
     backgroundQueue = setInterval(async () => {
         await this.processMetadataQueue();
-    }, 1200);
+    }, 2000);
 
     invalidateKeys = () => {
         this.sk = null;
@@ -783,9 +783,7 @@ export class Nostr {
         // }
 
         if (events?.length > 0) {
-            const mapByPk: Map<string, Event> = new Map<string, Event>();
             for (const event of events) {
-                mapByPk.set(event.pubkey, event);
                 this.cacheMetadataEvent(event);
             }
 
@@ -801,12 +799,15 @@ export class Nostr {
 
     updateAllNodesMetadata = () => {
         const ast = getAs();
+        let renderNeeded = false;
         ast.tabData.forEach(td => {
             td.processNode(ast, node => {
                 if (this.isNostrUserName(node.owner)) {
                     const pubKey = node.owner.substring(1);
                     const dispInfo = this.dispInfoCache.get(pubKey);
-                    if (dispInfo?.display) {
+                    if (dispInfo?.display && (node.displayName !== dispInfo.display ||
+                        node.apAvatar !== dispInfo.picture)) {
+                        renderNeeded = true;
                         node.displayName = dispInfo.display;
                         node.apAvatar = dispInfo.picture;
                     }
@@ -814,9 +815,11 @@ export class Nostr {
             })
         });
 
-        // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
-        // we had queued and the page will now render the names.
-        dispatch("ForceRefreshMetadata", s => { });
+        if (renderNeeded) {
+            // we can now simply refresh the page, and we know the 'queryRelays' will have loaded all the users
+            // we had queued and the page will now render the names.
+            dispatch("ForceRefreshMetadata", s => { });
+        }
     }
 
     // todo-1: need to have a localDb.setVal that takes an array of objects and only inserts the ones that don't exist
@@ -1283,7 +1286,7 @@ export class Nostr {
 
         // Push the events up to the server for storage
         const res = await S.rpcUtil.rpc<J.SaveNostrEventRequest, J.SaveNostrEventResponse>("saveNostrEvents", {
-            events: events.map(e => this.makeNostrEvent(e, null)),
+            events: events.map(e => this.makeNostrEventWrapper(e, null)),
             userInfo
         }, background);
 
@@ -1401,14 +1404,25 @@ export class Nostr {
         }
     }
 
-    makeNostrEvent = (event: Event, nodeId: string): J.NostrEventWrapper => {
+    makeNostrEventWrapper = (event: Event, nodeId: string): J.NostrEventWrapper => {
         if (!event) return null;
         return {
-            event,
-            // note: npub on this Event is Quanta-specific
+            event: this.makeNostrEvent(event),
             npub: (event as any).npub,
             relays: (event as any).relays,
             nodeId
+        };
+    }
+
+    makeNostrEvent = (event: Event): J.NostrEvent => {
+        return {
+            id: event.id,
+            sig: event.sig,
+            pubkey: event.pubkey,
+            kind: event.kind,
+            content: event.content,
+            tags: event.tags,
+            createdAt: event.created_at
         };
     }
 

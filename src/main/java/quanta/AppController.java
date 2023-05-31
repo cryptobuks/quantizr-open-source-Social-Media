@@ -1573,6 +1573,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
 					break;
 
+				case "nostrQueryUpdate":
+					res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
+					break;
+
 				case "compactDb":
 					res.getMessages().add(new InfoMessage(system.compactDb(), null));
 					break;

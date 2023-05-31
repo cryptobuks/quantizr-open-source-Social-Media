@@ -111,7 +111,8 @@ services:
                 eric:${testPassword}:${devEmail}
 
             nostrCurationAccounts: >-
-                admin
+                admin,
+                clay
     
             throttleTime: "0"
             spring.config.location: "classpath:/application.properties" 

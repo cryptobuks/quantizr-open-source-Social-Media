@@ -1,7 +1,6 @@
 package quanta.model.client;
 
 import java.util.ArrayList;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,5 @@ public class NostrEvent {
     private Integer kind;
     private String content;
     private ArrayList<ArrayList<String>> tags;
-
-    @JsonProperty("created_at")
     private Long createdAt;
 }

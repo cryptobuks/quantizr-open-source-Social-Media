@@ -75,7 +75,7 @@ export interface NostrEvent {
     kind: number;
     content: string;
     tags: string[][];
-    created_at: number;
+    createdAt: number;
 }
 
 export interface NostrEventWrapper {

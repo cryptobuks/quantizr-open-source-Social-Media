@@ -1,5 +1,5 @@
 import express from 'express';
-import { SimplePool, validateEvent, verifySignature } from 'nostr-tools';
+import { Event, SimplePool, validateEvent, verifySignature } from 'nostr-tools';
 import 'websocket-polyfill';
 
 // warning: for now, these two interfaces are duplicates and identical copies of what's compiled
@@ -12,7 +12,7 @@ interface NostrEvent {
     kind: number;
     content: string;
     tags: string[][];
-    created_at: number;
+    createdAt: number;
 }
 
 interface NostrEventWrapper {
@@ -36,12 +36,37 @@ app.get('/', (req: any, res: any, next: any) => {
     res.send("Quanta TServer ok!");
 });
 
+const makeNostrEvent = (event: NostrEvent): Event => {
+    return {
+        id: event.id,
+        sig: event.sig,
+        pubkey: event.pubkey,
+        kind: event.kind,
+        content: event.content,
+        tags: event.tags,
+        created_at: event.createdAt
+    };
+}
+
+const makeJavaNostrEvent = (event: Event): NostrEvent => {
+    return {
+        id: event.id,
+        sig: event.sig,
+        pubkey: event.pubkey,
+        kind: event.kind,
+        content: event.content,
+        tags: event.tags,
+        createdAt: event.created_at
+    };
+}
+
 app.post('/nostr-verify', async (req: any, res: any, next: any) => {
     // console.log("nostr-verify: req body=" + JSON.stringify(req.body, null, 4));
     const events: NostrEventWrapper[] = req.body.events;
     const ids: string[] = [];
     for (const event of events) {
-        if (!validateEvent(event.event) || !verifySignature(event.event)) {
+        const evt = makeNostrEvent(event.event);
+        if (!validateEvent(evt) || !verifySignature(evt)) {
             ids.push(event.nodeId);
         }
         else {
@@ -64,7 +89,7 @@ app.post('/nostr-query', async (req: any, res: any, next: any) => {
             ret = [];
         }
         pool.close(req.body.relays);
-        return res.send(ret);
+        return res.send(ret.map(m => makeJavaNostrEvent(m)));
     }
     catch (error) {
         return next(error);

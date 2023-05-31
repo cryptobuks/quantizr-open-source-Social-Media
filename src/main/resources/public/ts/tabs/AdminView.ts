@@ -88,6 +88,7 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("Nostr"),
                 this.settingsLink("Nostr Maintenance", () => S.view.runServerCommand("nostrMaintenance", null, "Nostr Maintenance Response", null)), //
+                this.settingsLink("Nostr Update Feed", () => S.view.runServerCommand("nostrQueryUpdate", null, "Nostr Update Feed", null)),
 
                 this.sectionTitle("Testing"),
                 this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //

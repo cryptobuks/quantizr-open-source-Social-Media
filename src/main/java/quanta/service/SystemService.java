@@ -263,10 +263,10 @@ public class SystemService extends ServiceBase {
 	}
 
 	// tserver-tag
-	@Scheduled(fixedDelay = 30 * DateUtil.MINUTE_MILLIS)
+	@Scheduled(fixedDelay = 20 * DateUtil.MINUTE_MILLIS)
 	public String nostrQueryUpdate() {
 		if (!prop.isNostrDaemonEnabled()) {
-			return "nostrDeamon not enabled";
+			return "nostrDaemon not enabled";
 		}
 
 		HashMap<String, Object> message = new HashMap<>();
@@ -283,6 +283,7 @@ public class SystemService extends ServiceBase {
 		arun.run(as -> {
 			// For all nostr curation users gather their nostr friends' pubkeys into authorsSet
 			final List<String> curationUsers = XString.tokenize(prop.getNostrCurationAccounts(), ",", true);
+			log.debug("curationUsers=" + XString.prettyPrint(curationUsers));
 			if (curationUsers != null) {
 				for (String cuser : curationUsers) {
 					GetPeopleResponse adminFriends = user.getPeople(as, cuser, "friends", Constant.NETWORK_NOSTR.s());
