@@ -8,7 +8,7 @@ THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export QUANTA_VER=2.14
+export QUANTA_VER=2.15
 
 # always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
 # builds we run on our machine should ever target to the 'subnode/repo:'
@@ -29,9 +29,6 @@ export DOCKER_NETWORK=bridge
 # The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
 #  but can be verified by running `docker network inspect bridge`.
 export quanta_domain=172.17.0.1
-
-# IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
-export CLEAN=true
 
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro

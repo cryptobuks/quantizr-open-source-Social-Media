@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- There are 5 profiles: DEV,PROD,DEV-VSCODE,Webpack -->
+<!-- There are 4 profiles: DEV,PROD,DEV-VSCODE,Webpack -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -68,6 +68,7 @@
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>server/node_modules/**</exclude>
+							<exclude>quanta-common/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -293,7 +294,6 @@
 					<version>1.0</version>
 					<type>pom</type>
 				</dependency>
-
 			</dependencies>
 
 			<build>
@@ -308,6 +308,7 @@
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>server/node_modules/**</exclude>
+							<exclude>quanta-common/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -351,7 +352,6 @@
 							    to get maximal typesafety
 							<optionalProperties>useLibraryDefinition</optionalProperties>
 							-->
-
 							<classPatterns>
 								<pattern>quanta.model.client.**</pattern>
 								<pattern>quanta.request.**</pattern>
@@ -504,6 +504,7 @@
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>server/node_modules/**</exclude>
+							<exclude>quanta-common/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 
@@ -663,6 +664,7 @@
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
 							<exclude>server/node_modules/**</exclude>
+							<exclude>quanta-common/node_modules/**</exclude>
 							<exclude>public/node/**</exclude>
 						</excludes>
 

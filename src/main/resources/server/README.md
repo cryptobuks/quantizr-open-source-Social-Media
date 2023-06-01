@@ -10,8 +10,8 @@ Future Plans: Eventually there will be the capability of running a "Quanta Lite"
 
 ### Build and Run Project
 
-NOTE: `npm i` is only needed to update node_modules if new packages are installed.
+NOTE: `yarn` is only needed to update node_modules if new packages are installed.
 
-`npm i`
+`yarn`
 `npm run build`
 `npm start`

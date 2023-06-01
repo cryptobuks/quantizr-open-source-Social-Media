@@ -255,8 +255,6 @@ public class SystemService extends ServiceBase {
 			sb.append(arg + "\n");
 		}
 
-		sb.append("\nNostr Query TServer:\n" + nostrQueryUpdate() + "\n");
-
 		// Run command inside container
 		// sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
 		return sb.toString();

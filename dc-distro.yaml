@@ -167,8 +167,7 @@ services:
                 aliases:
                     - tserver-host
         volumes:
-            - ./src/main/resources/server/src:/home/node/app/src
-            - ./src/main/resources/server/nodemon.json:/home/node/app/nodemon.json
+            - "${DEPLOY_TARGET}/log:/home/node/app/log"
         ports:
             - "${TSERVER_PORT}:${TSERVER_PORT}"
         environment:

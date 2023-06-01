@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -i
 
 # show commands as they are run.
 # set -x
@@ -11,11 +11,8 @@ fi
 
 echo "Running build.sh for $quanta_domain"
 
-# Wipe some existing stuff to ensure it gets rebuilt
-if [ "$CLEAN" == "true" ]; then
-    rm -rf ${PRJROOT}/target/*
-    rm -rf ${PRJROOT}/bin/*
-fi
+rm -rf ${PRJROOT}/target/*
+rm -rf ${PRJROOT}/bin/*
 
 # copy the marked js file into location where export engine finds it
 # The latest marked version that I need for support in static html files is missing
@@ -24,11 +21,43 @@ fi
 # cp ${PRJROOT}/src/main/resources/public/node_modules/marked/marked.min.js \
 #    ${PRJROOT}/src/main/resources/public/export-includes/marked.min.js
 
+# --------------------------------------------------------
+cd ${PRJROOT}/src/main/resources/quanta-common
+rm -rf lib
+yarn
+verifySuccess "yarn: quanta-common"
+node build.js
+verifySuccess "build.js: quanta-common"
+# run TSC to emit types now. (important!)
+tsc
+verifySuccess "tsc: quanta-common"
+
+# --------------------------------------------------------
+# Web App (not Yarn based, NPM)
+# --------------------------------------------------------
 # Run ignore-scripts for some security from NodeJS
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
 cd ${PRJROOT}/src/main/resources/public
 # NOTE: run 'npm outdated' in this folder to view all outdated versions.
 npm config set ignore-scripts true
+verifySuccess "NPM Config set for: public"
+# npm i
+npm uninstall ../quanta-common
+npm install --install-links ../quanta-common
+verifySuccess "NPM package install: public"
+
+# --------------------------------------------------------
+cd ${PRJROOT}/src/main/resources/server
+rm -rf ./build
+# NOTE: run 'npm outdated' in this folder to view all outdated versions.
+# yarn remove quanta-common
+yarn add ../quanta-common
+verifySuccess "Yarn (server): add quanta-common"
+yarn
+verifySuccess "Yarn Install (server)"
+yarn run build
+verifySuccess "NPM run build: server"
+# --------------------------------------------------------
 
 cd ${PRJROOT}/pom/common
 
@@ -52,17 +81,11 @@ cd ${PRJROOT}
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
-# Note: If CLEAN is false we're going for the fastest possible build.
-if [ "$CLEAN" == "true" ]; then
-    echo "Maven CLEAN package ${mvn_profile}"
-    # This run is required only to ensure TypeScript generated files are up to date.
-    # Always do the same profile here (pdev-vscode)
-    mvn -T 1C package -DskipTests=true -Pdev-vscode
+echo "Maven CLEAN package ${mvn_profile}"
+# This run is required only to ensure TypeScript generated files are up to date.
+# Always do the same profile here (dev-vscode)
+mvn -T 1C package -DskipTests=true -Pdev-vscode
 
-    # Then this is the actual full build.
-    mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
-else
-    echo "Maven (unclean) package ${mvn_profile}"
-    mvn -T 1C --offline package -DskipTests=true -P${mvn_profile} 
-fi
+# Then this is the actual full build.
+mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
 verifySuccess "Maven Build"

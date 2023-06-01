@@ -29,6 +29,7 @@
     "marked-highlight": "^2.0.1",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "nostr-tools": "^1.11.1",
+    "quanta-common": "file:../quanta-common",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-emoji-render": "^2.0.1"

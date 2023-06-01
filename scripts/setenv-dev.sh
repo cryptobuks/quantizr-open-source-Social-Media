@@ -11,7 +11,7 @@ source ./define-functions.sh
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
-export QUANTA_VER=2.14
+export QUANTA_VER=2.15
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
 
 # tserver-tag
@@ -31,9 +31,6 @@ export DOCKER_NETWORK=bridge
 # The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
 #  but can be verified by running `docker network inspect bridge`.
 export quanta_domain=172.17.0.1
-
-# IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
-export CLEAN=true
 
 # Docker files are relative to project root. We hold these in variables so that none of the scripts have them hardcoded
 export dc_yaml=dc-dev.yaml

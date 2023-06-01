@@ -1,26 +1,7 @@
 import express from 'express';
-import { Event, SimplePool, validateEvent, verifySignature } from 'nostr-tools';
+import { SimplePool, validateEvent, verifySignature } from 'nostr-tools';
+import { nostr, utils } from "quanta-common";
 import 'websocket-polyfill';
-
-// warning: for now, these two interfaces are duplicates and identical copies of what's compiled
-// into the webpack bundle also.
-
-interface NostrEvent {
-    id: string;
-    sig: string;
-    pubkey: string;
-    kind: number;
-    content: string;
-    tags: string[][];
-    createdAt: number;
-}
-
-interface NostrEventWrapper {
-    event: NostrEvent;
-    nodeId: string;
-    npub: string;
-    relays: string;
-}
 
 console.log("Express Server starting: TSERVER_API_KEY=" + process.env.TSERVER_API_KEY);
 
@@ -33,39 +14,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req: any, res: any, next: any) => {
-    res.send("Quanta TServer ok!");
+    // todo-1: eventually we can remove this call we do to verify package is working.
+    res.send("Quanta TServer ok! " + utils.testCall("server NPM Package!"));
 });
-
-const makeNostrEvent = (event: NostrEvent): Event => {
-    return {
-        id: event.id,
-        sig: event.sig,
-        pubkey: event.pubkey,
-        kind: event.kind,
-        content: event.content,
-        tags: event.tags,
-        created_at: event.createdAt
-    };
-}
-
-const makeJavaNostrEvent = (event: Event): NostrEvent => {
-    return {
-        id: event.id,
-        sig: event.sig,
-        pubkey: event.pubkey,
-        kind: event.kind,
-        content: event.content,
-        tags: event.tags,
-        createdAt: event.created_at
-    };
-}
 
 app.post('/nostr-verify', async (req: any, res: any, next: any) => {
     // console.log("nostr-verify: req body=" + JSON.stringify(req.body, null, 4));
-    const events: NostrEventWrapper[] = req.body.events;
+    const events: nostr.NostrEventWrapper[] = req.body.events;
     const ids: string[] = [];
     for (const event of events) {
-        const evt = makeNostrEvent(event.event);
+        const evt = nostr.makeEvent(event.event);
         if (!validateEvent(evt) || !verifySignature(evt)) {
             ids.push(event.nodeId);
         }
@@ -89,7 +47,7 @@ app.post('/nostr-query', async (req: any, res: any, next: any) => {
             ret = [];
         }
         pool.close(req.body.relays);
-        return res.send(ret.map(m => makeJavaNostrEvent(m)));
+        return res.send(ret.map(m => nostr.makeNostrEvent(m)));
     }
     catch (error) {
         return next(error);

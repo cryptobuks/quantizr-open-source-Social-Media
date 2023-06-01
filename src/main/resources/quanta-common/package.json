@@ -1,0 +1,41 @@
+{
+  "name": "quanta-common",
+  "version": "1.0.0",
+  "description": "Quanta Common Code",
+  "files": [
+    "./lib/**/*"
+  ],
+  "types": "./lib/index.d.ts",
+  "main": "lib/module.cjs.js",
+  "module": "lib/esm/module.mjs",
+  "exports": {
+    "import": "./lib/esm/module.mjs",
+    "require": "./lib/module.cjs.js",
+    "types": "./lib/index.d.ts"
+  },
+  "license": "Unlicense",
+  "scripts": {
+    "build": "node build",
+    "pack": "node package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@types/node-fetch": "^2.6.3",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "esbuild": "0.16.9",
+    "esbuild-plugin-alias": "^0.2.1",
+    "eslint": "^8.40.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-jest": "^27.2.1",
+    "esm-loader-typescript": "^1.0.3",
+    "events": "^3.3.0",
+    "node-fetch": "^2.6.9",
+    "prettier": "^2.8.4",
+    "tsd": "^0.22.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "nostr-tools": "^1.11.1"
+  }
+}

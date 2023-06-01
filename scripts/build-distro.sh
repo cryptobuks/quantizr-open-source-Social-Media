@@ -1,10 +1,5 @@
-#!/bin/bash
-
-# *********** Special Hack for Clay Ferguson's machine (everyone else delete this!)
-# docker stack rm quanta-stack-distro
-# sudo rm -r /home/clay/ferguson/distro-test
-# mkdir /home/clay/ferguson/distro-test
-# *********************************************************************************
+#!/bin/bash -i
+# (NOTE: -i arg makes .bashrc get sourced and without this NPM stuff commands won't be found)
 
 # =================================================================================================
 # Builds a production distro zip file, which should be able to be unzipped and run on any
@@ -112,13 +107,6 @@ tar -zcvf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
 #NOTE: Extraction command will be: `tar vxf quanta1.0.3.tar.gz`
 verifySuccess "TAR create: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
 
-# *********** Special Hack for Clay Ferguson's machine (everyone else delete this!)
-# cp ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz /home/clay/ferguson/distro-test
-# cd /home/clay/ferguson/distro-test
-# tar -xf quanta${QUANTA_VER}.tar.gz
-# cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar /home/clay/ferguson/distro-test/quanta-distro
-# **********************************************************************************
-
 echo
 echo "==================== NOTE ======================================="
 echo "Run docker-publish-distro.sh to publish the distro to docker repo"
@@ -127,4 +115,7 @@ echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "================================================================="
 echo 
 echo "************ Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
+
+read -p "Press a Key"
+
 
