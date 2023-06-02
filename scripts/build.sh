@@ -34,9 +34,6 @@ echo "mvn install the /pom/common/pom.xml into repo"
 mvn -T 1C install -Dmaven.javadoc.skip=true
 
 cd ${PRJROOT}
-./scripts/gen-css-imports.sh
-
-cd ${PRJROOT}
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
@@ -53,7 +50,6 @@ cp src/main/resources/public/ts/JavaIntf.ts src/main/resources/quanta-common/Jav
 # --------------------------------------------------------
 cd ${PRJROOT}/src/main/resources/quanta-common
 rm -rf lib
-yarn
 verifySuccess "yarn: quanta-common"
 node build.js
 verifySuccess "build.js: quanta-common"
@@ -77,8 +73,6 @@ rm -rf ./build
 # yarn remove quanta-common
 yarn add ../quanta-common
 verifySuccess "Yarn (server): add quanta-common"
-yarn
-verifySuccess "Yarn Install (server)"
 yarn run build
 verifySuccess "Yarn run build: server"
 # --------------------------------------------------------
