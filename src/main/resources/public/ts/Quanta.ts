@@ -156,12 +156,6 @@ export class Quanta {
                 }
             });
 
-            // runClassDemoTest();
-
-            // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
-            // and if this value isn't set it prints a message just saying the browser isn't supported.
-            (window as any).__initAppStarted = true;
-
             if (history.scrollRestoration) {
                 history.scrollRestoration = "manual";
             }

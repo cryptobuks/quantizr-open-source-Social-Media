@@ -90,7 +90,6 @@ module.exports = {
                 filename: "../../templates/index.html",
                 template: "indexTemplate.html",
                 publicPath: "/dist",
-
                 scriptLoading: "module",
                 inject: "body"
             }),
