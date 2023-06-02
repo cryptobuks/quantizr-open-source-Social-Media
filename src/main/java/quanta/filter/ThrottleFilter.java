@@ -1,3 +1,4 @@
+
 package quanta.filter;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.model.IPInfo;
 import quanta.util.Const;
@@ -24,20 +24,18 @@ import quanta.util.Util;
  */
 @Component
 @Order(3)
-@Slf4j 
 public class ThrottleFilter extends GenericFilterBean {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ThrottleFilter.class);
 	@Autowired
 	private AppProp appProp;
-
 	private static boolean THROTTLE_ENABLED = false;
 	private static int THROTTLE_INTERVAL = 500;
-
 	/*
 	 * For debugging we can turn this flag on and disable the server from processing multiple requests
 	 * simultenaously this is every helpful for debugging.
 	 */
 	private static boolean singleThreadDebugging = false;
-
 	private static final HashMap<String, IPInfo> ipInfo = new HashMap<>();
 
 	@PostConstruct
@@ -46,17 +44,13 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("ThrottleFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response))
-			return;
-
+		if (!Util.gracefulReadyCheck(response)) return;
 		HttpServletRequest sreq = null;
 		IPInfo info = null;
-
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
 			HttpSession session = sreq.getSession(false);
@@ -71,7 +65,6 @@ public class ThrottleFilter extends GenericFilterBean {
 				throttleRequest(sreq, info);
 			}
 		}
-
 		/*
 		 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
 		 * threaded, but other servers can call in parallel
@@ -86,25 +79,22 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
-		if (httpReq == null)
-			return;
-
+		if (httpReq == null) return;
 		long curTime = System.currentTimeMillis();
 		if (info.getLastRequestTime() == 0) {
 			info.setLastRequestTime(curTime);
 			return;
 		}
-
 		// log.debug("check:" + httpReq.getRequestURI());
-		if (httpReq.getRequestURI().endsWith("/checkMessages") || //
-				httpReq.getRequestURI().endsWith("/getUserProfile") || //
-				httpReq.getRequestURI().endsWith("/getConfig") || //
-				httpReq.getRequestURI().endsWith("/getBookmarks") || //
-				httpReq.getRequestURI().endsWith("/login") || //
-				httpReq.getRequestURI().endsWith("/proxyGet") || //
-				httpReq.getRequestURI().endsWith("/serverPush") || //
-				httpReq.getRequestURI().endsWith("/anonPageLoad") || //
-				httpReq.getRequestURI().endsWith("/getOpenGraph")) {
+		if ( //
+		//
+		//
+		//
+		//
+		//
+		//
+		httpReq.getRequestURI().endsWith("/checkMessages") || httpReq.getRequestURI().endsWith("/getUserProfile") || httpReq.getRequestURI().endsWith("/getConfig") || httpReq.getRequestURI().endsWith("/getBookmarks") || httpReq.getRequestURI().endsWith("/login") || httpReq.getRequestURI().endsWith("/proxyGet") || httpReq.getRequestURI().endsWith("/serverPush") || httpReq.getRequestURI().endsWith("/anonPageLoad") ||  //
+		httpReq.getRequestURI().endsWith("/getOpenGraph")) {
 		} else {
 			if (THROTTLE_ENABLED) {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
@@ -120,5 +110,6 @@ public class ThrottleFilter extends GenericFilterBean {
 		info.setLastRequestTime(System.currentTimeMillis());
 	}
 
-	public void destroy() {}
+	public void destroy() {
+	}
 }

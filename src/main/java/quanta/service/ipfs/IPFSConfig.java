@@ -1,16 +1,17 @@
+
 package quanta.service.ipfs;
 
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.util.Cast;
 import quanta.util.XString;
 
 @Component
-@Slf4j 
 public class IPFSConfig extends ServiceBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSConfig.class);
     public String API_CONFIG;
 
     @PostConstruct
@@ -31,31 +32,24 @@ public class IPFSConfig extends ServiceBase {
     //
     // WARNING: It WILL require a restart of IPFS to make changes go into effect. Note you can probably check that these have been 
     // applied right after running the command however, by looking inside /ipfs/config (in the IPFS data directory)
-
     public String getStat() {
         StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, Object> res = null;
-
         if (prop.ipfsEnabled()) {
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
             sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
-
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
             sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
-
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));
             sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
         } else {
             sb.append("\nIPFS Repository Status: ipfsEnabled=false\n\n");
         }
-
         // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic,
         // LinkedHashMap.class));
         // sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
-
         // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
         // sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
-
         return sb.toString();
     }
 }

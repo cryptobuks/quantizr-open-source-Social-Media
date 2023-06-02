@@ -1,3 +1,4 @@
+
 package quanta.mongo.model;
 
 import java.util.Date;
@@ -12,25 +13,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.extern.slf4j.Slf4j;
-
 /* We're going to be caching every Fediverse username we encounter for future unspecified purposes */
 @Document(collection = "fediNames")
 @TypeAlias("fn")
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME})
-@Slf4j 
 public class FediverseName {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FediverseName.class);
 	public static final String ID = "_id";
-
 	@Id
 	@Field(ID)
 	private ObjectId id;
-
 	public static final String NAME = "name";
 	@Field(NAME)
 	private String name;
-
 	public static final String CREATE_TIME = "ctm";
 	@Field(CREATE_TIME)
 	private Date createTime;

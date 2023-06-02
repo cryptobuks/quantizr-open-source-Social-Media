@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import lombok.extern.slf4j.Slf4j;
 import quanta.CallProcessor;
 import quanta.actpub.ActPubCache;
 import quanta.actpub.ActPubCrypto;
@@ -97,14 +96,13 @@ import quanta.util.Validator;
  * service, then unless we call like this: userFeed.myMethod(), then the proxy-based AOP stuff will
  * not execute, becuase it won't ge called thru a proxy.
  */
-@Slf4j
 public class ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ServiceBase.class);
 	@Autowired
 	public AppProp prop;
-
 	@Autowired
 	public ApplicationContext context;
-
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;
@@ -162,7 +160,6 @@ public class ServiceBase {
 	public static CryptoService crypto;
 	public static SchemaOrgService schema;
 	public static NostrService nostr;
-
 	public static IPFSService ipfs;
 	public static IPFSCat ipfsCat;
 	public static IPFSFiles ipfsFiles;
@@ -175,7 +172,6 @@ public class ServiceBase {
 	public static IPFSSwarm ipfsSwarm;
 	public static IPFSConfig ipfsConfig;
 	public static IPFSPubSub ipfsPubSub;
-
 	public static boolean initComplete = false;
 	public static final Object initLock = new Object();
 
@@ -195,7 +191,6 @@ public class ServiceBase {
 				return;
 			}
 			log.debug("Setting ServiceBase Proxy Instances...");
-
 			userFeed = getBean(ctx, UserFeedService.class);
 			convert = getBean(ctx, Convert.class);
 			typePluginMgr = getBean(ctx, TypePluginMgr.class);
@@ -250,7 +245,6 @@ public class ServiceBase {
 			crypto = getBean(ctx, CryptoService.class);
 			schema = getBean(ctx, SchemaOrgService.class);
 			nostr = getBean(ctx, NostrService.class);
-
 			ipfs = getBean(ctx, IPFSService.class);
 			ipfsCat = getBean(ctx, IPFSCat.class);
 			ipfsFiles = getBean(ctx, IPFSFiles.class);
@@ -263,7 +257,6 @@ public class ServiceBase {
 			ipfsSwarm = getBean(ctx, IPFSSwarm.class);
 			ipfsConfig = getBean(ctx, IPFSConfig.class);
 			ipfsPubSub = getBean(ctx, IPFSPubSub.class);
-
 			initComplete = true;
 		}
 	}

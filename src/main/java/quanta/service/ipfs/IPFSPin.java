@@ -1,3 +1,4 @@
+
 package quanta.service.ipfs;
 
 import java.util.HashMap;
@@ -5,7 +6,6 @@ import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -17,8 +17,9 @@ import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
-@Slf4j 
 public class IPFSPin extends ServiceBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSPin.class);
     public static String API_PIN;
 
     @PostConstruct
@@ -60,7 +61,6 @@ public class IPFSPin extends ServiceBase {
             String url = API_PIN + "/ls?type=recursive";
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
             // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
-
             if (res != null) {
                 pins = Cast.toLinkedHashMap(res.get("Keys"));
             }
@@ -80,22 +80,16 @@ public class IPFSPin extends ServiceBase {
              */
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
-
-            if (node == null)
-                return;
-
+            if (node == null) return;
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             String ipfsLink = att.getIpfsLink();
             add(ipfsLink);
-
             // always get bytes here from IPFS, and update the node prop with that too.
             IPFSObjectStat stat = ipfsObj.objectStat(ipfsLink, false);
-
             // note: the enclosing scope this we're running in will take care of comitting the node change to
             // the db.
-            att.setSize((long)stat.getCumulativeSize());
-
+            att.setSize((long) stat.getCumulativeSize());
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
             if (accountNode != null) {

@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import lombok.extern.slf4j.Slf4j;
 import quanta.model.UserPreferences;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -29,8 +28,9 @@ import quanta.util.Util;
  */
 @Component
 @Scope("prototype")
-@Slf4j 
 public class SessionContext extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionContext.class);
 	private HttpSession session;
 	private String urlIdFailMsg;
 	private String userMsg;
@@ -38,18 +38,13 @@ public class SessionContext extends ServiceBase {
 	private String initialNodeId;
 	private String loadNostrId;
 	private String loadNostrIdRelays;
-
 	public PublicKey pubSigKey = null;
-
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
-
 	public static final String QSC = "QSC";
 	private boolean live = true;
-
 	/* Identification of user's account root node. */
 	private String rootId;
-
 	/*
 	 * When the user does a "Timeline" search we store the path of the node the timeline was done on so
 	 * that with a simple substring search, we can detect any time a new node is added that would've
@@ -57,43 +52,30 @@ public class SessionContext extends ServiceBase {
 	 * a realtime view of the timeline, making it become like a "chat room"
 	 */
 	private String timelinePath;
-
 	private String userName = PrincipalName.ANON.s();
 	private ObjectId userNodeId;
 	private String pastUserName = userName;
 	private String timezone;
 	private String timeZoneAbbrev;
-
 	private String allowedFeatures = "";
-
 	// variable not currently being used (due to refactoring)
 	private long lastLoginTime;
 	private long lastActiveTime;
-
 	private UserPreferences userPreferences;
-
 	public int counter;
-
 	/* Emitter for sending push notifications to the client */
 	private SseEmitter pushEmitter = new SseEmitter();
-
 	// this one WILL work with multiple sessions per user
 	private static final HashSet<SessionContext> allSessions = new HashSet<>();
-
 	// Full list of active and inactive (dead) sessions.
 	public static final HashSet<SessionContext> historicalSessions = new HashSet<>();
-
 	/* keeps track of total calls to each URI */
 	public HashMap<String, Integer> actionCounters = new HashMap<>();
-
 	private String captcha;
 	private int captchaFails = 0;
-
 	private String userToken;
 	private String appGuid;
-
 	private boolean enableIPSM;
-
 	// this gets set to true, to trigger a refresh when needed again.
 	private boolean friendsTagsDirty;
 
@@ -102,8 +84,8 @@ public class SessionContext extends ServiceBase {
 		urlIdFailMsg = null;
 		userMsg = null;
 		displayUserProfileId = null;
-		initialNodeId = null;	
-		loadNostrIdRelays = null;	
+		initialNodeId = null;
+		loadNostrIdRelays = null;
 	}
 
 	public boolean isEnableIPSM() {
@@ -131,14 +113,11 @@ public class SessionContext extends ServiceBase {
 	public static SessionContext init(ApplicationContext context, HttpSession session) {
 		// Get the SessionContext bean off the http session if it exists
 		SessionContext scBean = (SessionContext) session.getAttribute(SessionContext.QSC);
-
 		// if we don't have a SessionContext yet or it timed out then create a new one.
 		if (scBean == null || !scBean.isLive()) {
-
 			// if we had a bean for this HTTP session, we need to remove it because we're replacing
 			// it with a new one now. 
 			removeSession(scBean);
-
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
 			 * because all our code makes the assumption there will be a SessionContext on the thread.
@@ -146,11 +125,9 @@ public class SessionContext extends ServiceBase {
 			 */
 			scBean = (SessionContext) context.getBean(SessionContext.class);
 			session.setAttribute(SessionContext.QSC, scBean);
-
 			synchronized (allSessions) {
 				allSessions.add(scBean);
 			}
-	
 			synchronized (historicalSessions) {
 				historicalSessions.add(scBean);
 			}
@@ -208,15 +185,11 @@ public class SessionContext extends ServiceBase {
 		if (userName.equals(PrincipalName.ANON.s())) {
 			throw new RuntimeException("invalid call to setAuthenticated for anon.");
 		}
-
 		if (userToken == null) {
 			userToken = Util.genStrongToken();
 		}
-
-		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
-				+ userToken);
+		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken " + userToken);
 		setUserName(userName);
-
 		if (userNodeId == null) {
 			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 			// we found user's node.
@@ -239,9 +212,7 @@ public class SessionContext extends ServiceBase {
 	 * and perhaps use Spring Security
 	 */
 	public static boolean validToken(String token, String userName) {
-		if (token == null)
-			return false;
-
+		if (token == null) return false;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
@@ -263,9 +234,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static SessionContext getSCByToken(String token) {
-		if (token == null)
-			return null;
-
+		if (token == null) return null;
 		synchronized (allSessions) {
 			// great candidate for a stream() here.
 			for (SessionContext sc : allSessions) {
@@ -283,7 +252,6 @@ public class SessionContext extends ServiceBase {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}
 		String bearer = ThreadLocals.getReqBearerToken();
-
 		// otherwise require secure header
 		if (bearer == null || !validToken(bearer, sc.getUserName())) {
 			throw new RuntimeException("Auth failed. Bad bearer token.");
@@ -295,16 +263,13 @@ public class SessionContext extends ServiceBase {
 		if (sc == null) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}
-
 		if (!sc.prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
 			return;
 		}
-
 		String sig = ThreadLocals.getReqSig();
 		if (sig == null) {
 			throw new RuntimeException("Request failed. No signature.");
 		}
-
 		// if pubSigKey not yet saved in SessionContext then generate it
 		if (sc.pubSigKey == null) {
 			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
@@ -313,20 +278,17 @@ public class SessionContext extends ServiceBase {
 			}
 			String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
 			if (pubKeyJson == null) {
-				throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
+				throw new RuntimeException("User Account didn\'t have SIG KEY: userName: " + sc.getUserName());
 			}
-
 			sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
 			if (sc.pubSigKey == null) {
 				throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
 			}
-			// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
 		}
-
-		boolean verified =
-				crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
+		// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
+		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
 		if (!verified) {
-			throw new RuntimeException("Request Sig Failed. Probably wrong signature key in browser for user "+sc.getUserName());
+			throw new RuntimeException("Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
 		}
 	}
 
@@ -351,7 +313,6 @@ public class SessionContext extends ServiceBase {
 		List<SessionContext> ret = new LinkedList<>();
 		HashSet<String> tokens = new HashSet<>();
 		HashSet<String> guids = new HashSet<>();
-
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (sc.isLive()) {
@@ -385,9 +346,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static List<SessionContext> getSessionsByUserName(String userName) {
-		if (userName == null)
-			return null;
-
+		if (userName == null) return null;
 		List<SessionContext> list = null;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
@@ -404,7 +363,6 @@ public class SessionContext extends ServiceBase {
 
 	public void sessionTimeout() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-
 		synchronized (allSessions) {
 			/*
 			 * This "lastActiveTime", should really be called "last message checked time", becaues that's the
@@ -539,11 +497,9 @@ public class SessionContext extends ServiceBase {
 	// //log.debug("SessionContext destroy hashCode=" + String.valueOf(hashCode()) + ": userName=" +
 	// this.userName);
 	// }
-
 	// // From InitializingBean interface
 	// @Override
 	// public void afterPropertiesSet() throws Exception {}
-
 	public String getWatchingPath() {
 		return watchingPath;
 	}

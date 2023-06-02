@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -18,8 +17,10 @@ import quanta.util.val.Val;
  * instead of having a POJO for the the various types of objects we use the accessor methods and
  * properties in this object.
  */
-@Slf4j 
 public class AP {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AP.class);
+
     public static boolean apHasProps(Object obj) {
         return obj instanceof Map<?, ?> || obj instanceof LinkedHashMap<?, ?>;
     }
@@ -29,8 +30,7 @@ public class AP {
      * the first one containing the prop val as a property of it
      */
     public static Object apParseList(List list, String prop) {
-        if (list == null)
-            return null;
+        if (list == null) return null;
         for (Object element : list) {
             // see if we can get it, no matter what type element is
             Val<Object> val = getFromMap(element, prop);
@@ -47,7 +47,6 @@ public class AP {
 
     public static String apStr(Object obj, String prop, boolean warnIfMissing) {
         Val<Object> val = null;
-
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
@@ -60,24 +59,19 @@ public class AP {
                 return null;
             } else {
                 if (warnIfMissing) {
-                    ExUtil.warn("unhandled type on apStr() return val: "
-                            + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object")
-                            + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+                    ExUtil.warn("unhandled type on apStr() return val: " + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object") + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
                 }
                 return null;
             }
         }
-
         if (warnIfMissing) {
-            ExUtil.warn("unhandled type on apStr(): " + (obj != null ? obj.getClass().getName() : "null")
-                    + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn("unhandled type on apStr(): " + (obj != null ? obj.getClass().getName() : "null") + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         }
         return null;
     }
 
     public static Boolean apBool(Object obj, String prop) {
         Val<Object> val = null;
-
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return false;
@@ -87,15 +81,12 @@ public class AP {
                 return ((Boolean) val.getVal()).booleanValue();
             }
         }
-
-        ExUtil.warn("unhandled type on apBool(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apBool(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return false;
     }
 
     public static Integer apInt(Object obj, String prop) {
         Val<Object> val = null;
-
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return 0;
@@ -107,15 +98,12 @@ public class AP {
                 return Integer.valueOf((String) val.getVal());
             }
         }
-
-        ExUtil.warn("unhandled type on apInt(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apInt(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return 0;
     }
 
     public static Date apDate(Object obj, String prop) {
         Val<Object> val = null;
-
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
@@ -123,30 +111,26 @@ public class AP {
                 return DateUtil.parseISOTime((String) val.getVal());
             }
         }
-
-        ExUtil.warn("unhandled type on apDate(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apDate(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
     public static List<?> apList(Object obj, String prop, boolean allowConvertString) {
         Val<Object> val = null;
-
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
-            }
+            } else 
             // if we got an instance of a list return it
-            else if (val.getVal() instanceof List<?>) {
+            if (val.getVal() instanceof List<?>) {
                 return (List<?>) val.getVal();
-            }
+            } else 
             // if we expected a list and found a String, that's ok, return a list with one entry
             // the address 'to' and 'cc' properties can have this happen often.
-            else if (allowConvertString && val.getVal() instanceof String) {
+            if (allowConvertString && val.getVal() instanceof String) {
                 return Arrays.asList(val.getVal());
             }
         }
-
         // todo-1: make this warning be triggered only by flag param 
         // ExUtil.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
         //         + prop + " from obj " + XString.prettyPrint(obj));
@@ -160,9 +144,7 @@ public class AP {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         } else {
-            ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: "
-                    + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
-                    + XString.prettyPrint(obj));
+            ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         }
         return null;
     }
@@ -195,9 +177,7 @@ public class AP {
      * in.
      */
     public static APObj typeFromFactory(Object obj) {
-        if (obj == null)
-            return null;
-
+        if (obj == null) return null;
         APObj ret = null;
         if (obj instanceof APObj) {
             ret = (APObj) obj;
@@ -206,42 +186,31 @@ public class AP {
         } else {
             throw new RuntimeException("Unable to convert type: " + obj.getClass().getName() + " to an APObj");
         }
-
         /* Parse "Activity" Objects */
         switch (ret.getType()) {
-            case APType.Create:
-                return new APOCreate(ret);
-
-            case APType.Update:
-                return new APOUpdate(ret);
-
-            case APType.Follow:
-                return new APOFollow(ret);
-
-            case APType.Undo:
-                return new APOUndo(ret);
-
-            case APType.Delete:
-                return new APODelete(ret);
-
-            case APType.Accept:
-                return new APOAccept(ret);
-
-            case APType.Like:
-                return new APOLike(ret);
-
-            case APType.Announce:
-                return new APOAnnounce(ret);
-
-            case APType.Person:
-                return new APOPerson(ret);
-
-            case APType.Note:
-                return new APONote(ret);
-
-            default:
-                // log.debug("using APObj for type: " + obj.getType());
-                break;
+        case APType.Create: 
+            return new APOCreate(ret);
+        case APType.Update: 
+            return new APOUpdate(ret);
+        case APType.Follow: 
+            return new APOFollow(ret);
+        case APType.Undo: 
+            return new APOUndo(ret);
+        case APType.Delete: 
+            return new APODelete(ret);
+        case APType.Accept: 
+            return new APOAccept(ret);
+        case APType.Like: 
+            return new APOLike(ret);
+        case APType.Announce: 
+            return new APOAnnounce(ret);
+        case APType.Person: 
+            return new APOPerson(ret);
+        case APType.Note: 
+            return new APONote(ret);
+        default: 
+            // log.debug("using APObj for type: " + obj.getType());
+            break;
         }
         return ret;
     }

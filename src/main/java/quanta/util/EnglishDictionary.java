@@ -1,3 +1,4 @@
+
 package quanta.util;
 
 import java.io.BufferedOutputStream;
@@ -14,12 +15,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 
 @Component
-@Slf4j
 public class EnglishDictionary extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
 	private static final HashSet<String> badWords = new HashSet<>();
@@ -34,9 +35,7 @@ public class EnglishDictionary extends ServiceBase {
 	}
 
 	public void loadWords(String fileName, HashSet<String> words) {
-		if (words.size() > 0)
-			return;
-
+		if (words.size() > 0) return;
 		try {
 			/*
 			 * todo-1: Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes
@@ -44,7 +43,6 @@ public class EnglishDictionary extends ServiceBase {
 			 */
 			// sed 's/[[:blank:]]//g' words.txt > cleaned.txt
 			// awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt
-
 			Resource resource = context.getResource(fileName);
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -83,11 +81,9 @@ public class EnglishDictionary extends ServiceBase {
 	}
 
 	public boolean isStopWord(String word) {
-		if (word == null)
-			return true;
+		if (word == null) return true;
 		return stopWords.contains(word.toLowerCase());
 	}
-
 
 	/*
 	 * Tokenizes text (like a paragraph of text) to determine if it appears to be English.
@@ -99,15 +95,11 @@ public class EnglishDictionary extends ServiceBase {
 	 * example threshold=0.60f -> 60% english)
 	 */
 	public boolean isEnglish(String text) {
-		if (text == null)
-			return true;
-		if (dictWords.size() == 0)
-			throw new RuntimeException("called isEnglish before dictionary was loaded.");
-
+		if (text == null) return true;
+		if (dictWords.size() == 0) throw new RuntimeException("called isEnglish before dictionary was loaded.");
 		// log.debug("Checking english: " + text);
 		int englishCount = 0;
 		int unknownCount = 0;
-
 		/*
 		 * Counts all the 'words' in the text that consist purely of alphabet strings (letters) and returns
 		 * true only of known English reach a threshold percentage.
@@ -115,55 +107,45 @@ public class EnglishDictionary extends ServiceBase {
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.?!><", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
-
 			if (XString.containsNonEnglish(token)) {
 				unknownCount++;
 				continue;
 			}
-
 			// only consider words that are all alpha characters
 			if (!StringUtils.isAlpha(token) || token.length() < 4) {
 				// log.debug(" ignoring: " + token);
 				continue;
 			}
-
 			token = token.toLowerCase();
-
 			switch (token) {
-				case "span":
-				case "div":
-				case "html":
-				case "img":
-					continue;
-				default:
-					break;
+			case "span": 
+			case "div": 
+			case "html": 
+			case "img": 
+				continue;
+			default: 
+				break;
 			}
-
 			// log.debug("tok: " + token);
 			if (dictWords.contains(token)) {
 				englishCount++;
-				// log.debug(" isEnglish: " + token);
-			} else {
+			} else 
+			// log.debug(" isEnglish: " + token);
+			{
 				unknownCount++;
 				// log.debug(" notEnglish: " + token);
 			}
 		}
-
-		if (englishCount == 0 && unknownCount == 0)
-			return true;
-
+		if (englishCount == 0 && unknownCount == 0) return true;
 		float percent = (float) englishCount / (englishCount + unknownCount);
 		// log.debug("eng=" + englishCount + " nonEng=" + unknownCount + " %=" + percent);
-		return percent > 0.6f;
+		return percent > 0.6F;
 	}
 
 	public boolean hasBadWords(String text) {
-		if (badWords.size() == 0)
-			throw new RuntimeException("called isBadWord before dictionary was loaded.");
-		if (text == null)
-			return false;
-
-		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);
+		if (badWords.size() == 0) throw new RuntimeException("called isBadWord before dictionary was loaded.");
+		if (text == null) return false;
+		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"\'`!?()*#<>", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim().toLowerCase();
 			if (badWords.contains(token)) {

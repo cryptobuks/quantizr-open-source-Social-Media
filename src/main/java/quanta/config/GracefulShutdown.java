@@ -11,20 +11,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
-
 /* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
-
 /**
  * Handles Tomcat shutdown
  * 
  * NOTE: This is a spring bean instantiated with @Bean elsewhere.
  */
 @Component
-@Slf4j 
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
-
     @Autowired
     private ApplicationContext appContext;
 
@@ -50,13 +47,10 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
         if (executor instanceof ThreadPoolExecutor) {
             try {
                 ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
-
-                log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class="
-                        + executor.getClass().getName());
+                log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class=" + executor.getClass().getName());
                 threadPoolExecutor.shutdown();
                 if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    log.warn(
-                            "Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
+                    log.warn("Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
                 }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
@@ -66,7 +60,6 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 log.debug("Unexpected executor: " + executor.getClass().getName());
             }
         }
-
         AppConfiguration.shutdown();
         log.debug("GracefulShudown: complete");
     }

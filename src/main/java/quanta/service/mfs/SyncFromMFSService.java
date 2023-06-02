@@ -1,3 +1,4 @@
+
 package quanta.service.mfs;
 
 import java.util.HashSet;
@@ -5,7 +6,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSDir;
@@ -18,13 +18,14 @@ import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-
 /* Does the reverse of SyncToMFSService */
 @Component
 @Scope("prototype")
-@Slf4j 
 public class SyncFromMFSService extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SyncFromMFSService.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
+
 	{
 		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
@@ -32,12 +33,9 @@ public class SyncFromMFSService extends ServiceBase {
 	int failedFiles = 0;
 	int matchingFiles = 0;
 	int createdFiles = 0;
-
 	MongoSession session;
-
 	HashSet<String> allNodePaths = new HashSet<>();
 	HashSet<String> allFilePaths = new HashSet<>();
-
 	int totalNodes = 0;
 	int orphansRemoved = 0;
 
@@ -59,7 +57,6 @@ public class SyncFromMFSService extends ServiceBase {
 	public void writeNodes(MongoSession ms, LoadNodeFromIpfsRequest req, LoadNodeFromIpfsResponse res) {
 		ms = ThreadLocals.ensure(ms);
 		this.session = ms;
-
 		try {
 			// if the path is a CID we load from CID however this flow path was never perfected/finised and was
 			// only ever a partially complete experiment
@@ -71,10 +68,10 @@ public class SyncFromMFSService extends ServiceBase {
 					res.setMessage("Unable to process: " + req.getPath());
 					res.setSuccess(false);
 				}
-			}
+			} else 
 			// Loading from an actual MFS path was completed, but is not very usable because we can only
 			// access data from the local MFS
-			else {
+			{
 				if (processPath(req.getPath())) {
 					res.setMessage(buildReport());
 					res.setSuccess(true);
@@ -103,34 +100,27 @@ public class SyncFromMFSService extends ServiceBase {
 	 */
 	public boolean traverseDag(SubNode node, String cid, int level, int recursive) {
 		boolean success = false;
-
 		String indent = "";
 		for (int i = 0; i < level; i++) {
 			indent += "    ";
 		}
-
 		log.debug(indent + "DagGet CID: " + cid);
-
 		//todo-2: I think IPFS has changed format and this will fail nowadays.
 		// disabling this code until the return value from ipfsDAg is updated
 		// MerkleNode dag = ipfsDag.getNode(cid);
 		// if (ok(dag)) {
 		// 	log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
-
 		// 	if (no(dag.getLinks())) {
 		// 		return success;
 		// 	}
-
 		// 	for (MerkleLink entry : dag.getLinks()) {
 		// 		String entryCid = entry.getCid().getPath();
-
 		// 		/*
 		// 		 * we rely on the logic of "if not a json file, it's a folder"
 		// 		 */
 		// 		if (!entry.getName().endsWith(".json")) {
 		// 			log.debug(indent + "Processing Folder: " + entry.getName());
 		// 			if (recursive > 0) {
-
 		// 				/*
 		// 				 * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
 		// 				 * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
@@ -141,7 +131,6 @@ public class SyncFromMFSService extends ServiceBase {
 		// 				 * traverse any node that's already fully loaded.
 		// 				 */
 		// 				SubNode newNode = null;
-
 		// 				traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
 		// 			}
 		// 		} else {
@@ -153,7 +142,6 @@ public class SyncFromMFSService extends ServiceBase {
 		// 				failedFiles++;
 		// 			} else {
 		// 				log.debug(indent + "json: " + json);
-
 		// 				try {
 		// 					SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
 		// 					log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
@@ -173,31 +161,26 @@ public class SyncFromMFSService extends ServiceBase {
 	public boolean processPath(String path) {
 		boolean success = false;
 		log.debug("processDir: " + path);
-
 		IPFSDir dir = ipfsFiles.getDir(path);
 		if (dir != null) {
 			log.debug("Dir: " + XString.prettyPrint(dir));
-
 			if (dir.getEntries() == null) {
 				return success;
 			}
-
 			for (IPFSDirEntry entry : dir.getEntries()) {
 				String entryPath = path + "/" + entry.getName();
-
 				if (entry.getSize() == 0) {
 					processPath(entryPath);
-				}
+				} else 
 				// else process a file
-				else {
+				{
 					// process directory
 					if (entry.isDir()) {
 						processPath(entryPath);
-					}
+					} else 
 					// process file
-					else if (entry.isFile()) {
+					if (entry.isFile()) {
 						log.debug("processFile: " + entryPath);
-
 						// read the node json from ipfs file
 						String json = ipfsFiles.readFile(entryPath);
 						log.debug("JSON: " + json);
@@ -221,14 +204,14 @@ public class SyncFromMFSService extends ServiceBase {
 								 * (import/export logic?)
 								 */
 								node = jsonMapper.readValue(json, SubNodeIdentity.class);
-
 								// we assume the node.id values can be the same across Federated instances.
 								SubNode findNode = read.getNode(session, node.getId());
 								if (findNode != null) {
 									log.debug("Node existed: " + node.getId());
 									matchingFiles++;
-									// todo-2: check if node is same content here.
-								} else {
+								} else 
+								// todo-2: check if node is same content here.
+								{
 									SubNode realNode = jsonMapper.readValue(json, SubNode.class);
 									update.save(session, realNode);
 									log.debug("Created Node: " + node.getId());

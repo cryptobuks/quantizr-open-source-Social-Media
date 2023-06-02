@@ -1,10 +1,19 @@
+
 package quanta.response;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class BrowseFolderResponse {
 	private String listingJson;
+
+	
+	public String getListingJson() {
+		return this.listingJson;
+	}
+
+	
+	public void setListingJson(final String listingJson) {
+		this.listingJson = listingJson;
+	}
+
+	public BrowseFolderResponse() {
+	}
 }

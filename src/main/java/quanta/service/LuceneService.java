@@ -1,7 +1,7 @@
+
 package quanta.service;
 
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -12,8 +12,10 @@ import quanta.response.LuceneSearchResponse;
  * Service for processing Lucene-related functions.
  */
 @Component
-@Slf4j 
-public class LuceneService extends ServiceBase  {
+public class LuceneService extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LuceneService.class);
+
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
@@ -31,7 +33,6 @@ public class LuceneService extends ServiceBase  {
 			ret = fileIndexer.getSummaryReport();
 			fileIndexer.close();
 		}
-
 		res.setSuccess(true);
 		res.setMessage(ret);
 		return res;
@@ -45,7 +46,6 @@ public class LuceneService extends ServiceBase  {
 		// if (ok(node )) {
 		// ret = searcher.search(nodeId, searchText);
 		// }
-
 		res.setSuccess(true);
 		res.setMessage(ret);
 		return res;

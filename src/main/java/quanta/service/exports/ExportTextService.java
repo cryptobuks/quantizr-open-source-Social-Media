@@ -1,3 +1,4 @@
+
 package quanta.service.exports;
 
 import java.io.BufferedOutputStream;
@@ -8,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
@@ -22,10 +22,10 @@ import quanta.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
-@Slf4j 
 public class ExportTextService extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportTextService.class);
 	private MongoSession session;
-
 	private BufferedOutputStream output = null;
 	private String shortFileName;
 	private String fullFileName;
@@ -43,11 +43,9 @@ public class ExportTextService extends ServiceBase {
 		this.req = req;
 		this.res = res;
 		String nodeId = req.getNodeId();
-
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
-
 		if (nodeId.equals("/")) {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
@@ -55,7 +53,6 @@ public class ExportTextService extends ServiceBase {
 			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
-
 		res.setSuccess(true);
 	}
 
@@ -63,19 +60,16 @@ public class ExportTextService extends ServiceBase {
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
-
 		SubNode exportNode = read.getNode(ms, nodeId, true, null);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".md";
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
-
 		try {
 			log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
 			output = new BufferedOutputStream(new FileOutputStream(fullFileName));
 			recurseNode(exportNode, 0);
 			output.flush();
 			StreamUtil.close(output);
-
 			if (req.isToIpfs()) {
 				// now write the file we just generated out to IPFS.
 				FileInputStream is = null;
@@ -90,7 +84,6 @@ public class ExportTextService extends ServiceBase {
 					StreamUtil.close(is);
 				}
 			}
-
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		} finally {
@@ -100,14 +93,10 @@ public class ExportTextService extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null)
-			return;
-
+		if (node == null) return;
 		/* process the current node */
 		processNode(node);
-
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
-
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 			recurseNode(n, level + 1);
 		}

@@ -1,3 +1,4 @@
+
 package quanta.service;
 
 import java.util.HashMap;
@@ -5,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.GraphNode;
 import quanta.model.client.PrivilegeType;
@@ -18,70 +18,59 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 @Component
-@Slf4j 
 public class GraphNodesService extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GraphNodesService.class);
 	static int guid = 0;
 
 	public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();
 		GraphResponse res = new GraphResponse();
 		ms = ThreadLocals.ensure(ms);
-
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
 		SubNode node = read.getNode(ms, req.getNodeId());
 		GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false, node.getLinks());
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");
-
 		mapByPath.put(gnode.getPath(), gnode);
 		// log.debug("Root Node Path: " + node.getPath());
-
 		try {
 			Iterable<SubNode> results = null;
-
 			// Run subgraph query to get all nodes if no search text provided
 			if (StringUtils.isEmpty(req.getSearchText())) {
 				results = read.getSubGraph(ms, node, null, 0, true, false, true);
-			}
+			} else 
 			// If search text provided run subgraph search.
-			else {
+			{
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false, null,
-						true, false, false);
+				results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false, null, true, false, false);
 			}
-
 			// Construct the GraphNode object for each result and add to mapByPath
 			for (SubNode n : results) {
 				try {
 					auth.auth(ms, node, PrivilegeType.READ);
-					GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
-							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
+					GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(), StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
 					mapByPath.put(gn.getPath(), gn);
 				} catch (Exception e) {
 				}
 			}
-
 			// processNodes ensuring we have a coherent/complete/consistent tree (no orphans)
 			processNodes(rootPath, rootLevel, mapByPath);
 			res.setRootNode(gnode);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
-
 		res.setSuccess(true);
 		return res;
 	}
 
 	private String getNodeName(SubNode node) {
 		String content = node.getContent();
-		if (content == null)
-			return "";
+		if (content == null) return "";
 		String name = null;
-
 		int nlIdx = content.indexOf("\n");
 		if (nlIdx != -1) {
 			name = content.substring(0, nlIdx).trim();
-
 			// remove leading hash marks which will be there if this is a markdown heading.
 			while (name.startsWith("#")) {
 				name = XString.stripIfStartsWith(name, "#");
@@ -103,7 +92,6 @@ public class GraphNodesService extends ServiceBase {
 		for (String path : mapByPath.keySet()) {
 			keys.add(path);
 		}
-
 		/*
 		 * First scan to create any parents that don't exist, putting them in mapByPath. Since the query to
 		 * get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have their
@@ -114,44 +102,35 @@ public class GraphNodesService extends ServiceBase {
 		for (String path : keys) {
 			ensureEnoughParents(rootPath, rootLevel, path, mapByPath);
 		}
-
 		// now add all nodes to the child list of their parents.
 		for (String path : mapByPath.keySet()) {
-			if (path.equals(rootPath))
-				continue;
-
+			if (path.equals(rootPath)) continue;
 			GraphNode n = mapByPath.get(path);
 			String parentPath = XString.truncAfterLast(n.getPath(), "/");
 			// log.debug("Looking for Parent (b): " + parentPath);
 			GraphNode parent = mapByPath.get(parentPath);
 			if (parent != null) {
 				parent.addChild(n);
-				// log.debug("Parent Name "+parent.getName()+" now has
-				// childCount="+parent.getChildren().size());
-			} else {
+			} else 
+			// log.debug("Parent Name "+parent.getName()+" now has
+			// childCount="+parent.getChildren().size());
+			{
 				log.debug("Top level node??:" + n);
 			}
 		}
 	}
 
 	public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
-		if (path == null || path.length() < 3)
-			return;
-
+		if (path == null || path.length() < 3) return;
 		String parentPath = XString.truncAfterLast(path, "/");
-		if (parentPath.equals(rootPath))
-			return;
-
+		if (parentPath.equals(rootPath)) return;
 		GraphNode parent = mapByPath.get(parentPath);
-
 		if (parent == null) {
 			// We only need guid on this name, to ensure D3 works, but the actual name on these
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.
-			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,
-					StringUtils.countMatches(parentPath, "/") - rootLevel, false, null);
+			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath, StringUtils.countMatches(parentPath, "/") - rootLevel, false, null);
 			mapByPath.put(parentPath, parent);
-
 			// keep creating parents until we know we made it to common root.
 			ensureEnoughParents(rootPath, rootLevel, parentPath, mapByPath);
 		}

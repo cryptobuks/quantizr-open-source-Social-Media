@@ -1,15 +1,16 @@
+
 package quanta.instrument;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import quanta.model.client.PrincipalName;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 
-@Slf4j 
 public class PerformanceReport {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PerformanceReport.class);
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
 	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
@@ -18,7 +19,6 @@ public class PerformanceReport {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html><head>" + htmlStyle() + "</head><body>");
 		sb.append(htmlH(2, "Performance Report"));
-
 		// Sort list by whichever are consuming the most time (i.e. by duration, descending order)
 		List<PerfMonEvent> orderedData;
 		synchronized (Instrument.data) {
@@ -29,9 +29,7 @@ public class PerformanceReport {
 			orderedData = new ArrayList<>(Instrument.data);
 			orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
 		}
-
 		sb.append(htmlH(3, "Events over Threshold of " + String.valueOf(REPORT_THRESHOLD)));
-
 		int counter = 0;
 		String rows = "";
 		for (PerfMonEvent se : orderedData) {
@@ -39,17 +37,14 @@ public class PerformanceReport {
 				rows += formatEvent(se, counter++ < 20, false);
 			}
 		}
-
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable(htmlTr( //
-					htmlTh("user") + //
-							htmlTh("Event") + //
-							htmlTh("Time") + //
-							htmlTh("Root Id") + //
-							htmlTh("Event Id"))
-					+ rows));
+			sb.append(htmlTable( //
+			//
+			//
+			//
+			//
+			htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows));
 		}
-
 		// calculate totals per person
 		HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
 		for (PerfMonEvent se : orderedData) {
@@ -62,10 +57,8 @@ public class PerformanceReport {
 			up.totalCalls++;
 			up.totalTime += se.duration;
 		}
-
 		List<UserPerf> upiList = new ArrayList<>(userPerfInfo.values());
 		upiList.sort((s1, s2) -> (int) (s2.totalCalls - s1.totalCalls));
-
 		// -------------------------------------------
 		sb.append(htmlH(3, "Call Counts"));
 		rows = "";
@@ -73,12 +66,11 @@ public class PerformanceReport {
 			rows += htmlTr(htmlTd(se.user) + htmlTdRt(String.valueOf(se.totalCalls)));
 		}
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable(htmlTr( //
-					htmlTh("user") + //
-							htmlTh("Count")) //
-					+ rows));
+			sb.append(htmlTable( //
+			//
+			//
+			htmlTr(htmlTh("user") + htmlTh("Count")) + rows));
 		}
-
 		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
 		sb.append(htmlH(3, "Time Usage by User"));
@@ -87,12 +79,11 @@ public class PerformanceReport {
 			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
 		}
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable(htmlTr( //
-					htmlTh("user") + //
-							htmlTh("Total Time")) //
-					+ rows));
+			sb.append(htmlTable( //
+			//
+			//
+			htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows));
 		}
-
 		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
 		sb.append(htmlH(3, "Avg Time Per Call"));
@@ -101,16 +92,16 @@ public class PerformanceReport {
 			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
 		}
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable(htmlTr( //
-					htmlTh("user") + //
-							htmlTh("Avg Time")) //
-					+ rows));
+			sb.append(htmlTable( //
+			//
+			//
+			htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
 		}
-
 		sb.append(getTimesPerCategory());
 		sb.append("</body></html>");
 		return sb.toString();
 	}
+
 
 	static class MethodStat {
 		String category;
@@ -121,7 +112,6 @@ public class PerformanceReport {
 	/* This is the most 'powerful/useful' feature, because it displays time usage for each category */
 	public static String getTimesPerCategory() {
 		HashMap<String, MethodStat> stats = new HashMap<>();
-
 		for (PerfMonEvent event : Instrument.data) {
 			MethodStat stat = stats.get(event.event);
 			if (stat == null) {
@@ -131,38 +121,31 @@ public class PerformanceReport {
 			stat.totalTime += event.duration;
 			stat.totalCount++;
 		}
-
 		List<MethodStat> orderedStats = new ArrayList<>(stats.values());
 		orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
-
 		String table = htmlTr( //
-				htmlTh("Category") + //
-						htmlTh("Count") + //
-						htmlTh("Avg. Time") + //
-						htmlTh("Time"));
-
+		//
+		//
+		htmlTh("Category") + htmlTh("Count") + htmlTh("Avg. Time") +  //
+		htmlTh("Time"));
 		for (MethodStat stat : orderedStats) {
 			table += htmlTr( //
-					htmlTd(stat.category) + //
-							htmlTdRt(String.valueOf(stat.totalCount)) + //
-							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) + //
-							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
+			//
+			//
+			htmlTd(stat.category) + htmlTdRt(String.valueOf(stat.totalCount)) + htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) +  //
+			htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
 		}
-
 		return htmlH(3, "Times Per Category") + htmlTable(table);
 	}
 
 	/* returns as an HTML Row (user, event, rootEvent, eventId */
 	public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean isSubItem) {
 		String tr = "";
-
 		// too verbose, keeping this capability turned off for now.)
 		boolean embedSubEvents = false;
-
 		if (!isSubItem) {
 			tr += htmlTd(se.user != null ? se.user : PrincipalName.ANON.s());
 		}
-
 		// If this event happens to be the head/root of a series of events
 		String set = "";
 		if (embedSubEvents) {
@@ -176,26 +159,21 @@ public class PerformanceReport {
 					}
 				}
 				if (!rows.isEmpty()) {
-					set += "<br>" + htmlTable(htmlTr( //
-							htmlTh("user") + //
-									htmlTh("Event") + //
-									htmlTh("Time") + //
-									htmlTh("Root Id") + //
-									htmlTh("Event Id"))
-							+ rows) + "<br>";
+					set +=  //
+					//
+					//
+					//
+					//
+					"<br>" + htmlTable(htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows) + "<br>";
 				}
 			}
 		}
-
 		tr += htmlTd(se.event + set);
 		tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
-
 		if (!isSubItem && se.root != null) {
 			tr += htmlTdRt(String.valueOf(se.root.hashCode()));
 		}
-
 		tr += htmlTdRt(String.valueOf(se.hashCode()));
-
 		return htmlTr(tr);
 	}
 
@@ -216,7 +194,7 @@ public class PerformanceReport {
 	}
 
 	public static String htmlTdRt(String td) {
-		return "<td align='right'>\n" + td + "</td>\n";
+		return "<td align=\'right\'>\n" + td + "</td>\n";
 	}
 
 	public static String htmlTh(String td) {
@@ -224,14 +202,14 @@ public class PerformanceReport {
 	}
 
 	public static String htmlStyle() {
-		return "<style>\n" + //
-				"table, th, td {\n" + //
-				"padding: 5px;\n" + //
-				"border: 1px solid black;\n" + //
-				"border-collapse: collapse;\n" + //
-				"}\n" + //
-				"body {padding: 20px;}" + //
-				"html, body {font-family: 'Courier New', 'Courier', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important}" + //
-				"</style>";
+		return  //
+		//
+		//
+		//
+		//
+		//
+		//
+		"<style>\n" + "table, th, td {\n" + "padding: 5px;\n" + "border: 1px solid black;\n" + "border-collapse: collapse;\n" + "}\n" + "body {padding: 20px;}" + "html, body {font-family: \'Courier New\', \'Courier\', \'Roboto\', \'Verdana\', \'Helvetica\', \'Arial\', \'sans-serif\' !important}" +  //
+		"</style>";
 	}
 }

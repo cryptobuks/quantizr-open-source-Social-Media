@@ -1,10 +1,6 @@
+
 package quanta.response;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class NotificationMessage extends ServerPushInfo {
 	private String nodeId;
 	private String fromUser;
@@ -15,5 +11,38 @@ public class NotificationMessage extends ServerPushInfo {
 		this.nodeId = nodeId;
 		this.message = message;
 		this.fromUser = fromUser;
+	}
+
+	
+	public String getNodeId() {
+		return this.nodeId;
+	}
+
+	
+	public String getFromUser() {
+		return this.fromUser;
+	}
+
+	
+	public String getMessage() {
+		return this.message;
+	}
+
+	
+	public void setNodeId(final String nodeId) {
+		this.nodeId = nodeId;
+	}
+
+	
+	public void setFromUser(final String fromUser) {
+		this.fromUser = fromUser;
+	}
+
+	
+	public void setMessage(final String message) {
+		this.message = message;
+	}
+
+	public NotificationMessage() {
 	}
 }

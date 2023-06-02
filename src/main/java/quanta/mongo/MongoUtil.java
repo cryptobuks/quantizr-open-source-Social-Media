@@ -1,3 +1,4 @@
+
 package quanta.mongo;
 
 import java.util.Arrays;
@@ -23,7 +24,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -49,15 +49,14 @@ import quanta.util.val.Val;
  * Verious utilities related to MongoDB persistence
  */
 @Component
-@Slf4j
 public class MongoUtil extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoUtil.class);
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static final Random rand = new Random();
-
 	public static SubNode allUsersRootNode = null;
 	public static SubNode localUsersNode = null;
 	public static SubNode remoteUsersNode = null;
-
 	/*
 	 * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
 	 * need very performant way to translate from /r/p to /r path and vice verse
@@ -78,43 +77,35 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public LinkedList<SubNode> filterOutOrphans(MongoSession ms, SubNode rootNode, Iterable<SubNode> nodes) {
 		LinkedList<SubNode> ret = new LinkedList<>();
-
 		// log.debug("Removing Orphans.");
 		HashSet<String> paths = new HashSet<>();
-
 		// this just helps us avoide redundant delete attempts
 		HashSet<String> pathsRemoved = new HashSet<>();
-
 		// log.debug("ROOT PTH: " + rootNode.getPath() + " content: " + rootNode.getContent());
 		paths.add(rootNode.getPath());
-
 		// Add all the paths
 		for (SubNode node : nodes) {
 			// log.debug("PTH: " + node.getPath() + " content: " + node.getContent());
 			paths.add(node.getPath());
 		}
-
 		// now identify all nodes that don't have a parent in the list
 		for (SubNode node : nodes) {
 			String parentPath = node.getParentPath();
-
 			// if parentPath not in paths this is an orphan
 			if (!paths.contains(parentPath)) {
 				// log.debug("ORPHAN: " + parentPath);
-
 				// if we haven't alread seen this parent path and deleted under it.
 				if (!pathsRemoved.contains(parentPath)) {
 					pathsRemoved.add(parentPath);
-
 					// Since we know this parent doesn't exist we can delete all nodes that fall under it
 					// which would remove ALL siblings that are also orphans. Using this kind of pattern:
 					// ${parantPath}/* (that is, we append a slash and then find anything starting with that)
 					delete.deleteUnderPath(ms, parentPath);
-					// NOTE: we can also go ahead and DELETE these orphans as found (from the DB)
 				}
-			}
+			} else 
+			// NOTE: we can also go ahead and DELETE these orphans as found (from the DB)
 			// otherwise add to our output results.
-			else {
+			{
 				ret.add(node);
 			}
 		}
@@ -147,9 +138,7 @@ public class MongoUtil extends ServiceBase {
 	 */
 	@PerfMon
 	public SubNode findById(ObjectId objId) {
-		if (objId == null)
-			return null;
-
+		if (objId == null) return null;
 		// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
 		return mongoUtil.ops_findById(objId);
 	}
@@ -158,7 +147,6 @@ public class MongoUtil extends ServiceBase {
 	public SubNode ops_findById(ObjectId objId) {
 		return ops.findById(objId, SubNode.class);
 	}
-
 
 	public SubNode findByIdNoCache(ObjectId objId) {
 		return ops.findById(objId, SubNode.class);
@@ -173,7 +161,6 @@ public class MongoUtil extends ServiceBase {
 	@PerfMon
 	public String findAvailablePath(String path) {
 		// log.debug("findAvailablePath on: " + path);
-
 		/*
 		 * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
 		 * don't have a path ending with slash because that means we KNOW we need to always find a new child
@@ -182,7 +169,6 @@ public class MongoUtil extends ServiceBase {
 		if (!path.endsWith("/") && pathIsAvailable(path)) {
 			return path;
 		}
-
 		int tries = 0;
 		while (true) {
 			/*
@@ -190,7 +176,6 @@ public class MongoUtil extends ServiceBase {
 			 * exponentially more likely we find an unused path.
 			 */
 			path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
-
 			/*
 			 * if we encountered two misses, start adding two characters per iteration (at least), because this
 			 * node has lots of children
@@ -198,17 +183,14 @@ public class MongoUtil extends ServiceBase {
 			if (tries >= 2) {
 				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
 			}
-
 			// after 3 fails get even more aggressive with 3 new chars per loop here.
 			if (tries >= 3) {
 				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
 			}
-
 			// after 4 fails get even more aggressive with 4 new chars per loop here.
 			if (tries >= 4) {
 				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
 			}
-
 			if (pathIsAvailable(path)) {
 				return path;
 			}
@@ -218,16 +200,14 @@ public class MongoUtil extends ServiceBase {
 
 	public boolean pathIsAvailable(String path) {
 		Criteria orCriteria = new Criteria();
-
 		/*
 		 * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
 		 * as an orphan (which can definitely happen) then this path it not available. So even orphaned
 		 * nodes can keep us from being able to consider a path 'available for use'
 		 */
 		orCriteria.orOperator(//
-				Criteria.where(SubNode.PATH).is(path), //
-				Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
-
+		Criteria.where(SubNode.PATH).is(path),  //
+		Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 		Query q = new Query(orCriteria);
 		return !ops.exists(q, SubNode.class);
 	}
@@ -245,19 +225,15 @@ public class MongoUtil extends ServiceBase {
 		if (testUserAccountsList == null) {
 			return;
 		}
-
 		arun.run(as -> {
 			for (String accountInfo : testUserAccountsList) {
 				log.debug("Verifying test Account: " + accountInfo);
-
 				final List<String> accountInfoList = XString.tokenize(accountInfo, ":", true);
 				if (accountInfoList == null || accountInfoList.size() != 3) {
 					log.debug("Invalid User Info substring: " + accountInfo);
 					continue;
 				}
-
 				String userName = accountInfoList.get(0);
-
 				SubNode ownerNode = read.getUserNodeByUserName(as, userName);
 				if (ownerNode == null) {
 					log.debug("userName not found: " + userName + ". Account will be created.");
@@ -265,12 +241,10 @@ public class MongoUtil extends ServiceBase {
 					signupReq.setUserName(userName);
 					signupReq.setPassword(accountInfoList.get(1));
 					signupReq.setEmail(accountInfoList.get(2));
-
 					user.signup(signupReq, true);
 				} else {
 					log.debug("account exists: " + userName);
 				}
-
 				/*
 				 * keep track of these names, because some API methods need to know if a given account is a test
 				 * account
@@ -294,13 +268,12 @@ public class MongoUtil extends ServiceBase {
 	public void setPendingPath(SubNode node, boolean pending) {
 		String pendingPath = NodePath.PENDING_PATH + "/";
 		String rootPath = NodePath.ROOT_PATH + "/";
-
 		// ensure node starts with /r/p
 		if (pending && !node.getPath().startsWith(pendingPath)) {
 			node.setPath(node.getPath().replace(rootPath, pendingPath));
-		}
+		} else 
 		// ensure node starts with /r and not /r/p
-		else if (!pending && node.getPath().startsWith(pendingPath)) {
+		if (!pending && node.getPath().startsWith(pendingPath)) {
 			// get pendingPath out of the path, first
 			String path = node.getPath().replace(pendingPath, rootPath);
 			path = findAvailablePath(path);
@@ -313,10 +286,8 @@ public class MongoUtil extends ServiceBase {
 		return path.startsWith("/") && path.substring(1).indexOf("/") == -1;
 	}
 
-
 	public String getHashOfPassword(String password) {
-		if (password == null)
-			return null;
+		if (password == null) return null;
 		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
 
@@ -326,20 +297,16 @@ public class MongoUtil extends ServiceBase {
 
 	public void processAllNodes(MongoSession ms) {
 		// Val<Long> nodesProcessed = new Val<Long>(0L);
-
 		// Query query = new Query();
 		// Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
 		// query.addCriteria(criteria);
-
 		// saveSession(session);
 		// Iterable<SubNode> iter = find(query);
-
 		// iter.forEach((node) -> {
 		// nodesProcessed.setVal(nodesProcessed.getVal() + 1);
 		// if (nodesProcessed.getVal() % 1000 == 0) {
 		// log.debug("reSave count: " + nodesProcessed.getVal());
 		// }
-
 		// // /*
 		// // * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some
 		// of
@@ -355,7 +322,6 @@ public class MongoUtil extends ServiceBase {
 		if (aclMap == null) {
 			return false;
 		}
-
 		Val<Boolean> keysRemoved = new Val<>(false);
 		aclMap.forEach((String key, AccessControl ac) -> {
 			if (ac.getKey() != null) {
@@ -363,7 +329,6 @@ public class MongoUtil extends ServiceBase {
 				keysRemoved.setVal(true);
 			}
 		});
-
 		return keysRemoved.getVal();
 	}
 
@@ -400,17 +365,14 @@ public class MongoUtil extends ServiceBase {
 	// This is the code I used to convert paths /r/usr to /r/usr/L (local) and /r/usr/R (remote)
 	public void processAccounts(MongoSession ms) {
 		dropAllIndexes(ms);
-
 		HashSet<String> localPathPart = new HashSet<>();
 		HashSet<String> remotePathPart = new HashSet<>();
-
 		log.debug("pre scan...");
 		IntVal scanCount = new IntVal();
 		LinkedList<SubNode> toDel = new LinkedList<>();
 		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
 			String path = node.getPath();
-			if (path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH)
-					|| path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/")) {
+			if (path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH) || path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/")) {
 				toDel.add(node);
 			}
 			scanCount.inc();
@@ -418,24 +380,18 @@ public class MongoUtil extends ServiceBase {
 				log.debug("scanCount: " + scanCount.getVal());
 			}
 		});
-
-		log.debug("pre scan...deleting: " + toDel.size());;
+		log.debug("pre scan...deleting: " + toDel.size());
+		;
 		for (SubNode node : toDel) {
 			delete.delete(ms, node);
 		}
-
-		Iterable<SubNode> accntNodes =
-				read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
-
+		Iterable<SubNode> accntNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 		for (SubNode acctNode : accntNodes) {
 			String userName = acctNode.getStr(NodeProp.USER.s());
-			if (userName == null)
-				continue;
-
+			if (userName == null) continue;
 			String path = acctNode.getPath();
 			log.debug("ProcUser: " + userName);
 			String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
-
 			if (userName.contains("@")) {
 				// log.debug("Short Piece: Remote: " + shortPart);
 				remotePathPart.add(shortPart);
@@ -444,14 +400,11 @@ public class MongoUtil extends ServiceBase {
 				localPathPart.add(shortPart);
 			}
 		}
-
 		ThreadLocals.clearDirtyNodes();
 		// we might have wiped these above, so ensure we have them.
 		ensureUsersLocalAndRemotePath(ms);
 		update.saveSession(ms);
-
 		// ---------------------------------
-
 		SubNode localCheck = read.getNode(ms, "/r/usr/L");
 		if (localCheck == null) {
 			log.debug("localCheck failed");
@@ -459,7 +412,6 @@ public class MongoUtil extends ServiceBase {
 		} else {
 			log.debug("Local Check: " + XString.prettyPrint(localCheck));
 		}
-
 		// -----------------------------------
 		SubNode remoteCheck = read.getNode(ms, "/r/usr/R");
 		if (remoteCheck == null) {
@@ -468,50 +420,41 @@ public class MongoUtil extends ServiceBase {
 		} else {
 			log.debug("Remote Check: " + XString.prettyPrint(remoteCheck));
 		}
-
 		ThreadLocals.clearDirtyNodes();
-
 		// ----------------------------------
-
 		Val<BulkOperations> bops = new Val<>();
 		IntVal opCount = new IntVal();
 		IntVal total = new IntVal();
-
 		// stream every node
 		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
 			String path = node.getPath();
 			String newPath = null;
-			if (!path.startsWith(NodePath.USERS_PATH + "/") || //
-					path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/"))
-				return;
-
+			if ( //
+			!path.startsWith(NodePath.USERS_PATH + "/") || path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/")) return;
 			String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
 			String shortPiece = XString.truncAfterFirst(shortPart, "/");
-
 			// if this is a local node
 			if (localPathPart.contains(shortPiece)) {
 				newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
-				// log.debug("LOCAL PATH [" + path + "] => [" + newPath + "]");
-			} //
-			else if (remotePathPart.contains(shortPiece)) {
+			} else 
+			// log.debug("LOCAL PATH [" + path + "] => [" + newPath + "]");
+			//
+			if (remotePathPart.contains(shortPiece)) {
 				newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
-				// log.debug("REMOT PATH [" + path + "] => [" + newPath + "]");
-			} else {
+			} else 
+			// log.debug("REMOT PATH [" + path + "] => [" + newPath + "]");
+			{
 				// log.debug("IGNORE PATH [" + path + "]");
 				return;
 			}
-
 			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 			Update update = new Update().set(SubNode.PATH, newPath);
-
 			if (!bops.hasVal()) {
 				bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 			}
-
 			bops.getVal().updateOne(query, update);
 			opCount.inc();
 			total.inc();
-
 			if (opCount.getVal() > Const.MAX_BULK_OPS) {
 				BulkWriteResult results = bops.getVal().execute();
 				log.debug("Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
@@ -519,12 +462,10 @@ public class MongoUtil extends ServiceBase {
 				opCount.setVal(0);
 			}
 		});
-
 		if (bops.hasVal()) {
 			BulkWriteResult results = bops.getVal().execute();
 			log.debug("Final Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
 		}
-
 		createAllIndexes(ms);
 	}
 
@@ -536,27 +477,21 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void fixSharing(MongoSession ms) {
 		log.debug("Processing fixSharing");
-
 		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
-
 		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		// int counter = 0;
-
 		// for (SubNode node : nodes) {
 		// // essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
 		// if (ok(node.getStr(NodeProp.OBJECT_ID)) && AclService.isPublic(ms, node)) {
 		// acl.makePublicAppendable(ms, node);
 		// }
-
 		// if (ThreadLocals.getDirtyNodeCount() > 200) {
 		// update.saveSession(ms);
 		// }
-
 		// if (++counter % 2000 == 0) {
 		// log.debug("fixShare: " + String.valueOf(counter));
 		// }
 		// }
-
 		// log.debug("fixSharing completed.");
 	}
 
@@ -571,9 +506,7 @@ public class MongoUtil extends ServiceBase {
 		// log.debug("Processing setParentNodes");
 		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		// int counter = 0;
-
 		// for (SubNode node : nodes) {
-
 		// // If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
 		// // need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
 		// if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") &&
@@ -581,19 +514,15 @@ public class MongoUtil extends ServiceBase {
 		// node.setParent(null);
 		// continue;
 		// }
-
 		// // this is what the MongoListener does....
 		// mongoUtil.validateParent(node, null);
-
 		// if (ThreadLocals.getDirtyNodeCount() > 200) {
 		// update.saveSession(ms);
 		// }
-
 		// if (++counter % 1000 == 0) {
 		// log.debug("SPN: " + String.valueOf(counter));
 		// }
 		// }
-
 		// log.debug("setParentNodes completed.");
 	}
 
@@ -604,32 +533,25 @@ public class MongoUtil extends ServiceBase {
 		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		// HashMap<String, Integer> set = new HashMap<>();
 		// int idx = 0;
-
 		// for (SubNode node : nodes) {
 		// StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
-
 		// while (t.hasMoreTokens()) {
 		// String part = t.nextToken().trim();
 		// if (part.length() < lenLimit)
 		// continue;
-
 		// if (no(set.get(part))) {
 		// Integer x = idx++;
 		// set.put(part, x);
 		// }
 		// }
 		// }
-
 		// nodes = ops.findAll(SubNode.class);
 		// int maxPathLen = 0;
-
 		// for (SubNode node : nodes) {
 		// StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
 		// StringBuilder fullPath = new StringBuilder();
-
 		// while (t.hasMoreTokens()) {
 		// String part = t.nextToken().trim();
-
 		// // if delimiter, or short parths, just take them as is
 		// if (part.length() < lenLimit) {
 		// fullPath.append(part);
@@ -637,7 +559,6 @@ public class MongoUtil extends ServiceBase {
 		// // if path part find it's unique integer, and insert
 		// else {
 		// Integer partIdx = set.get(part);
-
 		// // if the database changed underneath it we just take that as another new path part
 		// if (no(partIdx)) {
 		// partIdx = idx++;
@@ -646,7 +567,6 @@ public class MongoUtil extends ServiceBase {
 		// fullPath.append(String.valueOf(partIdx));
 		// }
 		// }
-
 		// // log.debug("fullPath: " + fullPath);
 		// if (fullPath.length() > maxPathLen) {
 		// maxPathLen = fullPath.length();
@@ -660,59 +580,43 @@ public class MongoUtil extends ServiceBase {
 	public void createAllIndexes(MongoSession ms) {
 		preprocessDatabase(ms);
 		log.debug("checking all indexes.");
-
 		// DO NOT DELETE. This is able to check contstraint volations.
 		// read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
-
 		log.debug("Creating FediverseName unique index.");
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
-
 		createUniqueIndex(ms, SubNode.class, SubNode.PATH);
-
 		// Other indexes that *could* be added but we don't, just as a performance enhancer is
 		// Unique node names: Key = node.owner+node.name (or just node.name for admin)
 		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
 		// account)
-
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.OBJECT_ID.s());
-
 		createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
-
-		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
-				NodeType.ACCOUNT.s());
-
+		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(), NodeType.ACCOUNT.s());
 		/*
 		 * DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations prior
 		 * to adding some new constraint. And this one was for making sure the "UniqueFriends" Index could
 		 * be built ok. You can't create such an index until violations of it are already removed.
 		 */
 		// delete.removeFriendConstraintViolations(ms);
-
 		createUniqueFriendsIndex(ms);
 		createUniqueNodeNameIndex(ms);
-
 		// DO NOT DELETE
 		// I had done this temporarily to fix a constraint violation
 		// dropIndex(ms, SubNode.class, "unique-friends");
 		// dropIndex(ms, SubNode.class, "unique-node-name");
-
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
 		 * user. That is, prefixed by their username followed by two dashes.
 		 */
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
-
 		createIndex(ms, SubNode.class, SubNode.OWNER);
 		createIndex(ms, SubNode.class, SubNode.XFR);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
-
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
 		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
 		createTextIndexes(ms, SubNode.class);
-
 		logIndexes(ms, SubNode.class);
-
 		log.debug("finished checking all indexes.");
 	}
 
@@ -726,14 +630,13 @@ public class MongoUtil extends ServiceBase {
 		log.debug("Creating unique friends index.");
 		auth.requireAdmin(ms);
 		String indexName = "unique-friends";
-
 		try {
 			ops.indexOps(SubNode.class).ensureIndex(//
-					new Index().on(SubNode.OWNER, Direction.ASC) //
-							.on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC) //
-							.unique() //
-							.named(indexName) //
-							.partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
+			//
+			//
+			//
+			//
+			new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC).unique().named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
 		}
@@ -744,14 +647,13 @@ public class MongoUtil extends ServiceBase {
 		log.debug("createUniqueNodeNameIndex()");
 		auth.requireAdmin(ms);
 		String indexName = "unique-node-name";
-
 		try {
 			ops.indexOps(SubNode.class).ensureIndex(//
-					new Index().on(SubNode.OWNER, Direction.ASC) //
-							.on(SubNode.NAME, Direction.ASC) //
-							.unique() //
-							.named(indexName) //
-							.partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
+			//
+			//
+			//
+			//
+			new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.NAME, Direction.ASC).unique().named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
 		}
@@ -793,16 +695,15 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1, String property2) {
 		auth.requireAdmin(ms);
-
 		try {
 			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
 			ops.indexOps(clazz).ensureIndex(//
-					new Index().on(property1, Direction.ASC) //
-							.on(property2, Direction.ASC) //
-							.unique() //
-							.named(name) //
-							// Note: also instead of exists, something like ".gt('')" would probably work too
-							.partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
+			//
+			//
+			//
+			//
+			// Note: also instead of exists, something like ".gt('')" would probably work too
+			new Index().on(property1, Direction.ASC).on(property2, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
 			log.debug("Index verified: " + name);
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -816,14 +717,13 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialIndex(MongoSession ms, String name, Class<?> clazz, String property) {
 		log.debug("Ensuring partial index named: " + name);
 		auth.requireAdmin(ms);
-
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
 			ops.indexOps(clazz).ensureIndex(//
-					new Index().on(property, Direction.ASC) //
-							.named(name) //
-							// Note: also instead of exists, something like ".gt('')" would probably work too
-							.partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
+			//
+			//
+			// Note: also instead of exists, something like ".gt('')" would probably work too
+			new Index().on(property, Direction.ASC).named(name).partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
 			log.debug("Index verified: " + name);
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -837,15 +737,14 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
 		log.debug("Ensuring unique partial index named: " + name);
 		auth.requireAdmin(ms);
-
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
 			ops.indexOps(clazz).ensureIndex(//
-					new Index().on(property, Direction.ASC) //
-							.unique() //
-							.named(name) //
-							// Note: also instead of exists, something like ".gt('')" would probably work too
-							.partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
+			//
+			//
+			//
+			// Note: also instead of exists, something like ".gt('')" would probably work too
+			new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
 			log.debug("Index verified: " + name);
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -855,17 +754,16 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property, String type) {
 		log.debug("Ensuring unique partial index (for type) named: " + name);
 		auth.requireAdmin(ms);
-
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
 			ops.indexOps(clazz).ensureIndex(//
-					new Index().on(property, Direction.ASC) //
-							.unique() //
-							.named(name) //
-							// Note: also instead of exists, something like ".gt('')" would probably work too
-							.partial(PartialIndexFilter.of(//
-									Criteria.where(SubNode.TYPE).is(type) //
-											.and(property).exists(true))));
+			//
+			//
+			//
+			// Note: also instead of exists, something like ".gt('')" would probably work too
+			new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of(//
+			//
+			Criteria.where(SubNode.TYPE).is(type).and(property).exists(true))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
 		}
@@ -930,28 +828,22 @@ public class MongoUtil extends ServiceBase {
 	//
 	// ops.indexOps(clazz).ensureIndex(textIndex);
 	// }
-
 	public void createTextIndexes(MongoSession ms, Class<?> clazz) {
 		log.debug("creatingText Indexes.");
 		auth.requireAdmin(ms);
-
 		try {
-			TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()//
-					// note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
-					// "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
-					// the properties array attached to each node.
-					.onAllFields()
-
-					// Using 'none' as default language allows `stop words` to be indexed, which are words usually
-					// not searched for like "and, of, the, about, over" etc, however if you index without stop words
-					// that also means searching for these basic words in the content fails. But if you do index them
-					// (by using "none" here) then the index will be larger.
-					// .withDefaultLanguage("none")
-
-					// .onField(SubNode.CONTENT) //
-					// .onField(SubNode.TAGS) //
-					.build();
-
+			TextIndexDefinition textIndex = //
+			// note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
+			// "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
+			// the properties array attached to each node.
+			// Using 'none' as default language allows `stop words` to be indexed, which are words usually
+			// not searched for like "and, of, the, about, over" etc, however if you index without stop words
+			// that also means searching for these basic words in the content fails. But if you do index them
+			// (by using "none" here) then the index will be larger.
+			// .withDefaultLanguage("none")
+			// .onField(SubNode.CONTENT) //
+			// .onField(SubNode.TAGS) //
+			new TextIndexDefinitionBuilder().onAllFields().build();
 			ops.indexOps(clazz).ensureIndex(textIndex);
 			log.debug("createTextIndex successful.");
 		} catch (Exception e) {
@@ -972,16 +864,13 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
-
 		// NOTES:
 		// - The leftmost caret (^) matches path to first part of the string (i.e. starts with 'path')
 		// - The caret inside the ([]) means "not" containing the '/' char.
 		// - \\/ is basically just '/' (escaped properly)
 		// - The '*' means we match the "not /" condition one or more times.
-
 		// legacy version (asterisk ouside group)
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
-
 		// This version also works (node the '*' location), but testing didn't show any performance
 		// difference
 		// return "^" + Pattern.quote(path) + "\\/([^\\/]*)$";
@@ -996,12 +885,10 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
-
 		// Based on this page:
 		// https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
 		// It looks like this might be the best performance here:
 		return "^" + Pattern.quote(path) + "\\/";
-
 		// Legacy implementation
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
@@ -1016,25 +903,21 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	@PerfMon(category = "mongoUtil")
-	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated,
-			Val<SubNode> postsNodeVal, boolean forceRemoteUser) {
+	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated, Val<SubNode> postsNodeVal, boolean forceRemoteUser) {
 		SubNode userNode = read.getUserNodeByUserName(ms, newUserName);
 		if (userNode != null) {
 			throw new RuntimeException("User already existed: " + newUserName);
 		}
-
 		// if (PrincipalName.ADMIN.s().equals(user)) {
 		// throw new RuntimeEx("createUser should not be called fror admin
 		// user.");
 		// }
-
 		auth.requireAdmin(ms);
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 		SubNode parentNode = newUserName.contains("@") || forceRemoteUser ? remoteUsersNode : localUsersNode;
 		userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true);
 		parentNode.setHasChildren(true);
-
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
@@ -1048,26 +931,20 @@ public class MongoUtil extends ServiceBase {
 		userNode.set(NodeProp.LAST_LOGIN_TIME, 0);
 		userNode.set(NodeProp.BIN_QUOTA, Const.DEFAULT_USER_QUOTA);
 		userNode.set(NodeProp.ALLOWED_FEATURES, "0");
-
 		userNode.setContent("### Account: " + newUserName);
 		userNode.touch();
-
 		if (!automated) {
 			userNode.set(NodeProp.SIGNUP_PENDING, true);
 		}
 		update.save(ms, userNode);
-
 		// ensure we've pre-created this node.
-		SubNode postsNode = read.getUserNodeByType(ms, null, userNode, "### Posts", NodeType.POSTS.s(),
-				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+		SubNode postsNode = read.getUserNodeByType(ms, null, userNode, "### Posts", NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 		if (postsNodeVal != null) {
 			postsNodeVal.setVal(postsNode);
 		}
-
 		if (!nostr.isNostrUserName(newUserName)) {
-			user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "'s Node", NodeType.NONE.s(), NodeName.HOME);
+			user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "\'s Node", NodeType.NONE.s(), NodeName.HOME);
 		}
-
 		update.save(ms, userNode);
 		return userNode;
 	}
@@ -1081,64 +958,48 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void createAdminUser(MongoSession ms) {
 		String adminUser = prop.getMongoAdminUserName();
-
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (adminNode == null) {
 			adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
-
 			adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
 			adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
 			adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
 			adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
 			update.save(ms, adminNode);
-
 			/*
 			 * If we just created this user we know the session object here won't have the adminNode id in it
 			 * yet and it needs to for all subsequent operations.
 			 */
 			ms.setUserNodeId(adminNode.getId());
 		}
-
 		allUsersRootNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
-
 		ensureUsersLocalAndRemotePath(ms);
 		createPublicNodes(ms);
 	}
 
 	public void ensureUsersLocalAndRemotePath(MongoSession ms) {
-		localUsersNode =
-				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
-		remoteUsersNode =
-				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
+		localUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
+		remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
 	}
 
 	public void createPublicNodes(MongoSession ms) {
 		log.debug("creating Public Nodes");
 		Val<Boolean> created = new Val<>(Boolean.FALSE);
-		SubNode publicNode =
-				snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.PUBLIC, null, "Public", null, true, null, created);
-
+		SubNode publicNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.PUBLIC, null, "Public", null, true, null, created);
 		if (created.getVal()) {
 			acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 		/////////////////////////////////////////////////////////
 		created = new Val<>(Boolean.FALSE);
-
 		// create home node (admin owned node named 'home').
 		snUtil.ensureNodeExists(ms, NodePath.PENDING_PATH, null, null, "Pending Edits", null, true, null, created);
-
 		/////////////////////////////////////////////////////////
 		created = new Val<>(Boolean.FALSE);
-
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME, NodeName.HOME,
-				"Public Home", null, true, null, created);
-
+		SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME, NodeName.HOME, "Public Home", null, true, null, created);
 		// make node public
 		acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
-
 		publicHome.set(NodeProp.UNPUBLISHED, true);
-
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 	}
 }

@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bson.types.ObjectId;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -21,49 +20,37 @@ import quanta.util.DateUtil;
  * #todo-optimization: need timer that cleans each of these out once every 8hrs.
  */
 @Component
-@Slf4j 
 public class ActPubCache extends ServiceBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubCache.class);
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed
      */
     public final ConcurrentHashMap<String, Boolean> usersPendingRefresh = new ConcurrentHashMap<>();
-
     public final ConcurrentHashMap<String, Boolean> allUserNames = new ConcurrentHashMap<>();
-
     /* Cache Actor objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APOActor> actorsByUserName = new ConcurrentHashMap<>();
-
     /* Cache Actor objects by URL in memory only for now */
     public final ConcurrentHashMap<String, APOActor> actorsByUrl = new ConcurrentHashMap<>();
-
     /* Cache Actor URLS by UserName in memory only for now */
     public final ConcurrentHashMap<String, String> actorUrlsByUserName = new ConcurrentHashMap<>();
-
     /* Cache inboxes by UserName in memory only for now */
     public final ConcurrentHashMap<String, String> inboxesByUserName = new ConcurrentHashMap<>();
-
     /* Cache of user account node Ids by actor url */
     public final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<>();
-
     /* Account Node by actor Url */
     public final ConcurrentHashMap<String, SubNode> acctNodesByActorUrl = new ConcurrentHashMap<>();
-
     /* Account Node by User Name */
     public final ConcurrentHashMap<String, SubNode> acctNodesByUserName = new ConcurrentHashMap<>();
-
     /* Account Node by node ID */
     public final ConcurrentHashMap<String, SubNode> acctNodesById = new ConcurrentHashMap<>();
-
     /* Cache WebFinger objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
-
     /* Maps the string representation of a key to the PrivateKey object */
     public final ConcurrentHashMap<String, PrivateKey> privateKeys = new ConcurrentHashMap<>();
-
     /* Cache WebFinger fails, so we don't try them again */
     public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
-
     /*
      * This holds the set of all users followed by any user in Quanta (which we might need to change to
      * just the users that are followed by FollowBot?) so that when we're doing the WebCrawl to pull
@@ -96,19 +83,16 @@ public class ActPubCache extends ServiceBase {
      */
     public void saveNotify(SubNode node) {
         final ObjectId objId = node.getId();
-
         acctNodesByActorUrl.forEach((k, v) -> {
             if (v.getId().equals(objId)) {
                 acctNodesByActorUrl.put(k, node);
             }
         });
-
         acctNodesByUserName.forEach((k, v) -> {
             if (v.getId().equals(objId)) {
                 acctNodesByUserName.put(k, node);
             }
         });
-
         acctNodesById.forEach((k, v) -> {
             if (v.getId().equals(objId)) {
                 acctNodesById.put(k, node);

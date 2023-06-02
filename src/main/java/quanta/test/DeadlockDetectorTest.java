@@ -1,6 +1,6 @@
+
 package quanta.test;
 
-import lombok.extern.slf4j.Slf4j;
 import quanta.util.LockEx;
 
 /**
@@ -18,11 +18,13 @@ import quanta.util.LockEx;
  *		throw new RuntimeEx("Aborting. Thread "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by thread "+getOwner().getName());
  *	}
  */
-@Slf4j 
 public class DeadlockDetectorTest {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DeadlockDetectorTest.class);
 	private int threadsRunning = 0;
 	private final LockEx a = new LockEx("a", true, 7000, 1);
 	private final LockEx b = new LockEx("b", true, 7000, 1);
+
 
 	class T1 extends Thread {
 		public void run() {
@@ -30,12 +32,10 @@ public class DeadlockDetectorTest {
 				threadsRunning++;
 				Thread.currentThread().setName("T1");
 				log.debug("Thread T1 Started.");
-
 				// Thread 1 gets lock "a"
 				a.lockEx();
 				System.out.println("T1: Lock a entered. And sleeping 3 seconds.");
 				delay(3000);
-
 				try {
 					// Thread 1 tries to get lock 'b'
 					b.lockEx();
@@ -54,16 +54,15 @@ public class DeadlockDetectorTest {
 		}
 	}
 
+
 	class T2 extends Thread {
 		public void run() {
 			try {
 				threadsRunning++;
 				Thread.currentThread().setName("T2");
 				log.debug("Thread T2 Started.");
-
 				//small sleep just enough to ensure Thread 1 has gotten lock a.
 				delay(2000);
-
 				// Thread 2 gets lock b
 				b.lockEx();
 				System.out.println("T2: Lock b entered. And sleeping two seconds.");
@@ -97,10 +96,8 @@ public class DeadlockDetectorTest {
 	public void run() {
 		new T1().start();
 		new T2().start();
-
 		//give threads a chance to start before we start waiting on them.
 		delay(100);
-
 		//i know there's a cleaner way to wait for multiple threads, but i want this test to be ultra simple
 		//with the smallest possible amount of 'Threading-specific' API calls in it.
 		while (threadsRunning > 0) {

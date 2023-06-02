@@ -1,9 +1,9 @@
+
 package quanta.mail;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
@@ -15,8 +15,9 @@ import quanta.mongo.model.SubNode;
  * Deamon for sending emails.
  */
 @Component
-@Slf4j 
 public class EmailSenderDaemon extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailSenderDaemon.class);
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
@@ -35,17 +36,14 @@ public class EmailSenderDaemon extends ServiceBase {
 	 */
 	@Scheduled(fixedDelay = 10000)
 	public void run() {
-		if (run || !MongoRepository.fullInit)
-			return;
+		if (run || !MongoRepository.fullInit) return;
 		try {
 			run = true;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 				log.debug("ignoring NotificationDeamon schedule cycle");
 				return;
 			}
-
 			runCounter++;
-
 			/* fail fast if no mail host is configured. */
 			if (StringUtils.isEmpty(prop.getMailHost())) {
 				if (runCounter < 3) {
@@ -53,10 +51,8 @@ public class EmailSenderDaemon extends ServiceBase {
 				}
 				return;
 			}
-
 			if (--runCountdown <= 0) {
 				runCountdown = INTERVAL_SECONDS;
-
 				arun.run((MongoSession ms) -> {
 					Iterable<SubNode> mailNodes = outbox.getMailNodes(ms);
 					if (mailNodes != null) {
@@ -83,13 +79,10 @@ public class EmailSenderDaemon extends ServiceBase {
 				mail.init();
 				for (SubNode node : nodes) {
 					log.debug("Iterating node to email. nodeId:" + node.getIdStr());
-
 					String email = node.getStr(NodeProp.EMAIL_RECIP);
 					String subject = node.getStr(NodeProp.EMAIL_SUBJECT);
 					String content = node.getStr(NodeProp.EMAIL_CONTENT);
-
 					if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
-
 						log.debug("Found mail to send to: " + email);
 						if (delete.delete(ms, node, false) > 0) {
 							// only send mail if we were able to delete the node, because other wise something is wrong

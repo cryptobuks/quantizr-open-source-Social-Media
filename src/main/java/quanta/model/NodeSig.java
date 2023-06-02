@@ -1,12 +1,30 @@
+
 package quanta.model;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 // A nodeId and the signature of the node
-@Data
-@NoArgsConstructor
 public class NodeSig {
     private String nodeId;
     private String sig;
+
+    
+    public String getNodeId() {
+        return this.nodeId;
+    }
+
+    
+    public String getSig() {
+        return this.sig;
+    }
+
+    
+    public void setNodeId(final String nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    
+    public void setSig(final String sig) {
+        this.sig = sig;
+    }
+    
+    public NodeSig() {
+    }
 }

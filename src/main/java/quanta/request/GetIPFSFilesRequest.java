@@ -1,11 +1,19 @@
+
 package quanta.request;
 
 import quanta.request.base.RequestBase;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 public class GetIPFSFilesRequest extends RequestBase {
     private String folder;
+
+    public String getFolder() {
+        return this.folder;
+    }
+
+    public void setFolder(final String folder) {
+        this.folder = folder;
+    }
+
+    public GetIPFSFilesRequest() {
+    }
 }

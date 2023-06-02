@@ -15,7 +15,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
 import quanta.model.client.PrincipalName;
@@ -31,15 +30,14 @@ import quanta.util.XString;
  */
 @Component
 @Order(5)
-@Slf4j 
 public class AppFilter extends GenericFilterBean {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppFilter.class);
 	@Autowired
 	private ApplicationContext context;
-
 	private static int reqId = 0;
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
-
 	/*
 	 * if non-zero this is used to put a millisecond delay (determined by its value) onto every request
 	 * that comes thru as an API call.
@@ -51,22 +49,16 @@ public class AppFilter extends GenericFilterBean {
 		if (Const.debugRequests) {
 			log.debug("AppFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(res))
-			return;
-
+		if (!Util.gracefulReadyCheck(res)) return;
 		HttpServletResponse httpRes = null;
 		try {
 			int thisReqId = ++reqId;
 			HttpServletRequest httpReq = null;
-
 			if (req instanceof HttpServletRequest) {
 				// log.debug("***** SC: User: " + sc.getUserName());
-
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
-
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
-
 				// Get SessionContext from the 'token' parameter if we can.
 				SessionContext sc = null;
 				String token = httpReq.getParameter("token");
@@ -78,7 +70,6 @@ public class AppFilter extends GenericFilterBean {
 				} else {
 					sc = ThreadLocals.getSC();
 				}
-
 				if (sc == null || !SessionContext.sessionExists(sc)) {
 					if (Util.allowInsecureUrl(httpReq.getRequestURI())) {
 						HttpSession session = httpReq.getSession(true);
@@ -87,11 +78,9 @@ public class AppFilter extends GenericFilterBean {
 						throw new NotLoggedInException();
 					}
 				}
-
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
 				ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
-
 				/*
 				 * if auth token is privided and doesn't exist that's a timed out session so send user back to
 				 * landing page. Should also blow away all browser memory. New browser page load.
@@ -102,36 +91,29 @@ public class AppFilter extends GenericFilterBean {
 					bearer = null;
 					sc.setUserName(PrincipalName.ANON.s());
 				}
-
 				// if no bearer is given, and no userName is set, then set to ANON
 				if (bearer == null && sc.getUserName() == null) {
 					sc.setUserName(PrincipalName.ANON.s());
 				}
-
 				ThreadLocals.setReqBearerToken(bearer);
-
 				if (simulateSlowServer > 0) {
 					Util.sleep(simulateSlowServer);
 				}
-
 				if (logRequests) {
-					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
-							+ httpReq.getQueryString();
+					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString=" + httpReq.getQueryString();
 					log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 				}
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
 			}
-
 			if (res instanceof HttpServletResponse) {
 				ThreadLocals.setServletResponse((HttpServletResponse) res);
 			}
-
 			try {
 				chain.doFilter(req, res);
 				if (logResponses) {
-					log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
-							+ HttpStatus.valueOf(httpRes.getStatus()));
+					log.debug( /* +httpRes.getStatus() */
+					"    RES: [" + String.valueOf(thisReqId) + "]" + HttpStatus.valueOf(httpRes.getStatus()));
 				}
 			} catch (RuntimeException ex) {
 				log.error("Failed", ex);

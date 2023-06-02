@@ -1,3 +1,4 @@
+
 package quanta.service.exports;
 
 import java.awt.image.BufferedImage;
@@ -18,7 +19,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -37,32 +37,27 @@ import quanta.util.XString;
  * This was experimental code, and it not currently being used. We are using the flexbox code for
  * exporting to PDF (see ExportServiceFlexmark.java)
  */
-
 @Component
 @Scope("prototype")
-@Slf4j 
 public class ExportPdfServicePdfBox extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 	private MongoSession session;
-
 	private String shortFileName;
 	private String fullFileName;
-
 	private PDFont font = PDType1Font.HELVETICA;
 	private float baseFontSize = 12;
 	private float fontSize = baseFontSize;
 	private float leading;
 	private int lineCount = 0;
-
 	private PDPageContentStream stream = null;
 	private PDDocument doc = null;
-
 	private PDRectangle mediabox;
 	private float margin = 35;
 	private float width;
 	private float startX;
 	private float startY;
 	private int lastSpace = -1;
-
 	private ExportRequest req;
 
 	/*
@@ -74,11 +69,9 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 		this.session = ms;
 		this.req = req;
 		String nodeId = req.getNodeId();
-
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
-
 		if (nodeId.equals("/")) {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
@@ -86,7 +79,6 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
-
 		res.setSuccess(true);
 	}
 
@@ -94,14 +86,11 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
-
 		setFontSize(baseFontSize);
-
 		SubNode exportNode = read.getNode(ms, nodeId, true, null);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".pdf";
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
-
 		try {
 			// log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);
 			doc = new PDDocument();
@@ -114,13 +103,11 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 				if (stream != null) {
 					stream.close();
 				}
-
 				doc.save(fullFileName);
 				doc.close();
 			} catch (Exception e) {
 				throw ExUtil.logAndWrapEx(log, "Failed Unwinding PDF", e);
 			}
-
 			(new File(fullFileName)).deleteOnExit();
 		}
 	}
@@ -130,17 +117,13 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			if (stream != null) {
 				stream.close();
 			}
-
 			PDPage page = new PDPage();
 			mediabox = page.getMediaBox();
-
 			lineCount = 0;
 			width = mediabox.getWidth() - 2 * margin;
 			startX = mediabox.getLowerLeftX() + margin;
 			startY = mediabox.getUpperRightY() - margin;
-
 			doc.addPage(page);
-
 			stream = new PDPageContentStream(doc, page);
 			stream.setLeading(leading);
 		} catch (Exception ex) {
@@ -149,12 +132,9 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null)
-			return;
-
+		if (node == null) return;
 		processNode(node);
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
-
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 			recurseNode(n, level + 1);
 		}
@@ -174,29 +154,21 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	private void writeImage(SubNode node) {
 		try {
 			List<Attachment> atts = node.getOrderedAttachments();
-			if (atts == null)
-				return;
-
+			if (atts == null) return;
 			// process all attachments specifically to embed the image ones
 			for (Attachment att : atts) {
-				if (att.getBin() == null)
-					continue;
-
+				if (att.getBin() == null) continue;
 				String mime = att.getMime();
 				if (!ImageUtil.isImageMime(mime)) continue;
 				String imgSize = att.getCssSize();
-				float sizeFactor = 1f;
-
+				float sizeFactor = 1.0F;
 				if (imgSize != null && imgSize.endsWith("%")) {
 					imgSize = XString.stripIfEndsWith(imgSize, "%");
 					int size = Integer.parseInt(imgSize);
 					sizeFactor = Float.valueOf(size).floatValue() / 100;
 				}
-
 				InputStream is = attach.getStream(session, att.getKey(), node, false);
-				if (is == null)
-					continue;
-
+				if (is == null) continue;
 				PDImageXObject pdImage = null;
 				try {
 					if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
@@ -208,14 +180,10 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 				} finally {
 					IOUtils.closeQuietly(is);
 				}
-
-				if (pdImage == null)
-					continue;
-
+				if (pdImage == null) continue;
 				float imgWidth = width * sizeFactor;
 				float scale = imgWidth / pdImage.getWidth();
 				advanceY(pdImage.getHeight() * scale);
-
 				stream.drawImage(pdImage, startX, startY, imgWidth, pdImage.getHeight() * scale);
 				advanceY(leading);
 			}
@@ -226,7 +194,6 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void advanceY(float delta) {
 		startY -= delta;
-
 		if (startY <= margin) {
 			newPage();
 			startY -= delta;
@@ -254,15 +221,12 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			if (lineCount > 0) {
 				advanceY(leading);
 			}
-
 			stream.beginText();
 			stream.setFont(font, fontSize);
 			stream.newLineAtOffset(startX, startY);
-
 			// I think once you call endText you can't expect newLine to work again without
 			// calling newLineAtOffset again first.
 			// stream.newLine();
-
 			stream.showText(val);
 			stream.endText();
 			lineCount++;
@@ -274,7 +238,6 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	private void printContent(String wholeLetter) {
 		try {
 			String[] paragraphs = wholeLetter.split(System.getProperty("line.separator"));
-
 			for (String para : paragraphs) {
 				lastSpace = -1;
 				printParagraph(para);
@@ -316,13 +279,12 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	public void setFontSize(float fontSize) {
 		this.fontSize = fontSize;
-
 		// this conditional is just to make sure we don't get too much space below title
 		// lines.
 		if (fontSize > baseFontSize + 4) {
-			this.leading = 1.5f * (baseFontSize + 4);
+			this.leading = 1.5F * (baseFontSize + 4);
 		} else {
-			this.leading = 1.5f * fontSize;
+			this.leading = 1.5F * fontSize;
 		}
 	}
 }

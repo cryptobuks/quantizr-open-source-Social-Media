@@ -1,3 +1,4 @@
+
 package quanta.service.exports;
 
 import java.io.BufferedOutputStream;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -27,13 +27,16 @@ import quanta.util.val.Val;
  */
 @Component
 @Scope("prototype")
-@Slf4j 
 public class ExportJsonService extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportJsonService.class);
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
+
 	static {
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 	}
+
 	private static final ObjectWriter jsonWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
 	/*
@@ -48,28 +51,22 @@ public class ExportJsonService extends ServiceBase {
 			if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 				throw ExUtil.wrapEx("adminDataFolder does not exist");
 			}
-
 			String targetFolder = prop.getAdminDataFolder() + File.separator + fileName;
 			FileUtils.createDirectory(targetFolder);
-
 			/* This is not a typo, this path will be like ".../fileName/fileName.json" */
 			String fullFileName = targetFolder + File.separator + fileName + ".json";
-
 			Val<Integer> numDocs = new Val<>(0);
 			Val<Integer> numBins = new Val<>(0);
-
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
-
 			Query q = new Query();
 			Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
 			q.addCriteria(crit);
-
 			Iterable<SubNode> iter = mongoUtil.find(q);
 			BufferedOutputStream os = null;
 			try {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
-				iter.forEach((node) -> {
+				iter.forEach(node -> {
 					// todo-2: this is not yet handling multiple images, but this method isn't currently used.
 					Attachment att = node.getFirstAttachment();
 					String binFileName = att != null ? att.getFileName() : null;
@@ -81,7 +78,6 @@ public class ExportJsonService extends ServiceBase {
 						String path = node.getPath();
 						log.debug("Node has no binary: " + path);
 					}
-
 					try {
 						String json = jsonWriter.writeValueAsString(node);
 						_os.write(json.getBytes(StandardCharsets.UTF_8));
@@ -98,7 +94,6 @@ public class ExportJsonService extends ServiceBase {
 			} finally {
 				StreamUtil.close(os);
 			}
-
 			return "NodeCount: " + numDocs.getVal() + " exported to " + fileName + ". BinaryCount=" + numBins.getVal() + "<p>";
 		} catch (Exception e) {
 			return "Failed exporting " + fileName;
@@ -108,12 +103,10 @@ public class ExportJsonService extends ServiceBase {
 	// Not used, but let's keep this code for now.
 	// private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
 	// 	boolean ret = false;
-
 	// 	Attachment att = node.getAttachment(null, true, true);
 	// 	String binMime = ok(att) ? att.getMime() : null;
 	// 	ObjectId oid = node.getId();
 	// 	if (ok(oid)) {
-
 	// 		InputStream is = null;
 	// 		LimitedInputStreamEx lis = null;
 	// 		try {
@@ -123,7 +116,6 @@ public class ExportJsonService extends ServiceBase {
 	// 			lis = new LimitedInputStreamEx(is, user.getMaxUploadSize(ms));
 	// 			attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
 	// 			update.save(ms, node);
-
 	// 		} catch (Exception e) {
 	// 			e.printStackTrace();
 	// 		} finally {
@@ -134,13 +126,11 @@ public class ExportJsonService extends ServiceBase {
 	// 	}
 	// 	return ret;
 	// }
-
 	private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
 		boolean ret = false;
 		if (binFileName != null) {
 			log.debug("FileName: " + binFileName);
 		}
-
 		InputStream is = attach.getStreamByNode(node, "");
 		if (is != null) {
 			try {
@@ -153,15 +143,12 @@ public class ExportJsonService extends ServiceBase {
 			} finally {
 				StreamUtil.close(is);
 			}
-
 			ret = true;
 		} else {
 			log.debug("Unable to get inputstream or oid.");
 		}
-
 		return ret;
 	}
-
 	/*
 	 * Imports the data from /src/main/resources/nodes/[subFolder] into the db, which will update the
 	 * targetPath node path (like "/r/public"), content on the tree.
@@ -172,16 +159,13 @@ public class ExportJsonService extends ServiceBase {
 	// public String resetNode(MongoSession ms, String subFolder) {
 	// 	try {
 	// 		ThreadLocals.setParentCheckEnabled(false);
-
 	// 		String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
 	// 		Resource resource = context.getResource(resourceName);
 	// 		InputStream is = resource.getInputStream();
 	// 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-
 	// 		try {
 	// 			String line;
 	// 			StringBuilder buf = new StringBuilder();
-
 	// 			while (ok(line = in.readLine())) {
 	// 				if (!line.equals(",")) {
 	// 					buf.append(line);
@@ -190,13 +174,10 @@ public class ExportJsonService extends ServiceBase {
 	// 				}
 	// 				String json = buf.toString();
 	// 				buf.setLength(0);
-
 	// 				// log.debug("JSON: " + json);
-
 	// 				// jsonToNodeService.importJsonContent(json, node);
 	// 				SubNode node = objectMapper.readValue(json, SubNode.class);
 	// 				update.save(ms, node);
-
 	// 				Attachment att = node.getAttachment();
 	// 				String binFileName = ok(att) ? att.getFileName() : null;
 	// 				if (ok(binFileName)) {

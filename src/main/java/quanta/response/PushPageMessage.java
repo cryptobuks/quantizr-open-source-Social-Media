@@ -1,10 +1,6 @@
+
 package quanta.response;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class PushPageMessage extends ServerPushInfo {
 	private String payload;
 	private boolean usePopup;
@@ -13,5 +9,28 @@ public class PushPageMessage extends ServerPushInfo {
 		super("pushPageMessage");
 		this.payload = payload;
 		this.usePopup = usePopup;
+	}
+
+	
+	public String getPayload() {
+		return this.payload;
+	}
+
+	
+	public boolean isUsePopup() {
+		return this.usePopup;
+	}
+
+	
+	public void setPayload(final String payload) {
+		this.payload = payload;
+	}
+
+	
+	public void setUsePopup(final boolean usePopup) {
+		this.usePopup = usePopup;
+	}
+
+	public PushPageMessage() {
 	}
 }

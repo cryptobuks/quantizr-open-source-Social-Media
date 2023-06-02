@@ -1,3 +1,4 @@
+
 package quanta.filter;
 
 import java.io.IOException;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import lombok.extern.slf4j.Slf4j;
 import quanta.util.Const;
 import quanta.util.Util;
 
@@ -20,25 +20,22 @@ import quanta.util.Util;
  */
 @Component
 @Order(4)
-@Slf4j 
 public class HitFilter extends GenericFilterBean {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HitFilter.class);
 	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("HitFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response))
-			return;
-
+		if (!Util.gracefulReadyCheck(response)) return;
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
 			updateHitCounter(sreq);
 		}
-
 		chain.doFilter(request, response);
 	}
 
@@ -53,12 +50,10 @@ public class HitFilter extends GenericFilterBean {
 	public static void addHit(String id) {
 		synchronized (uniqueHits) {
 			Integer hitCount = id != null ? uniqueHits.get(id) : null;
-
 			if (hitCount == null) {
 				uniqueHits.put(id, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;
-
 				// Throttle heavy users
 				if (hitCount > 20) {
 					Util.sleep(hitCount);
@@ -72,5 +67,6 @@ public class HitFilter extends GenericFilterBean {
 		return uniqueHits;
 	}
 
-	public void destroy() {}
+	public void destroy() {
+	}
 }

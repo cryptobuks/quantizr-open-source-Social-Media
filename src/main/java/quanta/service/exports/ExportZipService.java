@@ -1,3 +1,4 @@
+
 package quanta.service.exports;
 
 import java.io.FileOutputStream;
@@ -7,13 +8,13 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.util.ExUtil;
 
 @Component
 @Scope("prototype")
-@Slf4j 
 public class ExportZipService extends ExportArchiveBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportZipService.class);
     private ZipArchiveOutputStream out = null;
 
     @Override
@@ -44,12 +45,10 @@ public class ExportZipService extends ExportArchiveBase {
         // log.debug("Add Entry3: " + fileName + " bytes.length=" + bytes.length);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
-
             // I saw this in an example but haven't tried using it.
             // CRC32 crc32 = new CRC32();
             // crc32.update(tail);
             // zipEntry.setCrc(crc32.getValue());
-
             entry.setSize(bytes.length);
             out.putArchiveEntry(entry);
             out.write(bytes);
@@ -67,7 +66,6 @@ public class ExportZipService extends ExportArchiveBase {
         // log.debug("Add Entry4: " + fileName);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
-
             entry.setSize(length);
             out.putArchiveEntry(entry);
             IOUtils.copyLarge(stream, out, 0, length);

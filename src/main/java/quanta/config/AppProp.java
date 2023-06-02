@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
@@ -29,19 +28,16 @@ import quanta.util.XString;
  * accessible immediately to be used by other beans before all are fully initialized.
  */
 @Component
-@Slf4j
 public class AppProp {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppProp.class);
 	@Autowired
 	private Environment env;
-
 	@Autowired
 	private ApplicationContext context;
-
 	// if false this disables all backgrouind processing.
 	private boolean daemonsEnabled = true;
-
 	private String protocolHostAndPort = null;
-
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 	HashMap<String, Object> configMap = null;
 	private static final Object configLock = new Object();
@@ -51,22 +47,18 @@ public class AppProp {
 			if (configMap != null) {
 				return configMap;
 			}
-
 			synchronized (yamlMapper) {
 				try {
 					configMap = readYamlExternal("config-text.yaml");
-
 					// if we found the external config file in [deploy]/config/ folder then use it's contents
 					if (configMap == null) {
 						// otherwise use the internal version (internal to JAR)
 						configMap = readYamlInternal("config-text.yaml");
 					}
-
 					setPropertyOrdinals();
 				} catch (Exception e) {
 					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
-
 				if (configMap == null) {
 					configMap = new HashMap<>();
 				}
@@ -98,17 +90,15 @@ public class AppProp {
 		synchronized (yamlMapper) {
 			InputStream is = null;
 			HashMap<String, Object> map = null;
-
 			try {
 				log.debug("Loading config from internal classpath: " + fileName);
 				Resource resource = context.getResource("classpath:" + fileName);
 				is = resource.getInputStream();
-
-				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
+				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {
+				});
 				if (map == null) {
 					map = new HashMap<>();
 				}
-
 			} catch (Exception e) {
 				ExUtil.error(log, "failed to load help-text.yaml", e);
 			} finally {
@@ -123,11 +113,11 @@ public class AppProp {
 			HashMap<String, Object> map = null;
 			try {
 				File file = new File("/config/" + fileName);
-
 				// if an external config file is found use it.
 				if (file.isFile()) {
 					log.debug("Loading config from file system: " + fileName);
-					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
+					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {
+					});
 				}
 			} catch (Exception e) {
 				ExUtil.error(log, "failed to load help-text.yaml", e);
@@ -157,17 +147,12 @@ public class AppProp {
 	}
 
 	public String getProtocolHostAndPort() {
-		if (protocolHostAndPort != null)
-			return protocolHostAndPort;
-
+		if (protocolHostAndPort != null) return protocolHostAndPort;
 		protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
-
 		// If port is needed (not default) then add it.
-		if (!(getHttpProtocol().equals("https") && getServerPort().equals("443"))
-				&& !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
+		if (!(getHttpProtocol().equals("https") && getServerPort().equals("443")) && !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
 			protocolHostAndPort += ":" + getServerPort();
 		}
-
 		return protocolHostAndPort;
 	}
 
@@ -316,8 +301,7 @@ public class AppProp {
 	/* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
 	public boolean getBooleanProp(String propName) {
 		String val = env.getProperty(propName);
-		if (val == null)
-			return false;
+		if (val == null) return false;
 		val = val.toLowerCase();
 		return val.startsWith("t") || val.startsWith("y") || val.startsWith("1");
 	}
@@ -331,8 +315,7 @@ public class AppProp {
 	}
 
 	public String translateDirs(String folder) {
-		if (folder == null)
-			return folder;
+		if (folder == null) return folder;
 		String userDir = System.getProperty("user.dir");
 		return folder.replace("{user.dir}", userDir);
 	}

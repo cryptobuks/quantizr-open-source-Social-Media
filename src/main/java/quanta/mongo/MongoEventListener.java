@@ -1,3 +1,4 @@
+
 package quanta.mongo;
 
 import java.util.Calendar;
@@ -14,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.EventPublisher;
 import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
@@ -49,31 +49,24 @@ import quanta.util.XString;
  * after the Document has been retrieved from the database was converted to a POJO.
  */
 @Component
-@Slf4j 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
-
 	@Autowired
 	protected MongoTemplate ops;
-
 	@Autowired
 	private MongoRead read;
-
 	@Autowired
 	private MongoAuth auth;
-
 	@Autowired
 	private MongoUtil mongoUtil;
-
 	@Autowired
 	private SubNodeUtil snUtil;
-
 	@Autowired
 	private EventPublisher publisher;
-
 	@Autowired
 	private ActPubCache apCache;
-
 	@Autowired
 	private AclService acl;
 
@@ -89,13 +82,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// super.onBeforeSave(event);  todo-1: this needed?
 		SubNode node = event.getSource();
 		log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
-
 		// log.debug("onBeforeSave: "+XString.prettyPrint(node));
-
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
 		boolean isNew = false;
-
 		/*
 		 * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
 		 * there, along with setting that on the owner property so we can do one save and have both updated
@@ -104,29 +94,24 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			id = new ObjectId();
 			node.setId(id);
 			isNew = true;
-			// log.debug("New Node ID generated: " + id);
 		}
+		// log.debug("New Node ID generated: " + id);
 		dbObj.put(SubNode.ID, id);
-
 		// Extra protection to be sure accounts and repo root can't have any sharing
 		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
 			node.setAc(null);
 			dbObj.remove(SubNode.AC);
 		}
-
 		// home nodes are always unpublished
 		if ("home".equalsIgnoreCase(node.getName())) {
 			node.set(NodeProp.UNPUBLISHED, true);
 			dbObj.put(SubNode.PROPS, node.getProps());
 		}
-
 		if (node.getOrdinal() == null) {
 			node.setOrdinal(0L);
 			dbObj.put(SubNode.ORDINAL, 0L);
 		}
-
 		// log.debug("onBeforeSave: ID: " + node.getIdStr());
-
 		// DO NOT DELETE
 		/*
 		 * If we ever add a unique-index for "Name" (not currently the case), then we'd need something like
@@ -135,7 +120,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// if (StringUtils.isEmpty(node.getName())) {
 		// node.setName(id.toHexString())
 		// }
-
 		/* if no owner is assigned... */
 		if (node.getOwner() == null) {
 			/*
@@ -156,9 +140,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				}
 			}
 		}
-
 		Date now = null;
-
 		/* If no create/mod time has been set, then set it */
 		if (node.getCreateTime() == null) {
 			if (now == null) {
@@ -167,7 +149,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.CREATE_TIME, now);
 			node.setCreateTime(now);
 		}
-
 		if (node.getModifyTime() == null) {
 			if (now == null) {
 				now = Calendar.getInstance().getTime();
@@ -175,7 +156,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.MODIFY_TIME, now);
 			node.setModifyTime(now);
 		}
-
 		/*
 		 * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
 		 * part of the path
@@ -189,27 +169,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 			isNew = true;
 		}
-
 		// make sure root node can never have any sharing.
 		if (node.getPath().equals(NodePath.ROOT_PATH) && node.getAc() != null) {
 			dbObj.put(SubNode.AC, null);
 			node.setAc(null);
 		}
-
-		if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
-				&& (isNew || node.verifyParentPath)) {
+		if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled() && (isNew || node.verifyParentPath)) {
 			read.checkParentExists(null, node.getPath());
 		}
-
 		saveAuthByThread(node, isNew);
-
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
 		if (nodeName != null) {
 			nodeName = nodeName.replace(":", "-");
 			nodeName = nodeName.replace("~", "-");
 			nodeName = nodeName.replace("/", "-");
-
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.
 			if (nodeName != null) {
@@ -217,11 +191,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				node.setName(nodeName);
 			}
 		}
-
 		if (snUtil.removeDefaultProps(node)) {
 			dbObj.put(SubNode.PROPS, node.getProps());
 		}
-
 		if (node.getAc() != null) {
 			/*
 			 * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
@@ -233,9 +205,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (node.getAc().size() == 0) {
 				node.setAc(null);
 				dbObj.put(SubNode.AC, null);
-			}
+			} else 
 			// Remove any share to self because that never makes sense
-			else {
+			{
 				if (node.getOwner() != null) {
 					if (node.getAc().remove(node.getOwner().toHexString()) != null) {
 						dbObj.put(SubNode.AC, node.getAc());
@@ -243,11 +215,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				}
 			}
 		}
-
 		// Since we're saving this node already make sure none of our setters above left it flagged
 		// as dirty or it might unnecessarily get saved twice.
 		ThreadLocals.clean(node);
-
 		// log.debug(
 		// "MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" +
 		// node.getBool(NodeProp.USER_PREF_EDIT_MODE));
@@ -257,17 +227,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		// super.onAfterSave(event); todo-1: this needed?
 		SubNode node = event.getSource();
-
 		// update cache during save
 		if (node != null) {
 			apCache.saveNotify(node);
 		}
-
 		String dbRoot = NodePath.ROOT_PATH;
 		if (dbRoot.equals(node.getPath())) {
 			read.setDbRoot(node);
 		}
-
 		// log.debug("MongoListener SAVED hashCode: " + node.hashCode() + "  " + XString.prettyPrint(node));
 		// "\n" + ExUtil.getStackTrace(null));
 	}
@@ -275,7 +242,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterLoad(AfterLoadEvent<SubNode> event) {
 		// super.onAfterLoad(event); todo-1: this needed?
-
 		// Document dbObj = event.getDocument();
 		// String id = dbObj.getObjectId(SubNode.ID).toHexString();
 		// log.debug("onAfterLoad: id=" + id);
@@ -292,37 +258,29 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
 		}
-
 		// Extra protection to be sure accounts and repo root can't have any sharing
 		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
 			node.setAc(null);
 		}
-
 		// home nodes are always unpublished
 		if ("home".equalsIgnoreCase(node.getName())) {
 			node.set(NodeProp.UNPUBLISHED, true);
 		}
-
 		node.fixAttachments();
 		node.verifyParentPath = StringUtils.isEmpty(node.getPath());
-
 		if (ThreadLocals.hasDirtyNode(node.getId())) {
 			log.warn("DIRTY READ: " + node.getIdStr());
 		}
-
 		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
 		// + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
-
 		// log.debug("onAfterConvert: "+XString.prettyPrint(node));
 	}
 
 	@Override
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
 		// super.onBeforeDelete(event); todo-1: this needed?
-		if (!MongoRepository.fullInit)
-			return;
+		if (!MongoRepository.fullInit) return;
 		Document doc = event.getDocument();
-
 		if (doc != null) {
 			Object id = doc.get("_id");
 			if (id instanceof ObjectId) {
@@ -332,7 +290,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					auth.ownerAuth(node);
 					ThreadLocals.clean(node);
 				}
-
 				publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
 			}
 		}
@@ -344,26 +301,17 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (!MongoRepository.fullInit) {
 			return;
 		}
-		if (node.adminUpdate)
-			return;
-
-		if (verbose)
-			log.trace("saveAuth in MongoListener");
-
+		if (node.adminUpdate) return;
+		if (verbose) log.trace("saveAuth in MongoListener");
 		MongoSession ms = ThreadLocals.getMongoSession();
 		if (ms != null) {
-			if (ms.isAdmin())
-				return;
-
+			if (ms.isAdmin()) return;
 			// Must have write privileges to this node.
 			auth.ownerAuth(node);
-
 			// only if this is creating a new node do we need to check that the parent will allow it
 			if (isNew) {
 				SubNode parent = read.getParent(ms, node);
-				if (parent == null)
-					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
-
+				if (parent == null) throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 				auth.authForChildNodeCreate(ms, parent);
 				if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
 					throw new NodeAuthFailedException();

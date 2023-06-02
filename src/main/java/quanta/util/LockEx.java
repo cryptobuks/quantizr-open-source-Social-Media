@@ -1,30 +1,27 @@
+
 package quanta.util;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import lombok.extern.slf4j.Slf4j;
 import quanta.exception.base.RuntimeEx;
 
-@Slf4j 
 public class LockEx extends ReentrantLock {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LockEx.class);
 	private boolean allowRetries = true;
-
 	/* Initial wait before logging something (in seconds). */
 	private long loopTimeoutSecs = 7;
-
 	/*
 	 * How long the lock waits before it assumes a deadlock might be happening, and logs the deadlock
 	 * warning
 	 */
 	private long deadlockTimeoutMillis = 3 * 60 * 1000;
-
 	/*
 	 * This boolean makes it so that rather than letting server threads get hung we just throw an
 	 * exception and fail one of the threads whenever we detect a probable deadlock, so in this way we
 	 * do 'recover' from deadlocks although not gracefully.
 	 */
 	private boolean abortWhenDeadlockSuspected = true;
-
 	private String lockName;
 
 	public LockEx(String lockName, boolean allowRetries) {
@@ -47,21 +44,19 @@ public class LockEx extends ReentrantLock {
 	public void lockEx() {
 		boolean success = false;
 		boolean warningShown = false;
-
 		try {
 			log.trace("trying to lock: LockEx=[" + hashCode() + "] " + lockName);
 			success = tryLock(loopTimeoutSecs, TimeUnit.SECONDS);
-
 			if (success) {
-				// log.trace("GOT LOCK: " + lockName + "\nSTACK: " + getStackTrace(null));
 			}
-		} catch (Exception e) {
+		} catch (
+		// log.trace("GOT LOCK: " + lockName + "\nSTACK: " + getStackTrace(null));
+		Exception e) {
 			if (!allowRetries) {
 				throw new RuntimeEx("FAILED to obtain the lock during the allowed timeout. Lock: " + lockName, e);
 			}
 			success = false;
 		}
-
 		if (!success && allowRetries) {
 			log.trace("lock was not obtained, will retry: " + lockName);
 			/*
@@ -75,28 +70,24 @@ public class LockEx extends ReentrantLock {
 					logDeadlockWarning();
 					warningShown = true;
 					if (abortWhenDeadlockSuspected) {
-						throw new RuntimeEx("Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock "
-								+ lockName + " which was held by thread " + getOwner().getName());
+						throw new RuntimeEx("Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock " + lockName + " which was held by thread " + getOwner().getName());
 					}
 				}
-
 				try {
 					success = tryLock(loopTimeoutSecs, TimeUnit.SECONDS);
-
 					if (success) {
-						// log.trace("finally GOT LOCK: " + lockName + ". Waited " + totalWaitTime + " ms.\nSTACK: "
-						// 		+ getStackTrace(null));
 					}
-				} catch (Exception e) {
+				} catch (
+				// log.trace("finally GOT LOCK: " + lockName + ". Waited " + totalWaitTime + " ms.\nSTACK: "
+				// 		+ getStackTrace(null));
+				Exception e) {
 					success = false;
 				}
-
 				if (!success) {
 					log.trace("lock still busy[LockEx=" + hashCode() + "], continuing endless retries: " + lockName);
 				}
 			}
 		}
-
 		/*
 		 * if we printed a warning message because lock took a while to obtain then print a mia culpa on
 		 * that and because we got the lock now!!! Sometimes things just take some time. That' ok. These
@@ -118,13 +109,11 @@ public class LockEx extends ReentrantLock {
 		try {
 			// ALog.printStackTrace("unlocking");
 			if (!isHeldByCurrentThread()) {
-				log.trace("impossible unlock call being ignored. thread " + Thread.currentThread().getName()
-						+ " not holding lock " + lockName);
+				log.trace("impossible unlock call being ignored. thread " + Thread.currentThread().getName() + " not holding lock " + lockName);
 				return;
 			}
 			super.unlock();
 			log.trace("globalLockCounter=" + getHoldCount());
-
 		} catch (Exception e) {
 			log.trace("unlock failed: " + ExUtil.getStackTrace(null));
 			throw new RuntimeEx("LockEx.unlock failed.");
@@ -134,7 +123,6 @@ public class LockEx extends ReentrantLock {
 	private void logDeadlockWarning() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Lock timed out or deadlock occurred.\n");
-
 		Thread thread = Thread.currentThread();
 		sb.append("Thread attempting to get the lock: " + thread.getName() + "\n");
 		sb.append(ExUtil.getStackTrace(thread));

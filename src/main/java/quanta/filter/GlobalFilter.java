@@ -1,3 +1,4 @@
+
 package quanta.filter;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.APConst;
 import quanta.config.SessionContext;
 import quanta.util.Const;
@@ -25,20 +25,18 @@ import quanta.util.Util;
  */
 @Component
 @Order(2)
-@Slf4j 
 public class GlobalFilter extends GenericFilterBean {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GlobalFilter.class);
 	@Autowired
 	private ApplicationContext context;
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("GlobalFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response))
-			return;
-
+		if (!Util.gracefulReadyCheck(response)) return;
 		try {
 			ThreadLocals.removeAll();
 			HttpServletRequest sreq = null;
@@ -46,22 +44,19 @@ public class GlobalFilter extends GenericFilterBean {
 				sreq = (HttpServletRequest) request;
 				String uri = sreq.getRequestURI();
 				boolean createSession = "/".equals(uri) || uri.isEmpty();
-
 				// Special checks for Cache-Controls
-				if (sreq.getRequestURI().contains("/images/") || //
-						sreq.getRequestURI().contains("/fonts/") || //
-						sreq.getRequestURI().contains("/dist/main.") || // JS bundle file
-						sreq.getRequestURI().endsWith("/images/favicon.ico") || //
-						sreq.getRequestURI().contains("?v=")) {
+				if ( //
+				//
+				// JS bundle file
+				sreq.getRequestURI().contains("/images/") || sreq.getRequestURI().contains("/fonts/") || sreq.getRequestURI().contains("/dist/main.") || sreq.getRequestURI().endsWith("/images/favicon.ico") ||  //
+				sreq.getRequestURI().contains("?v=")) {
 					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 				}
-
 				// Special check for CORS
-				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
-						sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
+				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) ||  //
+				sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
 				}
-
 				HttpSession session = sreq.getSession(createSession);
 				if (session != null) {
 					SessionContext.init(context, session);
@@ -74,5 +69,6 @@ public class GlobalFilter extends GenericFilterBean {
 		}
 	}
 
-	public void destroy() {}
+	public void destroy() {
+	}
 }

@@ -1,3 +1,4 @@
+
 package quanta.model;
 
 import java.util.HashMap;
@@ -7,11 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import quanta.model.client.NodeLink;
 import org.springframework.data.annotation.Transient;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 public class GraphNode {
     private String id;
     private int level;
@@ -32,9 +29,7 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (childIds != null && childIds.contains(child.getId()))
-            return;
-
+        if (childIds != null && childIds.contains(child.getId())) return;
         if (children == null) {
             children = new LinkedList<>();
         }
@@ -63,5 +58,68 @@ public class GraphNode {
 
     public void setChildIds(HashSet<String> childIds) {
         this.childIds = childIds;
+    }
+
+    
+    public String getId() {
+        return this.id;
+    }
+
+    
+    public int getLevel() {
+        return this.level;
+    }
+
+    
+    public boolean isHighlight() {
+        return this.highlight;
+    }
+
+    
+    public String getName() {
+        return this.name;
+    }
+
+    
+    public List<GraphNode> getChildren() {
+        return this.children;
+    }
+
+    
+    public HashMap<String, NodeLink> getLinks() {
+        return this.links;
+    }
+
+    
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    
+    public void setLevel(final int level) {
+        this.level = level;
+    }
+
+    
+    public void setHighlight(final boolean highlight) {
+        this.highlight = highlight;
+    }
+
+    
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    
+    public void setChildren(final List<GraphNode> children) {
+        this.children = children;
+    }
+
+    
+    public void setLinks(final HashMap<String, NodeLink> links) {
+        this.links = links;
+    }
+    
+    public GraphNode() {
     }
 }

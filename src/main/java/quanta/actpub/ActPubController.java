@@ -15,39 +15,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import lombok.extern.slf4j.Slf4j;
 import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.util.Util;
 import quanta.util.XString;
-
+// @CrossOrigin is done by AppFilter.
 /**
  * Main REST Controller endpoint for AP
  * 
  * Actor URLs: ${host}/u/clay/home
  * 
  * Actor IDs: ${host}/ap/u/clay
- * 
  */
 @Controller
-@Slf4j 
-// @CrossOrigin is done by AppFilter.
 public class ActPubController extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubController.class);
 	@Autowired
 	private ActPubLog apLog;
 
+	//
+	//
+	//
 	/**
 	 * WebFinger GET
 	 */
-	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_JRD_JSON, //
-			APConst.CTYPE_ACT_JSON, //
-	})
-	public @ResponseBody Object webFinger(//
-			@RequestParam(value = "resource", required = true) String resource, //
-			HttpServletRequest req) {
+	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = {APConst.CTYPE_JRD_JSON, APConst.CTYPE_ACT_JSON})
+	@ResponseBody
+	public Object webFinger(//
+	@RequestParam(value = "resource", required = true) String resource,  //
+	HttpServletRequest req) {
 		apLog.trace("getWebFinger: " + resource);
 		APObj ret = apUtil.generateWebFinger(resource);
 		if (ret != null) {
@@ -74,9 +73,9 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
 	public void mastodonGetUser(//
-			@PathVariable(value = "userName", required = true) String userName, //
-			HttpServletRequest req, //
-			HttpServletResponse res) throws Exception {
+	@PathVariable(value = "userName", required = true) String userName,  //
+	HttpServletRequest req,  //
+	HttpServletResponse res) throws Exception {
 		Util.failIfAdmin(userName);
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apLog.trace("Redirecting to: " + url);
@@ -86,26 +85,27 @@ public class ActPubController extends ServiceBase {
 	/*
 	 * This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page
 	 */
-	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_HTML})
+	//
+	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_HTML})
 	public void getHTMLForUserId(//
-			@PathVariable(value = "userName", required = true) String userName, //
-			HttpServletRequest req, //
-			HttpServletResponse res) throws Exception {
+	@PathVariable(value = "userName", required = true) String userName,  //
+	HttpServletRequest req,  //
+	HttpServletResponse res) throws Exception {
 		Util.failIfAdmin(userName);
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apLog.trace("Redirecting to: " + url);
 		res.sendRedirect(url);
 	}
 
+	//
+	//
 	/**
 	 * Actor GET
 	 */
-	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON})
-	public @ResponseBody Object actor(//
-			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
+	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+	@ResponseBody
+	public Object actor(//
+	@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
 		Util.failIfAdmin(userName);
 		apLog.trace("getActor: " + userName);
 		APOPerson ret = apub.generatePersonObj(userName);
@@ -114,20 +114,20 @@ public class ActPubController extends ServiceBase {
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
 		}
-
 		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
+	//
+	//
+	//
 	/**
 	 * Shared Inbox POST
 	 */
-	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {//
-			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_ACT_JSON, //
-	})
-	public @ResponseBody Object sharedInboxPost(//
-			@RequestBody byte[] body, //
-			HttpServletRequest req) {
+	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+	@ResponseBody
+	public Object sharedInboxPost(//
+	@RequestBody byte[] body,  //
+	HttpServletRequest req) {
 		try {
 			ActPubService.inboxCount++;
 			apub.processInboxPost(req, body);
@@ -137,6 +137,9 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
+	//
 	/**
 	 * User Inbox POST
 	 * 
@@ -144,14 +147,12 @@ public class ActPubController extends ServiceBase {
 	 * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
 	 * and the post to the user simultaneously.
 	 */
-	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
-			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_ACT_JSON, //
-	})
-	public @ResponseBody Object inboxPost(//
-			@RequestBody byte[] body, //
-			@PathVariable(value = "userName", required = true) String userName, //
-			HttpServletRequest httpReq) {
+	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+	@ResponseBody
+	public Object inboxPost(//
+	@RequestBody byte[] body,  //
+	@PathVariable(value = "userName", required = true) String userName,  //
+	HttpServletRequest httpReq) {
 		Util.failIfAdmin(userName);
 		try {
 			ActPubService.inboxCount++;
@@ -162,15 +163,16 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
+	//
 	/**
 	 * GET JSON of object
 	 */
-	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
-			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_ACT_JSON, //
-	})
-	public @ResponseBody Object getJsonObj(HttpServletRequest req, //
-			@RequestParam(value = "id", required = false) String id) {
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+	@ResponseBody
+	public Object getJsonObj(HttpServletRequest req,  //
+	@RequestParam(value = "id", required = false) String id) {
 		try {
 			APObj ret = apOutbox.getResource(req, id);
 			if (ret != null) {
@@ -187,16 +189,15 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
 	/**
 	 * Outbox GET
 	 */
-	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON})
-	public @ResponseBody Object outbox(//
-			@PathVariable(value = "userName", required = true) String userName,
-			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
+	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+	@ResponseBody
+	public Object outbox(//
+	@PathVariable(value = "userName", required = true) String userName, @RequestParam(value = "min_id", required = false) String minId, @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
@@ -214,7 +215,6 @@ public class ActPubController extends ServiceBase {
 			 */
 			ret = apOutbox.generateOutbox(userName);
 		}
-
 		if (ret != null) {
 			apLog.trace("Reply with Outbox: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
@@ -225,17 +225,15 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
 	/**
 	 * Followers GET
 	 */
-	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON})
-	public @ResponseBody Object getFollowers(//
-			@PathVariable(value = "userName", required = false) String userName,
-			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-
+	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+	@ResponseBody
+	public Object getFollowers(//
+	@PathVariable(value = "userName", required = false) String userName, @RequestParam(value = "min_id", required = false) String minId, @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
@@ -243,7 +241,6 @@ public class ActPubController extends ServiceBase {
 		} else {
 			ret = apFollower.generateFollowers(null, userName);
 		}
-
 		if (ret != null) {
 			apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
@@ -254,17 +251,15 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
 	/**
 	 * Following GET
 	 */
-	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON})
-	public @ResponseBody Object getFollowing(//
-			@PathVariable(value = "userName", required = false) String userName,
-			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-
+	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+	@ResponseBody
+	public Object getFollowing(//
+	@PathVariable(value = "userName", required = false) String userName, @RequestParam(value = "min_id", required = false) String minId, @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
@@ -272,7 +267,6 @@ public class ActPubController extends ServiceBase {
 		} else {
 			ret = apFollowing.generateFollowing(null, userName);
 		}
-
 		if (ret != null) {
 			apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
@@ -283,15 +277,15 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	//
+	//
 	/**
 	 * Replies GET
 	 */
-	@RequestMapping(value = APConst.PATH_REPLIES + "/{nodeId}", method = RequestMethod.GET, produces = { //
-			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON})
-	public @ResponseBody Object getReplies(//
-			@PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
-
+	@RequestMapping(value = APConst.PATH_REPLIES + "/{nodeId}", method = RequestMethod.GET, produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+	@ResponseBody
+	public Object getReplies(//
+	@PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
 		APObj ret = apReplies.generateReplies(nodeId);
 		if (ret != null) {
 			HttpHeaders hdr = new HttpHeaders();

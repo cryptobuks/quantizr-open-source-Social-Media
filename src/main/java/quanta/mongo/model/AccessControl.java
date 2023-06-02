@@ -1,3 +1,4 @@
+
 package quanta.mongo.model;
 
 import org.apache.commons.lang3.StringUtils;
@@ -6,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Models access privileges of a single 'share', along with the encrypted symetric key to the data,
@@ -14,12 +14,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @TypeAlias("ac")
 @JsonInclude(Include.NON_NULL)
-@Slf4j 
 public class AccessControl {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccessControl.class);
 	public static final String FIELD_PRVS = "prvs";
 	@Field(FIELD_PRVS)
 	private String prvs;
-
 	// This is Encryption Cypher key for this ACL entry.
 	public static final String FIELD_KEY = "key";
 	@Field(FIELD_KEY)

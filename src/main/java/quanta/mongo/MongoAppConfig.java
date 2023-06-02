@@ -1,3 +1,4 @@
+
 package quanta.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -25,36 +26,31 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
-
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
-
+// see also: ServerMonitorListener to detect heartbeats, etc.
 /**
  * Spring configuration bean responsible for initializing and setting up MongoDD connection.
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "quanta.mongo")
-@Slf4j 
-// see also: ServerMonitorListener to detect heartbeats, etc.
 public class MongoAppConfig extends AbstractMongoClientConfiguration {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoAppConfig.class);
 	public static final String databaseName = "database";
-
 	private MongoTemplate ops;
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
 	private GridFsTemplate grid;
 	private SimpleMongoClientDatabaseFactory factory;
-
 	/**
 	 * we have this so we can set it to true and know that MongoDb failed and gracefully run in case we
 	 * need to run for debugging purposes.
 	 */
 	public static boolean connectionFailed = false;
-
 	@Autowired
 	private AppProp appProp;
 
@@ -67,9 +63,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Override
 	@Bean
 	public MongoDatabaseFactory mongoDbFactory() {
-		if (connectionFailed)
-			return null;
-
+		if (connectionFailed) return null;
 		if (factory == null) {
 			log.debug("create mongoDbFactory");
 			try {
@@ -91,9 +85,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFSBucket gridFsBucket() {
-		if (connectionFailed)
-			return null;
-
+		if (connectionFailed) return null;
 		if (gridFsBucket == null) {
 			log.debug("create gridFdBucket");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
@@ -113,13 +105,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
-		if (connectionFailed)
-			return null;
-
+		if (connectionFailed) return null;
 		if (mongoClient == null) {
 			log.debug("create mongoClient");
 			MongoCredential credential = null;
-
 			if (appProp.getMongoSecurity()) {
 				log.debug("MongoSecurity enabled.");
 				String password = appProp.getMongoPassword();
@@ -127,29 +116,22 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			} else {
 				log.debug("MongoSecurity disabled.");
 			}
-
 			try {
 				String mongoHost = appProp.getMongoDbHost();
 				Integer mongoPort = appProp.getMongoDbPort();
-
 				if (mongoHost == null) {
 					throw new RuntimeEx("mongodb.host property is missing");
 				}
-
 				if (mongoPort == null) {
 					throw new RuntimeEx("mongodb.port property is missing");
 				}
-
 				String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
 				log.info("Connecting to MongoDb: " + uri);
-
 				/*
 				 * This codec registroy is what allows us to store objects that contain other POJOS, like for
 				 * example the way we're storing AccessControl objects in a map inside SubNode
 				 */
-				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-
+				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 				MongoClientSettings.Builder builder = MongoClientSettings.builder();
 				if (credential != null) {
 					builder = builder.credential(credential);
@@ -158,20 +140,17 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				builder = builder.codecRegistry(pojoCodecRegistry); //
 				MongoClientSettings settings = builder.build();
 				mongoClient = MongoClients.create(settings);
-
 				if (mongoClient != null) {
 					if (credential != null) {
 						for (String db : mongoClient.listDatabaseNames()) {
 							log.debug("MONGO DB NAME: " + db);
 						}
 					}
-
 					log.info("Connected to Mongo OK.");
 				} else {
 					connectionFailed = true;
 					log.error("Unable to connect MongoClient");
 				}
-
 			} catch (Exception e) {
 				connectionFailed = true;
 				ExUtil.error(log, "********** Unable to connect to MongoDb. **********", e);
@@ -198,9 +177,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFsTemplate gridFsTemplate(MappingMongoConverter converter) throws Exception {
-		if (connectionFailed)
-			return null;
-
+		if (connectionFailed) return null;
 		if (grid == null) {
 			log.debug("create gridFsTemplate");
 			MongoDatabaseFactory mdbf = mongoDbFactory();

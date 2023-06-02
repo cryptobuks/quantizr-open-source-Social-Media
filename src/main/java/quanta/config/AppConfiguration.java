@@ -24,24 +24,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.filter.AppFilter;
-
+// @EnableAspectJAutoProxy // (proxyTargetClass = true)
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
  */
 @Configuration
 @EnableAsync
-@Slf4j 
-// @EnableAspectJAutoProxy // (proxyTargetClass = true)
 public class AppConfiguration implements WebMvcConfigurer {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppConfiguration.class);
 	@Autowired
 	private AppProp appProp;
-
 	@Autowired
 	private AppFilter appFilter;
-
 	private static Object execInitLock = new Object();
 	private static ThreadPoolTaskExecutor executor;
 
@@ -77,15 +74,12 @@ public class AppConfiguration implements WebMvcConfigurer {
 		if (executor != null) {
 			return executor;
 		}
-
 		synchronized (execInitLock) {
 			ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
 			exec.setCorePoolSize(8);
-
 			// t.setAwaitTerminationSeconds(20);
 			// t.setAllowCoreThreadTimeOut(true);
 			// t.setKeepAliveSeconds(120);
-
 			// only set the instance variable once the object is fully ready.
 			executor = exec;
 			log.debug("Created threadPoolTaskExecutor: hashCode=" + exec.hashCode());
@@ -95,8 +89,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	public static void shutdown() {
 		if (executor != null) {
-			log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class="
-					+ executor.getClass().getName());
+			log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class=" + executor.getClass().getName());
 			executor.shutdown();
 		}
 	}
@@ -111,10 +104,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 	// import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 	// import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
 	// @Override
 	// public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
 	// /*
 	// * This is how we enable the JS files to be edited and tested without doing a rebuild and restart
 	// of
@@ -130,7 +121,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// */
 	// if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
 	// ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
-
 	// List<String> folders = XString.tokenize(appProp.getResourcesBaseFolder(), ",", true);
 	// if (ok(folders )) {
 	// for (String folder : folders) {
@@ -145,11 +135,9 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// }
 	// }
 	// }
-
 	@Bean
 	public ServletWebServerFactory servletContainer(GracefulShutdown gracefulShutdown) {
 		TomcatServletWebServerFactory factory = null;
-
 		if ("https".equalsIgnoreCase(appProp.getHttpProtocol())) {
 			// This function is part of what's required to enable SSL on port 80.
 			factory = new TomcatServletWebServerFactory() {
@@ -167,7 +155,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 		} else {
 			factory = new TomcatServletWebServerFactory();
 		}
-
 		factory.addConnectorCustomizers(gracefulShutdown);
 		log.debug("GracefulShutdown configured.");
 		return factory;

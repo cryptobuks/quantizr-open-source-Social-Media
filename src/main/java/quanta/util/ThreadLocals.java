@@ -1,10 +1,10 @@
+
 package quanta.util;
 
 import java.util.HashMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMonEvent;
@@ -22,8 +22,9 @@ import quanta.response.base.ResponseBase;
  * decouple from Web Requests, and have these variables available on a *any* thread even if it's a
  * worker or deamon thread that isn't an actual Web Request.
  */
-@Slf4j
 public class ThreadLocals {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ThreadLocals.class);
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
@@ -33,25 +34,21 @@ public class ThreadLocals {
 	private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
 	private static final ThreadLocal<HashMap<String, NostrUserInfo>> newNostrUsers = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
-
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
 	 * will be added as top level children under it. Currently we don't do a hierarchy, but just one
 	 * level of containment
 	 */
 	private static final ThreadLocal<PerfMonEvent> rootEvent = new ThreadLocal<>();
-
 	/*
 	 * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
 	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
-
 	// We judiciously add only *some* nodes to this cache that we know are safe to cache because
 	// they're able to be treated as readonly during the context of the thread.
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
-
 	/*
 	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
 	 * nodes that should be all self contained as an acyclical-directed graph (i.e. tree) and there's no
@@ -61,6 +58,7 @@ public class ThreadLocals {
 	 * disable the check during the import only.
 	 */
 	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<>();
+
 	static {
 		parentCheckEnabled.set(true);
 	}
@@ -168,8 +166,7 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getSaving() {
-		if (saving.get() == null)
-			return false;
+		if (saving.get() == null) return false;
 		return saving.get();
 	}
 
@@ -178,8 +175,7 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getParentCheckEnabled() {
-		if (parentCheckEnabled.get() == null)
-			return false;
+		if (parentCheckEnabled.get() == null) return false;
 		return parentCheckEnabled.get();
 	}
 
@@ -213,7 +209,6 @@ public class ThreadLocals {
 		if (node == null || node.getId() == null) {
 			return;
 		}
-
 		getCachedNodes().put(node.getId(), node);
 	}
 
@@ -249,12 +244,10 @@ public class ThreadLocals {
 			log.debug("No dirty nodes.");
 			return;
 		}
-
 		log.debug("Dirty Nodes...");
 		getDirtyNodes().forEach((key, value) -> {
 			if (!key.toHexString().equals(value.getIdStr())) {
-				throw new RuntimeException(
-						"Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
+				throw new RuntimeException("Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
 			}
 			log.debug("    " + key.toHexString());
 		});
@@ -268,9 +261,7 @@ public class ThreadLocals {
 		if (node == null || node.getId() == null) {
 			return;
 		}
-
 		SubNode nodeFound = getDirtyNodes().get(node.getId());
-
 		/*
 		 * If we are setting this node to dirty, but we already see another copy of the same nodeId in
 		 * memory, this is a problem and will mean whichever node happens to be saved 'last' will overwrite,
@@ -286,7 +277,6 @@ public class ThreadLocals {
 			// }
 			return;
 		}
-
 		// log.debug("Setting Dirty: " + node.getIdStr());
 		getDirtyNodes().put(node.getId(), node);
 	}
@@ -297,14 +287,12 @@ public class ThreadLocals {
 		getDirtyNodes().remove(node.getId());
 	}
 
-
 	public static void setMongoSession(MongoSession ms) {
 		session.set(ms);
 	}
 
 	public static MongoSession ensure(MongoSession ms) {
 		MongoSession ret = ms != null ? ms : session.get();
-
 		// this should never happen, but if we didn't have a mongoSession here make one to return
 		if (ret == null && getSC() != null) {
 			ret = new MongoSession(getSC().getUserName(), getSC().getUserNodeId());

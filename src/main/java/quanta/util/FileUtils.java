@@ -1,3 +1,4 @@
+
 package quanta.util;
 
 import java.io.BufferedWriter;
@@ -18,17 +19,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 
 @Component
-@Slf4j 
 public class FileUtils extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileUtils.class);
 	/*
 	 * Creates the set of file extensions that we allow user to edit
 	 */
 	private static HashSet<String> editableExtensions = new HashSet<>();
+
 	static {
 		editableExtensions.add("md");
 		editableExtensions.add("txt");
@@ -36,6 +38,7 @@ public class FileUtils extends ServiceBase {
 	}
 
 	private static HashSet<String> imageExtensions = new HashSet<>();
+
 	static {
 		imageExtensions.add("jpg");
 		imageExtensions.add("png");
@@ -60,8 +63,9 @@ public class FileUtils extends ServiceBase {
 		try {
 			BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
 			return attr.creationTime().toMillis();
-			// System.out.println("lastAccessTime: " + attr.lastAccessTime());
-		} catch (Exception e) {
+		} catch (
+		// System.out.println("lastAccessTime: " + attr.lastAccessTime());
+		Exception e) {
 			return -1;
 		}
 	}
@@ -88,9 +92,7 @@ public class FileUtils extends ServiceBase {
 	 * output: file.txt
 	 */
 	public String getShortFileName(String fileName) {
-		if (fileName == null)
-			return null;
-
+		if (fileName == null) return null;
 		String shortName = null;
 		int idx = fileName.lastIndexOf(File.separatorChar);
 		if (idx != -1) {
@@ -108,9 +110,7 @@ public class FileUtils extends ServiceBase {
 	 * If no extension exists empty string is returned
 	 */
 	public String getFileNameExtension(String fileName) {
-		if (fileName == null)
-			return null;
-
+		if (fileName == null) return null;
 		String ext = null;
 		int idx = fileName.lastIndexOf(".");
 		if (idx != -1) {
@@ -122,9 +122,7 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public String stripExtension(String fileName) {
-		if (fileName == null)
-			return null;
-
+		if (fileName == null) return null;
 		String ret = null;
 		int idx = fileName.lastIndexOf(".");
 		if (idx != -1) {
@@ -166,9 +164,8 @@ public class FileUtils extends ServiceBase {
 	public File[] getSortedListOfFolders(String folder, Set<String> exclusions) {
 		File directory = new File(folder);
 		if (!directory.isDirectory()) {
-			throw new RuntimeEx("Folder doesn't exist: " + folder);
+			throw new RuntimeEx("Folder doesn\'t exist: " + folder);
 		}
-
 		/* First read folders and sort them */
 		File[] folders = directory.listFiles(new FileFilter() {
 			@Override
@@ -182,7 +179,6 @@ public class FileUtils extends ServiceBase {
 		if (folders != null) {
 			Arrays.sort(folders, NameFileComparator.NAME_COMPARATOR);
 		}
-
 		// log.debug("folderCount=" + (ok(folders) ? folders.length : 0));
 		return folders;
 	}
@@ -190,7 +186,7 @@ public class FileUtils extends ServiceBase {
 	public File[] getSortedListOfFiles(String folder, Set<String> exclusions) {
 		File directory = new File(folder);
 		if (!directory.isDirectory()) {
-			throw new RuntimeEx("Folder doesn't exist: " + folder);
+			throw new RuntimeEx("Folder doesn\'t exist: " + folder);
 		}
 		/* Then read files and sort them */
 		File[] files = directory.listFiles(new FileFilter() {
@@ -210,37 +206,30 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public boolean fileOrFolderExists(String fileName) {
-		if (fileName == null || fileName.trim().length() == 0)
-			return false;
+		if (fileName == null || fileName.trim().length() == 0) return false;
 		return new File(fileName).exists();
 	}
 
 	public static boolean fileExists(String fileName) {
-		if (fileName == null || fileName.equals(""))
-			return false;
-
+		if (fileName == null || fileName.equals("")) return false;
 		return new File(fileName).isFile();
 	}
 
 	public static boolean dirExists(String fileName) {
-		if (fileName == null || fileName.equals(""))
-			return false;
-
+		if (fileName == null || fileName.equals("")) return false;
 		return new File(fileName).isDirectory();
 	}
 
 	public static boolean deleteFile(String fileName) {
 		File f = new File(fileName);
 		boolean exists = f.exists();
-		if (!exists)
-			return true;
+		if (!exists) return true;
 		return f.delete();
 	}
 
 	public static boolean createDirectory(String dir) {
 		File file = new File(dir);
-		if (file.isDirectory())
-			return true;
+		if (file.isDirectory()) return true;
 		boolean success = file.mkdirs();
 		log.debug("Created folder: " + dir + ". success=" + success);
 		return success;
@@ -275,17 +264,13 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public static String ensureValidFileNameChars(String text) {
-		if (text == null)
-			return null;
-
+		if (text == null) return null;
 		int length = text.length();
 		StringBuilder ret = new StringBuilder();
 		char c;
 		boolean lastWasDash = false;
-
 		for (int i = 0; i < length; i++) {
 			c = text.charAt(i);
-
 			if (Character.isLetter(c) || Character.isDigit(c) || c == '.' || c == '-' || c == '_') {
 				ret.append(c);
 				lastWasDash = false;
@@ -298,5 +283,4 @@ public class FileUtils extends ServiceBase {
 		}
 		return ret.toString();
 	}
-
 }

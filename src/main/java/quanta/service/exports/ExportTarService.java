@@ -1,3 +1,4 @@
+
 package quanta.service.exports;
 
 import java.io.FileOutputStream;
@@ -8,13 +9,13 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.util.ExUtil;
 
 @Component
 @Scope("prototype")
-@Slf4j 
 public class ExportTarService extends ExportArchiveBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportTarService.class);
     private TarArchiveOutputStream out = null;
     private boolean gzip = false;
 
@@ -22,15 +23,11 @@ public class ExportTarService extends ExportArchiveBase {
     public void openOutputStream(String fileName) {
         log.debug("Opening Export File: " + fileName);
         try {
-            out = gzip ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName)))
-                    : new TarArchiveOutputStream(new FileOutputStream(fileName));
-
+            out = gzip ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName))) : new TarArchiveOutputStream(new FileOutputStream(fileName));
             // TAR has an 8 gig file limit by default, this gets around that
             out.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
-
             // TAR originally didn't support long file names, so enable the support for it
             out.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-
             out.setAddPaxHeadersForNonAsciiNames(true);
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
@@ -53,7 +50,6 @@ public class ExportTarService extends ExportArchiveBase {
             fileName = fileName.substring(1);
         }
         // log.debug("Add Entry1: " + fileName + " bytes.length=" + bytes.length);
-
         try {
             TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(fileName);
             tarArchiveEntry.setSize(bytes.length);
@@ -76,7 +72,6 @@ public class ExportTarService extends ExportArchiveBase {
             fileName = fileName.substring(1);
         }
         // log.debug("Add Entry2: " + fileName);
-
         try {
             TarArchiveEntry entry = new TarArchiveEntry(fileName);
             // entry.setMode ( mode );

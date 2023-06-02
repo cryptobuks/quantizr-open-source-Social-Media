@@ -1,12 +1,11 @@
+
 package quanta.util;
 
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
-
 /*
  * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to
  * use
@@ -14,12 +13,12 @@ import quanta.config.ServiceBase;
  * @Async annotation. That approach is dangerous and won't work in all scenarios
  */
 @Component
-@Slf4j
 public class AsyncExec extends ServiceBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncExec.class);
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     public Executor executor;
-
     // Reflects the true concurrently count, and should represent the current number of running threads
     // at all times.
     int execCounter = 0;
@@ -51,9 +50,9 @@ public class AsyncExec extends ServiceBase {
                 } finally {
                     ThreadLocals.removeAll();
                     execCounter--;
-                    // log.debug("Finished thread: " + Thread.currentThread().getName() + " execCounter="
-                    // + String.valueOf(execCounter) + " maxConcurrency=" + String.valueOf(maxExecCounter));
                 }
+                // log.debug("Finished thread: " + Thread.currentThread().getName() + " execCounter="
+                // + String.valueOf(execCounter) + " maxConcurrency=" + String.valueOf(maxExecCounter));
             }
         });
     }

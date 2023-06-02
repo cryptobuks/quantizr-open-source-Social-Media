@@ -1,7 +1,7 @@
+
 package quanta.util;
 
 import org.slf4j.Logger;
-import lombok.extern.slf4j.Slf4j;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -13,8 +13,10 @@ import quanta.exception.base.RuntimeEx;
  * of both types, but it just makes the code cleaner, by doing what the Java-language SHOULD have
  * done to begin with.
  */
-@Slf4j 
 public class ExUtil {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExUtil.class);
+
 	public static void run(Runnable runnable) {
 		try {
 			runnable.run();
@@ -67,7 +69,6 @@ public class ExUtil {
 
 	public static void debug(Logger logger, String msg, Throwable e) {
 		logger.debug(msg, e);
-
 		/* Not showing all sub-causes in the chain, but just the immediate one */
 		if (e.getCause() != null) {
 			logger.debug("cause:", e);
@@ -76,7 +77,6 @@ public class ExUtil {
 
 	public static void error(Logger logger, String msg, Throwable e) {
 		logger.error(msg, e);
-
 		/* Not showing all sub-causes in the chain, but just the immediate one */
 		if (e.getCause() != null) {
 			logger.error("cause:", e);
@@ -85,7 +85,6 @@ public class ExUtil {
 
 	public static void warn(Logger logger, String msg, Throwable e) {
 		logger.warn(msg, e);
-
 		/* Not showing all sub-causes in the chain, but just the immediate one */
 		if (e.getCause() != null) {
 			logger.warn("cause:", e);

@@ -1,3 +1,4 @@
+
 package quanta.util;
 
 import java.io.File;
@@ -10,14 +11,14 @@ import java.util.Map;
 import javax.activation.MimetypesFileTypeMap;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 
-@Slf4j 
 public class MimeTypeUtils {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MimeTypeUtils.class);
     private static final Tika tika = new Tika();
-
     private static Map<String, String> mimeMap;
+
     static {
         mimeMap = new HashMap<>();
         // todo-2: why this tiny list here? If doing this why not many many more?
@@ -36,7 +37,6 @@ public class MimeTypeUtils {
         } else {
             String fileName = "file." + extension;
             String ret = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(fileName);
-
             // If that getContentType didn't find anything specific, try again.
             if ("application/octet-stream".equals(ret)) {
                 ret = URLConnection.guessContentTypeFromName(fileName);
@@ -50,19 +50,16 @@ public class MimeTypeUtils {
         String mimeType = Files.probeContentType(file);
         if (mimeType == null) {
             mimeType = tika.detect(file.toFile());
-
             if (mimeType == null) {
                 mimeType = getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
             }
         }
-
         // log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
         return mimeType;
     }
 
     public static String getMimeType(File file) {
         String ret = null;
-
         try {
             String ext = FilenameUtils.getExtension(file.getCanonicalPath());
             if (ext.equalsIgnoreCase("md")) {

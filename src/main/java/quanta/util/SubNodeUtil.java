@@ -1,3 +1,4 @@
+
 package quanta.util;
 
 import java.util.HashMap;
@@ -5,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
@@ -25,8 +25,10 @@ import quanta.util.val.Val;
  * scope bean and non-static methods.
  */
 @Component
-@Slf4j
 public class SubNodeUtil extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SubNodeUtil.class);
+
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID);
 	}
@@ -38,8 +40,7 @@ public class SubNodeUtil extends ServiceBase {
 		int sz = name.length();
 		for (int i = 0; i < sz; i++) {
 			char c = name.charAt(i);
-			if (c == '-' || c == '_' || c == '.')
-				continue;
+			if (c == '-' || c == '_' || c == '.') continue;
 			if (!Character.isLetterOrDigit(c)) {
 				return false;
 			}
@@ -57,21 +58,18 @@ public class SubNodeUtil extends ServiceBase {
 	 */
 	public boolean removeDefaultProps(SubNode node) {
 		boolean ret = false;
-
 		/* If layout=="v" then remove the property */
 		String layout = node.getStr(NodeProp.LAYOUT);
 		if ("v".equals(layout)) {
 			node.delete(NodeProp.LAYOUT);
 			ret = true;
 		}
-
 		/* If priority=="0" then remove the property */
 		String priority = node.getStr(NodeProp.PRIORITY);
 		if ("0".equals(priority)) {
 			node.delete(NodeProp.PRIORITY);
 			ret = true;
 		}
-
 		if (node.getProps() != null && node.getProps().size() == 0) {
 			ret = true;
 			node.setProps(null);
@@ -80,8 +78,7 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public HashMap<String, AccessControl> cloneAcl(SubNode node) {
-		if (node.getAc() == null)
-			return null;
+		if (node.getAc() == null) return null;
 		return new HashMap<String, AccessControl>(node.getAc());
 	}
 
@@ -98,14 +95,12 @@ public class SubNodeUtil extends ServiceBase {
 		if (propName.startsWith("ap:")) {
 			return false;
 		}
-
-		if (propName.equals(NodeProp.OBJECT_ID.s()) || //
-				propName.equals(NodeProp.BIN.s()) || //
-				propName.equals(NodeProp.BIN_TOTAL.s()) || //
-				propName.equals(NodeProp.BIN_QUOTA.s())) {
+		if ( //
+		//
+		propName.equals(NodeProp.OBJECT_ID.s()) || propName.equals(NodeProp.BIN.s()) || propName.equals(NodeProp.BIN_TOTAL.s()) ||  //
+		propName.equals(NodeProp.BIN_QUOTA.s())) {
 			return false;
 		}
-
 		return true;
 	}
 
@@ -120,17 +115,16 @@ public class SubNodeUtil extends ServiceBase {
 		// if node doesn't thave a name, make ID-based url
 		if (StringUtils.isEmpty(node.getName())) {
 			return String.format("%s?id=%s", prop.getHostAndPort(), node.getIdStr());
-		}
+		} else 
 		// else format this node name based on whether the node is admin owned or not.
-		else {
+		{
 			String owner = read.getNodeOwner(ms, node);
-
 			// if admin owns node
 			if (owner.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
 				return String.format("%s/n/%s", prop.getHostAndPort(), node.getName());
-			}
+			} else 
 			// if non-admin owns node
-			else {
+			{
 				return String.format("%s/u/%s/%s", prop.getHostAndPort(), owner, node.getName());
 			}
 		}
@@ -140,23 +134,18 @@ public class SubNodeUtil extends ServiceBase {
 	 * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
 	 * provides), by creating said node if not already existing or leaving it as is if it does exist.
 	 */
-	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName, String defaultContent,
-			String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props, Val<Boolean> created) {
-
+	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName, String defaultContent, String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props, Val<Boolean> created) {
 		if (nodeName != null) {
 			SubNode nodeByName = read.getNodeByName(ms, nodeName);
 			if (nodeByName != null) {
 				return nodeByName;
 			}
 		}
-
 		if (!parentPath.endsWith("/")) {
 			parentPath += "/";
 		}
-
 		// log.debug("Looking up node by path: "+(parentPath+name));
 		SubNode node = read.getNode(ms, fixPath(parentPath + pathName));
-
 		// if we found the node and it's name matches (if provided)
 		if (node != null && (nodeName == null || nodeName.equals(node.getName()))) {
 			if (created != null) {
@@ -164,16 +153,13 @@ public class SubNodeUtil extends ServiceBase {
 			}
 			return node;
 		}
-
 		if (created != null) {
 			created.setVal(true);
 		}
-
 		List<String> nameTokens = XString.tokenize(pathName, "/", true);
 		if (nameTokens == null) {
 			return null;
 		}
-
 		SubNode parent = null;
 		if (!parentPath.equals("/")) {
 			parent = read.getNode(ms, parentPath);
@@ -181,14 +167,11 @@ public class SubNodeUtil extends ServiceBase {
 				throw ExUtil.wrapEx("Expected parent not found: " + parentPath);
 			}
 		}
-
 		boolean nodesCreated = false;
 		for (String nameToken : nameTokens) {
-
 			String path = fixPath(parentPath + nameToken);
 			// log.debug("ensuring node exists: parentPath=" + path);
 			node = read.getNode(ms, path);
-
 			/*
 			 * if this node is found continue on, using it as current parent to build on
 			 */
@@ -196,16 +179,12 @@ public class SubNodeUtil extends ServiceBase {
 				parent = node;
 			} else {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
-
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true,
-						true);
-
+				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true, true);
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
 				}
 				nodesCreated = true;
-
 				if (defaultContent == null) {
 					parent.setContent("");
 					parent.touch();
@@ -214,20 +193,16 @@ public class SubNodeUtil extends ServiceBase {
 			}
 			parentPath += nameToken + "/";
 		}
-
 		if (nodeName != null) {
 			parent.setName(nodeName);
 		}
-
 		if (defaultContent != null) {
 			parent.setContent(defaultContent);
 			parent.touch();
 		}
-
 		if (props != null) {
 			parent.addProps(props);
 		}
-
 		if (saveImmediate && nodesCreated) {
 			update.saveSession(ms);
 		}
@@ -260,7 +235,6 @@ public class SubNodeUtil extends ServiceBase {
 		String uid = UUID.randomUUID().toString();
 		StringBuilder sb = new StringBuilder();
 		int len = uid.length();
-
 		/* chop length in half by using every other character */
 		for (int i = 0; i < len; i += 2) {
 			char c = uid.charAt(i);
@@ -270,9 +244,7 @@ public class SubNodeUtil extends ServiceBase {
 				sb.append(c);
 			}
 		}
-
 		return sb.toString();
-
 		/*
 		 * WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
 		 * production servers), as they rely no some OS level sources of entropy that may be dormant at the
@@ -286,10 +258,8 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public NodeMetaInfo getNodeMetaInfo(SubNode node) {
-		if (node == null)
-			return null;
+		if (node == null) return null;
 		NodeMetaInfo ret = new NodeMetaInfo();
-
 		String description = node.getContent();
 		if (description == null) {
 			if (node.getName() != null) {
@@ -298,19 +268,15 @@ public class SubNodeUtil extends ServiceBase {
 				description = "Node ID: " + node.getIdStr();
 			}
 		}
-
 		int newLineIdx = description.indexOf("\n");
 		if (newLineIdx != -1) {
 			// call this once to start just so the title extraction works.
 			description = render.stripRenderTags(description);
-
 			// get the new idx, it might have changed.
 			newLineIdx = description.indexOf("\n");
-
 			String ogTitle = newLineIdx > 2 ? description.substring(0, newLineIdx).trim() : "";
 			ogTitle = render.stripRenderTags(ogTitle);
 			ret.setTitle(ogTitle);
-
 			if (newLineIdx > 2) {
 				description = description.substring(newLineIdx).trim();
 			}
@@ -321,19 +287,16 @@ public class SubNodeUtil extends ServiceBase {
 			description = render.stripRenderTags(description);
 			ret.setDescription(description);
 		}
-
 		String url = getFirstAttachmentUrl(node);
 		String mime = null;
 		Attachment att = node.getFirstAttachment();
 		if (att != null) {
 			mime = att.getMime();
 		}
-
 		if (url == null) {
 			url = prop.getHostAndPort() + "/branding/logo-200px-tr.jpg";
 			mime = "image/jpeg";
 		}
-
 		ret.setAttachmentUrl(url);
 		ret.setAttachmentMime(mime);
 		ret.setUrl(prop.getHostAndPort() + "?id=" + node.getIdStr());
@@ -342,20 +305,16 @@ public class SubNodeUtil extends ServiceBase {
 
 	public String getFirstAttachmentUrl(SubNode node) {
 		Attachment att = node.getFirstAttachment();
-		if (att == null)
-			return null;
+		if (att == null) return null;
 		String ipfsLink = att.getIpfsLink();
-
 		String bin = ipfsLink != null ? ipfsLink : att.getBin();
 		if (bin != null) {
 			return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
-
 		/* as last resort try to get any extrnally linked binary image */
 		if (bin == null) {
 			bin = att.getUrl();
 		}
-
 		// todo-2: will this fail to find "data:" type inline image data?
 		return bin;
 	}

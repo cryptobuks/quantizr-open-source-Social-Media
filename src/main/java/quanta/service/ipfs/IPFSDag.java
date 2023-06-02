@@ -1,3 +1,4 @@
+
 package quanta.service.ipfs;
 
 import java.io.InputStream;
@@ -8,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.ServiceBase;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.ipfs.dag.DagLink;
@@ -23,8 +23,9 @@ import quanta.util.XString;
 import quanta.util.val.Val;
 
 @Component
-@Slf4j 
 public class IPFSDag extends ServiceBase {
+    
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSDag.class);
     public static String API_DAG;
 
     @PostConstruct
@@ -37,8 +38,7 @@ public class IPFSDag extends ServiceBase {
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
-            ResponseEntity<String> response =
-                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
             log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {
@@ -62,21 +62,15 @@ public class IPFSDag extends ServiceBase {
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
         checkIpfs();
         LinkedList<MFSDirEntry> files = new LinkedList<>();
-
         if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
-
         // oops, looks like a path
-        if (req.getFolder().startsWith("/"))
-            return null;
-
+        if (req.getFolder().startsWith("/")) return null;
         cid.setVal(req.getFolder());
         folder.setVal(req.getFolder());
-
         DagNode dagNode = getNode(req.getFolder());
         log.debug("DagNode: " + XString.prettyPrint(dagNode));
-
         if (dagNode != null && dagNode.getLinks() != null) {
             for (DagLink entry : dagNode.getLinks()) {
                 MFSDirEntry me = new MFSDirEntry();
@@ -87,7 +81,6 @@ public class IPFSDag extends ServiceBase {
                 files.add(me);
             }
         }
-
         return files;
     }
 

@@ -1,3 +1,4 @@
+
 package quanta.lucene;
 
 import java.io.IOException;
@@ -15,10 +16,9 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.util.StreamUtil;
-
+// todo-2: make this a prototype-scope bean?
 /**
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes that Lucene index
  * already exists.
@@ -29,28 +29,24 @@ import quanta.util.StreamUtil;
  * todo-2: - need ability to search only specific fields (path, content, date?) - need ability to
  * order either by score or by date (rev chron)
  */
-// todo-2: make this a prototype-scope bean?
 @Component
-@Slf4j 
 public class FileSearcher {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileSearcher.class);
 	@Autowired
 	public AppProp appProp;
-
 	private StringBuilder output = new StringBuilder();
 
 	public String search(String luceneDataFoler, String line) {
-
 		log.debug("searching for: " + line);
 		String field = "contents";
 		int hitsPerPage = 10;
-
 		/**
 		 * todo-2: Is it more efficient (or even threadsafe?) to hold one or more of these two resources
 		 * open for multiple searches, and potentially simultaneous/threads?
 		 */
 		FSDirectory fsDir = null;
 		IndexReader reader = null;
-
 		try {
 			fsDir = FSDirectory.open(Paths.get(appProp.getLuceneDir() + "/" + luceneDataFoler));
 			reader = DirectoryReader.open(fsDir);
@@ -64,7 +60,6 @@ public class FileSearcher {
 		} finally {
 			StreamUtil.close(reader, fsDir);
 		}
-
 		return output.toString();
 	}
 
@@ -73,13 +68,10 @@ public class FileSearcher {
 	 * size n to the user. The user can then go to the next page if interested in the next hits.
 	 */
 	public void doPagingSearch(IndexSearcher searcher, Query query, int hitsPerPage) throws IOException {
-
 		TopDocs results = searcher.search(query, 100);
 		ScoreDoc[] hits = results.scoreDocs;
-
 		int numTotalHits = Math.toIntExact(results.totalHits.value);
 		write(numTotalHits + " total matching documents");
-
 		for (int i = 0; i < hits.length; i++) {
 			Document doc = searcher.doc(hits[i].doc);
 			String path = doc.get("path");

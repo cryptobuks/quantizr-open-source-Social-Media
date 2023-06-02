@@ -6,23 +6,22 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import lombok.extern.slf4j.Slf4j;
 import quanta.mongo.AppStartupEvent;
 import quanta.test.TestIntf;
 
 @Component
-@Slf4j 
 public class TestRunner {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TestRunner.class);
 	@Autowired
 	private ApplicationContext context;
-
 	@Autowired
 	private AppProp appProp;
 
 	@EventListener
-    public void onApplicationEvent(AppStartupEvent event) {
-        test();
-    }
+	public void onApplicationEvent(AppStartupEvent event) {
+		test();
+	}
 
 	/*
 	 * I've removed JUnit (for now) so that we can alway test *only* in a full environment and inside a
@@ -30,7 +29,6 @@ public class TestRunner {
 	 */
 	public void test() {
 		List<String> tests = appProp.getRunTests();
-
 		if (!CollectionUtils.isEmpty(tests)) {
 			log.debug("====================================================================");
 			tests.forEach(testClass -> {
@@ -41,7 +39,6 @@ public class TestRunner {
 				} catch (Exception e) {
 					log.error("test failed.", e);
 				} finally {
-
 				}
 			});
 			log.debug("Finished running tests.");

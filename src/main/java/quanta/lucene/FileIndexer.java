@@ -1,3 +1,4 @@
+
 package quanta.lucene;
 
 import java.io.BufferedInputStream;
@@ -42,14 +43,18 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import lombok.extern.slf4j.Slf4j;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
-
+// other compresison input types (not currently supported, but trvial to add, as
+// a 'CompressionType'):
+// org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+// org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
+// org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
+// org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 /**
  * Recursively scans all files in a folder (and subfolders) and indexes them into Lucene.
  * 
@@ -59,20 +64,13 @@ import quanta.util.XString;
  * index SUPPORTS reads to it DURING indexing process.
  * 
  * todo-2: for any inputstreams that are not wrapped in a BufferedInputStream I need to do that.
- * 
  */
-// other compresison input types (not currently supported, but trvial to add, as
-// a 'CompressionType'):
-// org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-// org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
-// org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
-// org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 @Component
-@Slf4j 
 public class FileIndexer extends ServiceBase {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileIndexer.class);
 	@Autowired
 	private AppProp appProp;
-
 	private IndexWriter writer;
 	private FSDirectory fsDir;
 	private int filesAdded = 0;
@@ -81,8 +79,9 @@ public class FileIndexer extends ServiceBase {
 	private boolean initialized = false;
 	private HashSet<String> suffixSet = new HashSet<>();
 
+
 	private enum CompressionType {
-		NONE, GZIP, XZIP
+		NONE, GZIP, XZIP;
 	}
 
 	public void index(String dirToIndex, String luceneIndexDataSubDir, String suffixes, boolean forceRebuild) {
@@ -90,7 +89,6 @@ public class FileIndexer extends ServiceBase {
 		buildSuffixSet(suffixes);
 		final long now = System.currentTimeMillis();
 		log.info("Indexing directory: " + dirToIndex);
-
 		// legacy code left intact but disabled here
 		// indexDirectory(new File(dirToIndex), suffix);
 		try {
@@ -99,7 +97,6 @@ public class FileIndexer extends ServiceBase {
 		} catch (Exception e) {
 			log.error("failed to index documents.", e);
 		}
-
 		log.info("Indexing completed in {} milliseconds.", System.currentTimeMillis() - now);
 	}
 
@@ -131,18 +128,15 @@ public class FileIndexer extends ServiceBase {
 	}
 
 	private void init(boolean forceRebuild, String luceneIndexDataSubDir) {
-		if (initialized)
-			return;
+		if (initialized) return;
 		initialized = true;
 		if (StringUtils.isEmpty(appProp.getLuceneDir())) {
 			throw ExUtil.wrapEx("Lucend Data Dir is not configured.");
 		}
-
 		try {
 			fsDir = FSDirectory.open(Paths.get(appProp.getLuceneDir() + "/" + luceneIndexDataSubDir));
 			Analyzer analyzer = new StandardAnalyzer();
 			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
 			if (forceRebuild) {
 				// Create a new index in the directory, removing any
 				// previously indexed documents:
@@ -151,7 +145,6 @@ public class FileIndexer extends ServiceBase {
 				// Add new documents to an existing index:
 				iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
 			}
-
 			/*
 			 * Optional: for better indexing performance, if you are indexing many documents, increase the RAM
 			 * buffer. But if you do this, increase the max heap size to the JVM (eg add -Xmx512m or -Xmx1g):
@@ -159,7 +152,6 @@ public class FileIndexer extends ServiceBase {
 			 * iwc.setRAMBufferSizeMB(256.0);
 			 */
 			writer = new IndexWriter(fsDir, iwc);
-
 		} catch (IOException e) {
 			throw ExUtil.wrapEx(e);
 		}
@@ -179,7 +171,6 @@ public class FileIndexer extends ServiceBase {
 		filesAdded = 0;
 		filesUpdated = 0;
 		filesSkipped = 0;
-
 		if (Files.isDirectory(path)) {
 			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 				@Override
@@ -215,7 +206,6 @@ public class FileIndexer extends ServiceBase {
 				filesSkipped++;
 				return;
 			}
-
 			if (isZipFileFormatFileName(absPath)) {
 				indexZipFile(path, absPath);
 			} else if (isTarFileFormatFileName(absPath)) {
@@ -258,21 +248,19 @@ public class FileIndexer extends ServiceBase {
 	private void indexTarInputStream(InputStream is, String zipParent, CompressionType compressionType) throws Exception {
 		InputStream bi = new BufferedInputStream(is);
 		InputStream istream = null;
-
 		switch (compressionType) {
-			case NONE:
-				istream = bi;
-				break;
-			case GZIP:
-				istream = new GzipCompressorInputStream(bi);
-				break;
-			case XZIP:
-				istream = new XZCompressorInputStream(bi);
-				break;
-			default:
-				throw new Exception("Invalid compression type.");
+		case NONE: 
+			istream = bi;
+			break;
+		case GZIP: 
+			istream = new GzipCompressorInputStream(bi);
+			break;
+		case XZIP: 
+			istream = new XZCompressorInputStream(bi);
+			break;
+		default: 
+			throw new Exception("Invalid compression type.");
 		}
-
 		TarArchiveInputStream tis = new TarArchiveInputStream(istream);
 		indexTarStream(tis, zipParent);
 	}
@@ -281,18 +269,19 @@ public class FileIndexer extends ServiceBase {
 		ZipEntry entry;
 		while ((entry = zis.getNextEntry()) != null) {
 			if (entry.isDirectory()) {
-				/*
+			} else 
+			/*
 				 * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
 				 * doesn't require folders to be stored but only FILES, and actually the full path on each file is
 				 * what determines the hierarchy.
 				 */
-				// processDirectory(entry);
-			} else {
+			// processDirectory(entry);
+			{
 				String absPath = entry.getName();
-
 				// if we encountered a zip file inside a zip file this is the recursion for
 				// that.
-				if (isZipFileFormatFileName(absPath)) { // todo-2: (or tar! handle tars)
+				if (isZipFileFormatFileName(absPath)) {
+					// todo-2: (or tar! handle tars)
 					indexZipInputStream(zis, zipParent + "->" + absPath);
 				} else {
 					indexZipEntry(entry, zis, zipParent);
@@ -306,16 +295,15 @@ public class FileIndexer extends ServiceBase {
 		try {
 			ArchiveEntry entry = null;
 			while ((entry = tis.getNextEntry()) != null) {
-
 				if (!tis.canReadEntryData(entry)) {
-					log.warn("Can't read entry." + entry.getName());
+					log.warn("Can\'t read entry." + entry.getName());
 					continue;
 				}
-
 				if (entry.isDirectory()) {
-					// todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
-					// is the case for TAR files. Check this.
-				} else {
+				} else 
+				// todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
+				// is the case for TAR files. Check this.
+				{
 					String absPath = entry.getName();
 					log.debug("TAR ENTRY:" + absPath);
 					// todo-2: oops ZIP is missing here. plain zip in a tar
@@ -333,9 +321,9 @@ public class FileIndexer extends ServiceBase {
 				// NOTE: There's no entry.close() method. This is not a bug, or mistake.
 			}
 		} finally {
-			// We leave this stream open here
-			// StreamUtil.close(ais);
 		}
+		// We leave this stream open here
+		// StreamUtil.close(ais);
 	}
 
 	private void indexZipEntry(ZipEntry entry, ZipInputStream zis, String zipParent) throws IOException {
@@ -344,7 +332,6 @@ public class FileIndexer extends ServiceBase {
 		// int lastSlashIdx = name.lastIndexOf("/");
 		// String fileName = name.substring(lastSlashIdx + 1);
 		// String path = name.substring(0, lastSlashIdx);
-
 		String ext = FilenameUtils.getExtension(absPath);
 		if (!suffixSet.contains(ext)) {
 			log.debug("SKIP ZipEntry: " + absPath);
@@ -352,10 +339,8 @@ public class FileIndexer extends ServiceBase {
 			return;
 		}
 		log.debug("INDEXING ZipEntry: " + absPath);
-
 		// InputStream stream = Files.newInputStream(file);
 		Document doc = new Document();
-
 		/*
 		 * Add the path of the file as a field named "path". Use a field that is indexed (i.e. searchable),
 		 * but don't tokenize the field into separate words and don't index term frequency or positional
@@ -363,7 +348,6 @@ public class FileIndexer extends ServiceBase {
 		 */
 		Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
 		doc.add(pathField);
-
 		/*
 		 * Add the last modified date of the file a field named "modified". Use a LongPoint that is indexed
 		 * (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
@@ -372,7 +356,6 @@ public class FileIndexer extends ServiceBase {
 		 * 2011021714 would mean February 17, 2011, 2-3 PM.
 		 */
 		doc.add(new LongPoint("modified", lastModified));
-
 		/*
 		 * Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
 		 * the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be in
@@ -386,7 +369,6 @@ public class FileIndexer extends ServiceBase {
 			log.warn("Failed to tika parse: " + absPath, e);
 		}
 		// log.debug(" content parse complete.");
-
 		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
 			// New index, so we just add the document (no old document can be there):
 			log.debug("adding");
@@ -409,7 +391,6 @@ public class FileIndexer extends ServiceBase {
 		// int lastSlashIdx = name.lastIndexOf("/");
 		// String fileName = name.substring(lastSlashIdx + 1);
 		// String path = name.substring(0, lastSlashIdx);
-
 		String ext = FilenameUtils.getExtension(absPath);
 		if (!suffixSet.contains(ext)) {
 			log.debug("SKIP TarEntry: " + absPath);
@@ -417,17 +398,14 @@ public class FileIndexer extends ServiceBase {
 			return;
 		}
 		log.debug("INDEXING TarEntry: " + absPath);
-
 		// InputStream stream = Files.newInputStream(file);
 		Document doc = new Document();
-
 		// Add the path of the file as a field named "path". Use a
 		// field that is indexed (i.e. searchable), but don't tokenize
 		// the field into separate words and don't index term frequency
 		// or positional information:
 		Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
 		doc.add(pathField);
-
 		/*
 		 * Add the last modified date of the file a field named "modified". Use a LongPoint that is indexed
 		 * (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
@@ -436,7 +414,6 @@ public class FileIndexer extends ServiceBase {
 		 * 2011021714 would mean February 17, 2011, 2-3 PM.
 		 */
 		doc.add(new LongPoint("modified", lastModified));
-
 		/*
 		 * Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
 		 * the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be in
@@ -450,7 +427,6 @@ public class FileIndexer extends ServiceBase {
 			log.warn("Failed to tika parse: " + absPath, e);
 		}
 		// log.debug(" content parse complete.");
-
 		if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
 			// New index, so we just add the document (no old document can be there):
 			log.debug("adding");
@@ -473,7 +449,6 @@ public class FileIndexer extends ServiceBase {
 		BodyContentHandler handler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
 		ParseContext context = new ParseContext();
-
 		try {
 			parser.parse(stream, handler, metadata, context);
 			// log.debug("META: " + XString.prettyPrint(metadata));
@@ -481,19 +456,19 @@ public class FileIndexer extends ServiceBase {
 		} catch (ZeroByteFileException e) {
 			return "";
 		}
-
 		// Another way...(that I never tried)
 		// String content = TikaAnalysis.extractContentUsingParser(stream);
 		// stream.close();
 	}
 
-	/** Indexes a single document */
+	/**
+	 * Indexes a single document
+	 */
 	private void indexDoc(Path file, long lastModified) throws IOException {
 		if (lastModified == -1) {
 			lastModified = Files.getLastModifiedTime(file).toMillis();
 		}
 		String absPath = file.toString();
-
 		// String ext = FilenameUtils.getExtension(absPath);
 		// if (!suffixSet.contains(ext)) {
 		// log.debug("SKIP: " + absPath);
@@ -501,18 +476,15 @@ public class FileIndexer extends ServiceBase {
 		// return;
 		// }
 		log.debug("INDEXING: " + absPath);
-
 		InputStream stream = Files.newInputStream(file);
 		try {
 			Document doc = new Document();
-
 			// Add the path of the file as a field named "path". Use a
 			// field that is indexed (i.e. searchable), but don't tokenize
 			// the field into separate words and don't index term frequency
 			// or positional information:
 			Field pathField = new StringField("path", file.toString(), Field.Store.YES);
 			doc.add(pathField);
-
 			// Add the last modified date of the file a field named "modified".
 			// Use a LongPoint that is indexed (i.e. efficiently filterable with
 			// PointRangeQuery). This indexes to milli-second resolution, which
@@ -521,7 +493,6 @@ public class FileIndexer extends ServiceBase {
 			// For example the long value 2011021714 would mean
 			// February 17, 2011, 2-3 PM.
 			doc.add(new LongPoint("modified", lastModified));
-
 			// Add the contents of the file to a field named "contents". Specify a Reader,
 			// so that the text of the file is tokenized and indexed, but not stored.
 			// Note that FileReader expects the file to be in UTF-8 encoding.
@@ -534,7 +505,6 @@ public class FileIndexer extends ServiceBase {
 				log.warn("Failed to tika parse: " + absPath, e);
 			}
 			// log.debug(" content parse complete.");
-
 			if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
 				// New index, so we just add the document (no old document can be there):
 				log.debug("adding");
@@ -578,7 +548,6 @@ public class FileIndexer extends ServiceBase {
 	// }
 	// index(f);
 	// }
-
 	// private void index(final File file) {
 	// try {
 	// boolean deletedExisting = false;
@@ -614,19 +583,15 @@ public class FileIndexer extends ServiceBase {
 	// }
 	// }
 	// }
-
 	// final String created = getAttrVal(attr, FileProperties.CREATED);
 	// final String size = String.valueOf(attr.size());
 	// final String content = FileUtils.readFileToString(file);
-
 	// final UserPrincipal owner = Files.getOwner(paths);
 	// final String username = owner.getName();
-
 	// Document newDoc = newLuceneDoc(content, path, name, username, lastModified,
 	// size, created,
 	// getDocType(file));
 	// writer.addDocument(newDoc);
-
 	// if (deletedExisting) {
 	// log.info("UPDATED file: {}", file.getCanonicalPath());
 	// } else {
@@ -636,19 +601,18 @@ public class FileIndexer extends ServiceBase {
 	// log.error("Failed indexing file", e);
 	// }
 	// }
-
 	/**
 	 * Get date attributes
 	 */
 	public static String getAttrVal(BasicFileAttributes attr, FileProperties prop) {
 		SimpleDateFormat format = new SimpleDateFormat(DateUtil.DATE_FORMAT);
 		switch (prop) {
-			case MODIFIED:
-				return format.format((attr.lastModifiedTime().toMillis()));
-			case CREATED:
-				return format.format((attr.creationTime().toMillis()));
-			default:
-				throw new IllegalArgumentException(prop.toString() + "is not supported.");
+		case MODIFIED: 
+			return format.format((attr.lastModifiedTime().toMillis()));
+		case CREATED: 
+			return format.format((attr.creationTime().toMillis()));
+		default: 
+			throw new IllegalArgumentException(prop.toString() + "is not supported.");
 		}
 	}
 
@@ -657,16 +621,14 @@ public class FileIndexer extends ServiceBase {
 	 */
 	public static String getDocType(File f) {
 		final int start = f.getName().lastIndexOf(".");
-		if (start == -1)
-			return "";
+		if (start == -1) return "";
 		return f.getName().substring(start + 1);
 	}
 
 	/**
 	 * Create lucene document from file attributes
 	 */
-	public static Document newLuceneDoc(String content, String path, String name, String username, String modified, String size,
-			String created, String docType) {
+	public static Document newLuceneDoc(String content, String path, String name, String username, String modified, String size, String created, String docType) {
 		Document doc = new Document();
 		doc.add(new Field("contents", content, TextField.TYPE_NOT_STORED));
 		doc.add(new StringField("filepath", path, Field.Store.YES));

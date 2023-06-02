@@ -1,3 +1,4 @@
+
 package quanta.filter;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import lombok.extern.slf4j.Slf4j;
 import quanta.util.Const;
 import quanta.util.Util;
 
@@ -22,25 +22,22 @@ import quanta.util.Util;
  */
 @Component
 @Order(1)
-@Slf4j 
 public class AuditFilter extends GenericFilterBean {
+	
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
 	public static boolean enabled = false;
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("AuditFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response))
-			return;
-
+		if (!Util.gracefulReadyCheck(response)) return;
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
 		}
-
 		try {
 			if (enabled) {
 				preProcess(sreq);
@@ -85,14 +82,12 @@ public class AuditFilter extends GenericFilterBean {
 		sb.append(" ");
 		sb.append(sreq.getRequestURI());
 		sb.append("\n");
-
 		sb.append(INDENT);
 		sb.append("proto path: ");
 		sb.append(sreq.getProtocol());
 		sb.append(" ");
 		sb.append(sreq.getServletPath());
 		sb.append("\n");
-
 		if (sreq.getPathInfo() != null || sreq.getPathTranslated() != null) {
 			sb.append(INDENT);
 			sb.append("pinfo -> ptrans: ");
@@ -101,21 +96,18 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(sreq.getPathTranslated());
 			sb.append("\n");
 		}
-
 		if (sreq.getQueryString() != null) {
 			sb.append(INDENT);
 			sb.append("q: ");
 			sb.append(sreq.getQueryString());
 			sb.append("\n");
 		}
-
 		sb.append(INDENT);
 		sb.append("len typ: ");
 		sb.append(sreq.getContentLength());
 		sb.append(" ");
 		sb.append(sreq.getContentType());
 		sb.append("\n");
-
 		sb.append(INDENT);
 		sb.append("server port usr: ");
 		sb.append(sreq.getServerName());
@@ -124,7 +116,6 @@ public class AuditFilter extends GenericFilterBean {
 		sb.append(" ");
 		sb.append(sreq.getRemoteUser());
 		sb.append("\n");
-
 		sb.append(INDENT);
 		sb.append("adrs host auth: ");
 		sb.append(sreq.getRemoteAddr());
@@ -133,7 +124,6 @@ public class AuditFilter extends GenericFilterBean {
 		sb.append(" ");
 		sb.append(sreq.getAuthType());
 		sb.append("\n");
-
 		return sb.toString();
 	}
 
@@ -177,14 +167,13 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append("Servlet parameters (Multiple Value style):\n");
 			while (e.hasMoreElements()) {
 				String name = (String) e.nextElement();
-				String vals[] = (String[]) sreq.getParameterValues(name);
+				String[] vals = (String[]) sreq.getParameterValues(name);
 				if (vals != null) {
 					sb.append(INDENT);
 					sb.append("[");
 					sb.append(name);
 					sb.append("]=");
 					sb.append(vals[0]);
-
 					for (int i = 1; i < vals.length; i++) {
 						sb.append(INDENT);
 						sb.append(INDENT); // double indent (not a typo)
@@ -227,7 +216,6 @@ public class AuditFilter extends GenericFilterBean {
 		if (session == null) {
 			return "[no session]\n";
 		}
-
 		StringBuilder sb = new StringBuilder();
 		Object sessionAattrs = session.getAttributeNames();
 		if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?>) {
@@ -255,7 +243,6 @@ public class AuditFilter extends GenericFilterBean {
 	private String getRequestParameterInfo(HttpServletRequest sreq) {
 		Enumeration<?> e = sreq.getParameterNames();
 		StringBuilder sb = new StringBuilder();
-
 		if (e.hasMoreElements()) {
 			sb.append("Servlet parameters (Single Value style):\n");
 			while (e.hasMoreElements()) {
@@ -263,14 +250,11 @@ public class AuditFilter extends GenericFilterBean {
 				sb.append(INDENT + name + " = " + sreq.getParameter(name) + "\n");
 			}
 		}
-
 		return sb.toString();
 	}
 
 	private void preProcess(HttpServletRequest sreq) {
-		if (sreq == null)
-			return;
-
+		if (sreq == null) return;
 		// NON-VERBOSE Logging
 		if (log.isDebugEnabled() && !log.isTraceEnabled()) {
 			StringBuilder sb = new StringBuilder();
@@ -287,9 +271,9 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append("]");
 			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
 			log.debug(sb.toString());
-		}
+		} else 
 		// VERBOSE Logging
-		else if (log.isTraceEnabled()) {
+		if (log.isTraceEnabled()) {
 			try {
 				StringBuilder sb = new StringBuilder();
 				sb.append("\n>\n");
@@ -310,9 +294,7 @@ public class AuditFilter extends GenericFilterBean {
 
 	private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
 		try {
-			if (sreq == null || sres == null)
-				return;
-
+			if (sreq == null || sres == null) return;
 			StringBuilder sb = new StringBuilder();
 			sb.append("\n<: " + String.valueOf(sres.getStatus()) + " ctyp: " + sres.getContentType() + "\n");
 			sb.append(getHeaderInfo(sres));
@@ -324,5 +306,6 @@ public class AuditFilter extends GenericFilterBean {
 		}
 	}
 
-	public void destroy() {}
+	public void destroy() {
+	}
 }

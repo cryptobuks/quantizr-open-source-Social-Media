@@ -1,12 +1,22 @@
+
 package quanta.response;
 
 import java.util.List;
 import quanta.response.base.ResponseBase;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 public class GetServerInfoResponse extends ResponseBase {
 	private List<InfoMessage> messages;
+
+	
+	public List<InfoMessage> getMessages() {
+		return this.messages;
+	}
+
+	
+	public void setMessages(final List<InfoMessage> messages) {
+		this.messages = messages;
+	}
+
+	public GetServerInfoResponse() {
+	}
 }
