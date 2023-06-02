@@ -1,6 +1,6 @@
 import express from 'express';
 import { SimplePool, validateEvent, verifySignature } from 'nostr-tools';
-import { nostr, utils } from "quanta-common";
+import { nostr, utils, jintf } from "quanta-common";
 import 'websocket-polyfill';
 
 console.log("Express Server starting: TSERVER_API_KEY=" + process.env.TSERVER_API_KEY);
@@ -20,7 +20,7 @@ app.get('/', (req: any, res: any, next: any) => {
 
 app.post('/nostr-verify', async (req: any, res: any, next: any) => {
     // console.log("nostr-verify: req body=" + JSON.stringify(req.body, null, 4));
-    const events: nostr.NostrEventWrapper[] = req.body.events;
+    const events: jintf.NostrEventWrapper[] = req.body.events;
     const ids: string[] = [];
     for (const event of events) {
         const evt = nostr.makeEvent(event.event);

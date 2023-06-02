@@ -331,7 +331,7 @@
 					<plugin>
 						<groupId>cz.habarta.typescript-generator</groupId>
 						<artifactId>typescript-generator-maven-plugin</artifactId>
-						<version>2.22.595</version>
+						<version>3.2.1263</version>
 						<executions>
 							<execution>
 								<id>generate</id>
@@ -358,7 +358,13 @@
 								<pattern>quanta.response.**</pattern>
 							</classPatterns>
 							<outputKind>module</outputKind>
-							<outputFile>src/main/resources/public/ts/JavaIntf.d.ts</outputFile>
+							<outputFile>src/main/resources/public/ts/JavaIntf.ts</outputFile>
+							<outputFileType>implementationFile</outputFileType>
+
+							<!-- <mapClasses>asClasses</mapClasses>
+        						<nonConstEnums>true</nonConstEnums>
+        						<optionalProperties>useLibraryDefinition</optionalProperties>-->
+
 							<mapEnum>asEnum</mapEnum>
 							<jackson2Configuration>
 								<enumsUsingToString>true</enumsUsingToString>

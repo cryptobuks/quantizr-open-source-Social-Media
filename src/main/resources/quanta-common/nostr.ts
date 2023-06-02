@@ -1,23 +1,7 @@
 import {
   Event
 } from "nostr-tools";
-
-export interface NostrEvent {
-  id: string;
-  sig: string;
-  pubkey: string;
-  kind: number;
-  content: string;
-  tags: string[][];
-  createdAt: number;
-}
-
-export interface NostrEventWrapper {
-  event: NostrEvent;
-  nodeId: string;
-  npub: string;
-  relays: string;
-}
+import { NostrEvent } from "./JavaIntf";
 
 export const makeEvent = (event: NostrEvent): Event => {
   return {
@@ -42,4 +26,3 @@ export const makeNostrEvent = (event: Event): NostrEvent => {
     createdAt: event.created_at
   };
 }
-

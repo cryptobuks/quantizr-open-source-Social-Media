@@ -6,6 +6,7 @@ const esbuild = require('esbuild')
 let common = {
   entryPoints: ['index.ts'],
   bundle: true,
+  // minify: false,
   sourcemap: 'external'
 }
 
