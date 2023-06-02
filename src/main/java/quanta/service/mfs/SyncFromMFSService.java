@@ -18,12 +18,15 @@ import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* Does the reverse of SyncToMFSService */
 @Component
 @Scope("prototype")
 public class SyncFromMFSService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SyncFromMFSService.class);
+	private static Logger log = LoggerFactory.getLogger(SyncFromMFSService.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
 	{

@@ -12,6 +12,8 @@ import quanta.model.client.NostrUserInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.base.ResponseBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread Local Storage
@@ -24,7 +26,7 @@ import quanta.response.base.ResponseBase;
  */
 public class ThreadLocals {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ThreadLocals.class);
+	private static Logger log = LoggerFactory.getLogger(ThreadLocals.class);
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();

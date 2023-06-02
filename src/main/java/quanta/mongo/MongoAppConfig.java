@@ -30,6 +30,9 @@ import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 // see also: ServerMonitorListener to detect heartbeats, etc.
 /**
@@ -39,7 +42,7 @@ import quanta.util.ExUtil;
 @EnableMongoRepositories(basePackages = "quanta.mongo")
 public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoAppConfig.class);
+	private static Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
 	public static final String databaseName = "database";
 	private MongoTemplate ops;
 	private MongoClient mongoClient;

@@ -18,6 +18,8 @@ import quanta.config.AppProp;
 import quanta.model.IPInfo;
 import quanta.util.Const;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ServletFilter for throttling access
@@ -26,7 +28,7 @@ import quanta.util.Util;
 @Order(3)
 public class ThrottleFilter extends GenericFilterBean {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ThrottleFilter.class);
+	private static Logger log = LoggerFactory.getLogger(ThrottleFilter.class);
 	@Autowired
 	private AppProp appProp;
 	private static boolean THROTTLE_ENABLED = false;

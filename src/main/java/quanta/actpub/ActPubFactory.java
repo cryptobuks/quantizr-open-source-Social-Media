@@ -33,6 +33,8 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Convert;
 import quanta.util.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convenience factory for some types of AP objects
@@ -40,7 +42,7 @@ import quanta.util.DateUtil;
 @Component
 public class ActPubFactory extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubFactory.class);
+	private static Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, boolean privateMessage, SubNode node) {
 		String objUrl = snUtil.getIdBasedUrl(node);

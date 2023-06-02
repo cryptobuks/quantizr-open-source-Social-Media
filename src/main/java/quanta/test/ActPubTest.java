@@ -5,11 +5,13 @@ import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component("ActPubTest")
 public class ActPubTest extends ServiceBase implements TestIntf {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubTest.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubTest.class);
 
     @Override
     public void test() throws Exception {

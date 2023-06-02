@@ -13,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* We're going to be caching every Fediverse username we encounter for future unspecified purposes */
 @Document(collection = "fediNames")
 @TypeAlias("fn")
@@ -20,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME})
 public class FediverseName {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FediverseName.class);
+	private static Logger log = LoggerFactory.getLogger(FediverseName.class);
 	public static final String ID = "_id";
 	@Id
 	@Field(ID)

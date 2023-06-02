@@ -5,10 +5,12 @@ import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
 import javax.imageio.ImageReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamUtil {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StreamUtil.class);
+	private static Logger log = LoggerFactory.getLogger(StreamUtil.class);
 
 	public static void close(Object... objects) {
 		for (Object obj : objects) {

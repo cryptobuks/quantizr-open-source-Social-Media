@@ -13,11 +13,13 @@ import org.springframework.util.MultiValueMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSKey extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSKey.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSKey.class);
     public static String API_NAME;
 
     @PostConstruct

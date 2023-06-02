@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the
@@ -15,7 +17,7 @@ import quanta.util.ThreadLocals;
 @Component
 public class AdminRun extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AdminRun.class);
+	private static Logger log = LoggerFactory.getLogger(AdminRun.class);
 
 	// Runs 'runner' using 'ms' if not null, or falls back to using 'admin' if ms is null
 	public <T> T run(MongoSession ms, MongoRunnableEx<T> runner) {

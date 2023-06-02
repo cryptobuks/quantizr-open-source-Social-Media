@@ -11,11 +11,13 @@ import quanta.config.ServiceBase;
 import quanta.model.client.OpenGraph;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class OpenGraphService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OpenGraphService.class);
+	private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
 	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
 	public static final String BROWSER_USER_AGENT = "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
 

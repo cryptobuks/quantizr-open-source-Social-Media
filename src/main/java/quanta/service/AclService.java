@@ -38,6 +38,8 @@ import quanta.response.SetCipherKeyResponse;
 import quanta.response.SetUnpublishedResponse;
 import quanta.util.Const;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service methods for (ACL): processing security, privileges, and Access Control List information
@@ -46,7 +48,7 @@ import quanta.util.XString;
 @Component
 public class AclService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AclService.class);
+	private static Logger log = LoggerFactory.getLogger(AclService.class);
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

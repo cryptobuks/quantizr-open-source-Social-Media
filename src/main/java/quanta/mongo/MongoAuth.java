@@ -34,6 +34,8 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for checking authorization for access to nodes. Checks what users are accessing what
@@ -42,7 +44,7 @@ import quanta.util.XString;
 @Component
 public class MongoAuth extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoAuth.class);
+	private static Logger log = LoggerFactory.getLogger(MongoAuth.class);
 	private static final boolean verbose = false;
 	private static final Object adminSessionLck = new Object();
 	private static MongoSession adminSession;

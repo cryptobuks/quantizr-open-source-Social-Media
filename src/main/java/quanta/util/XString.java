@@ -17,6 +17,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import quanta.exception.base.RuntimeEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * General string utilities.
@@ -26,7 +28,7 @@ import quanta.exception.base.RuntimeEx;
  */
 public class XString {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(XString.class);
+	private static Logger log = LoggerFactory.getLogger(XString.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
 	static {

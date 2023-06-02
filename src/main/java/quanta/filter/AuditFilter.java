@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.util.Const;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Filter for logging details of any request/response
@@ -24,7 +26,7 @@ import quanta.util.Util;
 @Order(1)
 public class AuditFilter extends GenericFilterBean {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuditFilter.class);
+	private static Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
 	public static boolean enabled = false;
 

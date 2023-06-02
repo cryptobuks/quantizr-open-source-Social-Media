@@ -12,6 +12,9 @@ import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // todo-2: need to look into bulk-ops for doing this
 // tips:
 // https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
@@ -31,7 +34,7 @@ import quanta.mongo.model.SubNode;
 @Scope("prototype")
 public class ImportWarAndPeace extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportWarAndPeace.class);
+	private static Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
 	private boolean debug = false;

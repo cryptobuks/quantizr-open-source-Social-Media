@@ -20,6 +20,8 @@ import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper to access application properties.
@@ -30,7 +32,7 @@ import quanta.util.XString;
 @Component
 public class AppProp {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppProp.class);
+	private static Logger log = LoggerFactory.getLogger(AppProp.class);
 	@Autowired
 	private Environment env;
 	@Autowired

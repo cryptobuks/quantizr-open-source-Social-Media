@@ -10,6 +10,8 @@ import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
@@ -19,7 +21,7 @@ import quanta.util.val.Val;
  */
 public class AP {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AP.class);
+    private static Logger log = LoggerFactory.getLogger(AP.class);
 
     public static boolean apHasProps(Object obj) {
         return obj instanceof Map<?, ?> || obj instanceof LinkedHashMap<?, ?>;

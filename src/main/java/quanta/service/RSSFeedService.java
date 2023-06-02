@@ -70,11 +70,14 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* Proof of Concept RSS Publishing */
 @Component
 public class RSSFeedService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RSSFeedService.class);
+	private static Logger log = LoggerFactory.getLogger(RSSFeedService.class);
 	private static boolean refreshingCache = false;
 	private static final Object policyLock = new Object();
 	PolicyFactory policy = null;

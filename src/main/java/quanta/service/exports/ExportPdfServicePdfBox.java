@@ -30,6 +30,8 @@ import quanta.util.FileUtils;
 import quanta.util.ImageUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Exporter using PDFBox
@@ -41,7 +43,7 @@ import quanta.util.XString;
 @Scope("prototype")
 public class ExportPdfServicePdfBox extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
+	private static Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 	private MongoSession session;
 	private String shortFileName;
 	private String fullFileName;

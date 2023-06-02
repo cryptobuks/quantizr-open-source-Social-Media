@@ -48,11 +48,13 @@ import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class NostrService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NostrService.class);
+	private static Logger log = LoggerFactory.getLogger(NostrService.class);
 	// cache is cleared every 3mins so it can pick up user changes
 	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
 	public final ConcurrentHashMap<ObjectId, NostrEventWrapper> eventsPendingVerify = new ConcurrentHashMap<>();

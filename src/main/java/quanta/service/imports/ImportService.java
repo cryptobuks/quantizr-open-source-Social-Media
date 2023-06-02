@@ -14,11 +14,13 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class ImportService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportService.class);
+	private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
 		if (nodeId == null) {

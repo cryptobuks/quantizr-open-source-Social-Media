@@ -14,6 +14,8 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Methods related to generating AP Replies endpoing
@@ -21,7 +23,7 @@ import quanta.service.AclService;
 @Component
 public class ActPubReplies extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubReplies.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubReplies.class);
     @Autowired
     private ActPubLog apLog;
 

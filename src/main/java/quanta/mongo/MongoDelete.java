@@ -35,6 +35,8 @@ import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.LongVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
@@ -42,7 +44,7 @@ import quanta.util.val.Val;
 @Component
 public class MongoDelete extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoDelete.class);
+	private static Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
 		auth.ownerAuth(ms, node);

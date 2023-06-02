@@ -73,6 +73,8 @@ import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for editing content of nodes. That is, this method updates property values of nodes. As
@@ -82,7 +84,7 @@ import quanta.util.val.Val;
 @Component
 public class NodeEditService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NodeEditService.class);
+	private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 	@Autowired
 	private ActPubLog apLog;
 

@@ -53,6 +53,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service methods for System related functions. Admin functions.
@@ -60,7 +62,7 @@ import quanta.util.val.IntVal;
 @Component
 public class SystemService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SystemService.class);
+	private static Logger log = LoggerFactory.getLogger(SystemService.class);
 	long lastNostrQueryTime = 0L;
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 	public static final ObjectMapper mapper = new ObjectMapper();

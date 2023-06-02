@@ -17,6 +17,8 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
@@ -24,7 +26,7 @@ import quanta.util.Const;
 @Component
 public class MongoCreate extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoCreate.class);
+	private static Logger log = LoggerFactory.getLogger(MongoCreate.class);
 	// this large top reserve size means the "insert at top" will always be done with out multiple node
 	// updates
 	// except for once every thousand times.

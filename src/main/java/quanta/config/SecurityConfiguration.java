@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import quanta.AppController;
 import quanta.filter.AuditFilter;
 import quanta.mongo.MongoAuth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // @EnableWebSecurity(debug = true) // #DEBUG-SECURITY
 /**
  * Spring security support
@@ -22,7 +25,7 @@ import quanta.mongo.MongoAuth;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SecurityConfiguration.class);
+	private static Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 	@Autowired
 	AuditFilter auditFilter;
 	@Autowired

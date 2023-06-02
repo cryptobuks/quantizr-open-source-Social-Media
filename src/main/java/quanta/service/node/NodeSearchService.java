@@ -47,6 +47,8 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -60,7 +62,7 @@ import quanta.util.val.Val;
 @Component
 public class NodeSearchService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NodeSearchService.class);
+	private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
 	static final String SENTENCE_DELIMS = ".!?";

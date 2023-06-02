@@ -72,6 +72,8 @@ import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * We have lots of circular references in our services, and since SpringBoot has decided it doesn't
@@ -98,7 +100,7 @@ import quanta.util.Validator;
  */
 public class ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ServiceBase.class);
+	private static Logger log = LoggerFactory.getLogger(ServiceBase.class);
 	@Autowired
 	public AppProp prop;
 	@Autowired

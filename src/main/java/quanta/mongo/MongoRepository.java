@@ -11,6 +11,8 @@ import quanta.EventPublisher;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Models the MongoDB repository connection.
@@ -18,7 +20,7 @@ import quanta.util.ThreadLocals;
 @Component
 public class MongoRepository extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoRepository.class);
+	private static Logger log = LoggerFactory.getLogger(MongoRepository.class);
 	@Autowired
 	private EventPublisher publisher;
 	/*

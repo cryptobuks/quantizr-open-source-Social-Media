@@ -55,6 +55,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AP-related utilities
@@ -62,7 +64,7 @@ import quanta.util.val.Val;
 @Component
 public class ActPubUtil extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubUtil.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubUtil.class);
     @Autowired
     private ActPubLog apLog;
     private static final int MAX_THREAD_NODES = 200;

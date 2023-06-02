@@ -17,6 +17,8 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -27,7 +29,7 @@ import quanta.util.val.Val;
 @Component
 public class SubNodeUtil extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SubNodeUtil.class);
+	private static Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID);

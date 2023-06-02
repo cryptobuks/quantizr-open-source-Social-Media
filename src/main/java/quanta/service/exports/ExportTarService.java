@@ -10,12 +10,14 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportTarService.class);
+    private static Logger log = LoggerFactory.getLogger(ExportTarService.class);
     private TarArchiveOutputStream out = null;
     private boolean gzip = false;
 

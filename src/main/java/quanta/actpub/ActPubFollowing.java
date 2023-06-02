@@ -35,6 +35,8 @@ import quanta.response.GetFollowingResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Methods relating to AP following
@@ -42,7 +44,7 @@ import quanta.util.XString;
 @Component
 public class ActPubFollowing extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubFollowing.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
     @Autowired
     private ActPubLog apLog;
 

@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.util.StreamUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // todo-2: make this a prototype-scope bean?
 /**
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes that Lucene index
@@ -32,7 +35,7 @@ import quanta.util.StreamUtil;
 @Component
 public class FileSearcher {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileSearcher.class);
+	private static Logger log = LoggerFactory.getLogger(FileSearcher.class);
 	@Autowired
 	public AppProp appProp;
 	private StringBuilder output = new StringBuilder();

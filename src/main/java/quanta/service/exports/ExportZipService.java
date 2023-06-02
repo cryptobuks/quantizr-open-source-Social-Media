@@ -9,12 +9,14 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportZipService.class);
+    private static Logger log = LoggerFactory.getLogger(ExportZipService.class);
     private ZipArchiveOutputStream out = null;
 
     @Override

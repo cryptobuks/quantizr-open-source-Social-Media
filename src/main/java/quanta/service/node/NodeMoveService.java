@@ -25,6 +25,8 @@ import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -36,7 +38,7 @@ import quanta.util.ThreadLocals;
 @Component
 public class NodeMoveService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NodeMoveService.class);
+	private static Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)

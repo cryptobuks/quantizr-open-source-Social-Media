@@ -16,6 +16,8 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Import from ZIP files. Imports zip files that have the same type of directory structure and
@@ -27,7 +29,7 @@ import quanta.util.ThreadLocals;
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportZipService.class);
+	private static Logger log = LoggerFactory.getLogger(ImportZipService.class);
 	private ZipArchiveInputStream zis;
 
 	/*

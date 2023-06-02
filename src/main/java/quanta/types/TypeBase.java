@@ -8,11 +8,14 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
 @Component
 public abstract class TypeBase extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TypeBase.class);
+    private static Logger log = LoggerFactory.getLogger(TypeBase.class);
 
     public void postContruct() {
         TypePluginMgr.addType(this);

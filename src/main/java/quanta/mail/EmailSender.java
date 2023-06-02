@@ -19,6 +19,8 @@ import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that sends emails
@@ -26,7 +28,7 @@ import quanta.util.LimitedInputStream;
 @Component
 public class EmailSender extends ServiceBase implements TransportListener {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailSender.class);
+	private static Logger log = LoggerFactory.getLogger(EmailSender.class);
 	@Autowired
 	private AppProp appProp;
 	public static final Object lock = new Object();

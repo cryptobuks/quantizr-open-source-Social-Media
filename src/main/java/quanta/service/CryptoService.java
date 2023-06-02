@@ -41,11 +41,13 @@ import quanta.util.Util;
 import quanta.util.val.BooleanVal;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class CryptoService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CryptoService.class);
+	private static Logger log = LoggerFactory.getLogger(CryptoService.class);
 	public static final ObjectMapper mapper = new ObjectMapper();
 	public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
 	private static final Random rand = new Random();

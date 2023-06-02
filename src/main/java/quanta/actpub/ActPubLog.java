@@ -1,4 +1,6 @@
 package quanta.actpub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActPubLog {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubLog.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubLog.class);
 
     public void trace(String message) {
         log.trace(message);

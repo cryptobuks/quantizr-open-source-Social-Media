@@ -26,6 +26,9 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import quanta.AppController;
 import quanta.filter.AppFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // @EnableAspectJAutoProxy // (proxyTargetClass = true)
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
@@ -34,7 +37,7 @@ import quanta.filter.AppFilter;
 @EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppConfiguration.class);
+	private static Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 	@Autowired
 	private AppProp appProp;
 	@Autowired

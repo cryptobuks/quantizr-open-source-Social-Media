@@ -34,6 +34,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
@@ -44,7 +46,7 @@ import quanta.util.val.Val;
 @Component
 public class MongoRead extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoRead.class);
+    private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     int MAX_DOC_DEPTH = 7;
     int MAX_DOC_ITEMS_PER_CALL = 40;
     private static final Object dbRootsLock = new Object();

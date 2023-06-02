@@ -21,6 +21,8 @@ import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
@@ -29,7 +31,7 @@ import quanta.util.val.Val;
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportJsonService.class);
+	private static Logger log = LoggerFactory.getLogger(ExportJsonService.class);
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 

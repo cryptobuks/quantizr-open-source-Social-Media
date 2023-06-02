@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeLink;
 import quanta.util.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
@@ -20,7 +22,7 @@ import quanta.util.DateUtil;
 @JsonInclude(Include.NON_NULL)
 public class NodeInfo {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NodeInfo.class);
+	private static Logger log = LoggerFactory.getLogger(NodeInfo.class);
 	private String id;
 	private String path;
 	private String name;

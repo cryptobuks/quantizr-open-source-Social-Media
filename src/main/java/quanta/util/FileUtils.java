@@ -21,11 +21,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class FileUtils extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileUtils.class);
+	private static Logger log = LoggerFactory.getLogger(FileUtils.class);
 	/*
 	 * Creates the set of file extensions that we allow user to edit
 	 */

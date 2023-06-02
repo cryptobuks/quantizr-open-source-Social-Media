@@ -16,10 +16,12 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ImportArchiveBase extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportArchiveBase.class);
+	private static Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	/*
 	 * This is used to detect if this 'prototype scope' object might have been autowired, and is getting

@@ -66,6 +66,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * General AP functions
@@ -73,7 +75,7 @@ import quanta.util.val.Val;
 @Component
 public class ActPubService extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubService.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubService.class);
     @Autowired
     private ActPubLog apLog;
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;

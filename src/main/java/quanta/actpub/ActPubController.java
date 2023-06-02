@@ -21,6 +21,9 @@ import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // @CrossOrigin is done by AppFilter.
 /**
  * Main REST Controller endpoint for AP
@@ -32,7 +35,7 @@ import quanta.util.XString;
 @Controller
 public class ActPubController extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubController.class);
+	private static Logger log = LoggerFactory.getLogger(ActPubController.class);
 	@Autowired
 	private ActPubLog apLog;
 

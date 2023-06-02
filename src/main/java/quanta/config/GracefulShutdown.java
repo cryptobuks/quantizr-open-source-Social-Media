@@ -11,6 +11,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
 /**
  * Handles Tomcat shutdown
@@ -20,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GracefulShutdown.class);
+    private static Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
     @Autowired
     private ApplicationContext appContext;

@@ -34,6 +34,8 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The primary element of storage for the entire Quanta DB.
@@ -46,7 +48,7 @@ import quanta.util.XString;
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.XFR, SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
 public class SubNode {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SubNode.class);
+	private static Logger log = LoggerFactory.getLogger(SubNode.class);
 	public static final ObjectMapper mapper = new ObjectMapper();
 
 	// NOTE: This didn't allow unknown properties as expected but putting the
@@ -66,6 +68,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public boolean adminUpdate = false;
+
 	// note: All bulk ops using "id" when the value here is "_id". I can't remember the
 	// reason for "_id"
 	public static final String ID = "_id";
@@ -73,74 +76,95 @@ public class SubNode {
 	@Field(ID)
 	private ObjectId id;
 	public static final String ORDINAL = "ord";
+
 	@Field(ORDINAL)
 	private Long ordinal;
 	// Holds null if children status unknown. Not yet generated.
 	// NOTE: We have no index on this field because we never query on it.
 	public static final String HAS_CHILDREN = "hch";
+	
 	@Field(HAS_CHILDREN)
 	private Boolean hch;
 	public static final String PATH = "pth";
+	
 	@Field(PATH)
 	private String path;
 	public static final String TYPE = "typ";
+	
 	@Field(TYPE)
 	private String type;
 	public static final String CONTENT = "cont";
+	
 	@Field(CONTENT)
 	private String content;
 	public static final String TAGS = "tag";
+	
 	@Field(TAGS)
 	private String tags;
 	public static final String NAME = "name";
+	
 	@Field(NAME)
 	private String name;
 	public static final String OWNER = "own";
+	
 	@Field(OWNER)
 	private ObjectId owner;
 	// OwnerId of person who transfered this node to "owner"
 	public static final String XFR = "xfr";
+	
 	@Field(XFR)
 	private ObjectId transferFrom;
 	public static final String CREATE_TIME = "ctm";
+	
 	@Field(CREATE_TIME)
 	private Date createTime;
 	public static final String MODIFY_TIME = "mtm";
+	
 	@Field(MODIFY_TIME)
 	private Date modifyTime;
 	// Also defined in NodeProp.SUBNODE_PROPS
 	public static final String PROPS = "p";
+	
 	@Field(PROPS)
 	private HashMap<String, Object> props;
+	
 	@Transient
 	@JsonIgnore
 	private Object propLock = new Object();
 	public static final String ATTACHMENTS = "a";
 	// for now the key string can be "p" (primary) or "h" (header). Header is the user's account header
 	// image.
+	
 	@Field(ATTACHMENTS)
 	private HashMap<String, Attachment> attachments;
+	
 	@Transient
 	@JsonIgnore
 	private Object linksLock = new Object();
 	public static final String LINKS = "lnk";
+	
 	@Field(LINKS)
 	private HashMap<String, NodeLink> links;
+	
 	@Transient
 	@JsonIgnore
 	private Object attLock = new Object();
 	public static final String LIKES = "like";
+	
 	@Field(LIKES)
 	private HashSet<String> likes;
+	
 	@Transient
 	@JsonIgnore
 	private Object likesLock = new Object();
 	// these are public on purpose. (the M means this CID is from MFS, and no need to pin or unpin ever)
 	public static final String MCID = "mcid";
+	
 	@Field(MCID)
 	public String mcid;
 	// (the M means this CID is from MFS, and no need to pin or unpin ever)
 	public static final String PREV_MCID = "prevMcid";
+	
 	@Field(PREV_MCID)
 	public String prevMcid;
 	/*
@@ -151,8 +175,10 @@ public class SubNode {
 	 * a key which indicates privileges granted to everyone (the entire public)
 	 */
 	public static final String AC = "ac";
+	
 	@Field(AC)
 	private HashMap<String, AccessControl> ac;
+	
 	@Transient
 	@JsonIgnore
 	private Object acLock = new Object();

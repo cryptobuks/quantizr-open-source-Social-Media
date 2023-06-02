@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Models access privileges of a single 'share', along with the encrypted symetric key to the data,
@@ -16,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_NULL)
 public class AccessControl {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AccessControl.class);
+	private static Logger log = LoggerFactory.getLogger(AccessControl.class);
 	public static final String FIELD_PRVS = "prvs";
 	@Field(FIELD_PRVS)
 	private String prvs;

@@ -41,6 +41,8 @@ import quanta.util.Convert;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered on the server side.
@@ -51,7 +53,7 @@ import quanta.util.XString;
 @Component
 public class NodeRenderService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NodeRenderService.class);
+	private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new

@@ -37,6 +37,8 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for exporting to archives (ZIP and TAR).
@@ -48,7 +50,7 @@ import quanta.util.val.Val;
  */
 public abstract class ExportArchiveBase extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportArchiveBase.class);
+	private static Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
 	private String shortFileName;
 	private String fullFileName;
 	private String rootPathParent;

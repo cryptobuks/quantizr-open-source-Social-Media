@@ -165,14 +165,16 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Primary Spring MVC controller.
  */
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
+	private static Logger log = LoggerFactory.getLogger(AppController.class);
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppController.class);
 	@Autowired
 	private ActPubLog apLog;
 	@Autowired

@@ -7,10 +7,12 @@ import java.util.List;
 import quanta.model.client.PrincipalName;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PerformanceReport {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PerformanceReport.class);
+	private static Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
 	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 

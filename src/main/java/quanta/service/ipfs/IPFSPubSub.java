@@ -36,11 +36,14 @@ import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
 public class IPFSPubSub extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSPubSub.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
     private static final String IPSM_TOPIC_TEST = "/ipsm/test";

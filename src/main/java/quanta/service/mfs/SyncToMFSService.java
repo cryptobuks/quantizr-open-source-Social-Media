@@ -18,6 +18,8 @@ import quanta.service.AclService;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) and
@@ -34,7 +36,7 @@ import quanta.util.XString;
 @Scope("prototype")
 public class SyncToMFSService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SyncToMFSService.class);
+	private static Logger log = LoggerFactory.getLogger(SyncToMFSService.class);
 	MongoSession session;
 	HashSet<String> allNodePaths = new HashSet<>();
 	HashSet<String> allFilePaths = new HashSet<>();

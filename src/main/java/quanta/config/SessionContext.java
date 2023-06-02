@@ -19,6 +19,8 @@ import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Session object holding state per user session.
@@ -30,7 +32,7 @@ import quanta.util.Util;
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SessionContext.class);
+	private static Logger log = LoggerFactory.getLogger(SessionContext.class);
 	private HttpSession session;
 	private String urlIdFailMsg;
 	private String userMsg;

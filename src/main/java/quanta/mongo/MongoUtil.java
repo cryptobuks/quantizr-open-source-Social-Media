@@ -44,6 +44,8 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Verious utilities related to MongoDB persistence
@@ -51,7 +53,7 @@ import quanta.util.val.Val;
 @Component
 public class MongoUtil extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoUtil.class);
+	private static Logger log = LoggerFactory.getLogger(MongoUtil.class);
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static final Random rand = new Random();
 	public static SubNode allUsersRootNode = null;

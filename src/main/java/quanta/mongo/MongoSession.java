@@ -3,13 +3,15 @@ package quanta.mongo;
 
 import org.bson.types.ObjectId;
 import quanta.model.client.PrincipalName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps the identity information about a specific user for access privileges to MongoDb
  */
 public class MongoSession {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoSession.class);
+	private static Logger log = LoggerFactory.getLogger(MongoSession.class);
 	private String userName;
 	private ObjectId userNodeId;
 

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.util.Const;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet filter for monitoring load statistics
@@ -22,7 +24,7 @@ import quanta.util.Util;
 @Order(4)
 public class HitFilter extends GenericFilterBean {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HitFilter.class);
+	private static Logger log = LoggerFactory.getLogger(HitFilter.class);
 	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override

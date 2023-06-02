@@ -7,11 +7,13 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.Cast;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSRepo extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSRepo.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSRepo.class);
     public static String API_REPO;
 
     @PostConstruct

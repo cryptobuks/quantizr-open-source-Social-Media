@@ -22,11 +22,13 @@ import quanta.request.GetIPFSFilesRequest;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSFiles extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSFiles.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSFiles.class);
     public static String API_FILES;
 
     @PostConstruct

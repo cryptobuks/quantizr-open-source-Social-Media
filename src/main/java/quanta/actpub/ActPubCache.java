@@ -13,6 +13,8 @@ import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Holds all the global caches related to AP.
@@ -22,7 +24,7 @@ import quanta.util.DateUtil;
 @Component
 public class ActPubCache extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubCache.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubCache.class);
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed

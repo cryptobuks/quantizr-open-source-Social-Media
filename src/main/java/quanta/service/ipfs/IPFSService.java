@@ -55,11 +55,14 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
 public class IPFSService extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSService.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSService.class);
     public static String API_ID;
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
     public LinkedHashMap<String, Object> instanceId = null;

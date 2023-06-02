@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import quanta.util.LockEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * For keeping track of sessions.
@@ -14,7 +16,7 @@ import quanta.util.LockEx;
 @Component
 public class AppSessionListener implements HttpSessionListener {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppSessionListener.class);
+	private static Logger log = LoggerFactory.getLogger(AppSessionListener.class);
 	@Autowired
 	private AppProp appProp;
 	private static int sessionCounter = 0;

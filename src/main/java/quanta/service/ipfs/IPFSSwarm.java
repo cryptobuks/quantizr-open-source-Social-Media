@@ -16,11 +16,13 @@ import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSSwarm extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSSwarm.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSSwarm.class);
     public static String API_SWARM;
 
     @PostConstruct

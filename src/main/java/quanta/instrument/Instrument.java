@@ -11,6 +11,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
  * Instrumentation for the app (for Performance Monitoring)
  * 
@@ -39,7 +42,7 @@ import quanta.util.ThreadLocals;
 // @Component
 public class Instrument {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Instrument.class);
+	private static Logger log = LoggerFactory.getLogger(Instrument.class);
 	public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
 	private static final int MAX_EVENTS = 10000;
 	public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());

@@ -86,6 +86,8 @@ import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.LongVal;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service methods for processing user management functions. Login, logout, signup, user
@@ -94,7 +96,7 @@ import quanta.util.val.Val;
 @Component
 public class UserManagerService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserManagerService.class);
+	private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 	@Autowired
 	private ActPubLog apLog;
 	@Autowired

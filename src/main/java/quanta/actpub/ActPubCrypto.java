@@ -31,6 +31,8 @@ import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Crypto functions for AP
@@ -38,7 +40,7 @@ import quanta.util.val.Val;
 @Component
 public class ActPubCrypto extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubCrypto.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
     public static final String SIGNATURE_ALGO = "SHA256withRSA";
     public static final String DIGEST_ALGO = "SHA-256";
 

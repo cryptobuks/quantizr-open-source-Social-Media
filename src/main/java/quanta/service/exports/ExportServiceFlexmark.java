@@ -39,6 +39,8 @@ import quanta.util.ImageUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * https://github.com/vsch/flexmark-java
@@ -47,7 +49,7 @@ import quanta.util.XString;
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportServiceFlexmark.class);
+	private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 	private MongoSession session;
 	private String shortFileName;
 	private String fullFileName;

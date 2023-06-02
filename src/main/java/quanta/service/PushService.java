@@ -16,11 +16,13 @@ import quanta.response.FeedPushInfo;
 import quanta.response.NodeEditedPushInfo;
 import quanta.response.ServerPushInfo;
 import quanta.util.Convert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class PushService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PushService.class);
+	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	static final int MAX_FEED_ITEMS = 25;
 
 	/* Notify all users being shared to on this node, or everyone if the node is public. */

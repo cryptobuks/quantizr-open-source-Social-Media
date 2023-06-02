@@ -23,6 +23,8 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the filter that executes FIRST (higheds @Order is the reason) This is Web Filter for
@@ -32,7 +34,7 @@ import quanta.util.XString;
 @Order(5)
 public class AppFilter extends GenericFilterBean {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppFilter.class);
+	private static Logger log = LoggerFactory.getLogger(AppFilter.class);
 	@Autowired
 	private ApplicationContext context;
 	private static int reqId = 0;

@@ -9,6 +9,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
  * NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
  * actual hosting server's fallback error page by adding this annotation, but only do one or the
@@ -24,7 +27,7 @@ import quanta.util.ExUtil;
 @ServletComponentScan
 public class AppServer extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppServer.class);
+	private static Logger log = LoggerFactory.getLogger(AppServer.class);
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
 

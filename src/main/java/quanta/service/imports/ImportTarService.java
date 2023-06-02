@@ -13,12 +13,14 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Scope("prototype")
 public class ImportTarService extends ImportArchiveBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ImportTarService.class);
+	private static Logger log = LoggerFactory.getLogger(ImportTarService.class);
 	private TarArchiveInputStream zis;
 
 	public SubNode importFromZippedStream(MongoSession ms, InputStream is, SubNode node, boolean isNonRequestThread) {

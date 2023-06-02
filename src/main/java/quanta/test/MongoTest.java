@@ -21,6 +21,8 @@ import quanta.mongo.model.SubNode;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is actually where I just run various experiments related to MongoDB, and this is not
@@ -29,7 +31,7 @@ import quanta.util.XString;
 @Component("MongoTest")
 public class MongoTest extends ServiceBase implements TestIntf {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoTest.class);
+	private static Logger log = LoggerFactory.getLogger(MongoTest.class);
 
 	@Override
 	public void test() throws Exception {

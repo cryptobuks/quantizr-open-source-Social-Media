@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.model.SubNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Part of Spring Security implementation
@@ -14,7 +16,7 @@ import quanta.mongo.model.SubNode;
 @Service
 public class AppUserDetailsService extends ServiceBase implements UserDetailsService {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppUserDetailsService.class);
+    private static Logger log = LoggerFactory.getLogger(AppUserDetailsService.class);
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {

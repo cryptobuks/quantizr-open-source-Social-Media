@@ -11,11 +11,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.FediverseName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoFediverseNamesTest.class);
+	private static Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 
 	@Override
 	public void test() throws Exception {

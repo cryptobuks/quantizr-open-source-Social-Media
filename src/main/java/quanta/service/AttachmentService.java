@@ -85,6 +85,8 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for managing node attachments.
@@ -97,7 +99,7 @@ import quanta.util.val.Val;
 @Component
 public class AttachmentService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AttachmentService.class);
+	private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
 	@Autowired
 	public GridFsTemplate grid;
 	@Autowired

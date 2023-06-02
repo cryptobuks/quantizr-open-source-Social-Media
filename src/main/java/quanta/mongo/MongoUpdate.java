@@ -22,6 +22,8 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs update (as in CRUD) operations for MongoDB
@@ -29,7 +31,7 @@ import quanta.util.val.Val;
 @Component
 public class MongoUpdate extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoUpdate.class);
+	private static Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	public void saveObj(Object obj) {
 		ops.save(obj);

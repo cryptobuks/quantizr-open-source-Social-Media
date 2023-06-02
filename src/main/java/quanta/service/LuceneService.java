@@ -7,6 +7,8 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.LuceneIndexResponse;
 import quanta.response.LuceneSearchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for processing Lucene-related functions.
@@ -14,7 +16,7 @@ import quanta.response.LuceneSearchResponse;
 @Component
 public class LuceneService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LuceneService.class);
+	private static Logger log = LoggerFactory.getLogger(LuceneService.class);
 
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();

@@ -16,11 +16,13 @@ import quanta.response.GraphResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class GraphNodesService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GraphNodesService.class);
+	private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 	static int guid = 0;
 
 	public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {

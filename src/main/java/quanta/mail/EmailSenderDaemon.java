@@ -10,6 +10,8 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deamon for sending emails.
@@ -17,7 +19,7 @@ import quanta.mongo.model.SubNode;
 @Component
 public class EmailSenderDaemon extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EmailSenderDaemon.class);
+	private static Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;

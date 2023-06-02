@@ -3,6 +3,8 @@ package quanta.util;
 
 import org.slf4j.Logger;
 import quanta.exception.base.RuntimeEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * We use RuntimeExceptions primarily for all exception handling, throughout the app because of the
@@ -15,7 +17,7 @@ import quanta.exception.base.RuntimeEx;
  */
 public class ExUtil {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExUtil.class);
+	private static Logger log = LoggerFactory.getLogger(ExUtil.class);
 
 	public static void run(Runnable runnable) {
 		try {

@@ -19,6 +19,8 @@ import quanta.config.SessionContext;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Global Servlet filter for cross-cutting concerns across all endpoints
@@ -27,7 +29,7 @@ import quanta.util.Util;
 @Order(2)
 public class GlobalFilter extends GenericFilterBean {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GlobalFilter.class);
+	private static Logger log = LoggerFactory.getLogger(GlobalFilter.class);
 	@Autowired
 	private ApplicationContext context;
 

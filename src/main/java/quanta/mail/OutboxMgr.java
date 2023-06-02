@@ -15,6 +15,8 @@ import quanta.mongo.model.SubNode;
 import quanta.response.NotificationMessage;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -25,7 +27,7 @@ import quanta.util.XString;
 @Component
 public class OutboxMgr extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OutboxMgr.class);
+	private static Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();

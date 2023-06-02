@@ -17,11 +17,13 @@ import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSObj extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSObj.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSObj.class);
     public static String API_OBJECT;
 
     @PostConstruct

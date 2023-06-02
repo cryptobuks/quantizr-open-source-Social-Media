@@ -37,6 +37,8 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.types.TypeBase;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converting objects from one type to another, and formatting.
@@ -44,7 +46,7 @@ import quanta.util.val.Val;
 @Component
 public class Convert extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Convert.class);
+	private static Logger log = LoggerFactory.getLogger(Convert.class);
 	// indicates we don't need to worry about sending back a good logicalOrdinal
 	public static int LOGICAL_ORDINAL_IGNORE = -1;
 	// indicates we need generate the correct logicalOrdinal

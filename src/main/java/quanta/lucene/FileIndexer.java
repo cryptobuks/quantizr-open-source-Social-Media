@@ -49,6 +49,9 @@ import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // other compresison input types (not currently supported, but trvial to add, as
 // a 'CompressionType'):
 // org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
@@ -68,7 +71,7 @@ import quanta.util.XString;
 @Component
 public class FileIndexer extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FileIndexer.class);
+	private static Logger log = LoggerFactory.getLogger(FileIndexer.class);
 	@Autowired
 	private AppProp appProp;
 	private IndexWriter writer;

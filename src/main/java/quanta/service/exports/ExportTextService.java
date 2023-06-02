@@ -19,12 +19,14 @@ import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Scope("prototype")
 public class ExportTextService extends ServiceBase {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ExportTextService.class);
+	private static Logger log = LoggerFactory.getLogger(ExportTextService.class);
 	private MongoSession session;
 	private BufferedOutputStream output = null;
 	private String shortFileName;

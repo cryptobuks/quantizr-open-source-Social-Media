@@ -2,6 +2,8 @@
 package quanta.test;
 
 import quanta.util.LockEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class intentionally creates a deadlock and using LockEx the deadlock is
@@ -20,7 +22,7 @@ import quanta.util.LockEx;
  */
 public class DeadlockDetectorTest {
 	
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DeadlockDetectorTest.class);
+	private static Logger log = LoggerFactory.getLogger(DeadlockDetectorTest.class);
 	private int threadsRunning = 0;
 	private final LockEx a = new LockEx("a", true, 7000, 1);
 	private final LockEx b = new LockEx("b", true, 7000, 1);

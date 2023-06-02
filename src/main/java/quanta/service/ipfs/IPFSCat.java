@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSCat extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IPFSCat.class);
+    private static Logger log = LoggerFactory.getLogger(IPFSCat.class);
     public static String API_CAT;
 
     @PostConstruct

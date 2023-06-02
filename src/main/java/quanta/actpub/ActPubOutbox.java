@@ -34,6 +34,8 @@ import quanta.service.AclService;
 import quanta.util.DateUtil;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AP Outbox
@@ -41,7 +43,7 @@ import quanta.util.val.Val;
 @Component
 public class ActPubOutbox extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ActPubOutbox.class);
+    private static Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
     @Autowired
     private ActPubLog apLog;
     // For actual WEB CRAWLER we'd set this larger but for now

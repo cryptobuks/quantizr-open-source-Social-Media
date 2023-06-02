@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*
  * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to
  * use
@@ -15,7 +18,7 @@ import quanta.config.ServiceBase;
 @Component
 public class AsyncExec extends ServiceBase {
     
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AsyncExec.class);
+    private static Logger log = LoggerFactory.getLogger(AsyncExec.class);
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     public Executor executor;
