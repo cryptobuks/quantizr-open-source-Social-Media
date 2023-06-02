@@ -56,7 +56,7 @@ export class Nav {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: ast.node.id,
                 upLevel: false,
-                siblingOffset: siblingOffset,
+                siblingOffset,
                 renderParentIfLeaf: true,
                 forceRenderParent: false,
                 offset: 0,

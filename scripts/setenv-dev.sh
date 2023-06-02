@@ -12,6 +12,7 @@ source ./define-functions.sh
 source ./define-functions-dev.sh
 
 export QUANTA_VER=2.15
+export WEBPACK_SCRIPT=build-dev
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
 
 # tserver-tag

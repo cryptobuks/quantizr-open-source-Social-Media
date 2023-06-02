@@ -4,8 +4,7 @@
         "es6": true
     },
     "extends": [
-        "plugin:react/recommended",
-        "standard"
+        "plugin:react/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -49,7 +48,6 @@
         "no-useless-constructor": "off",
         "no-undef": "off",
         "no-unneeded-ternary": "off",
-        "standard/no-callback-literal": "off",
         "valid-typeof": "off",
         "no-useless-return": "off",
         "prefer-promise-reject-errors": "off",
