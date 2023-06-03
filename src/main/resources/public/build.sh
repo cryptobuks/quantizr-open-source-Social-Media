@@ -9,10 +9,8 @@ then
     exit
 fi
 
-rm -rf ./build
-
 yarn add ../quanta-common
-verifySuccess "Yarn (server): add quanta-common"
+verifySuccess "yarn add quanta-common"
 
-yarn run build
-verifySuccess "Yarn run build: server"
+yarn run ${WEBPACK_SCRIPT}
+verifySuccess "yarn run: public"

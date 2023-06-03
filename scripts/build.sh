@@ -34,6 +34,7 @@ echo "mvn install the /pom/common/pom.xml into repo"
 mvn -T 1C install -Dmaven.javadoc.skip=true
 
 cd ${PRJROOT}
+
 # These aren't normally needed, so I'll just keep commented out most of time. 
 # mvn dependency:sources
 # mvn dependency:resolve -Dclassifier=javadoc
@@ -44,40 +45,18 @@ echo "Maven CLEAN package ${mvn_profile}"
 # This run is required only to ensure TypeScript generated files are up to date.
 # Always do the same profile here (dev-vscode)
 mvn -T 1C package -DskipTests=true -Pdev-vscode
-
 cp src/main/resources/public/ts/JavaIntf.ts src/main/resources/quanta-common/JavaIntf.ts
 
-# --------------------------------------------------------
 cd ${PRJROOT}/src/main/resources/quanta-common
-rm -rf lib
-verifySuccess "yarn: quanta-common"
-node build.js
-verifySuccess "build.js: quanta-common"
-# run TSC to emit types now. (important!)
-tsc
-verifySuccess "tsc: quanta-common"
+. ./build.sh
 
-# --------------------------------------------------------
-# Web App (not Yarn based, NPM)
-# --------------------------------------------------------
-# Run ignore-scripts for some security from NodeJS
-# Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
 cd ${PRJROOT}/src/main/resources/public
-yarn add ../quanta-common
-yarn run ${WEBPACK_SCRIPT}
+. ./build.sh
 
-# --------------------------------------------------------
 cd ${PRJROOT}/src/main/resources/server
-rm -rf ./build
-# NOTE: run 'npm outdated' in this folder to view all outdated versions.
-# yarn remove quanta-common
-yarn add ../quanta-common
-verifySuccess "Yarn (server): add quanta-common"
-yarn run build
-verifySuccess "Yarn run build: server"
-# --------------------------------------------------------
+. ./build.sh
 
 cd ${PRJROOT}
-# Then this is the actual full build.
+# Then this is the actual maven full build of the server springboot app
 mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
 verifySuccess "Maven Build"
