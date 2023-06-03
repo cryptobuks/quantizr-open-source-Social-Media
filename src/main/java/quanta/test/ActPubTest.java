@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 @Component("ActPubTest")
 public class ActPubTest extends ServiceBase implements TestIntf {
-    
+
     private static Logger log = LoggerFactory.getLogger(ActPubTest.class);
 
     @Override

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Order(5)
 public class AppFilter extends GenericFilterBean {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AppFilter.class);
 	@Autowired
 	private ApplicationContext context;
@@ -51,7 +51,8 @@ public class AppFilter extends GenericFilterBean {
 		if (Const.debugRequests) {
 			log.debug("AppFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(res)) return;
+		if (!Util.gracefulReadyCheck(res))
+			return;
 		HttpServletResponse httpRes = null;
 		try {
 			int thisReqId = ++reqId;
@@ -102,7 +103,8 @@ public class AppFilter extends GenericFilterBean {
 					Util.sleep(simulateSlowServer);
 				}
 				if (logRequests) {
-					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString=" + httpReq.getQueryString();
+					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
+							+ httpReq.getQueryString();
 					log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 				}
 			} else {
@@ -115,7 +117,7 @@ public class AppFilter extends GenericFilterBean {
 				chain.doFilter(req, res);
 				if (logResponses) {
 					log.debug( /* +httpRes.getStatus() */
-					"    RES: [" + String.valueOf(thisReqId) + "]" + HttpStatus.valueOf(httpRes.getStatus()));
+							"    RES: [" + String.valueOf(thisReqId) + "]" + HttpStatus.valueOf(httpRes.getStatus()));
 				}
 			} catch (RuntimeException ex) {
 				log.error("Failed", ex);

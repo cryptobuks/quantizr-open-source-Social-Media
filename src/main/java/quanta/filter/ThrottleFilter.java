@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Order(3)
 public class ThrottleFilter extends GenericFilterBean {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ThrottleFilter.class);
 	@Autowired
 	private AppProp appProp;
@@ -46,11 +46,13 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("ThrottleFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 		HttpServletRequest sreq = null;
 		IPInfo info = null;
 		if (request instanceof HttpServletRequest) {
@@ -81,7 +83,8 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
-		if (httpReq == null) return;
+		if (httpReq == null)
+			return;
 		long curTime = System.currentTimeMillis();
 		if (info.getLastRequestTime() == 0) {
 			info.setLastRequestTime(curTime);
@@ -95,8 +98,11 @@ public class ThrottleFilter extends GenericFilterBean {
 		//
 		//
 		//
-		httpReq.getRequestURI().endsWith("/checkMessages") || httpReq.getRequestURI().endsWith("/getUserProfile") || httpReq.getRequestURI().endsWith("/getConfig") || httpReq.getRequestURI().endsWith("/getBookmarks") || httpReq.getRequestURI().endsWith("/login") || httpReq.getRequestURI().endsWith("/proxyGet") || httpReq.getRequestURI().endsWith("/serverPush") || httpReq.getRequestURI().endsWith("/anonPageLoad") ||  //
-		httpReq.getRequestURI().endsWith("/getOpenGraph")) {
+		httpReq.getRequestURI().endsWith("/checkMessages") || httpReq.getRequestURI().endsWith("/getUserProfile")
+				|| httpReq.getRequestURI().endsWith("/getConfig") || httpReq.getRequestURI().endsWith("/getBookmarks")
+				|| httpReq.getRequestURI().endsWith("/login") || httpReq.getRequestURI().endsWith("/proxyGet")
+				|| httpReq.getRequestURI().endsWith("/serverPush") || httpReq.getRequestURI().endsWith("/anonPageLoad") || //
+				httpReq.getRequestURI().endsWith("/getOpenGraph")) {
 		} else {
 			if (THROTTLE_ENABLED) {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
@@ -112,6 +118,5 @@ public class ThrottleFilter extends GenericFilterBean {
 		info.setLastRequestTime(System.currentTimeMillis());
 	}
 
-	public void destroy() {
-	}
+	public void destroy() {}
 }

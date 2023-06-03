@@ -7,8 +7,7 @@ public class APOUrl extends APObj {
         super(obj);
     }
 
-    public APOUrl() {
-    }
+    public APOUrl() {}
 
     public APOUrl(String type, String mediaType, String href) {
         this();

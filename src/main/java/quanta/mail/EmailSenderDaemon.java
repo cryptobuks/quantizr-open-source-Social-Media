@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class EmailSenderDaemon extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
@@ -38,7 +38,8 @@ public class EmailSenderDaemon extends ServiceBase {
 	 */
 	@Scheduled(fixedDelay = 10000)
 	public void run() {
-		if (run || !MongoRepository.fullInit) return;
+		if (run || !MongoRepository.fullInit)
+			return;
 		try {
 			run = true;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {

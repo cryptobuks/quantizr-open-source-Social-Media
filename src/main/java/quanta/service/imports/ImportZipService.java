@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ImportZipService.class);
 	private ZipArchiveInputStream zis;
 
@@ -53,10 +53,11 @@ public class ImportZipService extends ImportArchiveBase {
 		return rootNode;
 	}
 
-	/* Returns the first node created which is always the root of the import 
+	/*
+	 * Returns the first node created which is always the root of the import
 	 * 
 	 * Assumes ms has already been verified as owner of 'node'
-	*/
+	 */
 	public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node, boolean isNonRequestThread) {
 		SessionContext sc = ThreadLocals.getSC();
 		if (used) {

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 @Service
 public class AppUserDetailsService extends ServiceBase implements UserDetailsService {
-    
+
     private static Logger log = LoggerFactory.getLogger(AppUserDetailsService.class);
 
     @Override

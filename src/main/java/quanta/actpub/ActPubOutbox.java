@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class ActPubOutbox extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
     @Autowired
     private ActPubLog apLog;
@@ -56,7 +56,8 @@ public class ActPubOutbox extends ServiceBase {
      * 
      * Returns true only if everything successful
      */
-    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode, String apUserName) {
+    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode,
+            String apUserName) {
         Val<Boolean> success = new Val<>(true);
         try {
             // try to read outboxUrl first and if we can't we just return false
@@ -69,7 +70,8 @@ public class ActPubOutbox extends ServiceBase {
             if (userNode == null) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
             }
-            SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
+            SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
             if (outboxNode == null) {
                 log.debug("no posts node for user: " + apUserName);
                 return false;
@@ -77,7 +79,8 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0);
+            Iterable<SubNode> outboxItems =
+                    read.getChildren(ms, outboxNode, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0);
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
              * foreign server
@@ -95,7 +98,7 @@ public class ActPubOutbox extends ServiceBase {
             apUtil.iterateCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
                 try {
                     // if (ok(obj)) {
-                    //     log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
+                    // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
                     String apId = apStr(obj, APObj.id);
                     // If this is a new post our server hasn't yet injested.
@@ -125,7 +128,8 @@ public class ActPubOutbox extends ServiceBase {
                             if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object, APType.Create, null, null, true, null);
+                                    apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object, APType.Create,
+                                            null, null, true, null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {
                                     log.debug("Record already existed: " + dke.getMessage());
@@ -153,7 +157,8 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getOutbox(MongoSession ms, String userDoingAction, String url) {
-        if (url == null) return null;
+        if (url == null)
+            return null;
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
@@ -165,8 +170,8 @@ public class ActPubOutbox extends ServiceBase {
         // log.debug("Generate outbox for userName: " + userName);
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
-        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true",  //
-        url + "?min_id=0&page=true");
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -196,7 +201,8 @@ public class ActPubOutbox extends ServiceBase {
         APList items = getOutboxItems(httpReq, userName, minId);
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, items, prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName, items.size());
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, items,
+                prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName, items.size());
         return ret;
     }
 
@@ -283,7 +289,8 @@ public class ActPubOutbox extends ServiceBase {
                 // log.debug("collecting = " + collecting);
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(_sharedTo);
-                for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList, Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
+                for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
+                        Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
                     // log.debug("OUTBOX ID: " + child.getIdStr());
                     // as a general security rule never send back any admin nodes.
                     if (child.getOwner().equals(as.getUserNodeId())) {
@@ -317,7 +324,7 @@ public class ActPubOutbox extends ServiceBase {
                                 }
                                 ret = new APOAnnounce(actor, id, published, boostedId);
                             }
-                        } else 
+                        } else
                         // log.debug("Outbound Announce (from outbox): " + XString.prettyPrint(ret));
                         {
                             // log.debug("not a boost.");
@@ -339,7 +346,8 @@ public class ActPubOutbox extends ServiceBase {
 
     /* Gets the object identified by nodeId as an ActPub object */
     public APObj getResource(HttpServletRequest httpReq, String nodeId) {
-        if (nodeId == null) return null;
+        if (nodeId == null)
+            return null;
         // this is breaking whenever a CURL command is used other scenarios
         // where no signature is in the header.
         boolean experimental = false;

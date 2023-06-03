@@ -2,21 +2,20 @@
 package quanta.test;
 
 import java.util.Calendar;
-import com.mongodb.client.result.DeleteResult;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.FediverseName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
-	
+
 	private static Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 
 	@Override

@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class FileIndexer extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(FileIndexer.class);
 	@Autowired
 	private AppProp appProp;
@@ -131,7 +131,8 @@ public class FileIndexer extends ServiceBase {
 	}
 
 	private void init(boolean forceRebuild, String luceneIndexDataSubDir) {
-		if (initialized) return;
+		if (initialized)
+			return;
 		initialized = true;
 		if (StringUtils.isEmpty(appProp.getLuceneDir())) {
 			throw ExUtil.wrapEx("Lucend Data Dir is not configured.");
@@ -252,17 +253,17 @@ public class FileIndexer extends ServiceBase {
 		InputStream bi = new BufferedInputStream(is);
 		InputStream istream = null;
 		switch (compressionType) {
-		case NONE: 
-			istream = bi;
-			break;
-		case GZIP: 
-			istream = new GzipCompressorInputStream(bi);
-			break;
-		case XZIP: 
-			istream = new XZCompressorInputStream(bi);
-			break;
-		default: 
-			throw new Exception("Invalid compression type.");
+			case NONE:
+				istream = bi;
+				break;
+			case GZIP:
+				istream = new GzipCompressorInputStream(bi);
+				break;
+			case XZIP:
+				istream = new XZCompressorInputStream(bi);
+				break;
+			default:
+				throw new Exception("Invalid compression type.");
 		}
 		TarArchiveInputStream tis = new TarArchiveInputStream(istream);
 		indexTarStream(tis, zipParent);
@@ -272,12 +273,12 @@ public class FileIndexer extends ServiceBase {
 		ZipEntry entry;
 		while ((entry = zis.getNextEntry()) != null) {
 			if (entry.isDirectory()) {
-			} else 
+			} else
 			/*
-				 * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
-				 * doesn't require folders to be stored but only FILES, and actually the full path on each file is
-				 * what determines the hierarchy.
-				 */
+			 * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
+			 * doesn't require folders to be stored but only FILES, and actually the full path on each file is
+			 * what determines the hierarchy.
+			 */
 			// processDirectory(entry);
 			{
 				String absPath = entry.getName();
@@ -303,7 +304,7 @@ public class FileIndexer extends ServiceBase {
 					continue;
 				}
 				if (entry.isDirectory()) {
-				} else 
+				} else
 				// todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
 				// is the case for TAR files. Check this.
 				{
@@ -610,12 +611,12 @@ public class FileIndexer extends ServiceBase {
 	public static String getAttrVal(BasicFileAttributes attr, FileProperties prop) {
 		SimpleDateFormat format = new SimpleDateFormat(DateUtil.DATE_FORMAT);
 		switch (prop) {
-		case MODIFIED: 
-			return format.format((attr.lastModifiedTime().toMillis()));
-		case CREATED: 
-			return format.format((attr.creationTime().toMillis()));
-		default: 
-			throw new IllegalArgumentException(prop.toString() + "is not supported.");
+			case MODIFIED:
+				return format.format((attr.lastModifiedTime().toMillis()));
+			case CREATED:
+				return format.format((attr.creationTime().toMillis()));
+			default:
+				throw new IllegalArgumentException(prop.toString() + "is not supported.");
 		}
 	}
 
@@ -624,14 +625,16 @@ public class FileIndexer extends ServiceBase {
 	 */
 	public static String getDocType(File f) {
 		final int start = f.getName().lastIndexOf(".");
-		if (start == -1) return "";
+		if (start == -1)
+			return "";
 		return f.getName().substring(start + 1);
 	}
 
 	/**
 	 * Create lucene document from file attributes
 	 */
-	public static Document newLuceneDoc(String content, String path, String name, String username, String modified, String size, String created, String docType) {
+	public static Document newLuceneDoc(String content, String path, String name, String username, String modified, String size,
+			String created, String docType) {
 		Document doc = new Document();
 		doc.add(new Field("contents", content, TextField.TYPE_NOT_STORED));
 		doc.add(new StringField("filepath", path, Field.Store.YES));

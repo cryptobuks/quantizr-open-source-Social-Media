@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class EnglishDictionary extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
@@ -37,7 +37,8 @@ public class EnglishDictionary extends ServiceBase {
 	}
 
 	public void loadWords(String fileName, HashSet<String> words) {
-		if (words.size() > 0) return;
+		if (words.size() > 0)
+			return;
 		try {
 			/*
 			 * todo-1: Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes
@@ -83,7 +84,8 @@ public class EnglishDictionary extends ServiceBase {
 	}
 
 	public boolean isStopWord(String word) {
-		if (word == null) return true;
+		if (word == null)
+			return true;
 		return stopWords.contains(word.toLowerCase());
 	}
 
@@ -97,8 +99,10 @@ public class EnglishDictionary extends ServiceBase {
 	 * example threshold=0.60f -> 60% english)
 	 */
 	public boolean isEnglish(String text) {
-		if (text == null) return true;
-		if (dictWords.size() == 0) throw new RuntimeException("called isEnglish before dictionary was loaded.");
+		if (text == null)
+			return true;
+		if (dictWords.size() == 0)
+			throw new RuntimeException("called isEnglish before dictionary was loaded.");
 		// log.debug("Checking english: " + text);
 		int englishCount = 0;
 		int unknownCount = 0;
@@ -120,33 +124,36 @@ public class EnglishDictionary extends ServiceBase {
 			}
 			token = token.toLowerCase();
 			switch (token) {
-			case "span": 
-			case "div": 
-			case "html": 
-			case "img": 
-				continue;
-			default: 
-				break;
+				case "span":
+				case "div":
+				case "html":
+				case "img":
+					continue;
+				default:
+					break;
 			}
 			// log.debug("tok: " + token);
 			if (dictWords.contains(token)) {
 				englishCount++;
-			} else 
+			} else
 			// log.debug(" isEnglish: " + token);
 			{
 				unknownCount++;
 				// log.debug(" notEnglish: " + token);
 			}
 		}
-		if (englishCount == 0 && unknownCount == 0) return true;
+		if (englishCount == 0 && unknownCount == 0)
+			return true;
 		float percent = (float) englishCount / (englishCount + unknownCount);
 		// log.debug("eng=" + englishCount + " nonEng=" + unknownCount + " %=" + percent);
 		return percent > 0.6F;
 	}
 
 	public boolean hasBadWords(String text) {
-		if (badWords.size() == 0) throw new RuntimeException("called isBadWord before dictionary was loaded.");
-		if (text == null) return false;
+		if (badWords.size() == 0)
+			throw new RuntimeException("called isBadWord before dictionary was loaded.");
+		if (text == null)
+			return false;
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"\'`!?()*#<>", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim().toLowerCase();

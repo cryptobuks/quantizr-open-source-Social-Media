@@ -11,46 +11,38 @@ public class GetSharedNodesRequest extends RequestBase {
 	private String shareTarget;
 	private String accessOption; // for public can be rd, rw, or null (all)
 
-	
 	public int getPage() {
 		return this.page;
 	}
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getShareTarget() {
 		return this.shareTarget;
 	}
-
 	
 	public String getAccessOption() {
 		return this.accessOption;
 	}
-
 	
 	public void setPage(final int page) {
 		this.page = page;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setShareTarget(final String shareTarget) {
 		this.shareTarget = shareTarget;
 	}
-
 	
 	public void setAccessOption(final String accessOption) {
 		this.accessOption = accessOption;
 	}
-
+	
 	public GetSharedNodesRequest() {
 	}
 }

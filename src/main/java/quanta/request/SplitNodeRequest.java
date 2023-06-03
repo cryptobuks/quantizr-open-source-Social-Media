@@ -9,32 +9,26 @@ public class SplitNodeRequest extends RequestBase {
 	private String splitType;
 	private String nodeId;
 	private String delimiter;
-
 	
 	public String getSplitType() {
 		return this.splitType;
 	}
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getDelimiter() {
 		return this.delimiter;
 	}
-
 	
 	public void setSplitType(final String splitType) {
 		this.splitType = splitType;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setDelimiter(final String delimiter) {
 		this.delimiter = delimiter;

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class EventPublisher implements ApplicationEventPublisherAware {
-	
+
 	private static Logger log = LoggerFactory.getLogger(EventPublisher.class);
 	// NOT autowired (this is correct)
 	private ApplicationEventPublisher publisher;

@@ -24,7 +24,7 @@ public class PerfMonEvent {
         if (event != null) {
             this.duration = duration;
             this.event = event;
-            
+
             Instrument.add(this);
             PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
 

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class ExportTextService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ExportTextService.class);
 	private MongoSession session;
 	private BufferedOutputStream output = null;
@@ -95,7 +95,8 @@ public class ExportTextService extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null) return;
+		if (node == null)
+			return;
 		/* process the current node */
 		processNode(node);
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);

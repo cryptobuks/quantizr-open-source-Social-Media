@@ -10,12 +10,10 @@ public class NodeEditedPushInfo extends ServerPushInfo {
 		super("nodeEdited");
 		this.nodeInfo = nodeInfo;
 	}
-
 	
 	public NodeInfo getNodeInfo() {
 		return this.nodeInfo;
 	}
-
 	
 	public void setNodeInfo(final NodeInfo nodeInfo) {
 		this.nodeInfo = nodeInfo;

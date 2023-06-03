@@ -43,93 +43,75 @@ public class UserPreferences {
 		this.mainPanelCols = mainPanelCols;
 	}
 
-	
 	public boolean isEditMode() {
 		return this.editMode;
 	}
-
 	
 	public boolean isShowMetaData() {
 		return this.showMetaData;
 	}
 
-	
 	public boolean isNsfw() {
 		return this.nsfw;
 	}
 
-	
 	public boolean isShowProps() {
 		return this.showProps;
 	}
-
 	
 	public boolean isAutoRefreshFeed() {
 		return this.autoRefreshFeed;
 	}
-
 	
 	public boolean isShowParents() {
 		return this.showParents;
 	}
-
 	
 	public boolean isShowReplies() {
 		return this.showReplies;
 	}
-
 	
 	public boolean isRssHeadlinesOnly() {
 		return this.rssHeadlinesOnly;
 	}
 
-	
 	public boolean isEnableIPSM() {
 		return this.enableIPSM;
 	}
 
-	
 	public void setEditMode(final boolean editMode) {
 		this.editMode = editMode;
 	}
-
 	
 	public void setShowMetaData(final boolean showMetaData) {
 		this.showMetaData = showMetaData;
 	}
 
-	
 	public void setNsfw(final boolean nsfw) {
 		this.nsfw = nsfw;
 	}
-
 	
 	public void setShowProps(final boolean showProps) {
 		this.showProps = showProps;
 	}
 
-	
 	public void setAutoRefreshFeed(final boolean autoRefreshFeed) {
 		this.autoRefreshFeed = autoRefreshFeed;
 	}
 
-	
 	public void setShowParents(final boolean showParents) {
 		this.showParents = showParents;
 	}
 
-	
 	public void setShowReplies(final boolean showReplies) {
 		this.showReplies = showReplies;
 	}
-
 	
 	public void setRssHeadlinesOnly(final boolean rssHeadlinesOnly) {
 		this.rssHeadlinesOnly = rssHeadlinesOnly;
 	}
 
 	@JsonProperty(required = false)
-	
 	public void setEnableIPSM(final boolean enableIPSM) {
 		this.enableIPSM = enableIPSM;
 	}

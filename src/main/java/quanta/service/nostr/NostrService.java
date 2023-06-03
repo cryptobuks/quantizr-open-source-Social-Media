@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class NostrService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(NostrService.class);
 	// cache is cleared every 3mins so it can pick up user changes
 	public final ConcurrentHashMap<String, SubNode> nostrUserNodesByPubKey = new ConcurrentHashMap<>();
@@ -79,7 +79,8 @@ public class NostrService extends ServiceBase {
 	// every 10 seconds
 	@Scheduled(fixedDelay = 10 * 1000)
 	public void verifyEvents() {
-		if (eventsPendingVerify.isEmpty()) return;
+		if (eventsPendingVerify.isEmpty())
+			return;
 		ConcurrentHashMap<ObjectId, NostrEventWrapper> workingMap = new ConcurrentHashMap<>(eventsPendingVerify);
 		eventsPendingVerify.clear();
 		List<NostrEventWrapper> events = new LinkedList<>(workingMap.values());
@@ -112,7 +113,8 @@ public class NostrService extends ServiceBase {
 	public SaveNostrEventResponse saveNostrEvents(SaveNostrEventRequest req) {
 		SaveNostrEventResponse res = new SaveNostrEventResponse();
 		IntVal saveCount = new IntVal(0);
-		if (req.getEvents() == null) return res;
+		if (req.getEvents() == null)
+			return res;
 		HashSet<String> accountNodeIds = new HashSet<>();
 		List<String> eventNodeIds = new ArrayList<>();
 		arun.run(as -> {
@@ -127,21 +129,22 @@ public class NostrService extends ServiceBase {
 		return res;
 	}
 
-	public void saveEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds, IntVal saveCount) {
+	public void saveEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds,
+			IntVal saveCount) {
 		switch (event.getEvent().getKind()) {
-		case KIND_Metadata: 
-			saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
-			break;
-		case KIND_EncryptedDirectMessage: 
-		case KIND_Text: 
-			saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
-			break;
-		default: 
-			// todo-1: for now we treat all unknown nodes as text, but we need to do something in the DB to
-			// indicate this is NOT a known type.
-			saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
-			log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
-			break;
+			case KIND_Metadata:
+				saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
+				break;
+			case KIND_EncryptedDirectMessage:
+			case KIND_Text:
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
+				break;
+			default:
+				// todo-1: for now we treat all unknown nodes as text, but we need to do something in the DB to
+				// indicate this is NOT a known type.
+				saveNostrTextEvent(as, event, accountNodeIds, eventNodeIds, saveCount);
+				log.debug("UNHANDLED NOSTR KIND: " + XString.prettyPrint(event));
+				break;
 		}
 	}
 
@@ -159,15 +162,16 @@ public class NostrService extends ServiceBase {
 		headers.setContentType(APConst.MTYPE_JSON);
 		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
 		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-verify";
-		ResponseEntity<List<String>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<String>>() {
-		});
+		ResponseEntity<List<String>> response =
+				restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<String>>() {});
 		// we get back a list of all IDs that failed to verify
 		List<String> failedIds = response.getBody();
 		// log.debug("FailedIDs: " + XString.prettyPrint(failedIds));
 		return failedIds;
 	}
 
-	private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, IntVal saveCount) {
+	private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+			IntVal saveCount) {
 		// log.debug("SaveNostr METADATA:" + XString.prettyPrint(event));
 		/*
 		 * Note: we can't do this verify async (in worker thread) like we do with events, because if the
@@ -187,7 +191,8 @@ public class NostrService extends ServiceBase {
 				return;
 			}
 			nostrAccnt = getOrCreateNostrAccount(as, nevent.getPubkey(), event.getRelays(), null, saveCount);
-			if (nostrAccnt == null) return;
+			if (nostrAccnt == null)
+				return;
 			Date timestamp = new Date(nevent.getCreatedAt() * 1000);
 			try {
 				NostrMetadata metadata = mapper.readValue(nevent.getContent(), NostrMetadata.class);
@@ -252,7 +257,8 @@ public class NostrService extends ServiceBase {
 	private SubNode getLocalUserByNostrPubKey(MongoSession as, String pubKey) {
 		// try to get from cache first
 		SubNode nostrAccnt = nostrUserNodesByPubKey.get(pubKey);
-		if (nostrAccnt != null) return nostrAccnt;
+		if (nostrAccnt != null)
+			return nostrAccnt;
 		// else we need to query and then cache
 		nostrAccnt = read.getLocalUserNodeByProp(as, NodeProp.NOSTR_USER_PUBKEY.s(), pubKey, false);
 		if (nostrAccnt != null) {
@@ -261,11 +267,13 @@ public class NostrService extends ServiceBase {
 		return nostrAccnt;
 	}
 
-	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds, List<String> eventNodeIds, IntVal saveCount) {
+	private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+			List<String> eventNodeIds, IntVal saveCount) {
 		NostrEvent nevent = event.getEvent();
 		SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
 		if (nostrAccnt != null) {
-			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event) + " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
+			log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
+					+ " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
 			// if the npub is owned by a local user we're done, and no need to create the foreign holder account
 			return;
 		}
@@ -287,16 +295,16 @@ public class NostrService extends ServiceBase {
 		}
 		String newType;
 		switch (nevent.getKind()) {
-		case KIND_EncryptedDirectMessage: 
-			newType = NodeType.NOSTR_ENC_DM.s();
-			break;
-		default: 
-			newType = NodeType.NONE.s();
-			break;
+			case KIND_EncryptedDirectMessage:
+				newType = NodeType.NOSTR_ENC_DM.s();
+				break;
+			default:
+				newType = NodeType.NONE.s();
+				break;
 		}
-		SubNode newNode = create.createNode(as, postsNode.getVal(), null,  //
-		newType, 0L, CreateNodeLocation.LAST, null,  //
-		nostrAccnt.getOwner(), true, true);
+		SubNode newNode = create.createNode(as, postsNode.getVal(), null, //
+				newType, 0L, CreateNodeLocation.LAST, null, //
+				nostrAccnt.getOwner(), true, true);
 		if (nevent.getKind() != KIND_EncryptedDirectMessage) {
 			acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
 		}
@@ -324,9 +332,12 @@ public class NostrService extends ServiceBase {
 		return accntNode;
 	}
 
-	// todo-1: we would now take care of this on the server right in this method by calling tserver for all 
-	// this info, and persisting it, just like the client would've, and then send the info down to the client, but the client 
-	// will need to know NOT to do any persisting of what it gets because we know we've already persisted.
+	// todo-1: we would now take care of this on the server right in this method by calling tserver for
+	// all
+	// this info, and persisting it, just like the client would've, and then send the info down to the
+	// client, but the client
+	// will need to know NOT to do any persisting of what it gets because we know we've already
+	// persisted.
 	public void pushNostrInfoToClient() {
 		if (ThreadLocals.getNewNostrUsers().size() > 0) {
 			// WARNING: make call to get users BEFORE 'exec.run()' or else we won't be on the request thread.
@@ -342,9 +353,10 @@ public class NostrService extends ServiceBase {
 	}
 
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode, IntVal saveCount) {
+	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode,
+			IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
-		
+
 		if (nostrAccnt == null) {
 			// log.debug("New Nostr User: " + userKey + " newCount=" + ThreadLocals.getNewNostrUsers().size());
 			ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
@@ -364,7 +376,8 @@ public class NostrService extends ServiceBase {
 			}
 		}
 		if (postsNode != null) {
-			SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+			SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
+					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 			postsNode.setVal(postsNodeFound);
 		}
 		return nostrAccnt;
@@ -373,7 +386,8 @@ public class NostrService extends ServiceBase {
 	// nodeMissing sends back 'true' if we did attemp to find a NostrNode and failed to find it in the
 	// DB
 	public SubNode getNodeBeingRepliedTo(MongoSession ms, SubNode node, Val<Boolean> nodeMissing) {
-		if (!isNostrNode(node)) return null;
+		if (!isNostrNode(node))
+			return null;
 		Val<String> eventRepliedTo = new Val<String>();
 		Val<String> relayRepliedTo = new Val<String>();
 		getReplyInfo(node, eventRepliedTo, relayRepliedTo);
@@ -398,7 +412,7 @@ public class NostrService extends ServiceBase {
 				// deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
 				if (itm.size() < 4) {
 					any = itm;
-				} else 
+				} else
 				// Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
 				if ("reply".equals(itm.get(3))) {
 					reply = itm;
@@ -459,7 +473,8 @@ public class NostrService extends ServiceBase {
 	 * Quanta users are not allwed to use a dot in their username.
 	 */
 	public boolean isNostrUserName(String userName) {
-		if (userName == null) return false;
+		if (userName == null)
+			return false;
 		return userName.startsWith(".") && !userName.contains("@");
 	}
 }

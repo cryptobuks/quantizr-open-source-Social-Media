@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class AppSessionListener implements HttpSessionListener {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AppSessionListener.class);
 	@Autowired
 	private AppProp appProp;
@@ -49,7 +49,8 @@ public class AppSessionListener implements HttpSessionListener {
 		}
 		session.removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
 		sessionCounter--;
-		// log.debug("sessionDestroyed: sessionId=" + se.getSession().getId() + " sessionCount=" + SessionContext.getSessionCount());
+		// log.debug("sessionDestroyed: sessionId=" + se.getSession().getId() + " sessionCount=" +
+		// SessionContext.getSessionCount());
 	}
 
 	public static int getSessionCounter() {

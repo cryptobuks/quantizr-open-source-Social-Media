@@ -10,36 +10,30 @@ public class GetPeopleRequest extends RequestBase {
     private String type; // friends | blocks
     private String subType; // null | nostr
 
-    
     public String getNodeId() {
         return this.nodeId;
     }
-
     
     public String getType() {
         return this.type;
     }
-
     
     public String getSubType() {
         return this.subType;
     }
-
     
     public void setNodeId(final String nodeId) {
         this.nodeId = nodeId;
     }
-
     
     public void setType(final String type) {
         this.type = type;
     }
-
     
     public void setSubType(final String subType) {
         this.subType = subType;
     }
-    
+
     public GetPeopleRequest() {
     }
 }

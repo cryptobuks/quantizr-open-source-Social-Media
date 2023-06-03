@@ -13,8 +13,7 @@ import java.util.regex.Pattern;
 public class StringPatternMatcher {
 	private ArrayList<String> patternList = new ArrayList<>();
 
-	public StringPatternMatcher() {
-	}
+	public StringPatternMatcher() {}
 
 	public void addPattern(String searchPattern) {
 		synchronized (patternList) {
@@ -47,7 +46,8 @@ public class StringPatternMatcher {
 	}
 
 	public void addListOfPatterns(String input) {
-		if (input == null || input.length() == 0) return;
+		if (input == null || input.length() == 0)
+			return;
 
 		StringTokenizer t = new StringTokenizer(input, ",", true);
 		String token;

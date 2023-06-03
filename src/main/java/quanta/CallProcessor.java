@@ -29,14 +29,15 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class CallProcessor extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
 	/*
 	 * Wraps the processing of any command by using whatever info is on the session and/or the request
 	 * to perform the login if the user is not logged in, and then call the function to be processed
 	 */
-	public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession, MongoRunnableEx<Object> runner) {
+	public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
+			MongoRunnableEx<Object> runner) {
 		if (AppServer.isShuttingDown()) {
 			throw ExUtil.wrapEx("Server not available.");
 		}
@@ -70,11 +71,11 @@ public class CallProcessor extends ServiceBase {
 		 * mutex here.
 		 */
 		switch (command) {
-		case "serverPush": 
-		case "signNodes": 
-			useLock = false;
-		default: 
-			break;
+			case "serverPush":
+			case "signNodes":
+				useLock = false;
+			default:
+				break;
 		}
 		Object ret = null;
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());

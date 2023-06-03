@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSConfig extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSConfig.class);
     public String API_CONFIG;
 
@@ -23,17 +23,24 @@ public class IPFSConfig extends ServiceBase {
 
     // todo-1:
     // add call to support CORS by calling this endpoint:
-    //  https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-config
-    //  example: 
-    //   curl -X POST "http://127.0.0.1:5001/api/v0/config?arg=<key>&arg=<value>&bool=<value>&json=<value>"
+    // https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-config
+    // example:
+    // curl -X POST
+    // "http://127.0.0.1:5001/api/v0/config?arg=<key>&arg=<value>&bool=<value>&json=<value>"
     // We'll put these values in:
-    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
-    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json
+    // API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json
+    // API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json
+    // Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    // docker-compose -f ${dc_yaml} exec $1 ipfs config --json
+    // Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
     //
-    // WARNING: It WILL require a restart of IPFS to make changes go into effect. Note you can probably check that these have been 
-    // applied right after running the command however, by looking inside /ipfs/config (in the IPFS data directory)
+    // WARNING: It WILL require a restart of IPFS to make changes go into effect. Note you can probably
+    // check that these have been
+    // applied right after running the command however, by looking inside /ipfs/config (in the IPFS data
+    // directory)
     public String getStat() {
         StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, Object> res = null;

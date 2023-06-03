@@ -23,16 +23,18 @@ import org.slf4j.LoggerFactory;
 @Component
 @Order(4)
 public class HitFilter extends GenericFilterBean {
-	
+
 	private static Logger log = LoggerFactory.getLogger(HitFilter.class);
 	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("HitFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
@@ -69,6 +71,5 @@ public class HitFilter extends GenericFilterBean {
 		return uniqueHits;
 	}
 
-	public void destroy() {
-	}
+	public void destroy() {}
 }

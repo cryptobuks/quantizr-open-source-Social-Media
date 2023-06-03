@@ -11,36 +11,30 @@ public class GetServerInfoRequest extends RequestBase {
     // currently selected node on the GUI
     private String nodeId;
 
-    
     public String getCommand() {
         return this.command;
     }
-
     
     public String getParameter() {
         return this.parameter;
     }
-
     
     public String getNodeId() {
         return this.nodeId;
     }
-
     
     public void setCommand(final String command) {
         this.command = command;
     }
-
     
     public void setParameter(final String parameter) {
         this.parameter = parameter;
     }
-
     
     public void setNodeId(final String nodeId) {
         this.nodeId = nodeId;
     }
-
+    
     public GetServerInfoRequest() {
     }
 }

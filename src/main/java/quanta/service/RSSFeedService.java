@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 /* Proof of Concept RSS Publishing */
 @Component
 public class RSSFeedService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(RSSFeedService.class);
 	private static boolean refreshingCache = false;
 	private static final Object policyLock = new Object();
@@ -99,11 +99,12 @@ public class RSSFeedService extends ServiceBase {
 	 */
 	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
 	private static int MAX_CACHE_SIZE = 500;
-	public static final LinkedHashMap<String, byte[]> proxyCache = new LinkedHashMap<String, byte[]>(MAX_CACHE_SIZE + 1, 0.75F, false) {
-		protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
-			return size() > MAX_CACHE_SIZE;
-		}
-	};
+	public static final LinkedHashMap<String, byte[]> proxyCache =
+			new LinkedHashMap<String, byte[]>(MAX_CACHE_SIZE + 1, 0.75F, false) {
+				protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+					return size() > MAX_CACHE_SIZE;
+				}
+			};
 	private static final int MAX_FEED_ITEMS = 75;
 	private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
 	static boolean run = false;
@@ -113,7 +114,8 @@ public class RSSFeedService extends ServiceBase {
 	 */
 	@Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
 	public void run() {
-		if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit) return;
+		if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+			return;
 		try {
 			run = true;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
@@ -251,10 +253,11 @@ public class RSSFeedService extends ServiceBase {
 			 * best theory for why is that my restTemplate is doing something special that fixes these issues.
 			 */
 			if (USE_HTTP_READER) {
-				RequestConfig config =  //
-				//
-				//
-				RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+				RequestConfig config = //
+						//
+						//
+						RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
+								.setSocketTimeout(timeout * 1000).build();
 				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 				HttpGet request = new HttpGet(url);
 				request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
@@ -334,7 +337,8 @@ public class RSSFeedService extends ServiceBase {
 
 	// See also: https://github.com/OWASP/java-html-sanitizer
 	private String sanitizeHtml(String html) {
-		if (StringUtils.isEmpty(html)) return html;
+		if (StringUtils.isEmpty(html))
+			return html;
 		// this sanitizer seems to choke on these special quotes so replace them first.
 		html = quoteFix(html);
 		if (policy == null) {
@@ -344,7 +348,8 @@ public class RSSFeedService extends ServiceBase {
 				 * as part of the feed formatting
 				 */
 				policy = /* .and(Sanitizers.IMAGES) *///
-				Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.LINKS).and(Sanitizers.STYLES).and(Sanitizers.TABLES);
+						Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.LINKS).and(Sanitizers.STYLES)
+								.and(Sanitizers.TABLES);
 			}
 		}
 		html = policy.sanitize(html);
@@ -372,7 +377,7 @@ public class RSSFeedService extends ServiceBase {
 			List<SyndEntry> entries = new LinkedList<>();
 			feed.setEntries(entries);
 			aggregateFeeds(urlList, entries, req.getPage());
-		} else 
+		} else
 		/* If not an aggregate return the one external feed itself */
 		{
 			String url = urlList.get(0);
@@ -509,7 +514,7 @@ public class RSSFeedService extends ServiceBase {
 						log.debug("media has no groups.");
 					}
 				} else if (m instanceof ContentModuleImpl) {
-				} else 
+				} else
 				// ContentModuleImpl contentMod = (ContentModuleImpl) m;
 				// if (ok(contentMod.getContents() )) {
 				// for (String contents : contentMod.getContents()) {
@@ -531,7 +536,7 @@ public class RSSFeedService extends ServiceBase {
 							e.setImage(itunesMod.getImage().toURI().toString());
 						} catch (Exception e1) {
 						}
-					} else 
+					} else
 					// ignore
 					{
 						e.setImage(itunesMod.getImageUri());
@@ -543,10 +548,10 @@ public class RSSFeedService extends ServiceBase {
 					if (!StringUtils.isEmpty(itunesMod.getSummary())) {
 						e.setDescription(sanitizeHtml(itunesMod.getSummary()));
 					}
-				} else 
+				} else
 				// what feeds use this? (todo-2)
 				if (m instanceof DCModuleImpl) {
-				} else 
+				} else
 				// DCModuleImpl dm = (DCModuleImpl) m;
 				// String dcFormat = dm.getFormat();
 				// String dcSource = dm.getSource();
@@ -612,7 +617,7 @@ public class RSSFeedService extends ServiceBase {
 						}
 					}
 				} else if (m instanceof ContentModuleImpl) {
-				} else 
+				} else
 				// ContentModuleImpl contentMod = (ContentModuleImpl) m;
 				// if (ok(contentMod.getContents() )) {
 				// for (String contents : contentMod.getContents()) {
@@ -634,7 +639,7 @@ public class RSSFeedService extends ServiceBase {
 							e.setImage(itunesMod.getImage().toURI().toString());
 						} catch (Exception e1) {
 						}
-					} else 
+					} else
 					// ignore
 					{
 						e.setImage(itunesMod.getImageUri());
@@ -646,10 +651,10 @@ public class RSSFeedService extends ServiceBase {
 					if (!StringUtils.isEmpty(itunesMod.getSummary())) {
 						e.setDescription(sanitizeHtml(itunesMod.getSummary()));
 					}
-				} else 
+				} else
 				// what feeds use this? (todo-2)
 				if (m instanceof DCModuleImpl) {
-				} else 
+				} else
 				// DCModuleImpl dm = (DCModuleImpl) m;
 				// String dcFormat = dm.getFormat();
 				// String dcSource = dm.getSource();
@@ -706,7 +711,8 @@ public class RSSFeedService extends ServiceBase {
 			Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
 			if (iter != null) {
 				for (SubNode n : iter) {
-					if (!AclService.isPublic(ms, n)) continue;
+					if (!AclService.isPublic(ms, n))
+						continue;
 					metaInfo = snUtil.getNodeMetaInfo(n);
 					// Currently the link will be an attachment URL, but need to research how ROME
 					// handles attachments.
@@ -715,7 +721,8 @@ public class RSSFeedService extends ServiceBase {
 					}
 					SyndEntry entry = new SyndEntryImpl();
 					entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
-					entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
+					entry.setLink(
+							metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
 					/*
 					 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
 					 * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
@@ -747,13 +754,20 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private void fixFeed(SyndFeed feed) {
-		if (feed == null) return;
-		if (StringUtils.isEmpty(feed.getEncoding())) feed.setEncoding("UTF-8");
-		if (StringUtils.isEmpty(feed.getFeedType())) feed.setFeedType("rss_2.0");
-		if (StringUtils.isEmpty(feed.getTitle())) feed.setTitle("");
-		if (StringUtils.isEmpty(feed.getDescription())) feed.setDescription("");
-		if (StringUtils.isEmpty(feed.getAuthor())) feed.setAuthor("");
-		if (StringUtils.isEmpty(feed.getLink())) feed.setLink("");
+		if (feed == null)
+			return;
+		if (StringUtils.isEmpty(feed.getEncoding()))
+			feed.setEncoding("UTF-8");
+		if (StringUtils.isEmpty(feed.getFeedType()))
+			feed.setFeedType("rss_2.0");
+		if (StringUtils.isEmpty(feed.getTitle()))
+			feed.setTitle("");
+		if (StringUtils.isEmpty(feed.getDescription()))
+			feed.setDescription("");
+		if (StringUtils.isEmpty(feed.getAuthor()))
+			feed.setAuthor("");
+		if (StringUtils.isEmpty(feed.getLink()))
+			feed.setLink("");
 	}
 
 	private void writeFeed(SyndFeed feed, Writer writer) {
@@ -784,18 +798,18 @@ public class RSSFeedService extends ServiceBase {
 				sb.append(c);
 			} else {
 				switch (c) {
-				case '—': 
-					sb.append("-");
-					break;
-				case '”': 
-					sb.append("\"");
-					break;
-				case '’': 
-					sb.append("\'");
-					break;
-				default: 
-					sb.append(" ");
-					break;
+					case '—':
+						sb.append("-");
+						break;
+					case '”':
+						sb.append("\"");
+						break;
+					case '’':
+						sb.append("\'");
+						break;
+					default:
+						sb.append(" ");
+						break;
 				}
 			}
 		}

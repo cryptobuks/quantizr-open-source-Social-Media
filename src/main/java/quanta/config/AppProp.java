@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class AppProp {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AppProp.class);
 	@Autowired
 	private Environment env;
@@ -96,8 +96,7 @@ public class AppProp {
 				log.debug("Loading config from internal classpath: " + fileName);
 				Resource resource = context.getResource("classpath:" + fileName);
 				is = resource.getInputStream();
-				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {
-				});
+				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
 				if (map == null) {
 					map = new HashMap<>();
 				}
@@ -118,8 +117,7 @@ public class AppProp {
 				// if an external config file is found use it.
 				if (file.isFile()) {
 					log.debug("Loading config from file system: " + fileName);
-					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {
-					});
+					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
 				}
 			} catch (Exception e) {
 				ExUtil.error(log, "failed to load help-text.yaml", e);
@@ -149,10 +147,12 @@ public class AppProp {
 	}
 
 	public String getProtocolHostAndPort() {
-		if (protocolHostAndPort != null) return protocolHostAndPort;
+		if (protocolHostAndPort != null)
+			return protocolHostAndPort;
 		protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
 		// If port is needed (not default) then add it.
-		if (!(getHttpProtocol().equals("https") && getServerPort().equals("443")) && !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
+		if (!(getHttpProtocol().equals("https") && getServerPort().equals("443"))
+				&& !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
 			protocolHostAndPort += ":" + getServerPort();
 		}
 		return protocolHostAndPort;
@@ -303,7 +303,8 @@ public class AppProp {
 	/* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
 	public boolean getBooleanProp(String propName) {
 		String val = env.getProperty(propName);
-		if (val == null) return false;
+		if (val == null)
+			return false;
 		val = val.toLowerCase();
 		return val.startsWith("t") || val.startsWith("y") || val.startsWith("1");
 	}
@@ -317,7 +318,8 @@ public class AppProp {
 	}
 
 	public String translateDirs(String folder) {
-		if (folder == null) return folder;
+		if (folder == null)
+			return folder;
 		String userDir = System.getProperty("user.dir");
 		return folder.replace("{user.dir}", userDir);
 	}

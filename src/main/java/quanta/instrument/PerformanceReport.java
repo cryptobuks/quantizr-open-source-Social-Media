@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PerformanceReport {
-	
+
 	private static Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
 	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
@@ -41,11 +41,11 @@ public class PerformanceReport {
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable( //
-			//
-			//
-			//
-			//
-			htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows));
+					//
+					//
+					//
+					//
+					htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows));
 		}
 		// calculate totals per person
 		HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
@@ -69,9 +69,9 @@ public class PerformanceReport {
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable( //
-			//
-			//
-			htmlTr(htmlTh("user") + htmlTh("Count")) + rows));
+					//
+					//
+					htmlTr(htmlTh("user") + htmlTh("Count")) + rows));
 		}
 		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
@@ -82,9 +82,9 @@ public class PerformanceReport {
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable( //
-			//
-			//
-			htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows));
+					//
+					//
+					htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows));
 		}
 		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
@@ -95,9 +95,9 @@ public class PerformanceReport {
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable( //
-			//
-			//
-			htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
+					//
+					//
+					htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
 		}
 		sb.append(getTimesPerCategory());
 		sb.append("</body></html>");
@@ -126,16 +126,17 @@ public class PerformanceReport {
 		List<MethodStat> orderedStats = new ArrayList<>(stats.values());
 		orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
 		String table = htmlTr( //
-		//
-		//
-		htmlTh("Category") + htmlTh("Count") + htmlTh("Avg. Time") +  //
-		htmlTh("Time"));
+				//
+				//
+				htmlTh("Category") + htmlTh("Count") + htmlTh("Avg. Time") + //
+						htmlTh("Time"));
 		for (MethodStat stat : orderedStats) {
 			table += htmlTr( //
-			//
-			//
-			htmlTd(stat.category) + htmlTdRt(String.valueOf(stat.totalCount)) + htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) +  //
-			htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
+					//
+					//
+					htmlTd(stat.category) + htmlTdRt(String.valueOf(stat.totalCount))
+							+ htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) + //
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
 		}
 		return htmlH(3, "Times Per Category") + htmlTable(table);
 	}
@@ -161,12 +162,14 @@ public class PerformanceReport {
 					}
 				}
 				if (!rows.isEmpty()) {
-					set +=  //
-					//
-					//
-					//
-					//
-					"<br>" + htmlTable(htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows) + "<br>";
+					set += //
+							//
+							//
+							//
+							//
+							"<br>" + htmlTable(htmlTr(
+									htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id"))
+									+ rows) + "<br>";
 				}
 			}
 		}
@@ -204,14 +207,17 @@ public class PerformanceReport {
 	}
 
 	public static String htmlStyle() {
-		return  //
+		return //
 		//
 		//
 		//
 		//
 		//
 		//
-		"<style>\n" + "table, th, td {\n" + "padding: 5px;\n" + "border: 1px solid black;\n" + "border-collapse: collapse;\n" + "}\n" + "body {padding: 20px;}" + "html, body {font-family: \'Courier New\', \'Courier\', \'Roboto\', \'Verdana\', \'Helvetica\', \'Arial\', \'sans-serif\' !important}" +  //
-		"</style>";
+		"<style>\n" + "table, th, td {\n" + "padding: 5px;\n" + "border: 1px solid black;\n" + "border-collapse: collapse;\n"
+				+ "}\n" + "body {padding: 20px;}"
+				+ "html, body {font-family: \'Courier New\', \'Courier\', \'Roboto\', \'Verdana\', \'Helvetica\', \'Arial\', \'sans-serif\' !important}"
+				+ //
+				"</style>";
 	}
 }

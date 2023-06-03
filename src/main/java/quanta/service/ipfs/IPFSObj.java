@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSObj extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSObj.class);
     public static String API_OBJECT;
 
@@ -65,8 +65,7 @@ public class IPFSObj extends ServiceBase {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = ipfs.restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {
-            });
+            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
         } catch (
         // log.debug("new Object: " + XString.prettyPrint(ret));
         Exception e) {
@@ -109,7 +108,8 @@ public class IPFSObj extends ServiceBase {
         if (StringUtils.isEmpty(filePath)) {
             filePath = fileCid;
         }
-        return objectOperation(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
+        return objectOperation(
+                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
     }
 
     public IPFSObjectStat objectStat(String cid, boolean humanReadable) {

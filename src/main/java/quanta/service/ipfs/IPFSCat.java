@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSCat extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSCat.class);
     public static String API_CAT;
 
@@ -33,7 +33,8 @@ public class IPFSCat extends ServiceBase {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
         } catch (
         // log.debug("IPFS post cat. Ret " + response.getStatusCode() + "] " + ret);

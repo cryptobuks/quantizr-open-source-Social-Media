@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(ExportTarService.class);
     private TarArchiveOutputStream out = null;
     private boolean gzip = false;
@@ -25,7 +25,8 @@ public class ExportTarService extends ExportArchiveBase {
     public void openOutputStream(String fileName) {
         log.debug("Opening Export File: " + fileName);
         try {
-            out = gzip ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName))) : new TarArchiveOutputStream(new FileOutputStream(fileName));
+            out = gzip ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName)))
+                    : new TarArchiveOutputStream(new FileOutputStream(fileName));
             // TAR has an 8 gig file limit by default, this gets around that
             out.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
             // TAR originally didn't support long file names, so enable the support for it

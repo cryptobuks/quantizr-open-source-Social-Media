@@ -11,35 +11,29 @@ public class JupyterKernelSpec {
     @JsonProperty("name")
     private String name;
 
-    
     public String getDisplayName() {
         return this.displayName;
     }
-
     
     public String getLanguage() {
         return this.language;
     }
-
     
     public String getName() {
         return this.name;
     }
 
     @JsonProperty("display_name")
-    
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
 
     @JsonProperty("language")
-    
     public void setLanguage(final String language) {
         this.language = language;
     }
 
     @JsonProperty("name")
-    
     public void setName(final String name) {
         this.name = name;
     }

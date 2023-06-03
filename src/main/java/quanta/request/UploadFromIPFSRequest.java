@@ -9,47 +9,39 @@ public class UploadFromIPFSRequest extends RequestBase {
 	private String nodeId;
 	private String cid;
 	private String mime;
-
 	
 	public boolean isPinLocally() {
 		return this.pinLocally;
 	}
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getCid() {
 		return this.cid;
 	}
-
 	
 	public String getMime() {
 		return this.mime;
 	}
-
 	
 	public void setPinLocally(final boolean pinLocally) {
 		this.pinLocally = pinLocally;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setCid(final String cid) {
 		this.cid = cid;
 	}
-
 	
 	public void setMime(final String mime) {
 		this.mime = mime;
 	}
-
+	
 	public UploadFromIPFSRequest() {
 	}
 }

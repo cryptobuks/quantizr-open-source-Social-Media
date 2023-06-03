@@ -7,13 +7,11 @@ public class MerkleCid {
     @JsonProperty("/")
     private String path;
 
-    
     public String getPath() {
         return this.path;
     }
 
     @JsonProperty("/")
-    
     public void setPath(final String path) {
         this.path = path;
     }

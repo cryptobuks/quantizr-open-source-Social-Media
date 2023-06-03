@@ -9,22 +9,18 @@ public class NodeSigData {
 		this.nodeId = nodeId;
 		this.data = data;
 	}
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getData() {
 		return this.data;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setData(final String data) {
 		this.data = data;

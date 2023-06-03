@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class ActPubFollower extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(ActPubFollower.class);
     @Autowired
     private ActPubLog apLog;
@@ -45,8 +45,8 @@ public class ActPubFollower extends ServiceBase {
     public APOOrderedCollection generateFollowers(String userMakingRequest, String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userMakingRequest, userName);
-        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true",  //
-        url + "?min_id=0&page=true");
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -69,7 +69,7 @@ public class ActPubFollower extends ServiceBase {
                     // with each actor url.
                     if (apub.saveFediverseName(followerActorUrl)) {
                     }
-                } else 
+                } else
                 // log.debug("follower: " + followerActorUrl);
                 {
                     log.debug("Unexpected follower item class: " + obj.getClass().getName());
@@ -84,7 +84,8 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public APObj getRemoteFollowers(MongoSession ms, String userMakingRequest, String url) {
-        if (url == null) return null;
+        if (url == null)
+            return null;
         APObj outbox = apUtil.getRemoteAP(ms, userMakingRequest, url);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
@@ -117,7 +118,7 @@ public class ActPubFollower extends ServiceBase {
                     // this will be non-null if it's a remote account.
                     if (remoteActorUrl != null) {
                         followers.add(remoteActorUrl);
-                    } else 
+                    } else
                     // otherwise, it's a local user, and we know how to build the Actor URL of our own users.
                     {
                         // the name on the account that owns the Friend node in his Friends List, is the "Follower"
@@ -149,13 +150,15 @@ public class ActPubFollower extends ServiceBase {
         if (minId != null) {
             url += "&min_id=" + minId;
         }
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, followers, prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName, followers.size());
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, followers,
+                prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName, followers.size());
         return ret;
     }
 
     public Iterable<SubNode> getPeopleByUserName(MongoSession ms, String userName) {
         Query q = getPeopleByUserName_query(ms, null, userName);
-        if (q == null) return null;
+        if (q == null)
+            return null;
         return mongoUtil.find(q);
     }
 
@@ -163,14 +166,16 @@ public class ActPubFollower extends ServiceBase {
         GetFollowersResponse res = new GetFollowersResponse();
         return arun.run(as -> {
             Query q = getPeopleByUserName_query(as, null, req.getTargetUserName());
-            if (q == null) return null;
+            if (q == null)
+                return null;
             q.limit(ConstantInt.ROWS_PER_PAGE.val());
             q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
             Iterable<SubNode> iterable = mongoUtil.find(q);
             List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
             int counter = 0;
             for (SubNode node : iterable) {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false, false, false, true, false, false, null, false);
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false, false,
+                        false, true, false, false, null, false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -180,11 +185,12 @@ public class ActPubFollower extends ServiceBase {
         });
     }
 
-    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, SubNode userNode, String userName, String actorUrl) {
+    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, SubNode userNode, String userName,
+            String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
             return countFollowersOfLocalUser(ms, userNode, userName);
-        } else 
+        } else
         // if foreign user
         {
             /* Starting with just actorUrl, lookup the follower count */
@@ -207,7 +213,8 @@ public class ActPubFollower extends ServiceBase {
 
     public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
         Query q = getPeopleByUserName_query(ms, userNode, userName);
-        if (q == null) return 0L;
+        if (q == null)
+            return 0L;
         return ops.count(q, SubNode.class);
     }
 
@@ -220,8 +227,10 @@ public class ActPubFollower extends ServiceBase {
                 return null;
             }
         }
-        Criteria crit =  //
-        Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH)).and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE).is(NodeType.FRIEND.s());
+        Criteria crit = //
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH))
+                        .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
+                        .is(NodeType.FRIEND.s());
         q.addCriteria(crit);
         return q;
     }

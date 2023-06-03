@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class NodeRenderService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	/*
@@ -94,8 +94,9 @@ public class NodeRenderService extends ServiceBase {
 		if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
 			res.setSuccess(true);
 			res.setRssNode(true);
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, true,  //
-			false, true, true, null, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+					Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, //
+					false, true, true, null, false);
 			res.setNode(nodeInfo);
 			return res;
 		}
@@ -117,7 +118,8 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, false, true, true, null, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+					Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, false, true, true, null, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -188,7 +190,8 @@ public class NodeRenderService extends ServiceBase {
 			try {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (highestUpParent != null) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false);
+					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false,
+							Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false);
 					if (nodeInfo != null) {
 						// each parent up goes on top of list for correct rendering order on client.
 						parentNodes.addFirst(nodeInfo);
@@ -215,8 +218,10 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	@PerfMon(category = "render")
-	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal, level > 0, false, true, false, true, true, null, false);
+	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
+			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
+		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal, level > 0,
+				false, true, false, true, true, null, false);
 		if (nodeInfo == null) {
 			return null;
 		}
@@ -245,7 +250,7 @@ public class NodeRenderService extends ServiceBase {
 		Sort sort = null;
 		if (!StringUtils.isEmpty(orderBy)) {
 			sort = parseOrderBy(orderBy);
-		} else 
+		} else
 		// if this is a user's POSTS node show in revchron always.
 		{
 			if (NodeName.POSTS.equals(node.getName())) {
@@ -347,7 +352,8 @@ public class NodeRenderService extends ServiceBase {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx, level + 1, limit, showReplies);
+								ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx, level + 1, limit,
+										showReplies);
 								nodeInfo.getChildren().add(0, ninfo);
 								/*
 								 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example would also
@@ -365,7 +371,7 @@ public class NodeRenderService extends ServiceBase {
 						// ROWS_PER_PAGE max and we're done.
 						slidingWindow = null;
 					}
-				} else 
+				} else
 				/*
 				 * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
 				 * iteration/node
@@ -408,7 +414,8 @@ public class NodeRenderService extends ServiceBase {
 				for (int i = count - 1; i >= 0; i--) {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
-					ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, (long) relativeIdx, level + 1, limit, showReplies);
+					ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, (long) relativeIdx, level + 1, limit,
+							showReplies);
 					nodeInfo.getChildren().add(0, ninfo);
 					// If we have enough records we're done
 					if (nodeInfo.getChildren().size() >= limit) {
@@ -487,9 +494,9 @@ public class NodeRenderService extends ServiceBase {
 			res.setSuccess(false);
 			return res;
 		}
-		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true,  //
-		Convert.LOGICAL_ORDINAL_IGNORE, false, false,  //
-		true, false, false, false, null, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, //
+				Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
+				true, false, false, false, null, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -517,7 +524,8 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {
-		if (node == null) return;
+		if (node == null)
+			return;
 		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());
@@ -577,8 +585,8 @@ public class NodeRenderService extends ServiceBase {
 					} else {
 						content = "";
 					}
-				} else if (node.getType() == NodeType.NOSTR_ENC_DM.s() ||  //
-				content.startsWith(Constant.ENC_TAG.s())) {
+				} else if (node.getType() == NodeType.NOSTR_ENC_DM.s() || //
+						content.startsWith(Constant.ENC_TAG.s())) {
 					content = "[encrypted]";
 				} else {
 					content = getFirstLineAbbreviation(content, 25);
@@ -592,14 +600,15 @@ public class NodeRenderService extends ServiceBase {
 		} catch (Exception e) {
 		}
 		/*
-			 * this is normal for users to wind up here because looking up the tree always ends at a place they
-			 * can't access, and whatever paths we accumulated until this access error is what we do want to
-			 * return so we just return everything as is by ignoring this exception
-			 */
+		 * this is normal for users to wind up here because looking up the tree always ends at a place they
+		 * can't access, and whatever paths we accumulated until this access error is what we do want to
+		 * return so we just return everything as is by ignoring this exception
+		 */
 	}
 
 	public String stripRenderTags(String content) {
-		if (content == null) return null;
+		if (content == null)
+			return null;
 		content = content.trim();
 		while (content.startsWith("#")) {
 			content = XString.stripIfStartsWith(content, "#");
@@ -609,7 +618,8 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	public String getFirstLineAbbreviation(String content, int maxLen) {
-		if (content == null) return null;
+		if (content == null)
+			return null;
 		// if this is a node starting with hashtags or usernames then chop them all
 		while (content.startsWith("@") || content.startsWith("#")) {
 			int spaceIdx = content.indexOf(" ");

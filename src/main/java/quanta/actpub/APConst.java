@@ -40,7 +40,8 @@ public class APConst {
 
     public static final String RDWR = PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s();
 
-    // Don't include '@'' or # or '.', because this tokenizer is for finding tags and mentions, and the dot
+    // Don't include '@'' or # or '.', because this tokenizer is for finding tags and mentions, and the
+    // dot
     // will be part of the username potentially (like in "person@instance.com")
     public static final String TAGS_TOKENIZER = " \n\r\t,;!<>?()+";
 }

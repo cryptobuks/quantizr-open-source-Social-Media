@@ -42,124 +42,102 @@ public class SubNodePojo {
 	private HashMap<String, Object> props;
 	@JsonProperty(SubNode.AC)
 	private HashMap<String, AccessControl> ac;
-
 	
 	public ObjectId getId() {
 		return this.id;
 	}
-
 	
 	public Long getOrdinal() {
 		return this.ordinal;
 	}
-
 	
 	public String getPath() {
 		return this.path;
 	}
-
 	
 	public String getType() {
 		return this.type;
 	}
 
-	
 	public String getContent() {
 		return this.content;
 	}
 
-	
 	public String getName() {
 		return this.name;
 	}
-
 	
 	public ObjectId getOwner() {
 		return this.owner;
 	}
 
-	
 	public Date getCreateTime() {
 		return this.createTime;
 	}
 
-	
 	public Date getModifyTime() {
 		return this.modifyTime;
 	}
 
-	
 	public HashMap<String, Object> getProps() {
 		return this.props;
 	}
-
 	
 	public HashMap<String, AccessControl> getAc() {
 		return this.ac;
 	}
 
 	@JsonProperty(SubNode.ID)
-	
 	public void setId(final ObjectId id) {
 		this.id = id;
 	}
 
 	@JsonProperty(SubNode.ORDINAL)
-	
 	public void setOrdinal(final Long ordinal) {
 		this.ordinal = ordinal;
 	}
 
 	@JsonProperty(SubNode.PATH)
-	
 	public void setPath(final String path) {
 		this.path = path;
 	}
 
 	@JsonProperty(SubNode.TYPE)
-	
 	public void setType(final String type) {
 		this.type = type;
 	}
 
 	@JsonProperty(SubNode.CONTENT)
-	
 	public void setContent(final String content) {
 		this.content = content;
 	}
 
 	@JsonProperty(SubNode.NAME)
-	
 	public void setName(final String name) {
 		this.name = name;
 	}
 
 	@JsonProperty(SubNode.OWNER)
-	
 	public void setOwner(final ObjectId owner) {
 		this.owner = owner;
 	}
 
 	@JsonProperty(SubNode.CREATE_TIME)
-	
 	public void setCreateTime(final Date createTime) {
 		this.createTime = createTime;
 	}
 
 	@JsonProperty(SubNode.MODIFY_TIME)
-	
 	public void setModifyTime(final Date modifyTime) {
 		this.modifyTime = modifyTime;
 	}
 
 	@JsonProperty(SubNode.PROPS)
-	
 	public void setProps(final HashMap<String, Object> props) {
 		this.props = props;
 	}
 
 	@JsonProperty(SubNode.AC)
-	
 	public void setAc(final HashMap<String, AccessControl> ac) {
 		this.ac = ac;
 	}

@@ -20,8 +20,6 @@ So to summarize, your Distro Zip files will automatically use the JAR file if it
 
 ## Building the Distro Zip (and executable JAR)
 
-If you are running your first build you might not have node and npm installed but the pom.xml should take care of that for you in the targets named `install-node-and-npm` and `npm-install` sections but the 'dev' build will have those commented out to speed up the dev builds.
-
 If the above made sense so far, you'll know there's a zip file (the Distro Zip) which contains a confuration for the installation files, and also a SpringBoot fat JAR that can be built too. Both of those things (Distro Zip file, and Fat JAR file) can themselves be built from scratch using `./scripts/build-distro.sh`, which will build them both at the same time. After you run the `build-distro.sh` you'll find the Fat JAR in the `./target/` folder and the Distro Zip file in the `./distro` folder. 
 
 To repeat again for clarity: You can simply unzip the Distro Zip file into some empty folder, then drop the Fat JAR into that folder, and then run script `run-distro.sh` to get a server up and running.

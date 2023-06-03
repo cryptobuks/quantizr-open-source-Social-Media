@@ -31,143 +31,115 @@ public class CreateSubNodeRequest extends RequestBase {
 	@Nullable
 	private String payloadType;
 	private boolean reply;
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getBoostTarget() {
 		return this.boostTarget;
 	}
-
 	
 	public boolean isPendingEdit() {
 		return this.pendingEdit;
 	}
 
-	
 	public String getContent() {
 		return this.content;
 	}
-
 	
 	public String getNewNodeName() {
 		return this.newNodeName;
 	}
-
 	
 	public String getTypeName() {
 		return this.typeName;
 	}
 
-	
 	public boolean isCreateAtTop() {
 		return this.createAtTop;
 	}
 
-	
 	public boolean isTypeLock() {
 		return this.typeLock;
 	}
 
-	
 	public List<PropertyInfo> getProperties() {
 		return this.properties;
 	}
-
 	
 	public String getShareToUserId() {
 		return this.shareToUserId;
 	}
-
 	
 	public String getBoosterUserId() {
 		return this.boosterUserId;
 	}
 
-	
 	public boolean isFediSend() {
 		return this.fediSend;
 	}
 
 	@Nullable
-	
 	public String getPayloadType() {
 		return this.payloadType;
 	}
 
-	
 	public boolean isReply() {
 		return this.reply;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
 
-	
 	public void setBoostTarget(final String boostTarget) {
 		this.boostTarget = boostTarget;
 	}
 
-	
 	public void setPendingEdit(final boolean pendingEdit) {
 		this.pendingEdit = pendingEdit;
 	}
 
-	
 	public void setContent(final String content) {
 		this.content = content;
 	}
-
 	
 	public void setNewNodeName(final String newNodeName) {
 		this.newNodeName = newNodeName;
 	}
-
 	
 	public void setTypeName(final String typeName) {
 		this.typeName = typeName;
 	}
-
 	
 	public void setCreateAtTop(final boolean createAtTop) {
 		this.createAtTop = createAtTop;
 	}
 
-	
 	public void setTypeLock(final boolean typeLock) {
 		this.typeLock = typeLock;
 	}
 
-	
 	public void setProperties(final List<PropertyInfo> properties) {
 		this.properties = properties;
 	}
 
-	
 	public void setShareToUserId(final String shareToUserId) {
 		this.shareToUserId = shareToUserId;
 	}
-
 	
 	public void setBoosterUserId(final String boosterUserId) {
 		this.boosterUserId = boosterUserId;
 	}
-
 	
 	public void setFediSend(final boolean fediSend) {
 		this.fediSend = fediSend;
 	}
-
 	
 	public void setPayloadType(@Nullable final String payloadType) {
 		this.payloadType = payloadType;
 	}
-
 	
 	public void setReply(final boolean reply) {
 		this.reply = reply;

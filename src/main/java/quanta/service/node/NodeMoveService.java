@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class NodeMoveService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
 	/*
@@ -190,7 +190,8 @@ public class NodeMoveService extends ServiceBase {
 	 * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
 	 * siblings posted in below it)
 	 */
-	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds, MoveNodesResponse res) {
+	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
+			MoveNodesResponse res) {
 		// log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		// get targetNode which is node we're pasting at or into.
 		SubNode targetNode = read.getNode(ms, targetId);
@@ -202,13 +203,13 @@ public class NodeMoveService extends ServiceBase {
 		// location==inside
 		if (location.equalsIgnoreCase("inside")) {
 			curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
-		} else 
+		} else
 		// location==inline (todo-2: rename this to inline-below -- or better yet, do an
 		// enum)
 		if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
 			create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
-		} else 
+		} else
 		// location==inline-above
 		if (location.equalsIgnoreCase("inline-above")) {
 			curTargetOrdinal = targetNode.getOrdinal();
@@ -238,7 +239,8 @@ public class NodeMoveService extends ServiceBase {
 		nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 		// process all nodes being moved.
 		for (SubNode node : nodesToMove) {
-			// log.debug("MovingID (and it's children): " + node.getIdStr() + "[" + node.getContent() + "] path: " + node.getPath());
+			// log.debug("MovingID (and it's children): " + node.getIdStr() + "[" + node.getContent() + "] path:
+			// " + node.getPath());
 			Long _targetOrdinal = curTargetOrdinal;
 			SubNode _nodeParent = nodeParent;
 			arun.run(as -> {
@@ -294,11 +296,12 @@ public class NodeMoveService extends ServiceBase {
 	 * WARNING: This does NOT affect the path of 'graphRoot' itself, but only changes the location of
 	 * all the children under it
 	 */
-	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix,  //
-	MoveNodesResponse res, boolean fast) {
+	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix, //
+			MoveNodesResponse res, boolean fast) {
 		String originalPath = graphRoot.getPath();
-		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" + oldPathPrefix
-		// 		+ " newPathPrefix" + newPathPrefix);
+		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" +
+		// oldPathPrefix
+		// + " newPathPrefix" + newPathPrefix);
 		boolean removeOrphans = !fast;
 		BulkOperations bops = null;
 		int batchSize = 0;
@@ -308,7 +311,7 @@ public class NodeMoveService extends ServiceBase {
 			}
 			// log.debug(" PROCESSING oldPath: " + node.getPath());
 			String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);
-			// log.debug("      SETTING new path:" + newPath);
+			// log.debug(" SETTING new path:" + newPath);
 			if (bops == null) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}

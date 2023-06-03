@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class LuceneService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(LuceneService.class);
 
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {

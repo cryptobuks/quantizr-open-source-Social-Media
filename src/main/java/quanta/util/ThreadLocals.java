@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * worker or deamon thread that isn't an actual Web Request.
  */
 public class ThreadLocals {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ThreadLocals.class);
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
@@ -168,7 +168,8 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getSaving() {
-		if (saving.get() == null) return false;
+		if (saving.get() == null)
+			return false;
 		return saving.get();
 	}
 
@@ -177,7 +178,8 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getParentCheckEnabled() {
-		if (parentCheckEnabled.get() == null) return false;
+		if (parentCheckEnabled.get() == null)
+			return false;
 		return parentCheckEnabled.get();
 	}
 
@@ -249,7 +251,8 @@ public class ThreadLocals {
 		log.debug("Dirty Nodes...");
 		getDirtyNodes().forEach((key, value) -> {
 			if (!key.toHexString().equals(value.getIdStr())) {
-				throw new RuntimeException("Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
+				throw new RuntimeException(
+						"Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
 			}
 			log.debug("    " + key.toHexString());
 		});

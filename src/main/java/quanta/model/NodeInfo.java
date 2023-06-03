@@ -159,346 +159,278 @@ public class NodeInfo {
 		return clientProps = new LinkedList<>();
 	}
 
-	
 	public String getId() {
 		return this.id;
 	}
-
 	
 	public String getPath() {
 		return this.path;
 	}
-
 	
 	public String getName() {
 		return this.name;
 	}
 
-	
 	public String getContent() {
 		return this.content;
 	}
-
 	
 	public String getRenderContent() {
 		return this.renderContent;
 	}
-
 	
 	public String getTags() {
 		return this.tags;
 	}
 
-	
 	public Long getLastModified() {
 		return this.lastModified;
 	}
-
 	
 	public String getTimeAgo() {
 		return this.timeAgo;
 	}
-
 	
 	public Long getLogicalOrdinal() {
 		return this.logicalOrdinal;
 	}
-
 	
 	public Long getOrdinal() {
 		return this.ordinal;
 	}
-
 	
 	public String getType() {
 		return this.type;
 	}
-
 	
 	public List<PropertyInfo> getProperties() {
 		return this.properties;
 	}
-
 	
 	public HashMap<String, Attachment> getAttachments() {
 		return this.attachments;
 	}
-
 	
 	public HashMap<String, NodeLink> getLinks() {
 		return this.links;
 	}
 
-	
 	public List<PropertyInfo> getClientProps() {
 		return this.clientProps;
 	}
-
 	
 	public List<AccessControlInfo> getAc() {
 		return this.ac;
 	}
-
 	
 	public boolean isHasChildren() {
 		return this.hasChildren;
 	}
-
 	
 	public String getCipherKey() {
 		return this.cipherKey;
 	}
 
-	
 	public boolean isLastChild() {
 		return this.lastChild;
 	}
-
 	
 	public NodeInfo getParent() {
 		return this.parent;
 	}
-
 	
 	public List<NodeInfo> getChildren() {
 		return this.children;
 	}
-
 	
 	public LinkedList<NodeInfo> getParents() {
 		return this.parents;
 	}
-
 	
 	public LinkedList<NodeInfo> getLinkedNodes() {
 		return this.linkedNodes;
 	}
-
 	
 	public List<String> getLikes() {
 		return this.likes;
 	}
 
-	
 	public String getImgId() {
 		return this.imgId;
 	}
-
 	
 	public String getDisplayName() {
 		return this.displayName;
 	}
-
 	
 	public String getOwner() {
 		return this.owner;
 	}
 
-	
 	public String getOwnerId() {
 		return this.ownerId;
 	}
-
 	
 	public String getNostrPubKey() {
 		return this.nostrPubKey;
 	}
 
-	
 	public String getTransferFromId() {
 		return this.transferFromId;
 	}
-
 	
 	public String getAvatarVer() {
 		return this.avatarVer;
 	}
-
 	
 	public String getApAvatar() {
 		return this.apAvatar;
 	}
-
 	
 	public String getApImage() {
 		return this.apImage;
 	}
-
 	
 	public NodeInfo getBoostedNode() {
 		return this.boostedNode;
 	}
 
-	
 	public void setId(final String id) {
 		this.id = id;
 	}
-
 	
 	public void setPath(final String path) {
 		this.path = path;
 	}
-
 	
 	public void setName(final String name) {
 		this.name = name;
 	}
 
-	
 	public void setContent(final String content) {
 		this.content = content;
 	}
-
 	
 	public void setRenderContent(final String renderContent) {
 		this.renderContent = renderContent;
 	}
-
 	
 	public void setTags(final String tags) {
 		this.tags = tags;
 	}
-
 	
 	public void setLastModified(final Long lastModified) {
 		this.lastModified = lastModified;
 	}
 
-	
 	public void setTimeAgo(final String timeAgo) {
 		this.timeAgo = timeAgo;
 	}
-
 	
 	public void setLogicalOrdinal(final Long logicalOrdinal) {
 		this.logicalOrdinal = logicalOrdinal;
 	}
-
 	
 	public void setOrdinal(final Long ordinal) {
 		this.ordinal = ordinal;
 	}
-
 	
 	public void setType(final String type) {
 		this.type = type;
 	}
-
 	
 	public void setProperties(final List<PropertyInfo> properties) {
 		this.properties = properties;
 	}
 
-	
 	public void setAttachments(final HashMap<String, Attachment> attachments) {
 		this.attachments = attachments;
 	}
-
 	
 	public void setLinks(final HashMap<String, NodeLink> links) {
 		this.links = links;
 	}
-
 	
 	public void setClientProps(final List<PropertyInfo> clientProps) {
 		this.clientProps = clientProps;
 	}
 
-	
 	public void setAc(final List<AccessControlInfo> ac) {
 		this.ac = ac;
 	}
-
 	
 	public void setHasChildren(final boolean hasChildren) {
 		this.hasChildren = hasChildren;
 	}
-
 	
 	public void setCipherKey(final String cipherKey) {
 		this.cipherKey = cipherKey;
 	}
 
-	
 	public void setLastChild(final boolean lastChild) {
 		this.lastChild = lastChild;
 	}
-
 	
 	public void setParent(final NodeInfo parent) {
 		this.parent = parent;
 	}
-
 	
 	public void setChildren(final List<NodeInfo> children) {
 		this.children = children;
 	}
-
 	
 	public void setParents(final LinkedList<NodeInfo> parents) {
 		this.parents = parents;
 	}
-
 	
 	public void setLinkedNodes(final LinkedList<NodeInfo> linkedNodes) {
 		this.linkedNodes = linkedNodes;
 	}
-
 	
 	public void setLikes(final List<String> likes) {
 		this.likes = likes;
 	}
 
-	
 	public void setImgId(final String imgId) {
 		this.imgId = imgId;
 	}
-
 	
 	public void setDisplayName(final String displayName) {
 		this.displayName = displayName;
 	}
 
-	
 	public void setOwner(final String owner) {
 		this.owner = owner;
 	}
-
 	
 	public void setOwnerId(final String ownerId) {
 		this.ownerId = ownerId;
 	}
-
 	
 	public void setNostrPubKey(final String nostrPubKey) {
 		this.nostrPubKey = nostrPubKey;
 	}
-
 	
 	public void setTransferFromId(final String transferFromId) {
 		this.transferFromId = transferFromId;
 	}
-
 	
 	public void setAvatarVer(final String avatarVer) {
 		this.avatarVer = avatarVer;
 	}
 
-	
 	public void setApAvatar(final String apAvatar) {
 		this.apAvatar = apAvatar;
 	}
-
 	
 	public void setApImage(final String apImage) {
 		this.apImage = apImage;
 	}
-
 	
 	public void setBoostedNode(final NodeInfo boostedNode) {
 		this.boostedNode = boostedNode;
 	}
-	
+
 	public NodeInfo() {
 	}
 }

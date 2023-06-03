@@ -13,22 +13,18 @@ public class CreateSubNodeResponse extends ResponseBase {
 	 * Mainly used in a 'reply' to an encrypted node.
 	 */
 	private boolean encrypt;
-
 	
 	public NodeInfo getNewNode() {
 		return this.newNode;
 	}
-
 	
 	public boolean isEncrypt() {
 		return this.encrypt;
 	}
-
 	
 	public void setNewNode(final NodeInfo newNode) {
 		this.newNode = newNode;
 	}
-
 	
 	public void setEncrypt(final boolean encrypt) {
 		this.encrypt = encrypt;

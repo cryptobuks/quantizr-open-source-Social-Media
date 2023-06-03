@@ -15,26 +15,22 @@ public class SaveNodeResponse extends ResponseBase {
 	 */
 	private List<AccessControlInfo> aclEntries;
 
-	
 	public NodeInfo getNode() {
 		return this.node;
 	}
-
 	
 	public List<AccessControlInfo> getAclEntries() {
 		return this.aclEntries;
 	}
-
 	
 	public void setNode(final NodeInfo node) {
 		this.node = node;
 	}
-
 	
 	public void setAclEntries(final List<AccessControlInfo> aclEntries) {
 		this.aclEntries = aclEntries;
 	}
-
+	
 	public SaveNodeResponse() {
 	}
 }

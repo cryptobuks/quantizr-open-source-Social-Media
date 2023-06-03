@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SessionContext.class);
 	private HttpSession session;
 	private String urlIdFailMsg;
@@ -107,7 +107,7 @@ public class SessionContext extends ServiceBase {
 	private String watchingPath;
 
 	public SessionContext() {
-		// WARNING: This object might be created on a worker thread so do not assume it's 
+		// WARNING: This object might be created on a worker thread so do not assume it's
 		// an actual HTTP request thread creating this.
 		// log.trace(String.format("SessionContext: object hashCode[%d]", hashCode()));
 	}
@@ -118,7 +118,7 @@ public class SessionContext extends ServiceBase {
 		// if we don't have a SessionContext yet or it timed out then create a new one.
 		if (scBean == null || !scBean.isLive()) {
 			// if we had a bean for this HTTP session, we need to remove it because we're replacing
-			// it with a new one now. 
+			// it with a new one now.
 			removeSession(scBean);
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
@@ -190,7 +190,8 @@ public class SessionContext extends ServiceBase {
 		if (userToken == null) {
 			userToken = Util.genStrongToken();
 		}
-		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken " + userToken);
+		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
+				+ userToken);
 		setUserName(userName);
 		if (userNodeId == null) {
 			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
@@ -214,7 +215,8 @@ public class SessionContext extends ServiceBase {
 	 * and perhaps use Spring Security
 	 */
 	public static boolean validToken(String token, String userName) {
-		if (token == null) return false;
+		if (token == null)
+			return false;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
@@ -236,7 +238,8 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static SessionContext getSCByToken(String token) {
-		if (token == null) return null;
+		if (token == null)
+			return null;
 		synchronized (allSessions) {
 			// great candidate for a stream() here.
 			for (SessionContext sc : allSessions) {
@@ -288,9 +291,11 @@ public class SessionContext extends ServiceBase {
 			}
 		}
 		// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
-		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
+		boolean verified =
+				crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
 		if (!verified) {
-			throw new RuntimeException("Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
+			throw new RuntimeException(
+					"Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
 		}
 	}
 
@@ -299,7 +304,8 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static void removeSession(SessionContext sc) {
-		if (sc == null) return;
+		if (sc == null)
+			return;
 		synchronized (allSessions) {
 			allSessions.remove(sc);
 		}
@@ -348,7 +354,8 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static List<SessionContext> getSessionsByUserName(String userName) {
-		if (userName == null) return null;
+		if (userName == null)
+			return null;
 		List<SessionContext> list = null;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {

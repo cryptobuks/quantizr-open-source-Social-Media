@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class TestRunner {
-	
+
 	private static Logger log = LoggerFactory.getLogger(TestRunner.class);
 	@Autowired
 	private ApplicationContext context;

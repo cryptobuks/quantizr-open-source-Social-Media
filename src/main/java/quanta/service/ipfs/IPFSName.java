@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSName extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSName.class);
     public static String API_NAME;
 
@@ -32,16 +32,17 @@ public class IPFSName extends ServiceBase {
         checkIpfs();
         Map<String, Object> ret = null;
         try {
-            if (key == null) throw new RuntimeException("Key is required for publishing.");
+            if (key == null)
+                throw new RuntimeException("Key is required for publishing.");
             String url = API_NAME + "/publish?arg=" + cid + "&key=" + key;
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Publishing IPNS: " + url);
-            ResponseEntity<String> response = ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
-            });
+            ResponseEntity<String> response =
+                    ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
         // ret output:
         // {
@@ -64,8 +65,7 @@ public class IPFSName extends ServiceBase {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
-            });
+            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

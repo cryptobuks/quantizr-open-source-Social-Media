@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class Convert extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(Convert.class);
 	// indicates we don't need to worry about sending back a good logicalOrdinal
 	public static int LOGICAL_ORDINAL_IGNORE = -1;
@@ -62,7 +62,9 @@ public class Convert extends ServiceBase {
 	 * if there ARE an children REGARDLESS of whether the given user can access those children.
 	 */
 	@PerfMon(category = "convert")
-	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
+	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
+			long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
+			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 		// if we have a signature, check it.
 		boolean sigFail = false;
@@ -134,26 +136,27 @@ public class Convert extends ServiceBase {
 				String relays = ownerAccnt.getStr(NodeProp.NOSTR_RELAYS);
 				if (ownerAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
 					log.debug("Queueing client to update metadata for nostr user: " + nostrPubKey);
-					/* Queueing up these nostrIds causes them to be sent down to the browser to be queries
-					 * and then the info is saved to the server once known, however that happens in the 
-					 * background and initially when the page renders there might be some "User Info" (username & avatar)
-					 * that is missing on the page, until it gets resolved. They way they get resolved on the browser
-					 * page is by the fact that nostr.ts has a metadataQueue which accumulates any 'unknown metadata users'
-					 * and then querys for them, and then simply re-renders the page. Any component that renders a 
-					 * nostr (username+avatar) must be smart enough to notice the missing data, and then try to render it
-					 * from the nostr metadataCache immediately or else queue it into metadataQueue so that the
-					 * page re-renders correctly shortly thereafter.
+					/*
+					 * Queueing up these nostrIds causes them to be sent down to the browser to be queries and then the
+					 * info is saved to the server once known, however that happens in the background and initially when
+					 * the page renders there might be some "User Info" (username & avatar) that is missing on the page,
+					 * until it gets resolved. They way they get resolved on the browser page is by the fact that
+					 * nostr.ts has a metadataQueue which accumulates any 'unknown metadata users' and then querys for
+					 * them, and then simply re-renders the page. Any component that renders a nostr (username+avatar)
+					 * must be smart enough to notice the missing data, and then try to render it from the nostr
+					 * metadataCache immediately or else queue it into metadataQueue so that the page re-renders
+					 * correctly shortly thereafter.
 					 */
 					ThreadLocals.getNewNostrUsers().put(nostrId, new NostrUserInfo(nostrId, null, relays));
 				}
 			}
 		}
 		/*
-			 * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
-			 * to client packaged in this response, so that tooltip on the browser can display it, and the
-			 * browser will simply contain this same 'map' that maps userIds to profile text, for good
-			 * performance.
-			 */
+		 * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
+		 * to client packaged in this response, so that tooltip on the browser can display it, and the
+		 * browser will simply contain this same 'map' that maps userIds to profile text, for good
+		 * performance.
+		 */
 		// log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" +
 		// sc.getRootId() + " node.content="
 		// + node.getContent() + " owner=" + owner);
@@ -182,13 +185,13 @@ public class Convert extends ServiceBase {
 		if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
 			logicalOrdinal = read.generateLogicalOrdinal(ms, node);
 		}
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent,  //
-		node.getTags(), displayName,  //
-		owner, ownerId, nostrPubKey,  //
-		node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null,  //
-		node.getOrdinal(),  //
-		node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren,  //
-		node.getType(), logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
+				node.getTags(), displayName, //
+				owner, ownerId, nostrPubKey, //
+				node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
+				node.getOrdinal(), //
+				node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, //
+				node.getType(), logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
 		if (plugin != null) {
@@ -216,7 +219,8 @@ public class Convert extends ServiceBase {
 					// NOTE: If this is set to false it then only would allow one level of depth in
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
-					NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel, lastChild, childrenCheck, false, loadLikes, false, null, false);
+					NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel, lastChild,
+							childrenCheck, false, loadLikes, false, null, false);
 					if (info != null) {
 						nodeInfo.safeGetChildren().add(info);
 					}
@@ -263,7 +267,8 @@ public class Convert extends ServiceBase {
 				}
 			}
 			if (boostedNode != null) {
-				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, false, null, false);
+				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
+						false, false, false, false, null, false);
 				if (info != null) {
 					nodeInfo.setBoostedNode(info);
 				}
@@ -295,7 +300,8 @@ public class Convert extends ServiceBase {
 		}
 		// sending back null for renderContent if no tags were inserted (no special HTML to send back, but
 		// just markdown)
-		if (tags == null || tags.size() == 0) return null;
+		if (tags == null || tags.size() == 0)
+			return null;
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
 		while (t.hasMoreTokens()) {
@@ -305,7 +311,8 @@ public class Convert extends ServiceBase {
 			boolean formatted = false;
 			// Hashtag
 			if ( //
-			includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 && Character.isLetter(tok.charAt(1))) {
+			includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1
+					&& Character.isLetter(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOHashtag) {
 					String href = (String) tag.get(APObj.href);
@@ -314,15 +321,17 @@ public class Convert extends ServiceBase {
 						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
 						formatted = true;
 						sb.append( //
-						"<a class=\'mention hashtag\' href=\'" + href + "\' target=\'_blank\'>#<span>" + shortTok + "</span></a>");
+								"<a class=\'mention hashtag\' href=\'" + href + "\' target=\'_blank\'>#<span>" + shortTok
+										+ "</span></a>");
 					}
 				}
-			} else 
+			} else
 			// sb.append("<a class='mention hashtag' href='" + href + //
 			// "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>");
 			// Mention
 			if ( //
-			tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2 && Character.isLetterOrDigit(tok.charAt(1))) {
+			tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2
+					&& Character.isLetterOrDigit(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
@@ -335,7 +344,8 @@ public class Convert extends ServiceBase {
 						// NOTE: h-card and u-url are part of 'microformats'
 						formatted = true;
 						sb.append( //
-						"<span class=\'h-card\'><a class=\'u-url mention\' href=\'" + href + "\' target=\'_blank\'>@<span>" + shortTok + "</span></a></span>");
+								"<span class=\'h-card\'><a class=\'u-url mention\' href=\'" + href
+										+ "\' target=\'_blank\'>@<span>" + shortTok + "</span></a></span>");
 					}
 				}
 			}
@@ -369,8 +379,8 @@ public class Convert extends ServiceBase {
 		return imageSize;
 	}
 
-	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node,  //
-	boolean initNodeEdit, boolean sigFail) {
+	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
+			boolean initNodeEdit, boolean sigFail) {
 		// log.debug("buildProp node=" + XString.prettyPrint(node));
 		List<PropertyInfo> props = null;
 		HashMap<String, Object> propMap = node.getProps();
@@ -398,7 +408,8 @@ public class Convert extends ServiceBase {
 	public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
 		List<AccessControlInfo> ret = null;
 		HashMap<String, AccessControl> ac = node.getAc();
-		if (ac == null) return null;
+		if (ac == null)
+			return null;
 		for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
 			String principalId = entry.getKey();
 			AccessControl acval = entry.getValue();
@@ -440,7 +451,8 @@ public class Convert extends ServiceBase {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop, boolean initNodeEdit) {
+	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
+			boolean initNodeEdit) {
 		// log.debug("propName=" + propName + " propClass=" + prop.getClass().getName() + " val=" + prop);
 		try {
 			Object value = null;

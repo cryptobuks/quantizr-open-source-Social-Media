@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class OutboxMgr extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
@@ -37,9 +37,11 @@ public class OutboxMgr extends ServiceBase {
 	 * attention, for some reason or that someone has shared this node with them.
 	 */
 	public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
-		// if you re-enable this code be sure to add a new partialIndex on "pro."+NodeProp.TARGET_ID.s(), so the
+		// if you re-enable this code be sure to add a new partialIndex on "pro."+NodeProp.TARGET_ID.s(), so
+		// the
 		// findNodeByProp will be fast.
-		if (true) throw new RuntimeException("currently not used.");
+		if (true)
+			throw new RuntimeException("currently not used.");
 		arun.run(as -> {
 			SubNode userInbox = read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 			if (userInbox != null) {
@@ -53,7 +55,8 @@ public class OutboxMgr extends ServiceBase {
 				 * If there's no notification for this node already in the user's inbox then add one
 				 */
 				if (notifyNode == null) {
-					notifyNode = create.createNode(as, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L, CreateNodeLocation.FIRST, null, null, true, true);
+					notifyNode = create.createNode(as, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L, CreateNodeLocation.FIRST,
+							null, null, true, true);
 					// trim to 280 like twitter.
 					String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 					String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
@@ -70,9 +73,10 @@ public class OutboxMgr extends ServiceBase {
 				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
 				if (scList != null) {
 					for (SessionContext sc : scList) {
-						push.sendServerPushInfo(sc, 
-						// todo-2: fill in the two null parameters here if/when you ever bring this method back.
-						new NotificationMessage("newInboxNode", node.getIdStr(), "New node shared to you.", ThreadLocals.getSC().getUserName()));
+						push.sendServerPushInfo(sc,
+								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
+								new NotificationMessage("newInboxNode", node.getIdStr(), "New node shared to you.",
+										ThreadLocals.getSC().getUserName()));
 					}
 				}
 			}
@@ -90,8 +94,9 @@ public class OutboxMgr extends ServiceBase {
 		String toUserName = toUserNode.getStr(NodeProp.USER);
 		// log.debug("sending node notification email to: " + email);
 		String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
-		String content = String.format(prop.getConfigText("brandingAppName") + " user \'%s\' shared a node to your \'%s\' account.<p>\n\n" +  //
-		"%s", fromUserName, toUserName, nodeUrl);
+		String content = String
+				.format(prop.getConfigText("brandingAppName") + " user \'%s\' shared a node to your \'%s\' account.<p>\n\n" + //
+						"%s", fromUserName, toUserName, nodeUrl);
 		queueMail(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
 	}
 
@@ -133,7 +138,8 @@ public class OutboxMgr extends ServiceBase {
 				return OutboxMgr.outboxNode;
 			}
 			snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, null, "Outbox", null, true, null, null);
-			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX + "/" + NodePath.SYSTEM, null, "System Messages", null, true, null, null);
+			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX + "/" + NodePath.SYSTEM, null,
+					"System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}
 	}

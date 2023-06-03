@@ -10,24 +10,20 @@ public class JupyterCell {
     @JsonProperty("source")
     private List<String> source;
 
-    
     public String getCellType() {
         return this.cellType;
     }
-
     
     public List<String> getSource() {
         return this.source;
     }
 
     @JsonProperty("cell_type")
-    
     public void setCellType(final String cellType) {
         this.cellType = cellType;
     }
 
     @JsonProperty("source")
-    
     public void setSource(final List<String> source) {
         this.source = source;
     }

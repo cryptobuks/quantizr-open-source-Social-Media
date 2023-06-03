@@ -13,35 +13,29 @@ public class MerkleNode {
     @JsonIgnore
     private String contentType;
 
-    
     public String getHash() {
         return this.hash;
     }
-
     
     public List<MerkleLink> getLinks() {
         return this.links;
     }
-
     
     public String getContentType() {
         return this.contentType;
     }
 
-    @JsonProperty("Hash")
-    
+    @JsonProperty("Hash")    
     public void setHash(final String hash) {
         this.hash = hash;
     }
 
     @JsonProperty("Links")
-    
     public void setLinks(final List<MerkleLink> links) {
         this.links = links;
     }
 
     @JsonIgnore
-    
     public void setContentType(final String contentType) {
         this.contentType = contentType;
     }

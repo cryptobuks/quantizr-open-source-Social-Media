@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class UserFeedService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(UserFeedService.class);
 	static final int MAX_FEED_ITEMS = 25;
 
@@ -50,7 +50,8 @@ public class UserFeedService extends ServiceBase {
 	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
 		CheckMessagesResponse res = new CheckMessagesResponse();
-		if (sc.isAnonUser()) return res;
+		if (sc.isAnonUser())
+			return res;
 		String pathToSearch = NodePath.USERS_PATH;
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
@@ -98,7 +99,8 @@ public class UserFeedService extends ServiceBase {
 		boolean testQuery = false;
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
-		String pathToSearch = testQuery ? NodePath.ROOT_PATH : (req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH);
+		String pathToSearch =
+				testQuery ? NodePath.ROOT_PATH : (req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH);
 		boolean doAuth = true;
 		/*
 		 * if we're doing a 'feed' under a specific root node this is like the 'chat feature' and is
@@ -113,7 +115,7 @@ public class UserFeedService extends ServiceBase {
 			pathToSearch = rootNode.getPath();
 			/* if the chat root is public disable all auth logic in this method */
 			if (AclService.isPublic(ms, rootNode)) {
-			} else 
+			} else
 			// do nothing, for now.
 			/*
 			 * If chat node is NOT public we try to check our read auth on it and if not this will throw an
@@ -151,7 +153,7 @@ public class UserFeedService extends ServiceBase {
 		String searchForUserName = null;
 		if (doAuth && req.getMyMentions()) {
 			searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
-		} else 
+		} else
 		// includes shares TO me (but not in the context of a 'bidirectional' query)
 		if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
@@ -192,7 +194,7 @@ public class UserFeedService extends ServiceBase {
 			// this regex simply is "Starts with a period"
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
 			crit = crit.andOperator(new Criteria().orOperator(orCrit));
-		} else 
+		} else
 		// ActivityPub
 		if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) {
 			List<Criteria> orCrit = new LinkedList<>();
@@ -257,17 +259,19 @@ public class UserFeedService extends ServiceBase {
 			if (myAcntNode != null) {
 				// sharing from us to the other user.
 				orCriteria.add(
-				// where node is owned by us.
-				//
-				// and the node has any sharing on it.
-				Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()).and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
+						// where node is owned by us.
+						//
+						// and the node has any sharing on it.
+						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner())
+								.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
 				// sharing from the other user to us.
 				if (bidirectional) {
 					orCriteria.add(
-					// where node is owned by us.
-					//
-					// and the node has any sharing on it.
-					Criteria.where(SubNode.OWNER).is(toUserNode.getOwner()).and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
+							// where node is owned by us.
+							//
+							// and the node has any sharing on it.
+							Criteria.where(SubNode.OWNER).is(toUserNode.getOwner())
+									.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
 				}
 			}
 		}
@@ -277,10 +281,10 @@ public class UserFeedService extends ServiceBase {
 			}
 			if (myAcntNode != null) {
 				orCriteria.add(
-				// where node is owned by us.
-				//
-				// and the node has any sharing on it.
-				Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()).and(SubNode.AC).ne(null));
+						// where node is owned by us.
+						//
+						// and the node has any sharing on it.
+						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()).and(SubNode.AC).ne(null));
 			}
 		}
 		if (!testQuery && doAuth && req.getFromFriends()) {
@@ -306,8 +310,9 @@ public class UserFeedService extends ServiceBase {
 						}
 						// since we're processing ALL friends we can go ahead and update friendIds here
 						// but also only do that if we're not filtering for tags, or the filter is a match
-						if (StringUtils.isEmpty(req.getFriendsTagSearch()) ||  //
-						(StringUtils.isNotEmpty(friendNode.getTags()) && friendNode.getTags().contains(req.getFriendsTagSearch()))) {
+						if (StringUtils.isEmpty(req.getFriendsTagSearch()) || //
+								(StringUtils.isNotEmpty(friendNode.getTags())
+										&& friendNode.getTags().contains(req.getFriendsTagSearch()))) {
 							String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 							// if we have a userNodeId and they aren't in the blocked list.
 							if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
@@ -436,7 +441,8 @@ public class UserFeedService extends ServiceBase {
 			// it's a boost! Be careful boosts also have no content, but we DO want to show boosts.
 			if (Constant.FEED_PUB.s().equals(req.getName())) {
 				if ( //
-				(StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) && node.getAttachments() == null && node.getStr(NodeProp.BOOST) == null) {
+				(StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) && node.getAttachments() == null
+						&& node.getStr(NodeProp.BOOST) == null) {
 					skipped++;
 					continue;
 				}
@@ -470,7 +476,8 @@ public class UserFeedService extends ServiceBase {
 				}
 			}
 			try {
-				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, false, true, true, boostedNodeVal, false);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, false,
+						true, true, boostedNodeVal, false);
 				if (info != null) {
 					searchResults.add(info);
 					if (searchResults.size() >= MAX_FEED_ITEMS) {
@@ -516,7 +523,8 @@ public class UserFeedService extends ServiceBase {
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		arun.run(as -> {
 			List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false, null);
-			if (nodeList == null) return null;
+			if (nodeList == null)
+				return null;
 			for (SubNode node : nodeList) {
 				String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
 				if (userNodeId != null) {

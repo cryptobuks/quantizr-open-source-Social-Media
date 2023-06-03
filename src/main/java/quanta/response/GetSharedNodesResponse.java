@@ -8,12 +8,10 @@ import quanta.response.base.ResponseBase;
 public class GetSharedNodesResponse extends ResponseBase {
 	/* orderablility of children not set in these objects, all will be false */
 	private List<NodeInfo> searchResults;
-
 	
 	public List<NodeInfo> getSearchResults() {
 		return this.searchResults;
 	}
-
 	
 	public void setSearchResults(final List<NodeInfo> searchResults) {
 		this.searchResults = searchResults;

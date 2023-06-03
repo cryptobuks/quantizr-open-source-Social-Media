@@ -7,8 +7,7 @@ public class APOIcon extends APObj {
         super(obj);
     }
 
-    public APOIcon() {
-    }
+    public APOIcon() {}
 
     public APOIcon(String type, String mediaType, String url) {
         this();

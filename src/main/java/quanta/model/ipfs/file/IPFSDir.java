@@ -8,13 +8,11 @@ public class IPFSDir {
     @JsonProperty("Entries")
     private List<IPFSDirEntry> entries;
 
-    
     public List<IPFSDirEntry> getEntries() {
         return this.entries;
     }
 
-    @JsonProperty("Entries")
-    
+    @JsonProperty("Entries")    
     public void setEntries(final List<IPFSDirEntry> entries) {
         this.entries = entries;
     }

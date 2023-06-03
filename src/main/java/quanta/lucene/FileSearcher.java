@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class FileSearcher {
-	
+
 	private static Logger log = LoggerFactory.getLogger(FileSearcher.class);
 	@Autowired
 	public AppProp appProp;

@@ -13,47 +13,39 @@ public class JupyterNB {
     private Integer nbFormat;
     @JsonProperty("nbformat_minor")
     private Integer nbFormatMinor;
-
     
     public List<JupyterCell> getCells() {
         return this.cells;
     }
-
     
     public JupyterMetadata getMetadata() {
         return this.metadata;
     }
 
-    
     public Integer getNbFormat() {
         return this.nbFormat;
     }
-
     
     public Integer getNbFormatMinor() {
         return this.nbFormatMinor;
     }
 
-    @JsonProperty("cells")
-    
+    @JsonProperty("cells")    
     public void setCells(final List<JupyterCell> cells) {
         this.cells = cells;
     }
 
     @JsonProperty("metadata")
-    
     public void setMetadata(final JupyterMetadata metadata) {
         this.metadata = metadata;
     }
 
     @JsonProperty("nbformat")
-    
     public void setNbFormat(final Integer nbFormat) {
         this.nbFormat = nbFormat;
     }
 
     @JsonProperty("nbformat_minor")
-    
     public void setNbFormatMinor(final Integer nbFormatMinor) {
         this.nbFormatMinor = nbFormatMinor;
     }

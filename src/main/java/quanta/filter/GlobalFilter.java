@@ -28,17 +28,19 @@ import org.slf4j.LoggerFactory;
 @Component
 @Order(2)
 public class GlobalFilter extends GenericFilterBean {
-	
+
 	private static Logger log = LoggerFactory.getLogger(GlobalFilter.class);
 	@Autowired
 	private ApplicationContext context;
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("GlobalFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 		try {
 			ThreadLocals.removeAll();
 			HttpServletRequest sreq = null;
@@ -50,13 +52,14 @@ public class GlobalFilter extends GenericFilterBean {
 				if ( //
 				//
 				// JS bundle file
-				sreq.getRequestURI().contains("/images/") || sreq.getRequestURI().contains("/fonts/") || sreq.getRequestURI().contains("/dist/main.") || sreq.getRequestURI().endsWith("/images/favicon.ico") ||  //
-				sreq.getRequestURI().contains("?v=")) {
+				sreq.getRequestURI().contains("/images/") || sreq.getRequestURI().contains("/fonts/")
+						|| sreq.getRequestURI().contains("/dist/main.") || sreq.getRequestURI().endsWith("/images/favicon.ico") || //
+						sreq.getRequestURI().contains("?v=")) {
 					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 				}
 				// Special check for CORS
-				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) ||  //
-				sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
+				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
+						sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
 				}
 				HttpSession session = sreq.getSession(createSession);
@@ -71,6 +74,5 @@ public class GlobalFilter extends GenericFilterBean {
 		}
 	}
 
-	public void destroy() {
-	}
+	public void destroy() {}
 }

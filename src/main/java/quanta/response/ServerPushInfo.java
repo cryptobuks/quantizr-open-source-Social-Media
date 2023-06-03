@@ -28,7 +28,6 @@ public class ServerPushInfo {
 	 * Examples: type=='newNode' nodeId=[id of the node]
 	 */
 	@JsonIgnore
-	
 	public void setType(final String type) {
 		this.type = type;
 	}

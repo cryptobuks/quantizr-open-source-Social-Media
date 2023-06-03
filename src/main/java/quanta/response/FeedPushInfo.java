@@ -10,12 +10,10 @@ public class FeedPushInfo extends ServerPushInfo {
 		super("feedPush");
 		this.nodeInfo = nodeInfo;
 	}
-
 	
 	public NodeInfo getNodeInfo() {
 		return this.nodeInfo;
 	}
-
 	
 	public void setNodeInfo(final NodeInfo nodeInfo) {
 		this.nodeInfo = nodeInfo;

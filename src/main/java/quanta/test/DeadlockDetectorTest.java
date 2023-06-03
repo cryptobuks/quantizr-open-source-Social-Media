@@ -6,22 +6,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class intentionally creates a deadlock and using LockEx the deadlock is
- * detected. The way it works is this flow:
+ * This class intentionally creates a deadlock and using LockEx the deadlock is detected. The way it
+ * works is this flow:
  * 
- * Thread 1 gets lock a, then waits a second and tries to get lock b, but by then Thread 2 will have obtained lock b and then also be making
- * an attempt to get lock a. This condition will never resolve itself, if they continue waiting, but the purpose of LockEx is that it can 
- * detect there's a deadlock probably happening, and log a warning about it.
+ * Thread 1 gets lock a, then waits a second and tries to get lock b, but by then Thread 2 will have
+ * obtained lock b and then also be making an attempt to get lock a. This condition will never
+ * resolve itself, if they continue waiting, but the purpose of LockEx is that it can detect there's
+ * a deadlock probably happening, and log a warning about it.
  * 
- * This test case verifies a deadlock DID happen and then eventually the following code in LockEx.java does run and breaks
- * the deadlock and then allowes the JUnit test to complete:
+ * This test case verifies a deadlock DID happen and then eventually the following code in
+ * LockEx.java does run and breaks the deadlock and then allowes the JUnit test to complete:
  * 
- *    if (abortWhenDeadlockSuspected) {
- *		throw new RuntimeEx("Aborting. Thread "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by thread "+getOwner().getName());
- *	}
+ * if (abortWhenDeadlockSuspected) { throw new RuntimeEx("Aborting. Thread
+ * "+Thread.currentThread().getName()+" was hung waiting for lock "+lockName+" which was held by
+ * thread "+getOwner().getName()); }
  */
 public class DeadlockDetectorTest {
-	
+
 	private static Logger log = LoggerFactory.getLogger(DeadlockDetectorTest.class);
 	private int threadsRunning = 0;
 	private final LockEx a = new LockEx("a", true, 7000, 1);
@@ -63,7 +64,7 @@ public class DeadlockDetectorTest {
 				threadsRunning++;
 				Thread.currentThread().setName("T2");
 				log.debug("Thread T2 Started.");
-				//small sleep just enough to ensure Thread 1 has gotten lock a.
+				// small sleep just enough to ensure Thread 1 has gotten lock a.
 				delay(2000);
 				// Thread 2 gets lock b
 				b.lockEx();
@@ -98,10 +99,11 @@ public class DeadlockDetectorTest {
 	public void run() {
 		new T1().start();
 		new T2().start();
-		//give threads a chance to start before we start waiting on them.
+		// give threads a chance to start before we start waiting on them.
 		delay(100);
-		//i know there's a cleaner way to wait for multiple threads, but i want this test to be ultra simple
-		//with the smallest possible amount of 'Threading-specific' API calls in it.
+		// i know there's a cleaner way to wait for multiple threads, but i want this test to be ultra
+		// simple
+		// with the smallest possible amount of 'Threading-specific' API calls in it.
 		while (threadsRunning > 0) {
 			delay(250);
 		}

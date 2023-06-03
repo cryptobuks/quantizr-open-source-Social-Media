@@ -10,22 +10,18 @@ public class AddPrivilegeResponse extends ResponseBase {
      * browser encrypts a key to send back to the server
      */
     private String principalNodeId;
-
     
     public String getPrincipalPublicKey() {
         return this.principalPublicKey;
     }
-
     
     public String getPrincipalNodeId() {
         return this.principalNodeId;
     }
-
     
     public void setPrincipalPublicKey(final String principalPublicKey) {
         this.principalPublicKey = principalPublicKey;
     }
-
     
     public void setPrincipalNodeId(final String principalNodeId) {
         this.principalNodeId = principalNodeId;

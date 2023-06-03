@@ -14,31 +14,25 @@ public class GetThreadViewResponse extends ResponseBase {
     // can start traversing up the tree from there.
     private boolean nostrDeadEnd;
 
-    
     public List<NodeInfo> getNodes() {
         return this.nodes;
     }
-
     
     public boolean isTopReached() {
         return this.topReached;
     }
-
     
     public boolean isNostrDeadEnd() {
         return this.nostrDeadEnd;
     }
-
     
     public void setNodes(final List<NodeInfo> nodes) {
         this.nodes = nodes;
     }
-
     
     public void setTopReached(final boolean topReached) {
         this.topReached = topReached;
     }
-
     
     public void setNostrDeadEnd(final boolean nostrDeadEnd) {
         this.nostrDeadEnd = nostrDeadEnd;

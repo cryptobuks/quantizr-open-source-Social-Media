@@ -5,7 +5,7 @@ import quanta.config.ServiceBase;
 
 @Component
 public class Validator extends ServiceBase {
-	
+
 	/*
 	 * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing digits,
 	 * letters, underscore, dash, and space.
@@ -30,7 +30,8 @@ public class Validator extends ServiceBase {
 
 		for (int i = 0; i < len; i++) {
 			char c = userName.charAt(i);
-			// WARNING: Never allow '.' in here because by convention we know names starting with '.' are nostr users
+			// WARNING: Never allow '.' in here because by convention we know names starting with '.' are nostr
+			// users
 			if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_' || c == ' ')) {
 				return "Username can contain only letters, digits, dashes, underscores, and spaces. invalid[" + userName + "]";
 			}

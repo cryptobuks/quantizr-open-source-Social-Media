@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class ImportWarAndPeace extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
@@ -83,13 +83,15 @@ public class ImportWarAndPeace extends ServiceBase {
 					if (processBook(line)) {
 						continue;
 					}
-					if (globalBook > maxBooks) break;
+					if (globalBook > maxBooks)
+						break;
 					/* keep appending each line to the current paragraph */
 					if (paragraph.length() > 0) {
 						paragraph.append(" ");
 					}
 					paragraph.append(line);
-					if (++lineCount > maxLines) break;
+					if (++lineCount > maxLines)
+						break;
 				}
 			} finally {
 				StreamUtil.close(in);
@@ -103,7 +105,8 @@ public class ImportWarAndPeace extends ServiceBase {
 	private boolean processChapter(String line) {
 		if (line.startsWith("CHAPTER ")) {
 			log.debug("Processing Chapter: " + line);
-			if (curBook == null) throw ExUtil.wrapEx("book is null.");
+			if (curBook == null)
+				throw ExUtil.wrapEx("book is null.");
 			addParagraph();
 			curChapter = create.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
 			curChapter.setContent(/* "C" + String.valueOf(globalChapter) + ". " + */ line);
@@ -121,8 +124,10 @@ public class ImportWarAndPeace extends ServiceBase {
 		 * sentence end
 		 */
 		line = line.replace(".   ", ".  ");
-		if (line.length() == 0) return false;
-		if (curChapter == null || curBook == null) return false;
+		if (line.length() == 0)
+			return false;
+		if (curChapter == null || curBook == null)
+			return false;
 		// line = XString.injectForQuotations(line);
 		SubNode paraNode = create.createNode(session, curChapter, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
 		paraNode.setContent(/* "VS" + globalVerse + ". " + */ line);
@@ -133,16 +138,17 @@ public class ImportWarAndPeace extends ServiceBase {
 	}
 
 	private boolean anyEpilogue(String line) {
-		return  //
+		return //
 		//
-		line.startsWith("FIRST EPILOGUE") || line.startsWith("SECOND EPILOGUE") || line.startsWith("THIRD EPILOGUE") ||  //
-		line.startsWith("FOURTH EPILOGUE");
+		line.startsWith("FIRST EPILOGUE") || line.startsWith("SECOND EPILOGUE") || line.startsWith("THIRD EPILOGUE") || //
+				line.startsWith("FOURTH EPILOGUE");
 	}
 
 	private boolean processBook(String line) {
 		if (line.startsWith("BOOK ") || anyEpilogue(line)) {
 			globalBook++;
-			if (globalBook > maxBooks) return false;
+			if (globalBook > maxBooks)
+				return false;
 			addParagraph();
 			curBook = create.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
 			curBook.setContent(/* "B" + String.valueOf(globalBook) + ". " + */ line);

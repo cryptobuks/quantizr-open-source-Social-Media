@@ -51,12 +51,10 @@ public class RenderNodeRequest extends RequestBase {
 	public boolean isRenderParentIfLeaf() {
 		return renderParentIfLeaf;
 	}
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public int getOffset() {
 		return this.offset;
@@ -70,42 +68,34 @@ public class RenderNodeRequest extends RequestBase {
 	public int getSiblingOffset() {
 		return this.siblingOffset;
 	}
-
 	
 	public boolean isUpLevel() {
 		return this.upLevel;
 	}
-
 	
 	public boolean isForceRenderParent() {
 		return this.forceRenderParent;
 	}
-
 	
 	public int getParentCount() {
 		return this.parentCount;
 	}
-
 	
 	public boolean isJumpToRss() {
 		return this.jumpToRss;
 	}
-
 	
 	public boolean isGoToLastPage() {
 		return this.goToLastPage;
 	}
-
 	
 	public boolean isSingleNode() {
 		return this.singleNode;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setOffset(final int offset) {
 		this.offset = offset;
@@ -119,37 +109,30 @@ public class RenderNodeRequest extends RequestBase {
 	public void setSiblingOffset(final int siblingOffset) {
 		this.siblingOffset = siblingOffset;
 	}
-
 	
 	public void setUpLevel(final boolean upLevel) {
 		this.upLevel = upLevel;
 	}
-
 	
 	public void setRenderParentIfLeaf(final boolean renderParentIfLeaf) {
 		this.renderParentIfLeaf = renderParentIfLeaf;
 	}
-
 	
 	public void setForceRenderParent(final boolean forceRenderParent) {
 		this.forceRenderParent = forceRenderParent;
 	}
-
 	
 	public void setParentCount(final int parentCount) {
 		this.parentCount = parentCount;
 	}
-
 	
 	public void setJumpToRss(final boolean jumpToRss) {
 		this.jumpToRss = jumpToRss;
 	}
-
 	
 	public void setGoToLastPage(final boolean goToLastPage) {
 		this.goToLastPage = goToLastPage;
 	}
-
 	
 	public void setSingleNode(final boolean singleNode) {
 		this.singleNode = singleNode;

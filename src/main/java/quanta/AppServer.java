@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 @EnableScheduling
 @ServletComponentScan
 public class AppServer extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AppServer.class);
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
@@ -56,7 +56,8 @@ public class AppServer extends ServiceBase {
 	}
 
 	public static void shutdownCheck() {
-		if (shuttingDown) throw ExUtil.wrapEx("Server is shutting down.");
+		if (shuttingDown)
+			throw ExUtil.wrapEx("Server is shutting down.");
 	}
 
 	public static boolean isShuttingDown() {

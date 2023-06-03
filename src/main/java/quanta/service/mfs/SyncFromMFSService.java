@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class SyncFromMFSService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SyncFromMFSService.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -46,7 +46,8 @@ public class SyncFromMFSService extends ServiceBase {
 	 * NOTE: req.path can be a path or CID. Path must of course be a LOCAL path, and is assumed if the
 	 * string starts with '/', otherwise is treated as a CID.
 	 *
-	 * todo-2: currently this is an inefficient AND imcomplete algo, and only a work in progress, and needs these two enhancements:
+	 * todo-2: currently this is an inefficient AND imcomplete algo, and only a work in progress, and
+	 * needs these two enhancements:
 	 * 
 	 * 1) Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then
 	 * use that to know which nodes already do exist, as a performance aid.
@@ -71,7 +72,7 @@ public class SyncFromMFSService extends ServiceBase {
 					res.setMessage("Unable to process: " + req.getPath());
 					res.setSuccess(false);
 				}
-			} else 
+			} else
 			// Loading from an actual MFS path was completed, but is not very usable because we can only
 			// access data from the local MFS
 			{
@@ -108,55 +109,57 @@ public class SyncFromMFSService extends ServiceBase {
 			indent += "    ";
 		}
 		log.debug(indent + "DagGet CID: " + cid);
-		//todo-2: I think IPFS has changed format and this will fail nowadays.
+		// todo-2: I think IPFS has changed format and this will fail nowadays.
 		// disabling this code until the return value from ipfsDAg is updated
 		// MerkleNode dag = ipfsDag.getNode(cid);
 		// if (ok(dag)) {
-		// 	log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
-		// 	if (no(dag.getLinks())) {
-		// 		return success;
-		// 	}
-		// 	for (MerkleLink entry : dag.getLinks()) {
-		// 		String entryCid = entry.getCid().getPath();
-		// 		/*
-		// 		 * we rely on the logic of "if not a json file, it's a folder"
-		// 		 */
-		// 		if (!entry.getName().endsWith(".json")) {
-		// 			log.debug(indent + "Processing Folder: " + entry.getName());
-		// 			if (recursive > 0) {
-		// 				/*
-		// 				 * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
-		// 				 * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
-		// 				 * now we could either just put it's CID also in as the text for it, or else actually read the
-		// 				 * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
-		// 				 * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO load
-		// 				 * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting to
-		// 				 * traverse any node that's already fully loaded.
-		// 				 */
-		// 				SubNode newNode = null;
-		// 				traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
-		// 			}
-		// 		} else {
-		// 			// read the node json from ipfs file
-		// 			log.debug(indent + "Processing File: " + entry.getName());
-		// 			String json = ipfsCat.getString(entryCid);
-		// 			if (no(json)) {
-		// 				log.debug("fileReadFailed: " + entryCid);
-		// 				failedFiles++;
-		// 			} else {
-		// 				log.debug(indent + "json: " + json);
-		// 				try {
-		// 					SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
-		// 					log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
-		// 					// update.save(session, nodePojo);
-		// 					log.debug(indent + "Created Node: " + nodePojo.getId());
-		// 				} catch (Exception e) {
-		// 					// todo
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// 	success = true;
+		// log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
+		// if (no(dag.getLinks())) {
+		// return success;
+		// }
+		// for (MerkleLink entry : dag.getLinks()) {
+		// String entryCid = entry.getCid().getPath();
+		// /*
+		// * we rely on the logic of "if not a json file, it's a folder"
+		// */
+		// if (!entry.getName().endsWith(".json")) {
+		// log.debug(indent + "Processing Folder: " + entry.getName());
+		// if (recursive > 0) {
+		// /*
+		// * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
+		// * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
+		// * now we could either just put it's CID also in as the text for it, or else actually read the
+		// * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
+		// * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO
+		// load
+		// * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting
+		// to
+		// * traverse any node that's already fully loaded.
+		// */
+		// SubNode newNode = null;
+		// traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
+		// }
+		// } else {
+		// // read the node json from ipfs file
+		// log.debug(indent + "Processing File: " + entry.getName());
+		// String json = ipfsCat.getString(entryCid);
+		// if (no(json)) {
+		// log.debug("fileReadFailed: " + entryCid);
+		// failedFiles++;
+		// } else {
+		// log.debug(indent + "json: " + json);
+		// try {
+		// SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
+		// log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
+		// // update.save(session, nodePojo);
+		// log.debug(indent + "Created Node: " + nodePojo.getId());
+		// } catch (Exception e) {
+		// // todo
+		// }
+		// }
+		// }
+		// }
+		// success = true;
 		// }
 		return success;
 	}
@@ -174,13 +177,13 @@ public class SyncFromMFSService extends ServiceBase {
 				String entryPath = path + "/" + entry.getName();
 				if (entry.getSize() == 0) {
 					processPath(entryPath);
-				} else 
+				} else
 				// else process a file
 				{
 					// process directory
 					if (entry.isDir()) {
 						processPath(entryPath);
-					} else 
+					} else
 					// process file
 					if (entry.isFile()) {
 						log.debug("processFile: " + entryPath);
@@ -212,7 +215,7 @@ public class SyncFromMFSService extends ServiceBase {
 								if (findNode != null) {
 									log.debug("Node existed: " + node.getId());
 									matchingFiles++;
-								} else 
+								} else
 								// todo-2: check if node is same content here.
 								{
 									SubNode realNode = jsonMapper.readValue(json, SubNode.class);

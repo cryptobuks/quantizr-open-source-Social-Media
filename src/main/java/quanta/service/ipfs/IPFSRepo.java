@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSRepo extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSRepo.class);
     public static String API_REPO;
 
@@ -33,7 +33,8 @@ public class IPFSRepo extends ServiceBase {
     }
 
     public String gc() {
-        if (!prop.ipfsEnabled()) return "IPFS Disabled.";
+        if (!prop.ipfsEnabled())
+            return "IPFS Disabled.";
         String url = API_REPO + "/gc";
         // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
         // LinkedHashMap.class));

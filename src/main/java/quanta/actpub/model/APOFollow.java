@@ -10,7 +10,7 @@ public class APOFollow extends APOActivity {
     public APOFollow(Map<?, ?> obj) {
         super(obj);
     }
-    
+
     public APOFollow() {
         put(context, APConst.CONTEXT_STREAMS);
 
@@ -26,21 +26,22 @@ public class APOFollow extends APOActivity {
         if (id != null) {
             put(APObj.id, id);
         }
-        put(APObj.actor, actor); 
+        put(APObj.actor, actor);
 
         // Pleroma hacking (nothing with pleroma has ever worked)
         // put("state", "pending");
 
         // NOTE: I saw on a Pleroma forum that they DO need these cc and to as LISTS
         // even though the AP SPEC allows for strings.
-        put(APObj.cc, new APList());  
-        put(APObj.to, new APList().val(target)); 
-        
+        put(APObj.cc, new APList());
+        put(APObj.to, new APList().val(target));
+
         // This format is known to work on all platforms except Pleroma. Never have gotten Pleroma to work
         // Pleroma always sends back a 400 error.
-        put(APObj.object, target); 
+        put(APObj.object, target);
 
-        // NOTE: This Person object is the format I've seen some servers use, and we do support this format for inbound follows.
+        // NOTE: This Person object is the format I've seen some servers use, and we do support this format
+        // for inbound follows.
         // put(APObj.object, new APOPerson(target));
     }
 

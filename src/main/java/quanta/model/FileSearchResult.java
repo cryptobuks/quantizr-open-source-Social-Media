@@ -11,11 +11,9 @@ public class FileSearchResult {
 		this.fileName = fileName;
 	}
 
-	
 	public String getFileName() {
 		return this.fileName;
 	}
-
 	
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;

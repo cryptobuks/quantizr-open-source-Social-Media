@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSKey extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSKey.class);
     public static String API_NAME;
 
@@ -38,9 +38,9 @@ public class IPFSKey extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Generate IPFS Key: " + url);
-            ResponseEntity<String> response = ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
-            });
+            ResponseEntity<String> response =
+                    ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
         // ret output:
         // {

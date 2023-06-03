@@ -15,12 +15,10 @@ public class PrivilegeInfo {
 		this.privilegeName = privilegeName;
 	}
 
-	
 	public String getPrivilegeName() {
 		return this.privilegeName;
 	}
 
-	
 	public void setPrivilegeName(final String privilegeName) {
 		this.privilegeName = privilegeName;
 	}

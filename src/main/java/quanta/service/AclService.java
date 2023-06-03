@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class AclService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AclService.class);
 
 	/**
@@ -73,8 +73,8 @@ public class AclService extends ServiceBase {
 		boolean batchMode = false;
 		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
 		int batchSize = 0;
-		for (SubNode n : read.getSubGraph(ms, node, null, 0, true,  //
-		false, true)) {
+		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, //
+				false, true)) {
 			if (batchMode) {
 				// lazy instantiate
 				if (bops == null) {
@@ -94,7 +94,7 @@ public class AclService extends ServiceBase {
 					}
 				} catch (Exception e) {
 				}
-			} else 
+			} else
 			// not an error, we just can't properties on nodes we don't own, so we skip them
 			{
 				auth.ownerAuth(ms, n);
@@ -161,7 +161,8 @@ public class AclService extends ServiceBase {
 		return res;
 	}
 
-	public boolean setCipherKey(MongoSession ms, SubNode node, String principalNodeId, String cipherKey, SetCipherKeyResponse res) {
+	public boolean setCipherKey(MongoSession ms, SubNode node, String principalNodeId, String cipherKey,
+			SetCipherKeyResponse res) {
 		boolean ret = false;
 		HashMap<String, AccessControl> acl = node.getAc();
 		AccessControl ac = acl.get(principalNodeId);
@@ -180,8 +181,10 @@ public class AclService extends ServiceBase {
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation.
 	 */
-	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, SubNode principalNode, List<String> privileges, AddPrivilegeResponse res) {
-		if ((principal == null && principalNode == null) || node == null) return false;
+	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, SubNode principalNode,
+			List<String> privileges, AddPrivilegeResponse res) {
+		if ((principal == null && principalNode == null) || node == null)
+			return false;
 		if (principal != null) {
 			principal = principal.trim();
 		}
@@ -193,7 +196,7 @@ public class AclService extends ServiceBase {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
-		} else 
+		} else
 		/*
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
 		 */
@@ -310,14 +313,15 @@ public class AclService extends ServiceBase {
 			return;
 		}
 		HashMap<String, AccessControl> acl = node.getAc();
-		if (acl == null) return;
+		if (acl == null)
+			return;
 		String newPrivs = "";
 		boolean removed = false;
 		AccessControl ac = null;
 		// if removing all privileges
 		if ("*".equals(privToRemove)) {
 			removed = true;
-		} else 
+		} else
 		// else removing just some specific privileges
 		{
 			ac = acl.get(principalNodeId);
@@ -408,7 +412,8 @@ public class AclService extends ServiceBase {
 			}
 			if (principals.size() == 0) {
 				node = read.getParent(ms, node);
-				if (node == null) break;
+				if (node == null)
+					break;
 			} else {
 				break;
 			}
@@ -440,12 +445,12 @@ public class AclService extends ServiceBase {
 		// if no privileges exist at all just add the one we need to add
 		if (node.getAc() == null) {
 			node.putAc(key, new AccessControl(null, prvs));
-		} else 
+		} else
 		// otherwise first check to see if it's already added
 		{
 			AccessControl ac = node.getAc().get(key);
 			if (ac != null && ac.getPrvs().equals(prvs)) {
-			} else 
+			} else
 			// already had the correct ac, nothing to do here
 			// else need to add it.
 			{
@@ -461,7 +466,8 @@ public class AclService extends ServiceBase {
 	}
 
 	public boolean isAdminOwned(SubNode node) {
-		if (node == null) return false;
+		if (node == null)
+			return false;
 		return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
 	}
 }

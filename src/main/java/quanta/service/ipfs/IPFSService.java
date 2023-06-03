@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
 public class IPFSService extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSService.class);
     public static String API_ID;
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
@@ -88,12 +88,14 @@ public class IPFSService extends ServiceBase {
     /* On regular interval forget which CIDs have failed and allow them to be retried */
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         failedCIDs.clear();
     }
 
     public LinkedHashMap<String, Object> getInstanceId() {
-        if (!prop.ipfsEnabled()) return null;
+        if (!prop.ipfsEnabled())
+            return null;
         synchronized (instanceIdLock) {
             if (instanceId == null) {
                 instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
@@ -142,7 +144,8 @@ public class IPFSService extends ServiceBase {
      * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call it
      * DOES pin the file
      */
-    public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType, Val<Integer> streamSize, boolean wrapInFolder) {
+    public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
+            Val<Integer> streamSize, boolean wrapInFolder) {
         checkIpfs();
         String endpoint = prop.getIPFSApiBase() + "/add?stream-channels=true";
         if (wrapInFolder) {
@@ -172,7 +175,8 @@ public class IPFSService extends ServiceBase {
      * pass this in and also check if there are ways we can avoid the old need for mime guessing by
      * always basing off extension on this filename?
      */
-    public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName, Val<Integer> streamSize) {
+    public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
+            Val<Integer> streamSize) {
         checkIpfs();
         // log.debug("Write stream to endpoint: " + endpoint);
         MerkleLink ret = null;
@@ -237,11 +241,14 @@ public class IPFSService extends ServiceBase {
      * have to add them here, primarily to ensure garbage collector will keep them, but secondly it's a
      * nice-feature for user to be able to browse them individually.
      */
-    public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName, List<ExportIpfsFile> childrenFiles) {
+    public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName,
+            List<ExportIpfsFile> childrenFiles) {
         checkIpfs();
-        SubNode exportParent = read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
+        SubNode exportParent =
+                read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
         if (exportParent != null) {
-            SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true, true);
+            SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null,
+                    true, true);
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             node.setOwner(exportParent.getOwner());
@@ -254,7 +261,8 @@ public class IPFSService extends ServiceBase {
             update.save(ms, node);
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
-                    SubNode child = create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true, true);
+                    SubNode child = create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null,
+                            true, true);
                     // todo-2: make this handle multiple attachments, and all calls to it
                     Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
                     child.setOwner(exportParent.getOwner());
@@ -303,10 +311,11 @@ public class IPFSService extends ServiceBase {
         String sourceUrl = prop.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
         try {
             int timeout = 15;
-            RequestConfig config =  //
-            //
-            //
-            RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+            RequestConfig config = //
+                    //
+                    //
+                    RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
+                            .setSocketTimeout(timeout * 1000).build();
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
             HttpGet request = new HttpGet(sourceUrl);
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);

@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class ActPubService extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(ActPubService.class);
     @Autowired
     private ActPubLog apLog;
@@ -188,9 +188,10 @@ public class ActPubService extends ServiceBase {
                                 boostedId = prop.getProtocolHostAndPort() + "?id=" + boostTarget;
                             }
                             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-                            message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostedId, now, privateMessage);
+                            message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostedId, now,
+                                    privateMessage);
                         }
-                    } else 
+                    } else
                     // log.debug("Outbound Announce: " + XString.prettyPrint(message));
                     // else send out as a note.
                     {
@@ -199,7 +200,8 @@ public class ActPubService extends ServiceBase {
                             content = node.getContent();
                         }
                         String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + node.getIdStr();
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, content, objUrl, repliesUrl, privateMessage, attachments);
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, content, objUrl,
+                                repliesUrl, privateMessage, attachments);
                         // log.debug("Outbound Note: " + XString.prettyPrint(message));
                     }
                 }
@@ -244,7 +246,8 @@ public class ActPubService extends ServiceBase {
 
     public void sendNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
         // if no sharing bail out.
-        if (acl == null || acl.isEmpty()) return;
+        if (acl == null || acl.isEmpty())
+            return;
         exec.run(() -> {
             try {
                 HashSet<String> toUserNames = new HashSet<>();
@@ -301,7 +304,8 @@ public class ActPubService extends ServiceBase {
     public void getSharedInboxesOfFollowers(String userName, HashSet<String> sharedInboxes, HashSet<String> userInboxes) {
         // This query gets the FRIEND nodes that specify userName on them
         Query q = arun.run(as -> apFollower.getPeopleByUserName_query(as, null, userName));
-        if (q == null) return;
+        if (q == null)
+            return;
         Iterable<SubNode> iterator = mongoUtil.find(q);
         for (SubNode node : iterator) {
             // log.debug("follower: " + XString.prettyPrint(node));
@@ -318,7 +322,7 @@ public class ActPubService extends ServiceBase {
                     if (sharedInbox != null) {
                         // log.debug("SharedInbox: " + sharedInbox);
                         sharedInboxes.add(sharedInbox);
-                    } else 
+                    } else
                     // not all users have a shared inbox, and the ones that don't we collect here...
                     {
                         String inbox = followerAccount.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
@@ -341,13 +345,14 @@ public class ActPubService extends ServiceBase {
             for (Attachment att : atts) {
                 if (att.getBin() != null && att.getMime() != null) {
                     attachments.val( //
-                    //
-                    //
-                    /*
+                            //
+                            //
+                            /*
                              * NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
                              * sharing meaning they can be visible to at least someone other than it's owner.
                              */
-                    new APObj().put(APObj.type, APType.Document).put(APObj.mediaType, att.getMime()).put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr() + "?att=" + att.getKey()));
+                            new APObj().put(APObj.type, APType.Document).put(APObj.mediaType, att.getMime()).put(APObj.url,
+                                    prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr() + "?att=" + att.getKey()));
                 }
             }
         }
@@ -417,8 +422,10 @@ public class ActPubService extends ServiceBase {
      * 
      * skipInboxes is a way to know which inboxes we've already sent to, and to not send again
      */
-    public void sendMessageToUsers(MongoSession ms, HashSet<String> toUserNames, String fromUser, APObj message, boolean privateMessage, HashSet<String> skipInboxes) {
-        if (toUserNames == null) return;
+    public void sendMessageToUsers(MongoSession ms, HashSet<String> toUserNames, String fromUser, APObj message,
+            boolean privateMessage, HashSet<String> skipInboxes) {
+        if (toUserNames == null)
+            return;
         String fromActor = null;
         /*
          * Post the same message to all the inboxes that need to see it
@@ -464,7 +471,8 @@ public class ActPubService extends ServiceBase {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
      * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName, boolean preferDbNode, boolean allowImport) {
+    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName, boolean preferDbNode,
+            boolean allowImport) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -552,7 +560,8 @@ public class ActPubService extends ServiceBase {
             String apUserName = apUtil.getLongUserNameFromActor(actor).trim();
             // This checks for both the non-port and has-port versions of the host (host may or may not have
             // port)
-            if (apUserName.endsWith("@" + prop.getMetaHost().toLowerCase()) || apUserName.contains("@" + prop.getMetaHost().toLowerCase() + ":")) {
+            if (apUserName.endsWith("@" + prop.getMetaHost().toLowerCase())
+                    || apUserName.contains("@" + prop.getMetaHost().toLowerCase() + ":")) {
                 log.debug("Can\'t import a user that\'s not from a foreign server.");
                 return null;
             }
@@ -584,7 +593,8 @@ public class ActPubService extends ServiceBase {
     public void processInboxPost(HttpServletRequest httpReq, byte[] body) {
         APObj payload = apUtil.buildObj(body);
         apLog.trace("INBOX: " + XString.prettyPrint(payload));
-        if (payload.getType() == null) return;
+        if (payload.getType() == null)
+            return;
         /*
          * todo-1: verify that for follow types the actorUrl can be obtained also from payload, rather than
          * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
@@ -599,35 +609,35 @@ public class ActPubService extends ServiceBase {
         }
         /* IMPORTANT: The ActivityPub calls these Activities */
         switch (payload.getType()) {
-        case APType.Create: 
-        case APType.Update: 
-            /*
+            case APType.Create:
+            case APType.Update:
+                /*
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-            processCreateOrUpdateActivity(httpReq, (APOActivity) payload, body, keyEncoded);
-            break;
-        case APType.Follow: 
-            apFollowing.processFollowActivity((APOActivity) payload);
-            break;
-        case APType.Undo: 
-            processUndoActivity(httpReq, (APOUndo) payload, body);
-            break;
-        case APType.Delete: 
-            processDeleteActivity(httpReq, (APODelete) payload, body, keyEncoded);
-            break;
-        case APType.Accept: 
-            processAcceptActivity((APOAccept) payload);
-            break;
-        case APType.Like: 
-            processLikeActivity(httpReq, (APOLike) payload, body);
-            break;
-        case APType.Announce: 
-            processAnnounceActivity((APOAnnounce) payload, body);
-            break;
-        default: 
-            log.debug("Unsupported inbox type:" + XString.prettyPrint(payload));
-            break;
+                processCreateOrUpdateActivity(httpReq, (APOActivity) payload, body, keyEncoded);
+                break;
+            case APType.Follow:
+                apFollowing.processFollowActivity((APOActivity) payload);
+                break;
+            case APType.Undo:
+                processUndoActivity(httpReq, (APOUndo) payload, body);
+                break;
+            case APType.Delete:
+                processDeleteActivity(httpReq, (APODelete) payload, body, keyEncoded);
+                break;
+            case APType.Accept:
+                processAcceptActivity((APOAccept) payload);
+                break;
+            case APType.Like:
+                processLikeActivity(httpReq, (APOLike) payload, body);
+                break;
+            case APType.Announce:
+                processAnnounceActivity((APOAnnounce) payload, body);
+                break;
+            default:
+                log.debug("Unsupported inbox type:" + XString.prettyPrint(payload));
+                break;
         }
     }
 
@@ -637,18 +647,18 @@ public class ActPubService extends ServiceBase {
         APObj obj = apAPObj(activity, APObj.object);
         apLog.trace("Undo Type: " + obj.getType());
         switch (obj.getType()) {
-        case APType.Follow: 
-            apFollowing.processFollowActivity(activity);
-            break;
-        case APType.Like: 
-            processLikeActivity(httpReq, activity, bodyBytes);
-            break;
-        case APType.Announce: 
-            processAnnounceActivity(activity, bodyBytes);
-            break;
-        default: 
-            log.debug("Unsupported Undo payload object type:" + XString.prettyPrint(obj));
-            break;
+            case APType.Follow:
+                apFollowing.processFollowActivity(activity);
+                break;
+            case APType.Like:
+                processLikeActivity(httpReq, activity, bodyBytes);
+                break;
+            case APType.Announce:
+                processAnnounceActivity(activity, bodyBytes);
+                break;
+            default:
+                log.debug("Unsupported Undo payload object type:" + XString.prettyPrint(obj));
+                break;
         }
     }
 
@@ -657,38 +667,40 @@ public class ActPubService extends ServiceBase {
         APObj obj = activity.getAPObj();
         apLog.trace("Accept Type: " + obj.getType());
         switch (obj.getType()) {
-        case APType.Follow: 
-            apLog.trace("Nothing to do for Follow Acceptance. no op.");
-            break;
-        default: 
-            log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
-            break;
+            case APType.Follow:
+                apLog.trace("Nothing to do for Follow Acceptance. no op.");
+                break;
+            default:
+                log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
+                break;
         }
     }
 
     /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes, Val<String> keyEncoded) {
+    public void processCreateOrUpdateActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes,
+            Val<String> keyEncoded) {
         arun.run(as -> {
             apLog.trace("processCreateOrUpdateAction");
             APObj object = activity.getAPObj();
             apLog.trace("create type: " + object.getType());
             switch (object.getType()) {
-            case APType.Video: 
-            case APType.Note: 
-                createOrUpdateObj(as, activity, keyEncoded.getVal());
-                break;
-            case APType.Person: 
-                // we can safely cast to APOActor here because getAPObj returns the proper type object.
-                processUpdatePerson(as, (APOActor) object, keyEncoded.getVal());
-                break;
-            default: 
-                // this captures videos? and other things (todo-1: add more support)
-                // not showing quesitons. they eat up too much log space.
-                if (!"Question".equals(object.getType())) {
-                    log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n" + XString.prettyPrint(activity));
-                }
-                break;
+                case APType.Video:
+                case APType.Note:
+                    createOrUpdateObj(as, activity, keyEncoded.getVal());
+                    break;
+                case APType.Person:
+                    // we can safely cast to APOActor here because getAPObj returns the proper type object.
+                    processUpdatePerson(as, (APOActor) object, keyEncoded.getVal());
+                    break;
+                default:
+                    // this captures videos? and other things (todo-1: add more support)
+                    // not showing quesitons. they eat up too much log space.
+                    if (!"Question".equals(object.getType())) {
+                        log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n"
+                                + XString.prettyPrint(activity));
+                    }
+                    break;
             }
             return null;
         });
@@ -759,8 +771,10 @@ public class ActPubService extends ServiceBase {
                 if (actorAccountNode != null) {
                     String userName = actorAccountNode.getStr(NodeProp.USER);
                     // get posts node which will be parent we save boost into
-                    SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                    saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce, boostedNode.getIdStr(), null, true, null);
+                    SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
+                            NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+                    saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce,
+                            boostedNode.getIdStr(), null, true, null);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");
@@ -778,7 +792,7 @@ public class ActPubService extends ServiceBase {
             // if the object to be deleted is specified as a string, assume it's the ID.
             if (object instanceof String) {
                 id = (String) object;
-            } else 
+            } else
             // otherwise we assume it's an object, with an ID in it.
             {
                 id = apStr(object, APObj.id);
@@ -789,7 +803,8 @@ public class ActPubService extends ServiceBase {
             }
             // find node user wants to delete
             SubNode delNode = read.findNodeByProp(as, NodeProp.OBJECT_ID.s(), id);
-            if (delNode == null) return null;
+            if (delNode == null)
+                return null;
             // verify the user doing the delete is the owner of the node, before deleting.
             if (apCrypto.ownerHasKey(as, delNode, keyEncoded.getVal())) {
                 // run subgraph delete asynchronously
@@ -797,7 +812,8 @@ public class ActPubService extends ServiceBase {
                     delete.deleteSubGraphChildren(as, delNode, true);
                 });
             } else {
-                log.debug("key match fail. rejecting attempt to delete node: " + XString.prettyPrint(delNode) + "   \ninbound payload: " + XString.prettyPrint(activity));
+                log.debug("key match fail. rejecting attempt to delete node: " + XString.prettyPrint(delNode)
+                        + "   \ninbound payload: " + XString.prettyPrint(activity));
             }
             return null;
         });
@@ -806,7 +822,8 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin())
+            throw new NodeAuthFailedException();
         SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
         if (actorAccnt == null) {
             log.debug("user not found: " + actor.getId());
@@ -833,7 +850,8 @@ public class ActPubService extends ServiceBase {
 
     @PerfMon(category = "apub")
     public void createOrUpdateObj(MongoSession as, APOActivity activity, String encodedKey) {
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin())
+            throw new NodeAuthFailedException();
         apLog.trace("createOrUpdateObj");
         // obj is the 'Note' or 'Video' object, or other payload type.
         APObj obj = activity.getAPObj();
@@ -874,7 +892,7 @@ public class ActPubService extends ServiceBase {
         if (nodeBeingRepliedTo != null) {
             apLog.trace("foreign actor replying to a quanta node.");
             saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true, replyToId);
-        } else 
+        } else
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
          * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that this new
@@ -886,8 +904,10 @@ public class ActPubService extends ServiceBase {
             SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
-                SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true, replyToId);
+                SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
+                        NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true,
+                        replyToId);
             }
         }
     }
@@ -905,7 +925,8 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create, APType.Update, or APType.Announce
      */
     @PerfMon(category = "apub")
-    public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, APObj obj, String action, String boostTargetId, String encodedKey, boolean allowFiltering, String inReplyTo) {
+    public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode,
+            APObj obj, String action, String boostTargetId, String encodedKey, boolean allowFiltering, String inReplyTo) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
@@ -918,11 +939,12 @@ public class ActPubService extends ServiceBase {
             if (!action.equals(APType.Update)) {
                 apLog.trace("duplicate post ignored: ActPubId: " + obj.getId() + " nodeId=" + dupNode.getIdStr());
                 return dupNode;
-            } else 
+            } else
             // if we're updating the node, need to validate they encodedKey owns it.
             {
                 if (!apCrypto.ownerHasKey(ms, dupNode, encodedKey)) {
-                    log.warn("unauthorized key [" + encodedKey + "] tried action " + action + " on node " + dupNode.getIdStr() + " with object " + XString.prettyPrint(obj));
+                    log.warn("unauthorized key [" + encodedKey + "] tried action " + action + " on node " + dupNode.getIdStr()
+                            + " with object " + XString.prettyPrint(obj));
                     throw new RuntimeException("unauthorized key");
                 }
             }
@@ -989,7 +1011,8 @@ public class ActPubService extends ServiceBase {
         if (toAccountNode == null) {
             toAccountNode = getAcctNodeByActorUrl(ms, userDoingAction, objAttributedTo);
         }
-        SubNode newNode = create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true, true);
+        SubNode newNode = create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null,
+                toAccountNode.getId(), true, true);
         // If we're updating a node, find what the ID should be and we can just put that ID value into
         // newNode
         if (action.equals(APType.Update)) {
@@ -1083,12 +1106,12 @@ public class ActPubService extends ServiceBase {
         if ((val = AP.getFromMap(obj, APObj.attributedTo)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else 
+            } else
             // if we have a plain string prop return it.
             if (val.getVal() instanceof String) {
                 apLog.trace("attributed to found as string: " + (String) val.getVal());
                 return (String) val.getVal();
-            } else 
+            } else
             // else if this is a list we scan it.
             if (val.getVal() instanceof List) {
                 List<?> attribsList = (List<?>) val.getVal();
@@ -1105,13 +1128,16 @@ public class ActPubService extends ServiceBase {
                 }
             } else {
                 if (warnIfMissing) {
-                    ExUtil.warn("unhandled type on getSingleAttributedTo() return val: " + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object") + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
+                    ExUtil.warn("unhandled type on getSingleAttributedTo() return val: "
+                            + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object")
+                            + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
                 }
                 return null;
             }
         }
         if (warnIfMissing) {
-            ExUtil.warn("unhandled type on getSingleAttributedTo(): " + (obj != null ? obj.getClass().getName() : "null") + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn("unhandled type on getSingleAttributedTo(): " + (obj != null ? obj.getClass().getName() : "null")
+                    + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
         }
         return null;
     }
@@ -1125,7 +1151,7 @@ public class ActPubService extends ServiceBase {
             String href = apStr(tag, APObj.href);
             if ("Mention".equalsIgnoreCase(type)) {
                 tags.put(name, new APOMention(href, name));
-            } else  //
+            } else //
             if ("Hashtag".equalsIgnoreCase(type)) {
                 tags.put(name, new APOHashtag(href, name));
             }
@@ -1136,10 +1162,12 @@ public class ActPubService extends ServiceBase {
     // imports the list of foreign users into the system, and performs the side-effect, of ensuring
     // both local users and foreign users have the 'href' set on the APOTag
     public void importUsers(MongoSession ms, HashMap<String, APObj> users, String userDoingAction) {
-        if (users == null) return;
+        if (users == null)
+            return;
         users.forEach((user, tag) -> {
             // ignore of this is something else like a Hashtag
-            if (!(tag instanceof APOMention)) return;
+            if (!(tag instanceof APOMention))
+                return;
             try {
                 // remove '@' prefix
                 user = XString.stripIfStartsWith(user, "@");
@@ -1156,7 +1184,7 @@ public class ActPubService extends ServiceBase {
                             tag.put(APObj.href, actorUrl);
                         }
                     }
-                } else 
+                } else
                 // else if this is a local user, still need actor ID
                 {
                     String actorUrl = apUtil.makeActorUrlForUserName(user);
@@ -1207,7 +1235,7 @@ public class ActPubService extends ServiceBase {
          */
         if (!url.contains("/followers")) {
             shareNodeToActorByUrl(ms, userDoingAction, node, url);
-        } else 
+        } else
         /*
          * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
          * code path when some foreign user has a mention of our local user and is also a public post, and
@@ -1334,10 +1362,12 @@ public class ActPubService extends ServiceBase {
      * Returns true if the name was added, or false if already existed
      */
     public boolean saveFediverseName(String name) {
-        if (name == null) return false;
+        if (name == null)
+            return false;
         name = name.trim();
         // lazy job of detecting garbage names
-        if (name.indexOf("\n") != -1 || name.indexOf("\r") != -1 || name.indexOf("\t") != -1) return false;
+        if (name.indexOf("\n") != -1 || name.indexOf("\r") != -1 || name.indexOf("\t") != -1)
+            return false;
         if (!apCache.allUserNames.contains(name)) {
             apCache.allUserNames.put(name, false);
             return true;
@@ -1351,7 +1381,8 @@ public class ActPubService extends ServiceBase {
         if (!prop.isActPubEnabled()) {
             return;
         }
-        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + prop.getMetaHost())) return;
+        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + prop.getMetaHost()))
+            return;
         saveFediverseName(apUserName);
         // unless force is true, don't add this apUserName to pending list
         if (!force && apCache.usersPendingRefresh.contains(apUserName)) {
@@ -1364,7 +1395,8 @@ public class ActPubService extends ServiceBase {
     /* every 90 minutes read all the outboxes of all users */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
-        if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit) return;
+        if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+            return;
         // refreshForeignUsers();
         // refreshFollowedUsers();
     }
@@ -1374,7 +1406,8 @@ public class ActPubService extends ServiceBase {
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (userRefresh || !prop.isActPubEnabled() || !prop.isDaemonsEnabled() || !MongoRepository.fullInit) return;
+        if (userRefresh || !prop.isActPubEnabled() || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+            return;
         try {
             userRefresh = true;
             try {
@@ -1393,7 +1426,8 @@ public class ActPubService extends ServiceBase {
     }
 
     private void refreshUsers() {
-        if (!prop.isDaemonsEnabled()) return;
+        if (!prop.isDaemonsEnabled())
+            return;
         List<String> names = new ArrayList<>();
         for (String userName : apCache.usersPendingRefresh.keySet()) {
             names.add(userName);
@@ -1405,7 +1439,8 @@ public class ActPubService extends ServiceBase {
         Collections.shuffle(names);
         String lastServer = null;
         for (String userName : names) {
-            if (!prop.isDaemonsEnabled()) break;
+            if (!prop.isDaemonsEnabled())
+                break;
             // never hit the same server twice here, which is good to not do too much traffic on any one
             String server = apUtil.getHostFromUserName(userName);
             if (server != null && server.equals(lastServer)) {
@@ -1413,7 +1448,8 @@ public class ActPubService extends ServiceBase {
             }
             try {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
-                if (done) continue;
+                if (done)
+                    continue;
                 /*
                  * To limit load on our server we do a sleep here, making sure to do a 4s sleep if we're accessing
                  * the same server twice in a row or a 1s sleep if it's a different server. Accessing the same
@@ -1464,7 +1500,8 @@ public class ActPubService extends ServiceBase {
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
                     String userName = acctNode.getStr(NodeProp.USER);
-                    if (userName == null || !userName.contains("@")) continue;
+                    if (userName == null || !userName.contains("@"))
+                        continue;
                     log.debug("rePullActor [" + accountsRefreshed + "]: " + userName);
                     String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                     try {
@@ -1521,11 +1558,11 @@ public class ActPubService extends ServiceBase {
                 if (!apOutbox.loadForeignOutbox(as, userMakingRequest, actor, userNode, userName)) {
                     return null;
                 }
-            } else 
+            } else
             /*
-                 * I was going to load followerCounts into userNode, but I decided to just query them live when
-                 * needed on the UserPreferences dialog
-                 */
+             * I was going to load followerCounts into userNode, but I decided to just query them live when
+             * needed on the UserPreferences dialog
+             */
             // todo-1: need a flag to enable these to allow for agressive collection of usernames, but for now
             // we have more than enough users
             // so I'm disabling this.
@@ -1543,7 +1580,8 @@ public class ActPubService extends ServiceBase {
         List<String> names = new LinkedList<>(apCache.allUserNames.keySet());
         for (String name : names) {
             Boolean done = apCache.allUserNames.get(name);
-            if (done) continue;
+            if (done)
+                continue;
             apCache.allUserNames.put(name, true);
             FediverseName fName = new FediverseName();
             fName.setName(name);
@@ -1577,19 +1615,24 @@ public class ActPubService extends ServiceBase {
      * Generates the list of all users being followed into 'apCache.followedUsers'
      */
     public void identifyFollowedAccounts(boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
-        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers) return;
+        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
+            return;
         arun.run(as -> {
-            if (scanningForeignUsers) return null;
+            if (scanningForeignUsers)
+                return null;
             try {
                 scanningForeignUsers = true;
                 Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
                 for (SubNode node : accountNodes) {
-                    if (!prop.isDaemonsEnabled()) break;
+                    if (!prop.isDaemonsEnabled())
+                        break;
                     String userName = node.getStr(NodeProp.USER);
                     // if a foreign account we skip it.
-                    if (userName == null || userName.contains("@")) continue;
+                    if (userName == null || userName.contains("@"))
+                        continue;
                     // we query for only the foreign users this local user is following
-                    List<String> following = apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
+                    List<String> following =
+                            apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
                     // log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
                     synchronized (apCache.followedUsers) {
                         apCache.followedUsers.addAll(following);
@@ -1630,9 +1673,11 @@ public class ActPubService extends ServiceBase {
      */
     public void refreshForeignUsers() {
         log.debug("refreshForeignUsers()");
-        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers) return;
+        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers)
+            return;
         arun.run(as -> {
-            if (refreshingForeignUsers) return null;
+            if (refreshingForeignUsers)
+                return null;
             try {
                 refreshingForeignUsers = true;
                 lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());
@@ -1642,17 +1687,20 @@ public class ActPubService extends ServiceBase {
                 newPostsInCycle = 0;
                 HashSet<ObjectId> blockedUserIds = new HashSet<>();
                 userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null,  //
-                Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS, -1, true, true);
+                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, //
+                        Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS, -1, true, true);
                 StringBuilder usersToFollow = new StringBuilder();
                 // process each account in the system
                 for (SubNode node : accountNodes) {
-                    if (!prop.isDaemonsEnabled()) break;
+                    if (!prop.isDaemonsEnabled())
+                        break;
                     // if this user is blocked by admin, skip them.
-                    if (blockedUserIds.contains(node.getId())) continue;
+                    if (blockedUserIds.contains(node.getId()))
+                        continue;
                     String userName = node.getStr(NodeProp.USER);
                     // if not a forgien account ignore
-                    if (userName == null || !userName.contains("@")) continue;
+                    if (userName == null || !userName.contains("@"))
+                        continue;
                     refreshForeignUsersQueuedCount++;
                     queueUserForRefresh(userName, true);
                     usersToFollow.append(userName + "\n");
@@ -1667,14 +1715,16 @@ public class ActPubService extends ServiceBase {
 
     /* This is just to pull in arbitary new users so our Fediverse feed is populated */
     public String crawlNewUsers() {
-        if (!prop.isActPubEnabled()) return "ActivityPub not enabled";
+        if (!prop.isActPubEnabled())
+            return "ActivityPub not enabled";
         return arun.run(as -> {
             Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER);
-                if (userName == null) continue;
+                if (userName == null)
+                    continue;
                 knownUsers.add(userName);
             }
             Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
@@ -1688,7 +1738,8 @@ public class ActPubService extends ServiceBase {
                         userName = apUtil.getLongUserNameFromActorUrl(as, null, userName);
                     }
                     // log.debug("Converted to: " + userName);
-                    if (knownUsers.contains(userName)) continue;
+                    if (knownUsers.contains(userName))
+                        continue;
                     queueUserForRefresh(userName, true);
                     apCache.allUserNames.remove(userName);
                     if (++numLoaded > 250) {
@@ -1703,7 +1754,8 @@ public class ActPubService extends ServiceBase {
     }
 
     public String maintainActPubUsers() {
-        if (!prop.isActPubEnabled()) return "ActivityPub not enabled";
+        if (!prop.isActPubEnabled())
+            return "ActivityPub not enabled";
         return arun.run(as -> {
             log.debug("Starting ActPub cleanup...");
             long delCount = delete.deleteOldActPubPosts(4, as);
@@ -1755,7 +1807,8 @@ public class ActPubService extends ServiceBase {
 
     public List<String> getUserNamesFromNodeAcl(MongoSession ms, SubNode node) {
         // if we have no ACL return null
-        if (node == null || node.getAc() == null) return null;
+        if (node == null || node.getAc() == null)
+            return null;
         List<String> userNames = new LinkedList<>();
         /*
          * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
@@ -1779,7 +1832,8 @@ public class ActPubService extends ServiceBase {
     }
 
     public APList getTagListFromUserNames(String userDoingAction, List<String> userNames) {
-        if (userNames == null || userNames.isEmpty()) return null;
+        if (userNames == null || userNames.isEmpty())
+            return null;
         APList tagList = new APList();
         for (String userName : userNames) {
             try {
@@ -1787,12 +1841,13 @@ public class ActPubService extends ServiceBase {
                 // if this is a local username
                 if (!userName.contains("@")) {
                     actorUrl = apUtil.makeActorUrlForUserName(userName);
-                } else 
+                } else
                 // else foreign userName
                 {
                     actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
                 }
-                if (actorUrl == null) continue;
+                if (actorUrl == null)
+                    continue;
                 // prepend character to make it like '@user@server.com'
                 tagList.val(new APOMention(actorUrl, "@" + userName));
             } catch (
@@ -1838,7 +1893,8 @@ public class ActPubService extends ServiceBase {
      */
     public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
         HashMap<String, APObj> tags = new HashMap<>();
-        if (content == null) return tags;
+        if (content == null)
+            return tags;
         StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
@@ -1853,14 +1909,14 @@ public class ActPubService extends ServiceBase {
                         userName = XString.stripIfStartsWith(userName, "@");
                         userName = apUtil.stripHostFromUserName(userName);
                         actor = apUtil.makeActorUrlForUserName(userName);
-                    } else 
+                    } else
                     // foreign userName
                     if (atMatches == 2) {
                         String userDoingAction = ThreadLocals.getSC().getUserName();
                         actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
                     }
                     tags.put(tok, new APOMention(actor, tok));
-                } else 
+                } else
                 // HASHTAG
                 if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
                     String shortTok = XString.stripIfStartsWith(tok, "#");
@@ -1876,10 +1932,11 @@ public class ActPubService extends ServiceBase {
      */
     public HashMap<String, APObj> parseTags(SubNode node) {
         HashMap<String, APObj> tagMap = new HashMap<>();
-        if (node == null) return tagMap;
-        List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {
-        });
-        if (tags == null) return tagMap;
+        if (node == null)
+            return tagMap;
+        List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
+        if (tags == null)
+            return tagMap;
         for (APTag tag : tags) {
             try {
                 // ActPub spec originally didn't have Hashtag here, so default to that if no type
@@ -1888,7 +1945,7 @@ public class ActPubService extends ServiceBase {
                 }
                 if ("Hashtag".equalsIgnoreCase(tag.getType())) {
                     tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
-                } else 
+                } else
                 // Process Mention
                 if ("Mention".equalsIgnoreCase(tag.getType())) {
                     APOMention tagObj = new APOMention(tag.getHref(), tag.getName());

@@ -10,22 +10,18 @@ public class ImportRequest extends RequestBase {
 	 * expected to be in the folder specified by adminDataFolder application property.
 	 */
 	private String sourceFileName;
-
 	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-
 	
 	public String getSourceFileName() {
 		return this.sourceFileName;
 	}
-
 	
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-
 	
 	public void setSourceFileName(final String sourceFileName) {
 		this.sourceFileName = sourceFileName;

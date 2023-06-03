@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class SyncToMFSService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SyncToMFSService.class);
 	MongoSession session;
 	HashSet<String> allNodePaths = new HashSet<>();
@@ -78,7 +78,8 @@ public class SyncToMFSService extends ServiceBase {
 			 * result in the MFS files now being perfectly in sync with the Quanta Nodes
 			 */
 			removeOrphanFiles();
-			// Now we can get the IPFS CID of the root and save it on a property on the root of the node we just saved to MFS.
+			// Now we can get the IPFS CID of the root and save it on a property on the root of the node we just
+			// saved to MFS.
 			IPFSDirStat pathStat = ipfsFiles.pathStat(node.getPath());
 			if (pathStat != null) {
 				node.set(NodeProp.IPFS_CID, pathStat.getHash());
@@ -125,12 +126,12 @@ public class SyncToMFSService extends ServiceBase {
 			}
 		});
 		/*
-					 * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
-					 * already deleted because we may have just deleted their parents already in this same loop so...
-					 * 
-					 * todo-2: when we delete a folder, scan for all other folders that have that matching prefix and
-					 * remove them too, because there's no need to call deleteFile on those.
-					 */
+		 * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
+		 * already deleted because we may have just deleted their parents already in this same loop so...
+		 * 
+		 * todo-2: when we delete a folder, scan for all other folders that have that matching prefix and
+		 * remove them too, because there's no need to call deleteFile on those.
+		 */
 	}
 
 	private void processNode(SubNode node) {

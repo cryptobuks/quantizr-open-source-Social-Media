@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 @Component
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 	private MongoSession session;
 	private String shortFileName;
@@ -117,10 +117,10 @@ public class ExportServiceFlexmark extends ServiceBase {
 			// options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 			MutableDataSet options = new MutableDataSet();
 			options.set(Parser.EXTENSIONS, Arrays.asList(//
-			TablesExtension.create(),  //
-			TocExtension.create(),  //
-			AnchorLinkExtension.create(),  //
-			AutolinkExtension.create()));
+					TablesExtension.create(), //
+					TocExtension.create(), //
+					AnchorLinkExtension.create(), //
+					AutolinkExtension.create()));
 			options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
 			// This numbering works in the TOC but I haven't figured out how to number the
 			// actual headings in the body of the document itself.
@@ -232,7 +232,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null) return;
+		if (node == null)
+			return;
 		processNode(node);
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
@@ -253,7 +254,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 			content = content.trim();
 			int slashCount = StringUtils.countMatches(node.getPath(), "/");
 			int lev = slashCount - baseSlashCount;
-			if (lev > 6) lev = 6;
+			if (lev > 6)
+				lev = 6;
 			content = edit.translateHeadingsForLevel(session, content, lev);
 		}
 		markdown.append(content);
@@ -263,11 +265,13 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 	private void writeImages(SubNode node) {
 		List<Attachment> atts = node.getOrderedAttachments();
-		if (atts == null) return;
+		if (atts == null)
+			return;
 		// process all attachments specifically to embed the image ones
 		for (Attachment att : atts) {
 			String mime = att.getMime();
-			if (!ImageUtil.isImageMime(mime)) continue;
+			if (!ImageUtil.isImageMime(mime))
+				continue;
 			String bin = att.getBin();
 			String url = att.getUrl();
 			String ipfsLink = att.getIpfsLink();
@@ -294,7 +298,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 					// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
 					files.add(new ExportIpfsFile(cid, fileName, mime));
 					src = fileName + "?cid=" + cid;
-				} else 
+				} else
 				/*
 				 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
 				 * so reference it in src
@@ -313,7 +317,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 					 */
 					src = fileName + "?cid=" + ipfsLink;
 				}
-			} else 
+			} else
 			/*
 			 * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
 			 * kind of reference to the image resource, because ultimately the Flexmark code that converts the
@@ -322,12 +326,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 			 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 			 */
 			if (bin != null) {
-				String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token=" + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
+				String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
+						+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 				src = prop.getHostAndPort() + path;
 			} else if (url != null) {
 				src = url;
 			}
-			if (src == null) continue;
+			if (src == null)
+				continue;
 			/*
 			 * I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
 			 * but the PDF engine seems to be able to smartly insert images in an attractive way arranging small

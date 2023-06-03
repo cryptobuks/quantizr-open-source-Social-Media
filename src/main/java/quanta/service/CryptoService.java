@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class CryptoService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(CryptoService.class);
 	public static final ObjectMapper mapper = new ObjectMapper();
 	public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
@@ -61,7 +61,8 @@ public class CryptoService extends ServiceBase {
 	}
 
 	public boolean nodeSigVerify(SubNode node, String sig) {
-		if (sig == null || node == null) return false;
+		if (sig == null || node == null)
+			return false;
 		PublicKey pubKey = null;
 		try {
 			// if we didn't get this as admin key we'll be generating the key
@@ -73,10 +74,12 @@ public class CryptoService extends ServiceBase {
 					return false;
 				}
 				String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-				// log.debug("*************** (verify) Setting key on user nodeId: " + ownerAccntNode.getIdStr() + " to "
-				// 		+ pubKeyJson);
+				// log.debug("*************** (verify) Setting key on user nodeId: " + ownerAccntNode.getIdStr() + "
+				// to "
+				// + pubKeyJson);
 				if (pubKeyJson == null) {
-					log.debug("User Account didn\'t have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr() + " They own nodeId=" + node.getIdStr());
+					log.debug("User Account didn\'t have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr() + " They own nodeId="
+							+ node.getIdStr());
 					return false;
 				} else {
 					// log.debug("Verifying with key: " + pubKeyJson);
@@ -90,7 +93,8 @@ public class CryptoService extends ServiceBase {
 			String strToSign = getNodeSigData(node);
 			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
 			// if (!verified) {
-			// 	log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
+			// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " +
+			// sig);
 			// }
 			return verified;
 		} catch (Exception e) {
@@ -202,8 +206,9 @@ public class CryptoService extends ServiceBase {
 			return;
 		}
 		// query all nodes under the path that are owned by 'ms'
-		Criteria criteria =  //
-		Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())).and(SubNode.OWNER).is(ms.getUserNodeId());
+		Criteria criteria = //
+				Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())).and(SubNode.OWNER)
+						.is(ms.getUserNodeId());
 		Val<NodeSigPushInfo> pushInfo = new Val<>();
 		Query query = new Query();
 		query.addCriteria(criteria);
@@ -216,7 +221,8 @@ public class CryptoService extends ServiceBase {
 		BooleanVal failed = new BooleanVal();
 		ops.stream(query, SubNode.class).forEachRemaining(node -> {
 			// make sure session is still alive
-			if (failed.getVal() || !sc.isLive()) return;
+			if (failed.getVal() || !sc.isLive())
+				return;
 			// create new push object lazily
 			if (pushInfo.getVal() == null) {
 				pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
@@ -236,7 +242,8 @@ public class CryptoService extends ServiceBase {
 			}
 		});
 		// make sure session is still alive
-		if (failed.getVal() || !sc.isLive()) return;
+		if (failed.getVal() || !sc.isLive())
+			return;
 		// send the accumulated remainder
 		if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
 			// log.debug("REMAIN: " + XString.prettyPrint(pushInfo));
@@ -244,9 +251,11 @@ public class CryptoService extends ServiceBase {
 				failed.setVal(true);
 			}
 			// make sure session is still alive
-			if (failed.getVal() || !sc.isLive()) return;
+			if (failed.getVal() || !sc.isLive())
+				return;
 		}
-		push.sendServerPushInfo(sc, new PushPageMessage("SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.", true));
+		push.sendServerPushInfo(sc, new PushPageMessage(
+				"SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.", true));
 	}
 
 	// This method pushes data down to the browser to be signed and waits for the reply here.

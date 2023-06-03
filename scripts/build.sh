@@ -27,7 +27,7 @@ cd ${PRJROOT}/pom/common
 # mvn install javadoc:javadoc 
 
 # build without apidocs
-# WARNING: This pom.xml is in common and is SEPARATE and just a way
+# WARNING: This pom.xml (in common folder) and is SEPARATE and just a way
 # to simplify the POMs by separately installing all the common stuff
 # from this common pom. Both POMS are necessary!
 echo "mvn install the /pom/common/pom.xml into repo"

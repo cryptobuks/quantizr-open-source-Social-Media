@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class PushService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(PushService.class);
 	static final int MAX_FEED_ITEMS = 25;
 
@@ -46,7 +46,8 @@ public class PushService extends ServiceBase {
 					continue;
 				}
 				/* Anonymous sessions won't have userName and can be ignored */
-				if (sc.getUserName() == null) continue;
+				if (sc.getUserName() == null)
+					continue;
 				/*
 				 * push if the sc user is in the shared set or this session is OURs
 				 * 
@@ -56,13 +57,13 @@ public class PushService extends ServiceBase {
 				 * we only live-push messages to the browser that created them (the guy who did the save), and the
 				 * people a node is specifically shared to.
 				 */
-				if (sc.getRootId().equals(node.getOwner().toHexString()) ||  // node owned by this 'sc' user
+				if (sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
 				// usersSharedToSet.contains("public") ||
-				usersSharedToSet.contains(sc.getUserName())) {
+						usersSharedToSet.contains(sc.getUserName())) {
 					/* build our push message payload */
-					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false,  //
-					Convert.LOGICAL_ORDINAL_IGNORE, false, false, true,  //
-					false, true, true, null, false);
+					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, //
+							Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, //
+							false, true, true, null, false);
 					if (info != null) {
 						FeedPushInfo pushInfo = new FeedPushInfo(info);
 						// push notification message to browser
@@ -84,7 +85,8 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null) continue;
+			if (sc.getUserName() == null)
+				continue;
 			// log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" +
 			// sc.getUserName() + " token="
 			// + sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
@@ -92,7 +94,8 @@ public class PushService extends ServiceBase {
 			// the watching path
 			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
 				/* build our push message payload */
-				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, false, true, true, null, false);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
+						false, true, false, true, true, null, false);
 				if (info != null) {
 					FeedPushInfo pushInfo = new FeedPushInfo(info);
 					// push notification message to browser
@@ -110,7 +113,8 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 			/* Anonymous sessions can be ignored */
-			if (sc.getUserName() == null) continue;
+			if (sc.getUserName() == null)
+				continue;
 			/*
 			 * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
 			 * node and therefore will be sent to their respecitve browsers
@@ -126,7 +130,8 @@ public class PushService extends ServiceBase {
 	@PerfMon(category = "push")
 	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
-		if (sc == null) return;
+		if (sc == null)
+			return;
 		exec.run(() -> {
 			SseEmitter pushEmitter = sc.getPushEmitter();
 			/*
@@ -136,20 +141,20 @@ public class PushService extends ServiceBase {
 			synchronized (pushEmitter) {
 				// log.debug("Pushing to User: " + sc.getUserName());
 				try {
-					SseEventBuilder event =  //
-					//
-					//
-					SseEmitter.event().data(info).id(String.valueOf(info.hashCode())).name(info.getType());
+					SseEventBuilder event = //
+							//
+							//
+							SseEmitter.event().data(info).id(String.valueOf(info.hashCode())).name(info.getType());
 					pushEmitter.send(event);
 				} catch (
 				/*
-					 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-					 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-					 * and let the 'name' in the builder route different objects to different event listeners on the
-					 * client. Not really sure if either approach has major advantages over the other.
-					 * 
-					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-					 */
+				 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+				 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+				 * and let the 'name' in the builder route different objects to different event listeners on the
+				 * client. Not really sure if either approach has major advantages over the other.
+				 * 
+				 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
+				 */
 				Exception ex) {
 					log.error("FAILED Pushing to Session User: " + sc.getUserName());
 					pushEmitter.completeWithError(ex);

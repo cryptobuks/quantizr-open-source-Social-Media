@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSFiles extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSFiles.class);
     public static String API_FILES;
 
@@ -70,10 +70,12 @@ public class IPFSFiles extends ServiceBase {
         ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
     }
 
-    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType, Val<Integer> streamSize) {
+    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
+            Val<Integer> streamSize) {
         checkIpfs();
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
-        return ipfs.writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null, streamSize);
+        return ipfs.writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
+                null, streamSize);
     }
 
     public IPFSDirStat pathStat(String path) {
@@ -157,7 +159,8 @@ public class IPFSFiles extends ServiceBase {
         String mfsPath = req.getFolder() == null ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
         // opps, not a path
-        if (!mfsPath.startsWith("/")) return null;
+        if (!mfsPath.startsWith("/"))
+            return null;
         IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
         if (pathStat != null) {
             cid.setVal(pathStat.getHash());

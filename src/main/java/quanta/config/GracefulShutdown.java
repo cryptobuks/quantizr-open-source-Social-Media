@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
-    
+
     private static Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
     @Autowired
@@ -50,10 +50,12 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
         if (executor instanceof ThreadPoolExecutor) {
             try {
                 ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
-                log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class=" + executor.getClass().getName());
+                log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class="
+                        + executor.getClass().getName());
                 threadPoolExecutor.shutdown();
                 if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    log.warn("Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
+                    log.warn(
+                            "Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
                 }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();

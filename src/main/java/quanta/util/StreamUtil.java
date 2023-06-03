@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StreamUtil {
-	
+
 	private static Logger log = LoggerFactory.getLogger(StreamUtil.class);
 
 	public static void close(Object... objects) {

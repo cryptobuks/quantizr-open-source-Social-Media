@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * lines, strip, stripLeading, stripTrailing, and repeat.
  */
 public class XString {
-	
+
 	private static Logger log = LoggerFactory.getLogger(XString.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -39,7 +39,8 @@ public class XString {
 	private static ObjectWriter jsonCompactWriter = jsonMapper.writer();
 
 	public static String prettyPrint(Object obj) {
-		if (obj == null) return "null";
+		if (obj == null)
+			return "null";
 		if (obj instanceof String) {
 			return (String) obj;
 		}
@@ -51,7 +52,8 @@ public class XString {
 	}
 
 	public static String compactPrint(Object obj) {
-		if (obj == null) return "null";
+		if (obj == null)
+			return "null";
 		if (obj instanceof String) {
 			return (String) obj;
 		}
@@ -82,7 +84,8 @@ public class XString {
 	}
 
 	public static String repeatingTrimFromFront(String val, String prefix) {
-		if (val == null) return null;
+		if (val == null)
+			return null;
 		int loopSafe = 0;
 		while (++loopSafe < 1000) {
 			int len = val.length();
@@ -96,7 +99,8 @@ public class XString {
 	}
 
 	public static List<String> tokenizeWithDelims(String val, String delimiter) {
-		if (val == null) return null;
+		if (val == null)
+			return null;
 		List<String> list = null;
 		StringTokenizer t = new StringTokenizer(val, delimiter, true);
 		while (t.hasMoreTokens()) {
@@ -109,7 +113,8 @@ public class XString {
 	}
 
 	public static List<String> tokenize(String val, String delimiter, boolean trim) {
-		if (val == null) return null;
+		if (val == null)
+			return null;
 		List<String> list = null;
 		StringTokenizer t = new StringTokenizer(val, delimiter, false);
 		while (t.hasMoreTokens()) {
@@ -159,19 +164,23 @@ public class XString {
 				break;
 			}
 		}
-		if (c != ' ') return 0;
+		if (c != ' ')
+			return 0;
 		return idx;
 	}
 
 	public static boolean isMarkdownHeading(String val) {
-		if (val == null) return false;
+		if (val == null)
+			return false;
 		int level = getHeadingLevel(val);
 		return level >= 1 && level <= 6;
 	}
 
 	public static String trimToMaxLen(String val, int maxLen) {
-		if (val == null) return null;
-		if (val.length() <= maxLen) return val;
+		if (val == null)
+			return null;
+		if (val.length() <= maxLen)
+			return val;
 		return val.substring(0, maxLen - 1);
 	}
 
@@ -193,7 +202,8 @@ public class XString {
 
 	/* Truncates after delimiter including truncating the delimiter */
 	public static String truncAfterFirst(String text, String delim) {
-		if (text == null) return null;
+		if (text == null)
+			return null;
 		int idx = text.indexOf(delim);
 		if (idx != -1) {
 			text = text.substring(0, idx);
@@ -209,7 +219,8 @@ public class XString {
 	}
 
 	public static String stripIfStartsWith(String val, String prefix) {
-		if (val == null) return val;
+		if (val == null)
+			return val;
 		if (val.startsWith(prefix)) {
 			val = val.substring(prefix.length());
 		}
@@ -221,7 +232,8 @@ public class XString {
 	}
 
 	public static String truncAfterLast(String text, String delim) {
-		if (text == null) return null;
+		if (text == null)
+			return null;
 		int idx = text.lastIndexOf(delim);
 		if (idx != -1) {
 			text = text.substring(0, idx);
@@ -230,7 +242,8 @@ public class XString {
 	}
 
 	public static String parseAfterLast(String text, String delim) {
-		if (text == null) return null;
+		if (text == null)
+			return null;
 		int idx = text.lastIndexOf(delim);
 		if (idx != -1) {
 			text = text.substring(idx + delim.length());
@@ -254,7 +267,8 @@ public class XString {
 	 * input: abc--file.txt, -- output: file.txt
 	 */
 	public String truncBefore(String fileName, String delims) {
-		if (fileName == null) return null;
+		if (fileName == null)
+			return null;
 		String ret = null;
 		int idx = fileName.indexOf(delims);
 		if (idx != -1) {
@@ -270,7 +284,8 @@ public class XString {
 	 * input: abc--file.txt, . output: abc--file
 	 */
 	public String truncAfter(String fileName, String delims) {
-		if (fileName == null) return null;
+		if (fileName == null)
+			return null;
 		String ret = null;
 		int idx = fileName.lastIndexOf(delims);
 		if (idx != -1) {
@@ -286,7 +301,8 @@ public class XString {
 	 * input: /home/clay/path/file.txt output: /home/clay/path
 	 */
 	public String getPathPart(String fileName) {
-		if (fileName == null) return null;
+		if (fileName == null)
+			return null;
 		String pathPart = null;
 		int idx = fileName.lastIndexOf(File.separatorChar);
 		if (idx != -1) {
@@ -299,9 +315,11 @@ public class XString {
 	}
 
 	public static boolean containsNonEnglish(String s) {
-		if (s == null || s.length() == 0) return false;
+		if (s == null || s.length() == 0)
+			return false;
 		for (int i = 0; i < s.length(); i++) {
-			if ((int) s.charAt(i) >= 128) return true;
+			if ((int) s.charAt(i) >= 128)
+				return true;
 		}
 		return false;
 	}

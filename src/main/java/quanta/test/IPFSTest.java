@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 @Component("IPFSTest")
 public class IPFSTest extends ServiceBase implements TestIntf {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSTest.class);
 
     @Override
@@ -71,15 +71,15 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
             // The line above will print something like this:
             // {
-            //     "Name" : "k51qzi5uqu5dkvzwaur63dwcvl49faobfu5wehnhgprr40sd91ut1quiwhg7fa",
-            //     "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // "Name" : "k51qzi5uqu5dkvzwaur63dwcvl49faobfu5wehnhgprr40sd91ut1quiwhg7fa",
+            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
             // }
             String ipnsName = (String) ret.get("Name");
             ret = ipfsName.resolve(as, ipnsName);
             log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
             // Resolve will print something like this:
             // {
-            //     "Path" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // "Path" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
             // }
             // verify = ipfs.dagGet(ipnsName);
             // log.debug("verifyIPNS!: " + verify);

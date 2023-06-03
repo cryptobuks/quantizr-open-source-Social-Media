@@ -37,11 +37,11 @@ import org.slf4j.LoggerFactory;
  * org.springframework.stereotype.Component;
  */
 // NOTE : To disable the instrumentation, just comment these two annotations
-//        Adding these annotations is all you need to enable it.
+// Adding these annotations is all you need to enable it.
 // @Aspect
 // @Component
 public class Instrument {
-	
+
 	private static Logger log = LoggerFactory.getLogger(Instrument.class);
 	public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
 	private static final int MAX_EVENTS = 10000;
@@ -88,8 +88,8 @@ public class Instrument {
 			Method method = signature.getMethod();
 			PerfMon annotation = method.getAnnotation(PerfMon.class);
 			if (duration > CAPTURE_THRESHOLD) {
-				new PerfMonEvent(duration, annotation.category().equals("") ? signature.getName() :  //
-				(annotation.category() + "." + signature.getName()), userName);
+				new PerfMonEvent(duration, annotation.category().equals("") ? signature.getName() : //
+						(annotation.category() + "." + signature.getName()), userName);
 			}
 		}
 		return value;

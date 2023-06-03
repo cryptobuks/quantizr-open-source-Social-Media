@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSDag extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(IPFSDag.class);
     public static String API_DAG;
 
@@ -40,7 +40,8 @@ public class IPFSDag extends ServiceBase {
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
             log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {
@@ -68,7 +69,8 @@ public class IPFSDag extends ServiceBase {
             return null;
         }
         // oops, looks like a path
-        if (req.getFolder().startsWith("/")) return null;
+        if (req.getFolder().startsWith("/"))
+            return null;
         cid.setVal(req.getFolder());
         folder.setVal(req.getFolder());
         DagNode dagNode = getNode(req.getFolder());
@@ -79,7 +81,7 @@ public class IPFSDag extends ServiceBase {
                 me.setName(entry.getName());
                 me.setHash(entry.getHash().getPath());
                 me.setSize(entry.getTsize());
-                me.setType(-1); //entry.getType());
+                me.setType(-1); // entry.getType());
                 files.add(me);
             }
         }

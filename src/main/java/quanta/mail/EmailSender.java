@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class EmailSender extends ServiceBase implements TransportListener {
-	
+
 	private static Logger log = LoggerFactory.getLogger(EmailSender.class);
 	@Autowired
 	private AppProp appProp;
@@ -45,7 +45,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	 * mail is sent
 	 */
 	public void init() {
-		if (!mailEnabled()) return;
+		if (!mailEnabled())
+			return;
 		log.trace("MailSender.init()");
 		String mailHost = appProp.getMailHost();
 		String mailUser = appProp.getMailUser();
@@ -88,7 +89,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	}
 
 	public void close() {
-		if (!mailEnabled()) return;
+		if (!mailEnabled())
+			return;
 		if (transport != null) {
 			try {
 				log.trace("closing transport");
@@ -102,7 +104,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	}
 
 	public void sendMail(String sendToAddress, String fromAddress, String content, String subjectLine) {
-		if (!mailEnabled()) return;
+		if (!mailEnabled())
+			return;
 		if (fromAddress == null) {
 			fromAddress = appProp.getMailFrom();
 		}

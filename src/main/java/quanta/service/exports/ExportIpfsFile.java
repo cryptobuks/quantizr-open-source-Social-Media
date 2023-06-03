@@ -14,12 +14,15 @@ public class ExportIpfsFile {
     public String getFileName() {
         return fileName;
     }
+
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
     public String getCid() {
         return cid;
     }
+
     public void setCid(String cid) {
         this.cid = cid;
     }

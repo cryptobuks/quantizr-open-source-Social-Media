@@ -12,23 +12,19 @@ public class PropertyInfo {
 		this.name = name;
 		this.value = value;
 	}
-
 	
 	public String getName() {
 		return this.name;
 	}
 
-	
 	public Object getValue() {
 		return this.value;
 	}
-
 	
 	public void setName(final String name) {
 		this.name = name;
 	}
 
-	
 	public void setValue(final Object value) {
 		this.value = value;
 	}

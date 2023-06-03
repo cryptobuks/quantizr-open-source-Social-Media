@@ -11,12 +11,10 @@ public class NewNostrUsersPushInfo extends ServerPushInfo {
 		super("newNostrUsersPush");
 		this.users = users;
 	}
-
 	
 	public List<NostrUserInfo> getUsers() {
 		return this.users;
 	}
-
 	
 	public void setUsers(final List<NostrUserInfo> users) {
 		this.users = users;

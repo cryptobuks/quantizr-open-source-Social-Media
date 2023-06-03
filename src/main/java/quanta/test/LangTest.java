@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 @Component("LangTest")
 public class LangTest extends ServiceBase implements TestIntf {
-	
+
 	private static Logger log = LoggerFactory.getLogger(LangTest.class);
 
 	@Override

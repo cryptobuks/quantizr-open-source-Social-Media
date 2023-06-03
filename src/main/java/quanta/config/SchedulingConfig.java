@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
-/** 
+/**
  * Without this config the @Scheduled annotated functions all share the same thread and the long
  * running once completely block the others and can disable things like signup processing, email
  * sending, etc.

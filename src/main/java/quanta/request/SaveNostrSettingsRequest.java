@@ -9,32 +9,26 @@ public class SaveNostrSettingsRequest extends RequestBase {
     public String key;
     // newline delimited list of relays
     public String relays;
-
     
     public String getTarget() {
         return this.target;
     }
-
     
     public String getKey() {
         return this.key;
     }
-
     
     public String getRelays() {
         return this.relays;
     }
-
     
     public void setTarget(final String target) {
         this.target = target;
     }
-
     
     public void setKey(final String key) {
         this.key = key;
     }
-
     
     public void setRelays(final String relays) {
         this.relays = relays;

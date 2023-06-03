@@ -25,17 +25,19 @@ import org.slf4j.LoggerFactory;
 @Component
 @Order(1)
 public class AuditFilter extends GenericFilterBean {
-	
+
 	private static Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
 	public static boolean enabled = false;
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		if (Const.debugRequests) {
 			log.debug("AuditFilter.doFilter()");
 		}
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
@@ -256,7 +258,8 @@ public class AuditFilter extends GenericFilterBean {
 	}
 
 	private void preProcess(HttpServletRequest sreq) {
-		if (sreq == null) return;
+		if (sreq == null)
+			return;
 		// NON-VERBOSE Logging
 		if (log.isDebugEnabled() && !log.isTraceEnabled()) {
 			StringBuilder sb = new StringBuilder();
@@ -273,7 +276,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append("]");
 			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
 			log.debug(sb.toString());
-		} else 
+		} else
 		// VERBOSE Logging
 		if (log.isTraceEnabled()) {
 			try {
@@ -296,7 +299,8 @@ public class AuditFilter extends GenericFilterBean {
 
 	private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
 		try {
-			if (sreq == null || sres == null) return;
+			if (sreq == null || sres == null)
+				return;
 			StringBuilder sb = new StringBuilder();
 			sb.append("\n<: " + String.valueOf(sres.getStatus()) + " ctyp: " + sres.getContentType() + "\n");
 			sb.append(getHeaderInfo(sres));
@@ -308,6 +312,5 @@ public class AuditFilter extends GenericFilterBean {
 		}
 	}
 
-	public void destroy() {
-	}
+	public void destroy() {}
 }

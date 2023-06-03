@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class ImportService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
@@ -35,7 +35,8 @@ public class ImportService extends ServiceBase {
 		// This is critical to be correct so we run the actual query based determination of 'hasChildren'
 		boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath(), false);
 		if (hasChildren) {
-			throw ExUtil.wrapEx("You can only import into an empty node. There are direct children under path(a): " + node.getPath());
+			throw ExUtil
+					.wrapEx("You can only import into an empty node. There are direct children under path(a): " + node.getPath());
 		}
 		/*
 		 * It's important to be sure there are absolutely no orphans at any level under this branch of the
@@ -59,7 +60,7 @@ public class ImportService extends ServiceBase {
 					ImportZipService impSvc = (ImportZipService) context.getBean(ImportZipService.class);
 					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
-				} else 
+				} else
 				// Import TAR files (non GZipped)
 				if (fileName.toLowerCase().endsWith(".tar")) {
 					log.debug("Import TAR to Node: " + node.getPath());
@@ -67,7 +68,7 @@ public class ImportService extends ServiceBase {
 					ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
 					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
-				} else 
+				} else
 				// Import TAR.GZ (GZipped TAR)
 				if (fileName.toLowerCase().endsWith(".tar.gz")) {
 					log.debug("Import TAR.GZ to Node: " + node.getPath());

@@ -12,31 +12,25 @@ public class SaveNodeRequest extends RequestBase {
 	private NostrEventWrapper nostrEvent;
 	boolean saveToActPub;
 
-	
 	public NodeInfo getNode() {
 		return this.node;
 	}
-
 	
 	public NostrEventWrapper getNostrEvent() {
 		return this.nostrEvent;
 	}
-
 	
 	public boolean isSaveToActPub() {
 		return this.saveToActPub;
 	}
-
 	
 	public void setNode(final NodeInfo node) {
 		this.node = node;
 	}
-
 	
 	public void setNostrEvent(final NostrEventWrapper nostrEvent) {
 		this.nostrEvent = nostrEvent;
 	}
-
 	
 	public void setSaveToActPub(final boolean saveToActPub) {
 		this.saveToActPub = saveToActPub;

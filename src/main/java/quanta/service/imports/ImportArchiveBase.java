@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ImportArchiveBase extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	/*
@@ -62,10 +62,11 @@ public abstract class ImportArchiveBase extends ServiceBase {
 				}
 			}
 			// if we processed the above as an attachment we're done bail out.
-			if (done.getVal()) return;
+			if (done.getVal())
+				return;
 			// HTML FILE
 			if (mimeUtil.isHtmlTypeFileName(fileName)) {
-			} else 
+			} else
 			// log.debug(" isHTML: " + fileName);
 			// we ignore the html files during import. Data will be in JSON files
 			// JSON FILE
@@ -138,19 +139,22 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
 		String attName = fileUtil.stripExtension(fileName);
 		HashMap<String, Attachment> atts = node.getAttachments();
-		if (atts == null) return false;
+		if (atts == null)
+			return false;
 		/*
 		 * note the filename in the imported JAR is the 'attName', but when we import we name the
 		 * Attachment.name back to what it originally was before the export which is in the JSON, but also
 		 * on the node we have now.
 		 */
 		Attachment att = atts.get(attName);
-		if (att == null) return false;
+		if (att == null)
+			return false;
 		Long length = att.getSize();
 		String mimeType = att.getMime();
 		LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 		// log.debug("Attaching binary to nodeId: " + node.getIdStr());
-		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false, false, true, false, true, null, false);
+		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false, false,
+				true, false, true, null, false);
 		return true;
 	}
 }

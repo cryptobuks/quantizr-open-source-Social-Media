@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 	@Autowired
 	AuditFilter auditFilter;
@@ -57,7 +57,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		//
 		//
 		//
-		web.ignoring().antMatchers(AppController.API_PATH + "/getConfig").antMatchers(AppController.API_PATH + "/login").antMatchers(AppController.API_PATH + "/bin/**").antMatchers(AppController.API_PATH + "/anonPageLoad").antMatchers(AppController.API_PATH + "/getUserProfile").antMatchers(AppController.API_PATH + "/serverPush").antMatchers("/public").antMatchers("/error").antMatchers("/");
+		web.ignoring().antMatchers(AppController.API_PATH + "/getConfig").antMatchers(AppController.API_PATH + "/login")
+				.antMatchers(AppController.API_PATH + "/bin/**").antMatchers(AppController.API_PATH + "/anonPageLoad")
+				.antMatchers(AppController.API_PATH + "/getUserProfile").antMatchers(AppController.API_PATH + "/serverPush")
+				.antMatchers("/public").antMatchers("/error").antMatchers("/");
 	}
 
 	// .authenticationEntryPoint(restAuthenticationEntryPoint)
@@ -80,9 +83,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	/*
-     * This NoOpPasswordEncoder is misleading, because we DO use HASHED passwords, but for now I'm doing
-     * the hash before passing thru to spring, so this needs to be a noop
-     */
+	 * This NoOpPasswordEncoder is misleading, because we DO use HASHED passwords, but for now I'm doing
+	 * the hash before passing thru to spring, so this needs to be a noop
+	 */
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		return NoOpPasswordEncoder.getInstance();

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 @Component
 public class SchemaOrgService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
 	public static final ObjectMapper mapper = new ObjectMapper();
 	public static HashMap<String, Object> schema = null;
@@ -49,8 +49,7 @@ public class SchemaOrgService extends ServiceBase {
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
-				schema = mapper.readValue(is, new TypeReference<HashMap<String, Object>>() {
-				});
+				schema = mapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
 				if (schema == null) {
 					log.debug("schema.org data failed to load.");
 					schema = new HashMap<>();
@@ -70,7 +69,8 @@ public class SchemaOrgService extends ServiceBase {
 
 	private void parseSchema() {
 		List graph = (List) schema.get("@graph"); // will be ArrayList<Object>
-		if (graph == null) return;
+		if (graph == null)
+			return;
 		// first scan graph to build classes
 		log.debug("Scanning Schema.org Classes.");
 		for (Object item : graph) {
@@ -79,11 +79,11 @@ public class SchemaOrgService extends ServiceBase {
 				Object type = mitem.get("@type");
 				if (type instanceof String) {
 					switch ((String) type) {
-					case "rdfs:Class": 
-						setupClass(mitem);
-						break;
-					default: 
-						break;
+						case "rdfs:Class":
+							setupClass(mitem);
+							break;
+						default:
+							break;
 					}
 				} else {
 					log.debug("unknown type: " + XString.prettyPrint(item));
@@ -99,10 +99,10 @@ public class SchemaOrgService extends ServiceBase {
 				if (type instanceof String) {
 					String stype = (String) type;
 					switch (stype) {
-					case "rdf:Property": 
-						setupProperty(mitem);
-					default: 
-						break;
+						case "rdf:Property":
+							setupProperty(mitem);
+						default:
+							break;
 					}
 				} else {
 					log.debug("unknown type: " + XString.prettyPrint(item));
@@ -144,7 +144,7 @@ public class SchemaOrgService extends ServiceBase {
 		// handle if string
 		if (label instanceof String) {
 			slabel = (String) label;
-		} else 
+		} else
 		// else try to get @value out of object
 		if (label instanceof HashMap) {
 			HashMap mlabel = (HashMap) label;
@@ -173,7 +173,7 @@ public class SchemaOrgService extends ServiceBase {
 		// handle if object
 		if (domains instanceof HashMap) {
 			setupDomainObj(sop, prop, domains);
-		} else 
+		} else
 		// handle of list
 		if (domains instanceof List) {
 			List ldomains = (List) domains;
@@ -182,7 +182,7 @@ public class SchemaOrgService extends ServiceBase {
 					setupDomainObj(sop, prop, domain);
 				}
 			}
-		} else 
+		} else
 		// else warning
 		{
 			log.debug("unable to get domainIncludes from " + XString.prettyPrint(prop));
@@ -196,7 +196,7 @@ public class SchemaOrgService extends ServiceBase {
 		// handle if object
 		if (ranges instanceof HashMap) {
 			setupRangeObj(sop, prop, ranges);
-		} else 
+		} else
 		// handle of list
 		if (ranges instanceof List) {
 			List lranges = (List) ranges;
@@ -205,7 +205,7 @@ public class SchemaOrgService extends ServiceBase {
 					setupRangeObj(sop, prop, range);
 				}
 			}
-		} else 
+		} else
 		// else warning
 		{
 			log.debug("unable to get domainIncludes from " + XString.prettyPrint(prop));

@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class SystemService extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(SystemService.class);
 	long lastNostrQueryTime = 0L;
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
@@ -138,7 +138,8 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		if (!prop.ipfsEnabled()) return "IPFS Disabled.";
+		if (!prop.ipfsEnabled())
+			return "IPFS Disabled.";
 		String ret = ipfsRepo.gc();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
@@ -153,11 +154,11 @@ public class SystemService extends ServiceBase {
 	// metadata: <boolean> // Optional, added in MongoDB 5.0.4
 	// })
 	public String validateDb() {
-		String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,  //
-		//
-		new Document("validate", "nodes").append("full", true));
-		ret += "\n\ndbStats: " + runMongoDbCommand(MongoAppConfig.databaseName,  //
-		new Document("dbStats", 1).append("scale", 1024));
+		String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName, //
+				//
+				new Document("validate", "nodes").append("full", true));
+		ret += "\n\ndbStats: " + runMongoDbCommand(MongoAppConfig.databaseName, //
+				new Document("dbStats", 1).append("scale", 1024));
 		ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
 		if (prop.ipfsEnabled()) {
 			ret += ipfsRepo.verify();
@@ -293,8 +294,8 @@ public class SystemService extends ServiceBase {
 		headers.setContentType(APConst.MTYPE_JSON);
 		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
 		String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
-		ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<NostrEvent>>() {
-		});
+		ResponseEntity<List<NostrEvent>> response =
+				restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<NostrEvent>>() {});
 		IntVal saveCount = new IntVal(0);
 		HashSet<String> accountNodeIds = new HashSet<>();
 		List<String> eventNodeIds = new ArrayList<>();
@@ -308,7 +309,8 @@ public class SystemService extends ServiceBase {
 			}
 			return null;
 		});
-		return "NostrQueryUpdate: relays=" + relayList.size() + " people=" + authors.size() + " eventCount=" + eventCount + " newCount=" + saveCount.getVal();
+		return "NostrQueryUpdate: relays=" + relayList.size() + " people=" + authors.size() + " eventCount=" + eventCount
+				+ " newCount=" + saveCount.getVal();
 	}
 
 	// For now this is for server restart notify, but will eventually be a general broadcast messenger.
@@ -319,7 +321,10 @@ public class SystemService extends ServiceBase {
 			HttpSession httpSess = ThreadLocals.getHttpSession();
 			log.debug("Send admin note to: " + sc.getUserName() + " sessId: " + httpSess.getId());
 			// need custom messages support pushed by admin
-			push.sendServerPushInfo(sc, new PushPageMessage("Server " + prop.getMetaHost() + "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.", true));
+			push.sendServerPushInfo(sc,
+					new PushPageMessage("Server " + prop.getMetaHost()
+							+ "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.",
+							true));
 			sessionCount++;
 		}
 		return String.valueOf(sessionCount) + " sessions notified.";

@@ -99,7 +99,7 @@ import org.slf4j.LoggerFactory;
  * not execute, becuase it won't ge called thru a proxy.
  */
 public class ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(ServiceBase.class);
 	@Autowired
 	public AppProp prop;

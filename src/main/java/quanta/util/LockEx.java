@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LockEx extends ReentrantLock {
-	
+
 	private static Logger log = LoggerFactory.getLogger(LockEx.class);
 	private boolean allowRetries = true;
 	/* Initial wait before logging something (in seconds). */
@@ -72,7 +72,8 @@ public class LockEx extends ReentrantLock {
 					logDeadlockWarning();
 					warningShown = true;
 					if (abortWhenDeadlockSuspected) {
-						throw new RuntimeEx("Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock " + lockName + " which was held by thread " + getOwner().getName());
+						throw new RuntimeEx("Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock "
+								+ lockName + " which was held by thread " + getOwner().getName());
 					}
 				}
 				try {
@@ -81,7 +82,7 @@ public class LockEx extends ReentrantLock {
 					}
 				} catch (
 				// log.trace("finally GOT LOCK: " + lockName + ". Waited " + totalWaitTime + " ms.\nSTACK: "
-				// 		+ getStackTrace(null));
+				// + getStackTrace(null));
 				Exception e) {
 					success = false;
 				}
@@ -111,7 +112,8 @@ public class LockEx extends ReentrantLock {
 		try {
 			// ALog.printStackTrace("unlocking");
 			if (!isHeldByCurrentThread()) {
-				log.trace("impossible unlock call being ignored. thread " + Thread.currentThread().getName() + " not holding lock " + lockName);
+				log.trace("impossible unlock call being ignored. thread " + Thread.currentThread().getName()
+						+ " not holding lock " + lockName);
 				return;
 			}
 			super.unlock();
