@@ -6,7 +6,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const isProduction = process.argv[process.argv.indexOf("--mode") + 1] === "production";
 const env = isProduction ? "prod" : "dev";
 
-console.log("TARGET ENV: " + env);
+console.log("Webpack Build: " + env);
 
 function formatDate(date) {
     let hours = date.getHours();

@@ -1,6 +1,7 @@
 
 package quanta.service.nostr;
 
+import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.cxf.common.util.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.query.Criteria;
