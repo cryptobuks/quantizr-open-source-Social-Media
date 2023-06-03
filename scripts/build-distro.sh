@@ -103,7 +103,7 @@ cp ${SCRIPTS}/tools/restore.sh          ${DEPLOY_TARGET}
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
 cd ${TARGET_PARENT}
 
-tar -zcvf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
+tar -zcf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
 #NOTE: Extraction command will be: `tar vxf quanta1.0.3.tar.gz`
 verifySuccess "TAR create: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
 

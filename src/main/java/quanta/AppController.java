@@ -174,11 +174,13 @@ import org.slf4j.LoggerFactory;
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
 	private static Logger log = LoggerFactory.getLogger(AppController.class);
-	
+
 	@Autowired
 	private ActPubLog apLog;
+
 	@Autowired
 	private GracefulShutdown gracefulShutdown;
+
 	public static final String API_PATH = "/mobile/api";
 	/*
 	 * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -226,26 +228,26 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@RequestMapping({"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
-	// =======================================================================================
-	/* PATH PARAMS */
-	// node name on 'admin' account. Non-admin named nodes use url
-	// "/u/userName/nodeName"
-	@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode,  //
-	@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode,  //
-	@PathVariable(value = "userName", required = false) String userName,  //
-	// =======================================================================================
-	/* REQUEST PARAMS */
-	@RequestParam(value = "id", required = false) String id,  //
-	@RequestParam(value = "nostrId", required = false) String nostrId,  //
-	@RequestParam(value = "refNodeId", required = false) String refNodeId,  //
-	// be careful removing this, clicking on a node updates the browser history to
-	// an 'n=' style url if this node is named
-	// so we will need to change that to the path format.
-	@RequestParam(value = "n", required = false) String name,  //
-	@RequestParam(value = "passCode", required = false) String passCode,  //
-	@RequestParam(value = "signupCode", required = false) String signupCode,  //
-	HttpSession session,  //
-	Model model) {
+			// =======================================================================================
+			/* PATH PARAMS */
+			// node name on 'admin' account. Non-admin named nodes use url
+			// "/u/userName/nodeName"
+			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
+			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
+			@PathVariable(value = "userName", required = false) String userName, //
+			// =======================================================================================
+			/* REQUEST PARAMS */
+			@RequestParam(value = "id", required = false) String id, //
+			@RequestParam(value = "nostrId", required = false) String nostrId, //
+			@RequestParam(value = "refNodeId", required = false) String refNodeId, //
+			// be careful removing this, clicking on a node updates the browser history to
+			// an 'n=' style url if this node is named
+			// so we will need to change that to the path format.
+			@RequestParam(value = "n", required = false) String name, //
+			@RequestParam(value = "passCode", required = false) String passCode, //
+			@RequestParam(value = "signupCode", required = false) String signupCode, //
+			HttpSession session, //
+			Model model) {
 		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
@@ -254,7 +256,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			boolean isHomeNodeRequest = false;
 			if (nostrId != null) {
 				id = "." + nostrId;
-			} else 
+			} else
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
 				if ("home".equalsIgnoreCase(nameOnUserNode)) {
@@ -341,8 +343,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@PerfMon
 	@RequestMapping({"/demo/{file}"})
-	public String demo(@PathVariable(value = "file", required = false) String file,  //
-	Model model) {
+	public String demo(@PathVariable(value = "file", required = false) String file, //
+			Model model) {
 		model.addAllAttributes(getThymeleafAttribs());
 		return "demo/" + file;
 	}
@@ -396,9 +398,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * todo-2: need a 'useCache' url param option
 	 */
 	@GetMapping({"/proxyGet"})
-	public void proxyGet(@RequestParam(value = "url", required = true) String url,  //
-	HttpSession session, HttpServletResponse response) //
-	{
+	public void proxyGet(@RequestParam(value = "url", required = true) String url, //
+			HttpSession session, HttpServletResponse response) {
 		callProc.run("proxyGet", true, true, null, session, ms -> {
 			try {
 				// try to get proxy info from cache.
@@ -409,8 +410,9 @@ public class AppController extends ServiceBase implements ErrorController {
 				if (cacheBytes != null) {
 					// limiting the stream just because for now this is only used in feed
 					// processing, and 5MB is plenty
-					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB), response.getOutputStream());
-				} else 
+					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
+							response.getOutputStream());
+				} else
 				// not in cache then read and update cache
 				{
 					ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
@@ -497,8 +499,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/renderCalendar", method = RequestMethod.POST)
 	@ResponseBody
-	public Object renderCalendarNodes(@RequestBody RenderCalendarRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("renderCalendar", true, true, req, session, ms -> {
 			return render.renderCalendar(ms, req);
 		});
@@ -506,8 +508,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/likeNode", method = RequestMethod.POST)
 	@ResponseBody
-	public Object likeNode(@RequestBody LikeNodeRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object likeNode(@RequestBody LikeNodeRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("likeNode", false, false, req, session, ms -> {
 			return edit.likeNode(ms, req);
@@ -516,8 +518,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
 	@ResponseBody
-	public Object loadActPubObject(@RequestBody GetActPubObjectRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object loadActPubObject(@RequestBody GetActPubObjectRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("loadActPubObject", true, true, req, session, ms -> {
 			NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
 			GetActPubObjectResponse res = new GetActPubObjectResponse();
@@ -547,8 +549,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
 	@ResponseBody
-	public Object renderNode(@RequestBody RenderNodeRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object renderNode(@RequestBody RenderNodeRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("renderNode", false, false, req, session, ms -> {
 			return render.renderNode(ms, req);
@@ -557,8 +559,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getIPFSFiles", method = RequestMethod.POST)
 	@ResponseBody
-	public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getIPFSFiles", false, false, req, session, ms -> {
@@ -568,7 +570,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			// Get files using MFS
 			if (req.getFolder() == null || req.getFolder().startsWith("/")) {
 				files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
-			} else 
+			} else
 			// Get files using DAG
 			{
 				files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
@@ -583,8 +585,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
 	@ResponseBody
-	public Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		checkIpfs();
 		return callProc.run("deleteMFSFile", false, false, req, session, ms -> {
@@ -596,8 +598,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getIPFSContent", method = RequestMethod.POST)
 	@ResponseBody
-	public Object getIPFSContent(@RequestBody GetIPFSContentRequest req,  //
-	HttpServletRequest httpReq, HttpSession session) {
+	public Object getIPFSContent(@RequestBody GetIPFSContentRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
 		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getIPFSContent", false, false, req, session, ms -> {
@@ -732,7 +734,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			 */
 			arun.run(as -> {
 				SubNode node = read.getNode(as, req.getNodeId());
-				if (node == null) throw new RuntimeException("Node not found: " + req.getNodeId());
+				if (node == null)
+					throw new RuntimeException("Node not found: " + req.getNodeId());
 				if (!auth.ownedByThreadUser(node)) {
 					throw new RuntimeException("You can only export nodes you own");
 				}
@@ -741,7 +744,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
 				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);
-			} else  //
+			} else //
 			// ================================================
 			// DO NOT DELETE (YET)
 			// I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this
@@ -766,7 +769,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				}
 				ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
-			} else  //
+			} else //
 			if ("tar".equalsIgnoreCase(req.getExportExt())) {
 				if (req.isToIpfs()) {
 					res.setMessage("Export of TAR to IPFS not yet available.");
@@ -774,7 +777,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				}
 				ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
 				svc.export(ms, req, res);
-			} else  //
+			} else //
 			if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
 				if (req.isToIpfs()) {
 					res.setMessage("Export of TAR.GZ to IPFS not yet available.");
@@ -783,7 +786,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);
-			} else  //
+			} else //
 			{
 				throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
 			}
@@ -836,8 +839,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
 	@ResponseBody
 	public Object streamImport(//
-	@RequestParam(value = "nodeId", required = true) String nodeId,  //
-	@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
+			@RequestParam(value = "nodeId", required = true) String nodeId, //
+			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
 		return callProc.run("streamImport", true, true, null, session, ms -> {
 			return importService.streamImport(ms, nodeId, uploadFiles);
 		});
@@ -914,8 +917,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		return callProc.run("updateHeadings", true, true, req, session, ms -> {
 			edit.updateHeadings(ms, req.getNodeId());
 			UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-			res.setSuccess(true);
-			;
+			res.setSuccess(true);;
 			return res;
 		});
 	}
@@ -1004,22 +1006,22 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@RequestMapping({"/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}"})
 	public void attachment(//
-	// node name on 'admin' account. Non-admin named nodes use url
-	// "/u/userName/nodeName"
-	@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode,  //
-	@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode,  //
-	@PathVariable(value = "userName", required = false) String userName,  //
-	@PathVariable(value = "id", required = false) String id,  //
-	@RequestParam(value = "download", required = false) String download,  //
-	// gid is used ONLY for cache bustring so it can be the IPFS hash -or- the
-	// gridId, we don't know or care which it is.
-	@RequestParam(value = "gid", required = false) String gid,  //
-	// attachment name for retrieving from a multiple attachment node, and if omitted
-	// defaults to "p" (primary)
-	@RequestParam(value = "att", required = false) String attName,  //
-	HttpSession session,  //
-	HttpServletRequest req,  //
-	HttpServletResponse response) {
+			// node name on 'admin' account. Non-admin named nodes use url
+			// "/u/userName/nodeName"
+			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
+			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
+			@PathVariable(value = "userName", required = false) String userName, //
+			@PathVariable(value = "id", required = false) String id, //
+			@RequestParam(value = "download", required = false) String download, //
+			// gid is used ONLY for cache bustring so it can be the IPFS hash -or- the
+			// gridId, we don't know or care which it is.
+			@RequestParam(value = "gid", required = false) String gid, //
+			// attachment name for retrieving from a multiple attachment node, and if omitted
+			// defaults to "p" (primary)
+			@RequestParam(value = "att", required = false) String attName, //
+			HttpSession session, //
+			HttpServletRequest req, //
+			HttpServletResponse response) {
 		try {
 			if (StringUtils.isEmpty(attName)) {
 				attName = Constant.ATTACHMENT_PRIMARY.s();
@@ -1094,23 +1096,23 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
-	public void getBinary(@PathVariable("binId") String binId,  //
-	@RequestParam(value = "nodeId", required = false) String nodeId,  //
-	/*
+	public void getBinary(@PathVariable("binId") String binId, //
+			@RequestParam(value = "nodeId", required = false) String nodeId, //
+			/*
 			 * In the file exports where this is appended, we could have appended just nodeId and it would also
 			 * work but be a bit slower as that would look up the node rather than streaming straight out of
 			 * IPFS.
 			 */
-	@RequestParam(value = "cid", required = false) String ipfsCid,  //
-	/*
+			@RequestParam(value = "cid", required = false) String ipfsCid, //
+			/*
 			 * The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
 			 * it's generated from HTML intermediate file what has all the links in it for accessing binary
 			 * content, and as the PDF is being generated calls are made to this endpoint for each image, or
 			 * other file so we use the token to auth the request
 			 */
-	@RequestParam(value = "token", required = false) String token,  //
-	@RequestParam(value = "download", required = false) String download,  //
-	HttpSession session, HttpServletResponse response) {
+			@RequestParam(value = "token", required = false) String token, //
+			@RequestParam(value = "download", required = false) String download, //
+			HttpSession session, HttpServletResponse response) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		if (token == null) {
 			// Check if this is an 'avatar' request and if so bypass security
@@ -1119,14 +1121,14 @@ public class AppController extends ServiceBase implements ErrorController {
 					attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null, response);
 					return null;
 				});
-			} else 
+			} else
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			if ("profileHeader".equals(binId)) {
 				arun.run(as -> {
 					attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null, response);
 					return null;
 				});
-			} else 
+			} else
 			/* Else if not an avatar request then do a secure acccess */
 			{
 				callProc.run("bin", false, false, null, session, ms -> {
@@ -1157,11 +1159,11 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
 	public void getFile(//
-	@PathVariable("fileName") String fileName,  //
-	@RequestParam(name = "disp", required = false) String disposition,  //
-	@RequestParam(name = "token", required = true) String token,  //
-	HttpSession session,  //
-	HttpServletResponse response) {
+			@PathVariable("fileName") String fileName, //
+			@RequestParam(name = "disp", required = false) String disposition, //
+			@RequestParam(name = "token", required = true) String token, //
+			HttpSession session, //
+			HttpServletResponse response) {
 		if (SessionContext.getSCByToken(token) == null) {
 			throw new RuntimeException("Invalid token.");
 		}
@@ -1194,9 +1196,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
 	public Object getFileSystemResourceStream(//
-	@PathVariable("nodeId") String nodeId,  //
-	@RequestParam(name = "disp", required = false) String disposition,  //
-	HttpSession session) {
+			@PathVariable("nodeId") String nodeId, //
+			@RequestParam(name = "disp", required = false) String disposition, //
+			HttpSession session) {
 		return callProc.run("filesys", false, false, null, session, ms -> {
 			// return attachmentService.getFileSystemResourceStream(ms, nodeId,
 			// disposition);
@@ -1216,13 +1218,13 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
 	public ResponseEntity<ResourceRegion> streamMultiPart(//
-	@PathVariable("fileName") String fileName,  //
-	@RequestParam("nodeId") String nodeId,  //
-	@RequestParam(name = "disp", required = false) final String disp,  //
-	@RequestHeader HttpHeaders headers,  //
-	HttpServletRequest request,  //
-	HttpServletResponse response,  //
-	HttpSession session) {
+			@PathVariable("fileName") String fileName, //
+			@RequestParam("nodeId") String nodeId, //
+			@RequestParam(name = "disp", required = false) final String disp, //
+			@RequestHeader HttpHeaders headers, //
+			HttpServletRequest request, //
+			HttpServletResponse response, //
+			HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return (ResponseEntity<ResourceRegion>) callProc.run("stream", false, false, null, session, ms -> {
 			return attach.getStreamResource(ms, headers, nodeId);
@@ -1246,8 +1248,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/parseFiles", method = RequestMethod.POST)
 	@ResponseBody
 	public Object parseFiles(//
-	@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,  //
-	HttpSession session) {
+			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
+			HttpSession session) {
 		return callProc.run("parseFiles", true, true, null, session, ms -> {
 			// log.debug("Parsing as user: "+ms.getUser());
 			return attach.parseUploadFiles(ms, uploadFiles);
@@ -1257,18 +1259,18 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	@ResponseBody
 	public Object upload(//
-	@RequestParam(value = "nodeId", required = true) String nodeId,  //
-	@RequestParam(value = "attName", required = false) String attName,  //
-	@RequestParam(value = "explodeZips", required = false) String explodeZips,  //
-	@RequestParam(value = "ipfs", required = false) String ipfs,  //
-	@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,  //
-	HttpSession session) {
+			@RequestParam(value = "nodeId", required = true) String nodeId, //
+			@RequestParam(value = "attName", required = false) String attName, //
+			@RequestParam(value = "explodeZips", required = false) String explodeZips, //
+			@RequestParam(value = "ipfs", required = false) String ipfs, //
+			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
+			HttpSession session) {
 		final String _attName = attName == null ? "" : attName;
 		return callProc.run("upload", true, true, null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles,  //
-			"true".equalsIgnoreCase(explodeZips),  //
-			"true".equalsIgnoreCase(ipfs));
+			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
+					"true".equalsIgnoreCase(explodeZips), //
+					"true".equalsIgnoreCase(ipfs));
 		});
 	}
 
@@ -1529,91 +1531,91 @@ public class AppController extends ServiceBase implements ErrorController {
 			GetServerInfoResponse res = new GetServerInfoResponse();
 			res.setMessages(new LinkedList<>());
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
-			} else 
+			} else
 			// allow this one if user owns node.
 			{
 				ThreadLocals.requireAdmin();
 			}
 			log.debug("Command: " + req.getCommand());
 			switch (req.getCommand()) {
-			case "crawlUsers": 
-				res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
-				break;
-			case "actPubMaintenance": 
-				res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
-				break;
-			case "nostrMaintenance": 
-				res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
-				break;
-			case "nostrQueryUpdate": 
-				res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
-				break;
-			case "compactDb": 
-				res.getMessages().add(new InfoMessage(system.compactDb(), null));
-				break;
-			case "runConversion": 
-				res.getMessages().add(new InfoMessage(system.runConversion(), null));
-				break;
-			case "deleteLeavingOrphans": 
-				res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
-				break;
-			case "validateDb": 
-				res.getMessages().add(new InfoMessage(system.validateDb(), null));
-				break;
-			case "repairDb": 
-				res.getMessages().add(new InfoMessage(system.repairDb(), null));
-				break;
-			case "rebuildIndexes": 
-				res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
-				break;
-			case "refreshRssCache": 
-				res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
-				break;
-			case "refreshTrendingCache": 
-				res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
-				break;
-			case "refreshFediverseUsers": 
-				// apub.refreshForeignUsers();
-				apub.refreshFollowedUsers();
-				res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
-				break;
-			case "refreshAPAccounts": 
-				apub.refreshActorPropsForAllUsers();
-				res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
-				break;
-			case "toggleAuditFilter": 
-				AuditFilter.enabled = !AuditFilter.enabled;
-				res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-				break;
-			case "toggleDaemons": 
-				prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
-				res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-				break;
-			case "ipfsPubSubTest": 
-				// currently unused (leaving hook in place)
-				throw new RuntimeException("ipfsPubSubTest depricated");
-			// res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-			// break;
-			case "getServerInfo": 
-				res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-				break;
-			case "getSessionActivity": 
-				res.getMessages().add(new InfoMessage(system.getSessionActivity(), null));
-				break;
-			case "sendAdminNote": 
-				res.getMessages().add(new InfoMessage(system.sendAdminNote(), null));
-				break;
-			case "getJson": 
-				res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
-				break;
-			case "getActPubJson": 
-				res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
-				break;
-			case "readOutbox": 
-				res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
-				break;
-			default: 
-				throw new RuntimeEx("Invalid command: " + req.getCommand());
+				case "crawlUsers":
+					res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
+					break;
+				case "actPubMaintenance":
+					res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
+					break;
+				case "nostrMaintenance":
+					res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
+					break;
+				case "nostrQueryUpdate":
+					res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
+					break;
+				case "compactDb":
+					res.getMessages().add(new InfoMessage(system.compactDb(), null));
+					break;
+				case "runConversion":
+					res.getMessages().add(new InfoMessage(system.runConversion(), null));
+					break;
+				case "deleteLeavingOrphans":
+					res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
+					break;
+				case "validateDb":
+					res.getMessages().add(new InfoMessage(system.validateDb(), null));
+					break;
+				case "repairDb":
+					res.getMessages().add(new InfoMessage(system.repairDb(), null));
+					break;
+				case "rebuildIndexes":
+					res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
+					break;
+				case "refreshRssCache":
+					res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
+					break;
+				case "refreshTrendingCache":
+					res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
+					break;
+				case "refreshFediverseUsers":
+					// apub.refreshForeignUsers();
+					apub.refreshFollowedUsers();
+					res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
+					break;
+				case "refreshAPAccounts":
+					apub.refreshActorPropsForAllUsers();
+					res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
+					break;
+				case "toggleAuditFilter":
+					AuditFilter.enabled = !AuditFilter.enabled;
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+					break;
+				case "toggleDaemons":
+					prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+					break;
+				case "ipfsPubSubTest":
+					// currently unused (leaving hook in place)
+					throw new RuntimeException("ipfsPubSubTest depricated");
+				// res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
+				// break;
+				case "getServerInfo":
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+					break;
+				case "getSessionActivity":
+					res.getMessages().add(new InfoMessage(system.getSessionActivity(), null));
+					break;
+				case "sendAdminNote":
+					res.getMessages().add(new InfoMessage(system.sendAdminNote(), null));
+					break;
+				case "getJson":
+					res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
+					break;
+				case "getActPubJson":
+					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
+					break;
+				case "readOutbox":
+					res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
+					break;
+				default:
+					throw new RuntimeEx("Invalid command: " + req.getCommand());
 			}
 			res.setSuccess(true);
 			return res;
@@ -1680,7 +1682,10 @@ public class AppController extends ServiceBase implements ErrorController {
 			synchronized (EmailSender.getLock()) {
 				try {
 					mail.init();
-					mail.sendMail("wclayf@gmail.com", null, "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the " + prop.getConfigText("brandingAppName") + " admin menu.", "Test Subject");
+					mail.sendMail("wclayf@gmail.com", null,
+							"<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
+									+ prop.getConfigText("brandingAppName") + " admin menu.",
+							"Test Subject");
 				} finally {
 					mail.close();
 				}

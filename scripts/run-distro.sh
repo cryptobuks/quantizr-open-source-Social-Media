@@ -2,7 +2,7 @@
 
 clear
 # show commands as they are run.
-set -x
+# set -x
 
 # ===================================================================
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}

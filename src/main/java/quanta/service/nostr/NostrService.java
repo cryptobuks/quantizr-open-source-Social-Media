@@ -324,6 +324,9 @@ public class NostrService extends ServiceBase {
 		return accntNode;
 	}
 
+	// todo-1: we would now take care of this on the server right in this method by calling tserver for all 
+	// this info, and persisting it, just like the client would've, and then send the info down to the client, but the client 
+	// will need to know NOT to do any persisting of what it gets because we know we've already persisted.
 	public void pushNostrInfoToClient() {
 		if (ThreadLocals.getNewNostrUsers().size() > 0) {
 			// WARNING: make call to get users BEFORE 'exec.run()' or else we won't be on the request thread.
@@ -341,9 +344,11 @@ public class NostrService extends ServiceBase {
 	/* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
 	public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode, IntVal saveCount) {
 		SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
+		
 		if (nostrAccnt == null) {
 			// log.debug("New Nostr User: " + userKey + " newCount=" + ThreadLocals.getNewNostrUsers().size());
 			ThreadLocals.getNewNostrUsers().put(userKey, new NostrUserInfo(userKey, null, relays));
+
 			nostrAccnt = mongoUtil.createUser(as, "." + userKey, "", "", true, postsNode, true);
 			if (nostrAccnt == null) {
 				throw new RuntimeException("Unable to create nostr user for PubKey:" + userKey);

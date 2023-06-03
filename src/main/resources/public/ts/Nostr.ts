@@ -849,9 +849,7 @@ export class Nostr {
     }
 
     /* This handles the server push where the server is sending down a list of userinfo that needs to
-    be queued up for querying, on the client.
-    (todo-0: NOTE: We could now do this entirely in tserver on server side)
-    */
+    be queued up for querying, on the client. */
     loadUserMetadata = async (userInfo: J.NewNostrUsersPushInfo): Promise<void> => {
         if (userInfo.users?.length > 0) {
             for (const user of userInfo.users) {
