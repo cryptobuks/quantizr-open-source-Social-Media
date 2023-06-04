@@ -12,7 +12,12 @@ public class GetNodeStatsRequest extends RequestBase {
     private boolean getWords;
     private boolean getMentions;
     private boolean getTags;
+    private String protocol;
     
+    public String getProtocol() {
+        return protocol;
+    }
+
     public String getNodeId() {
         return this.nodeId;
     }
@@ -41,6 +46,10 @@ public class GetNodeStatsRequest extends RequestBase {
         return this.getTags;
     }
     
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
     public void setNodeId(final String nodeId) {
         this.nodeId = nodeId;
     }

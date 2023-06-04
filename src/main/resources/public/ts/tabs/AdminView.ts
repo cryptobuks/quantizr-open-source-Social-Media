@@ -7,7 +7,6 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { SignupDlg } from "../dlg/SignupDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
-import { TrendingView } from "./TrendingView";
 
 export class AdminView extends AppTab<any, AdminView> {
 
@@ -61,12 +60,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
                 this.settingsLink("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null)), //
                 this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
-                this.settingsLink("Refresh Trending Cache", () => {
-                    S.view.runServerCommand("refreshTrendingCache", null, "Refresh Trending Cache", null);
-
-                    // setting 'loaded' to false will trigger a call to the server to get the updated trending info.
-                    TrendingView.loaded = false;
-                }), //
+                this.settingsLink("Refresh Trending Cache", () => S.view.runServerCommand("refreshTrendingCache", null, "Refresh Trending Cache", null)), //
                 this.settingsLink("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace()),
 
                 this.sectionTitle("Database"),

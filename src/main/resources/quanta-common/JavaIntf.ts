@@ -346,6 +346,7 @@ export interface GetNodeStatsRequest extends RequestBase {
     getWords: boolean;
     getMentions: boolean;
     getTags: boolean;
+    protocol: string;
 }
 
 export interface GetOpenGraphRequest extends RequestBase {

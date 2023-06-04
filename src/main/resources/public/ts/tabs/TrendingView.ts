@@ -18,16 +18,12 @@ PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
     if (tabId === C.TAB_TRENDING) {
         // We have this timer to allow the TrendingView to come into existence.
         setTimeout(() => {
-            // only ever do this once, just to save CPU load on server.
-            if (TrendingView.loaded || !TrendingView.inst) return;
-            TrendingView.loaded = true;
             TrendingView.inst.refresh();
         }, 500);
     }
 });
 
 export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
-    static loaded: boolean = false;
     static inst: TrendingView = null;
 
     constructor(data: TabIntf<TrendingRSInfo, TrendingView>) {
@@ -36,6 +32,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     }
 
     refresh = async () => {
+        console.log("getNodeStats");
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: null,
             trending: true,
@@ -43,7 +40,8 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             getWords: true,
             getTags: true,
             getMentions: true,
-            signatureVerify: false
+            signatureVerify: false,
+            protocol: getAs().protocolFilter
         });
 
         dispatch("RenderSearchResults", s => {

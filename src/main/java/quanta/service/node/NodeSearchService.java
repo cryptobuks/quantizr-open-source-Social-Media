@@ -64,7 +64,8 @@ public class NodeSearchService extends ServiceBase {
 
 	private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
 	public static Object trendingFeedInfoLock = new Object();
-	public static GetNodeStatsResponse trendingFeedInfo;
+	public static GetNodeStatsResponse nostrTrendingFeedInfo;
+	public static GetNodeStatsResponse apTrendingFeedInfo;
 	static final String SENTENCE_DELIMS = ".!?";
 	/*
 	 * Warning: Do not add '#' or '@' to this list because we're using it to parse text for hashtags
@@ -84,14 +85,16 @@ public class NodeSearchService extends ServiceBase {
 	public void run() {
 		/* Setting the trending data to null causes it to refresh itself the next time it needs to. */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
-			NodeSearchService.trendingFeedInfo = null;
+			NodeSearchService.nostrTrendingFeedInfo = null;
+			NodeSearchService.apTrendingFeedInfo = null;
 		}
 	}
 
 	public String refreshTrendingCache() {
 		/* Setting the trending data to null causes it to refresh itself the next time it needs to. */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
-			NodeSearchService.trendingFeedInfo = null;
+			NodeSearchService.nostrTrendingFeedInfo = null;
+			NodeSearchService.apTrendingFeedInfo = null;
 		}
 		return "Trending Data will be refreshed immediately at next request to display it.";
 	}
@@ -355,13 +358,27 @@ public class NodeSearchService extends ServiceBase {
 		 */
 		if (req.isFeed()) {
 			synchronized (NodeSearchService.trendingFeedInfoLock) {
-				if (NodeSearchService.trendingFeedInfo != null) {
-					res.setStats(NodeSearchService.trendingFeedInfo.getStats());
-					res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
-					res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
-					res.setTopWords(NodeSearchService.trendingFeedInfo.getTopWords());
-					res.setSuccess(true);
-					return;
+				// If Requesting Nostr
+				if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
+					if (NodeSearchService.nostrTrendingFeedInfo != null) {
+						res.setStats(NodeSearchService.nostrTrendingFeedInfo.getStats());
+						res.setTopMentions(NodeSearchService.nostrTrendingFeedInfo.getTopMentions());
+						res.setTopTags(NodeSearchService.nostrTrendingFeedInfo.getTopTags());
+						res.setTopWords(NodeSearchService.nostrTrendingFeedInfo.getTopWords());
+						res.setSuccess(true);
+						return;
+					}
+				} 
+				// else Requesting ActPub
+				else {
+					if (NodeSearchService.apTrendingFeedInfo != null) {
+						res.setStats(NodeSearchService.apTrendingFeedInfo.getStats());
+						res.setTopMentions(NodeSearchService.apTrendingFeedInfo.getTopMentions());
+						res.setTopTags(NodeSearchService.apTrendingFeedInfo.getTopTags());
+						res.setTopWords(NodeSearchService.apTrendingFeedInfo.getTopWords());
+						res.setSuccess(true);
+						return;
+					}
 				}
 			}
 		}
@@ -392,11 +409,28 @@ public class NodeSearchService extends ServiceBase {
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
 			Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
-			// This pattern is what is required when you have multiple conditions added to a
-			// single field.
-			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.FRIEND.s())); //
-			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.POSTS.s())); //
-			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+
+			List<Criteria> orCrit = new LinkedList<>();
+			// Nostr
+			if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
+				// This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
+				orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+				// this regex simply is "Starts with a period"
+				orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
+				// crit = crit.andOperator(new Criteria().orOperator(orCrit));
+			} else
+			// ActivityPub
+			if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) {
+				// This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
+				orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+				// this regex simly is "Starts with a period"
+				orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
+				// crit = crit.andOperator(new Criteria().orOperator(orCrit));
+			}
+
+			ands.add(new Criteria().orOperator(orCrit));
+			ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s()));
+
 			// For public feed statistics only consider PUBLIC nodes.
 			ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 			HashSet<ObjectId> blockedUserIds = new HashSet<>();
@@ -464,6 +498,7 @@ public class NodeSearchService extends ServiceBase {
 					unsignedNodeCount++;
 				}
 			}
+
 			// PART 1: Process sharing info
 			HashMap<String, AccessControl> aclEntry = node.getAc();
 			if (aclEntry != null) {
@@ -483,6 +518,7 @@ public class NodeSearchService extends ServiceBase {
 			if (acl.isAdminOwned(node)) {
 				adminOwnedCount++;
 			}
+
 			// PART 2: process 'content' text.
 			if (node.getContent() == null)
 				continue;
@@ -578,10 +614,12 @@ public class NodeSearchService extends ServiceBase {
 				}
 			}
 		}
+
 		List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
 		List<WordStats> tagList = req.isGetTags() ? new ArrayList<>(tagMap.values()) : null;
 		List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
 		List<WordStats> voteList = countVotes ? new ArrayList<>(voteMap.values()) : null;
+
 		if (wordList != null)
 			wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
 		if (tagList != null)
@@ -590,6 +628,7 @@ public class NodeSearchService extends ServiceBase {
 			mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 		if (voteList != null)
 			voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
 		if (wordList != null) {
@@ -598,6 +637,7 @@ public class NodeSearchService extends ServiceBase {
 		if (voteList != null) {
 			sb.append("Unique Votes: " + voteList.size() + "\n");
 		}
+
 		sb.append("Public: " + publicCount + ", ");
 		sb.append("Public Writable: " + publicWriteCount + "\n");
 		sb.append("Admin Owned: " + adminOwnedCount + "\n");
@@ -606,6 +646,7 @@ public class NodeSearchService extends ServiceBase {
 		if (req.isSignatureVerify()) {
 			sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: " + failedSigCount);
 		}
+
 		res.setStats(sb.toString());
 		if (wordList != null) {
 			ArrayList<String> topWords = new ArrayList<>();
@@ -616,6 +657,7 @@ public class NodeSearchService extends ServiceBase {
 					break;
 			}
 		}
+
 		if (voteList != null) {
 			ArrayList<String> topVotes = new ArrayList<>();
 			res.setTopVotes(topVotes);
@@ -625,6 +667,7 @@ public class NodeSearchService extends ServiceBase {
 					break;
 			}
 		}
+
 		if (tagList != null) {
 			ArrayList<String> topTags = new ArrayList<>();
 			res.setTopTags(topTags);
@@ -634,6 +677,7 @@ public class NodeSearchService extends ServiceBase {
 					break;
 			}
 		}
+
 		if (mentionList != null) {
 			ArrayList<String> topMentions = new ArrayList<>();
 			res.setTopMentions(topMentions);
@@ -649,7 +693,11 @@ public class NodeSearchService extends ServiceBase {
 		 */
 		if (req.isFeed()) {
 			synchronized (NodeSearchService.trendingFeedInfoLock) {
-				NodeSearchService.trendingFeedInfo = res;
+				if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
+					NodeSearchService.nostrTrendingFeedInfo = res;
+				} else {
+					NodeSearchService.apTrendingFeedInfo = res;
+				}
 			}
 		}
 	}

@@ -314,7 +314,8 @@ export class View {
             getWords: isMine,
             getTags: isMine,
             getMentions: isMine,
-            signatureVerify: false
+            signatureVerify: false,
+            protocol: ast.protocolFilter
         });
         new NodeStatsDlg(res, trending, feed).open();
     }
@@ -339,7 +340,8 @@ export class View {
             getWords: false,
             getTags: false,
             getMentions: false,
-            signatureVerify: true
+            signatureVerify: true,
+            protocol: getAs().protocolFilter
         });
         new NodeStatsDlg(res, false, false).open();
     }
