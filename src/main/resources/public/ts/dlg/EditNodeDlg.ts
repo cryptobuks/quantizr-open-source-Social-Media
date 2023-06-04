@@ -539,7 +539,7 @@ export class EditNodeDlg extends DialogBase {
         // -------------------------
 
         propEditFieldContainer.setChildren([editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
-            propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()]);
+            propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons(), new Clearfix()]);
 
         return children;
     }

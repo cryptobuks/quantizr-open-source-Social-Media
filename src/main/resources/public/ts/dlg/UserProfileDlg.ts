@@ -4,6 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
+import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
@@ -225,12 +226,13 @@ export class UserProfileDlg extends DialogBase {
                     state.userProfile.actorUrl || state.userProfile.actorId ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                     }) : null,
-
-                    new ButtonBar([
-                        !this.readOnly ? new Button("Logout", S.user.logout) : null,
-                        new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary")
-                    ], "float-end")
-                ], "marginTop")
+                ], "marginTop"),
+                new Clearfix(),
+                new ButtonBar([
+                    !this.readOnly ? new Button("Logout", S.user.logout) : null,
+                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary")
+                ], "float-end marginTop"),
+                new Clearfix()
             ])
         ];
 
