@@ -54,6 +54,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-webpack-plugin": "^4.0.1",
     "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.43.4",
     "sass-loader": "^13.3.0",
     "source-map-loader": "^4.0.1",
