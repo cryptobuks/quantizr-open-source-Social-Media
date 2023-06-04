@@ -1,17 +1,18 @@
 import { dispatch, getAs } from "../AppContext";
-import { AppTab } from "../comp/AppTab";
-import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
-import { Heading } from "../comp/core/Heading";
-import { Span } from "../comp/core/Span";
-import { Spinner } from "../comp/core/Spinner";
-import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
+import { AppTab } from "../comp/AppTab";
+import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
+import { Heading } from "../comp/core/Heading";
+import { Selection } from "../comp/core/Selection";
+import { Span } from "../comp/core/Span";
+import { Spinner } from "../comp/core/Spinner";
+import { TabHeading } from "../comp/core/TabHeading";
+import { TabIntf } from "../intf/TabIntf";
 import { FeedTab } from "./data/FeedTab";
 
 PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
@@ -99,8 +100,29 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
 
         this.setChildren([
             this.headingBar = new TabHeading([
-                new Div("Trending", { className: "tabTitle" })
+                new Div("Trending", { className: "tabTitle" }),
+                new Divc({ className: "float-end" }, [
+                    new Selection(null, null, [
+                        { key: J.Constant.NETWORK_NOSTR, val: "Nostr" },
+                        { key: J.Constant.NETWORK_ACTPUB, val: "ActivityPub" }
+                    ],
+                        null, "protocolPickerOnView", {
+                        setValue: (val: string) => {
+                            dispatch("setProtocol", s => {
+                                s.protocolFilter = val;
+                                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val);
+
+                                // use a timer because we're in a dispatch already here
+                                setTimeout(() => {
+                                    TrendingView.inst.refresh();
+                                }, 100);
+                            });
+                        },
+                        getValue: (): string => getAs().protocolFilter
+                    }),
+                ]),
             ]),
+
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
 
             tagPanel.hasChildren() ? tagPanel : null,
