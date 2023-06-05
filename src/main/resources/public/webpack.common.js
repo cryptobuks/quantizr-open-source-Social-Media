@@ -2,7 +2,10 @@ const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+// I no longer trust this plugin. I've seen strange failures to have the 
+// correct CSS. I may permanently remove it soon.
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const isProduction = process.argv[process.argv.indexOf("--mode") + 1] === "production";
 const env = isProduction ? "prod" : "dev";
@@ -54,9 +57,9 @@ const plugins = [
     })
 ];
 
-if (isProduction) {
-    plugins.push(new MiniCssExtractPlugin());
-}
+// if (isProduction) {
+//     plugins.push(new MiniCssExtractPlugin());
+// }
 
 module.exports = {
     formatDate,
@@ -103,7 +106,10 @@ module.exports = {
                     // handles both scss or css files.
                     test: /\.(sc|c)ss$/i,
                     use: [
-                        isProduction ? MiniCssExtractPlugin.loader : "style-loader",
+                        // isProduction ? MiniCssExtractPlugin.loader : 
+                        {
+                            loader: "style-loader"
+                        },
                         {
                             loader: "css-loader"
                         }, {
