@@ -9,8 +9,5 @@ then
     exit
 fi
 
-yarn add ../quanta-common
-verifySuccess "yarn add quanta-common"
-
 yarn run ${WEBPACK_SCRIPT}
 verifySuccess "yarn run: public"
