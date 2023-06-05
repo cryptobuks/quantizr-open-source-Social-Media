@@ -25,7 +25,7 @@ export class NodeCompMarkdown extends Html {
     private autoDecrypting: boolean = true;
 
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
-    urls: string[];
+    urls: Set<String>;
 
     constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
         super(null, { key: "ncmkd_" + node.id });
@@ -144,9 +144,13 @@ export class NodeCompMarkdown extends Html {
             if (content.indexOf("* " + href) !== -1) return;
             if (content.indexOf("* " + hrefWithSlash) !== -1) return;
 
-            // lazy instantiate
-            this.urls = this.urls || [];
-            this.urls.push(href);
+            // Only add to 'urls' if we do NOT have an attachment pointing to the same href, because this
+            // would make it render it twice because we already know the attachments will rendering.
+            if (!S.props.getAttachmentByUrl(this.node, href)) {
+                // lazy instantiate
+                this.urls = this.urls || new Set<String>();
+                this.urls.add(href);
+            }
         });
     }
 

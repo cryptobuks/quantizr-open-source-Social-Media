@@ -133,6 +133,17 @@ export class Props {
         return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
+    getAttachmentByUrl = (node: J.NodeInfo, url: string): J.Attachment => {
+        if (!node || !node.attachments) return null;
+        let ret: J.Attachment = null;
+        Object.keys(node.attachments).forEach(key => {
+            if (node.attachments[key].u === url) {
+                ret = node.attachments[key];
+            }
+        });
+        return ret;
+    }
+
     getOrderedAtts = (node: J.NodeInfo): J.Attachment[] => {
         const list: J.Attachment[] = [];
 

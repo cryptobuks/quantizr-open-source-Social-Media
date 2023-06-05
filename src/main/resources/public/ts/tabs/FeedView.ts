@@ -342,7 +342,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     break;
 
                 case J.Constant.FEED_PUB:
-                    subHeading = "Public Feed";
+                    subHeading = "Fediverse";
                     break;
 
                 default: break;
