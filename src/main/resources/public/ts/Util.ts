@@ -1,8 +1,8 @@
 import { marked } from "marked";
+import { nip19 } from "nostr-tools";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
-import { Menu } from "./comp/Menu";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
@@ -11,9 +11,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-import { nip19 } from "nostr-tools";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -808,18 +806,9 @@ export class Util {
         const ast = getAs();
         if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
-            // let count = res.bookmarks ? res.bookmarks.length : 0;
             await promiseDispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
-
-                // use a timer to let this dispatch completely finish setting bookmarks before we sent the click to expand.
-                setTimeout(() => {
-                    // if user has not yet clicked any menus and we just loaded bookmarks,
-                    // then open up and display the bookmarks menu.
-                    if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
-                        PubSub.pub(C.PUBSUB_menuExpandChanged, { op: "expand", name: C.BOOKMARKS_MENU_TEXT });
-                    }
-                }, 250);
+                console.log("Bookmarks Found: " + S.util.prettyPrint(s.bookmarks));
             });
         }
     }

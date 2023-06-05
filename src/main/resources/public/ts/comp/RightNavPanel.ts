@@ -1,5 +1,4 @@
 import { getAs } from "../AppContext";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
@@ -12,7 +11,7 @@ import { S } from "../Singletons";
 import { SettingsTab } from "../tabs/data/SettingsTab";
 import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
-import { HorizontalLayout } from "./core/HorizontalLayout";
+import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
@@ -69,9 +68,6 @@ export class RightNavPanel extends Div {
             // If user had nothing left after insertion after ":tags:" replacement in their display name, then display their userName
             displayName = displayName || ast.node.owner;
         }
-
-        const allowEditMode = !ast.isAnonUser;
-        const fullScreenViewer = S.util.fullscreenViewerActive();
 
         // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
         //     className: "fa fa-clipboard fa-lg marginRight clickable",
@@ -161,7 +157,7 @@ export class RightNavPanel extends Div {
 
         this.setChildren([
             new Divc({ className: "float-left" }, [
-                new HorizontalLayout([
+                new FlexRowLayout([
                     avatarImg,
                     new Diva([
                         new Divc({ className: "marginBottom" }, [
@@ -171,8 +167,9 @@ export class RightNavPanel extends Div {
                                     PubSub.pub(C.PUBSUB_closeNavPanel);
                                     new UserProfileDlg(null).open();
                                 }
-                            }) : null,
-
+                            }) : null
+                        ]),
+                        new Divc({ className: "marginBottom" }, [
                             !ast.isAnonUser ? new Icon({
                                 className: "fa fa-gear fa-lg marginRight clickable",
                                 onClick: () => {
@@ -183,23 +180,12 @@ export class RightNavPanel extends Div {
                                 title: "Edit Account Settings"
                             }) : null,
 
-                            textToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
-                                textToSpeech,
-                                addNoteButton]) : null
+                            textToSpeech, 
+                            addNoteButton
                         ]),
                         loginSignupDiv,
-
-                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
-                            setValue: (checked: boolean) => S.edit.setEditMode(checked),
-                            getValue: (): boolean => ast.userPrefs.editMode
-                        }, "form-switch formCheckInlineNoMargin") : null,
-
-                        !fullScreenViewer ? new Checkbox("Info", { title: "Display of avatars, timestamps, etc." }, {
-                            setValue: (checked: boolean) => S.edit.setShowMetaData(checked),
-                            getValue: (): boolean => ast.userPrefs.showMetaData
-                        }, "form-switch formCheckInlineNoMargin") : null
                     ])
-                ], "horizontalLayoutCompCompact fullWidth"),
+                ], "fullWidth"),
                 // new Divc({ className: "marginBottom" }, [
                 //     new ButtonBar([
                 //         clipboardPasteButton,

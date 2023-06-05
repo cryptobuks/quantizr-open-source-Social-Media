@@ -67,6 +67,8 @@
     position: relative;
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .userBio {

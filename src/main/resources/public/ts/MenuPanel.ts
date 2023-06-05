@@ -29,6 +29,7 @@ import { TTSTab } from "./tabs/data/TTSTab";
 
 export class MenuPanel extends Div {
     static activeMenu: Set<string> = new Set<string>();
+    static initialized: boolean = false;
     static inst: MenuPanel;
 
     constructor() {
@@ -38,6 +39,10 @@ export class MenuPanel extends Div {
             className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
         MenuPanel.inst = this;
+        if (!MenuPanel.initialized) {
+            MenuPanel.activeMenu.add("Options");
+            MenuPanel.initialized = true;
+        }
         this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
     }
 
@@ -109,6 +114,14 @@ export class MenuPanel extends Div {
         // S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
         const dlg = new BlockedUsersDlg("Blocked Users");
         dlg.open();
+    }
+
+    static toggleEditMode = () => {
+        S.edit.setEditMode(!getAs().userPrefs.editMode);
+        
+    }
+    static toggleInfoMode = () => {
+        S.edit.setShowMetaData(!getAs().userPrefs.showMetaData);
     }
 
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
@@ -188,6 +201,14 @@ export class MenuPanel extends Div {
         const canMoveDown = !isPageRootNode && !ast.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
+
+        const allowEditMode = !ast.isAnonUser;
+        const fullScreenViewer = S.util.fullscreenViewerActive();
+
+        children.push(new Menu(state, "Options", [
+            new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
+            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData)
+        ]));
 
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
