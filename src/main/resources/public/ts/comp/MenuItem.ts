@@ -4,6 +4,8 @@ import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
+import { Checkbox } from "./core/Checkbox";
 
 interface LS { // Local State
     visible: boolean;
@@ -25,9 +27,22 @@ export class MenuItem extends Div {
         const enablement = state.enabled ? {} : { disabled: "disabled" };
         const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
-        const prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
+        let innerSpan: Comp;
+        let innerClazz: string;
+        if (this.stateFunc) {
+            innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
+                setValue: (checked: boolean) => this.onClick(),
+                getValue: (): boolean => this.stateFunc()
+            });
+            innerClazz = "listGroupMenuItemCompact";
+        }
+        else {
+            innerSpan = new Span(state.content);
+            innerClazz = "listGroupMenuItem";
+        }
+
         this.setChildren([
-            new Span(S.render.parseEmojis(prefix + state.content), null, null, true),
+            innerSpan,
             this.floatRightComp
         ]);
 
@@ -36,7 +51,7 @@ export class MenuItem extends Div {
             ...enablement,
             ...{
                 style: { display: (state.visible ? "" : "none") },
-                className: "listGroupMenuItem list-group-item-action " + enablementClass + "  listGroupTransparent" +
+                className: innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
                     (getAs().mobileMode ? " mobileMenuText" : ""),
                 onClick: this.onClick
             }

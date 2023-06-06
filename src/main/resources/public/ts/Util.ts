@@ -12,6 +12,7 @@ import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { TrendingView } from "./tabs/TrendingView";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -800,6 +801,29 @@ export class Util {
                 });
             }, 5000);
         }, 500);
+    }
+
+    setProtocol = (val: string) => {
+        if (getAs().protocolFilter === val) return;
+
+        dispatch("setProtocol", s => {
+            if (s.protocolFilter !== val) {
+                s.protocolFilter = val;
+                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val);
+
+                setTimeout(() => {
+                    switch (s.activeTab) {
+                        case C.TAB_FEED:
+                            S.srch.refreshFeed();
+                            break;
+                        case C.TAB_TRENDING:
+                            TrendingView.inst.refresh();
+                            break;
+                        default: break;
+                    }
+                }, 250);
+            }
+        });
     }
 
     loadBookmarks = async () => {

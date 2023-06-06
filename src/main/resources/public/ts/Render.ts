@@ -38,8 +38,6 @@ export class Render {
     private debug: boolean = false;
     private markedRenderer: any = null;
 
-    CHAR_CHECKMARK = "&#10004;";
-
     // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
     // I'm disabling it entirely with this flag.
     enableRowFading: boolean = true;

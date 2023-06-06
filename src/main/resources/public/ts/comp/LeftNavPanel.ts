@@ -1,14 +1,14 @@
 import { dispatch, getAs } from "../AppContext";
-import { Div } from "../comp/core/Div";
-import { Img } from "../comp/core/Img";
-import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
+import { Div } from "../comp/core/Div";
+import { Img } from "../comp/core/Img";
+import { Span } from "../comp/core/Span";
 import { FeedTab } from "../tabs/data/FeedTab";
+import { TabPanelButtons } from "./TabPanelButtons";
 import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
-import { TabPanelButtons } from "./TabPanelButtons";
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -72,6 +72,7 @@ export class LeftNavPanel extends Div {
                     onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
                 }) : null,
+
                 // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                 // which is in a different class.
                 new Span(null, { className: "float-end" }, [

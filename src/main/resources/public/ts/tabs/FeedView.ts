@@ -276,20 +276,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,
                 new Divc({ className: "float-end" }, [
-                    new Selection(null, null, [
-                        { key: J.Constant.NETWORK_NOSTR, val: "Nostr" },
-                        { key: J.Constant.NETWORK_ACTPUB, val: "ActivityPub" }
-                    ],
-                        null, "protocolPickerOnView", {
-                        setValue: (val: string) => {
-                            dispatch("setProtocol", s => {
-                                s.protocolFilter = val;
-                                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val);
-                            });
-                            S.srch.refreshFeed();
-                        },
-                        getValue: (): string => getAs().protocolFilter
-                    }),
                     ast.isAnonUser ? null : friendsTagDropDown,
                     ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
