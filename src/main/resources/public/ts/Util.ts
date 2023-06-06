@@ -803,6 +803,14 @@ export class Util {
         }, 500);
     }
 
+    isNostrUserName = (userName: string) => {
+        return userName?.startsWith(".");
+    }
+
+    isActPubUserName = (userName: string) => {
+        return userName?.indexOf("@") !== -1;
+    }
+
     setProtocol = (val: string) => {
         if (getAs().protocolFilter === val) return;
 
@@ -1062,7 +1070,7 @@ export class Util {
     // Gets a name like "@user" (for AP names) or "12345678..." for nostr users
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
         let ret = null;
-        if (S.nostr.isNostrUserName(ac.principalName)) {
+        if (this.isNostrUserName(ac.principalName)) {
             if (ac.displayName) {
                 return ac.displayName;
             }

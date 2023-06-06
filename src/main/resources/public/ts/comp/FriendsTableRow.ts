@@ -37,8 +37,17 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        const isNostr = S.nostr.isNostrUserName(this.friend.userName);
-        const nameSuffix = isNostr ? " (Nostr)" : "";
+        let nameSuffix: string;
+        const isNostr = S.util.isNostrUserName(this.friend.userName);
+        if (isNostr) {
+            nameSuffix = " (Nostr)";
+        }
+        else if (S.util.isActPubUserName(this.friend.userName)) {
+            nameSuffix = " (ActivityPub)";
+        }
+        else {
+            nameSuffix = "";
+        }
 
         this.setChildren([
             new Diva([

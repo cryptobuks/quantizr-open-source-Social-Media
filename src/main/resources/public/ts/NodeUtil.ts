@@ -19,7 +19,7 @@ export class NodeUtil {
     }
 
     getDisplayName = (node: J.NodeInfo): string => {
-        const isNostr = S.nostr.isNostrUserName(node.owner);
+        const isNostr = S.util.isNostrUserName(node.owner);
         let name = "";
         if (isNostr) {
             name = S.props.getPropStr(J.NodeProp.DISPLAY_NAME, node) ||

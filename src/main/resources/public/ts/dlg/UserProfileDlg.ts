@@ -52,8 +52,11 @@ export class UserProfileDlg extends DialogBase {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
-        if (S.nostr.isNostrUserName(userName)) {
+        if (S.util.isNostrUserName(userName)) {
             return "Nostr Account";
+        }
+        else if (S.util.isActPubUserName(userName)) {
+            return "ActivityPub Account";
         }
         if (userName.indexOf("@") === -1) {
             userName = userName + "@" + window.location.hostname;
@@ -103,7 +106,7 @@ export class UserProfileDlg extends DialogBase {
             web3Div = new Diva(web3Comps);
         }
 
-        const isForeignNostr: boolean = S.nostr.isNostrUserName(state.userProfile.userName);
+        const isForeignNostr: boolean = S.util.isNostrUserName(state.userProfile.userName);
         let nostrId: string = null;
         if (isForeignNostr) {
             nostrId = isForeignNostr ? S.nostr.encodeToNpub(state.userProfile.userName.substring(1)) : "";
@@ -308,7 +311,7 @@ export class UserProfileDlg extends DialogBase {
         if (res?.userProfile) {
             // if we get back a userprofile that's a nostr one but with no nostrTimestamp we need load it from
             // relay now because lack of a timestamp indicates we've never read from relay.
-            if (res.userProfile.nostrTimestamp === 0 && S.nostr.isNostrUserName(res.userProfile.userName)) {
+            if (res.userProfile.nostrTimestamp === 0 && S.util.isNostrUserName(res.userProfile.userName)) {
 
                 // read this user using their relays or our own for.
                 await S.nostr.readUserMetadataEx(res.userProfile.userName.substring(1),

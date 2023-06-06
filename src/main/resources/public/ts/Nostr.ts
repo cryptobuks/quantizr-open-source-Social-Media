@@ -806,7 +806,7 @@ export class Nostr {
         const ast = getAs();
         ast.tabData.forEach(td => {
             td.processNode(ast, node => {
-                if (this.isNostrUserName(node.owner)) {
+                if (S.util.isNostrUserName(node.owner)) {
                     const pubKey = node.owner.substring(1);
                     const dispInfo = this.dispInfoCache.get(pubKey);
                     if (dispInfo && (node.displayName !== dispInfo.display ||
@@ -1449,7 +1449,7 @@ export class Nostr {
 
             // scan all people to build list of users (PublicKeys) and relays to read from
             for (const person of this.myFriends) {
-                if (!S.nostr.isNostrUserName(person.userName)) continue;
+                if (!S.util.isNostrUserName(person.userName)) continue;
                 userNames.push(person.userName.substring(1));
                 const personRelays = this.getRelays(person.relays);
                 if (personRelays) {
@@ -1521,10 +1521,6 @@ export class Nostr {
     isActPubNode = (node: J.NodeInfo) => {
         const id = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
         return id && !id.startsWith(".");
-    }
-
-    isNostrUserName = (userName: string) => {
-        return userName?.startsWith(".") && userName.indexOf("@") === -1;
     }
 
     private async getRelaysForUser(node: J.NodeInfo) {
