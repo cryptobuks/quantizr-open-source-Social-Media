@@ -11,7 +11,7 @@ import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { FullScreenType } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { HorizontalLayout } from "../core/HorizontalLayout";
+import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
 
 interface LS {
@@ -45,7 +45,7 @@ export class NodeCompBinary extends Div {
         }
         else {
             size = att.c;
-            if (size==="0" || size==="100%") {
+            if (size === "0" || size === "100%") {
                 rtMargin = false;
             }
         }
@@ -133,28 +133,32 @@ export class NodeCompBinary extends Div {
             this.setChildren([this.makeImageComp(node)]);
         }
         else if (S.props.hasVideo(node, this.attName)) {
-            this.setChildren([new HorizontalLayout([
-                new IconButton("fa-play", "Play Video", {
-                    onClick: () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
-                    }
-                }, "btn-primary"),
-                new Span("", {
-                    className: "downloadLink"
-                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
-            ])]);
+            this.setChildren([
+                new FlexRowLayout([
+                    new IconButton("fa-play", "Play Video", {
+                        onClick: () => {
+                            new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
+                        }
+                    }, "btn-primary marginRight"),
+                    new Span("", {
+                        className: "downloadLink marginRight" 
+                    }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
+                ], "marginBottom")
+            ]);
         }
         else if (S.props.hasAudio(node, this.attName)) {
-            this.setChildren([new HorizontalLayout([
-                new IconButton("fa-play", "Play Audio", {
-                    onClick: () => {
-                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
-                    }
-                }, "btn-primary"),
-                new Span("", {
-                    className: "downloadLink"
-                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
-            ], "horizontalLayoutCompCompact")]);
+            this.setChildren([
+                new FlexRowLayout([
+                    new IconButton("fa-play", "Play Audio", {
+                        onClick: () => {
+                            new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
+                        }
+                    }, "btn-primary marginRight"),
+                    new Span("", {
+                        className: "downloadLink marginRight"
+                    }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
+                ], "marginBottom")
+            ]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
@@ -183,7 +187,7 @@ export class NodeCompBinary extends Div {
                 }),
                 new Span(null, null, [
                     new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName, {
-                        className: "downloadLink",
+                        className: "downloadLink marginRight",
                         title: "Click to download attachment\n\n" + titleSuffix
                     }),
                     viewFileLink

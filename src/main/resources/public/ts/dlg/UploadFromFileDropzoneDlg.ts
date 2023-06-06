@@ -1,5 +1,9 @@
 import Dropzone from "dropzone";
 import { getAs } from "../AppContext";
+import { Constants } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -7,12 +11,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
-import { Constants } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
 
@@ -49,7 +48,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         const ast = getAs();
         const children = [
             new Diva([
-                this.importMode || !ast.config.ipfsEnabled ? null : new HorizontalLayout([
+                this.importMode || !ast.config.ipfsEnabled ? null : new Divc({ className: "marginBottom" }, [
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */

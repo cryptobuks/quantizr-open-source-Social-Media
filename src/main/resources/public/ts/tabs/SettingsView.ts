@@ -3,8 +3,8 @@ import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Divc } from "../comp/core/Divc";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
@@ -29,7 +29,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
     override preRender(): boolean {
         const ast = getAs();
-        const horzClass = "horizontalLayoutComp accountSettingsSection";
+        const horzClass = "marginTop marginBottom accountSettingsSection"; // horizontalLayoutComp
 
         this.setChildren([
             this.headingBar = new TabHeading([
@@ -39,7 +39,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
             new Divc({ className: "accountSettingsPanel" }, [
                 // -----------------------
                 this.sectionTitle("Account"),
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
@@ -59,7 +59,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // -----------------------
                 this.sectionTitle("View Options"),
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Divc({ className: "accountSettingsCol" }, [
                         new Checkbox("Sensitive Content", { className: "bigMarginLeft" }, {
                             setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
@@ -114,7 +114,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // -----------------------
                 this.sectionTitle("Nostr"),
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Show Private Key", S.nostr.showPrivateKey),
                         this.settingsLink("Change Private Key", S.nostr.editPrivateKey),
@@ -124,7 +124,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // -----------------------
                 this.sectionTitle("Tools"),
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Test Microphone", () => new MediaRecorderDlg(false, false).open()), //
                         this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
@@ -137,7 +137,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // -----------------------
                 this.sectionTitle("Danger Zone"),
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Divc({ className: "accountSettingsCol" }, [
                         this.settingsLink("Bulk Delete", S.edit.bulkDelete)
                     ]),

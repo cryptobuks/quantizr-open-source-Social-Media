@@ -2,7 +2,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Img } from "../comp/core/Img";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -45,7 +45,7 @@ export class SignupDlg extends DialogBase {
                 new TextField({ label: "Password", inputType: "password", val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),
 
-                this.adminCreatingUser ? null : new HorizontalLayout([
+                this.adminCreatingUser ? null : new FlexRowLayout([
                     new Img({
                         src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
@@ -53,7 +53,7 @@ export class SignupDlg extends DialogBase {
                     new Diva([
                         new TextField({ label: "Enter Numbers Displayed", val: this.captchaState })
                     ])
-                ]),
+                ], "marginTop"),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
                     new Button("Cancel", this.close, { className: "float-end" })

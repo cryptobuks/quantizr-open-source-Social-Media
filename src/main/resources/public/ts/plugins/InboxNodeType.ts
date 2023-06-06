@@ -2,8 +2,8 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
@@ -32,13 +32,13 @@ export class InboxNodeType extends TypeBase {
     }
 
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
-        return new HorizontalLayout([
+        return new FlexRowLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([
                 new Button("Clear Inbox", () => S.edit.clearInbox())
             ], null, "float-end marginBottom"),
             new Clearfix()
-        ], "displayTable systemNodeContent");
+        ], "systemNodeContent");
     }
 
     override isSpecialAccountNode(): boolean {

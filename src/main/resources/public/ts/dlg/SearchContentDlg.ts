@@ -6,7 +6,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Diva } from "../comp/core/Diva";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
@@ -15,7 +15,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
-import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
+import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
 interface LS { // Local State
     searchRoot?: string;
@@ -73,7 +73,7 @@ export class SearchContentDlg extends DialogBase {
                 this.createSearchFieldIconButtons(),
                 new Clearfix(),
 
-                new HorizontalLayout([
+                new FlexRowLayout([
                     ast.userProfile.blockedWords ? new Checkbox("Blocked Words", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.blockedWords = checked;
@@ -120,9 +120,9 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): boolean => this.getState<LS>().requireAttachment
                     })
-                ], "displayTable marginBottom"),
+                ], "marginBottom"),
 
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Selection(null, "Search in", [
                         { key: "curNode", val: "Current Node" },
                         { key: "allNodes", val: "My Account" }
@@ -167,7 +167,7 @@ export class SearchContentDlg extends DialogBase {
                     new Diva([
                         requirePriorityCheckbox
                     ])
-                ], "horizontalLayoutComp bigMarginBottom"),
+                ], "bigMarginBottom"),
 
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "btn-primary"),

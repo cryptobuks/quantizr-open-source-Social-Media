@@ -119,7 +119,7 @@ export class EditAttachmentsPanel extends Div {
 
         const fileNameField = new TextField({
             labelClass: "txtFieldLabelShort",
-            outterClass: "fileNameField",
+            outterClass: "fileNameField marginLeft",
             label: "File Name",
             val: fileNameFieldState
         });

@@ -3,7 +3,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Diva } from "../comp/core/Diva";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { Divc } from "../comp/core/Divc";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -29,7 +29,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             new Diva([
                 new TextField({ label: "Search for", val: this.searchState }),
                 new TextField({ label: "Replace with", val: this.replaceState }),
-                new HorizontalLayout([
+                new Divc({ className: "marginTop" }, [
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
                         getValue: (): boolean => this.getState<LS>().recursive

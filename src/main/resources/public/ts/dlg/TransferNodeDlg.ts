@@ -4,7 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Diva } from "../comp/core/Diva";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -34,17 +34,17 @@ export class TransferNodeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Diva([
-                this.operation === "transfer" ? new HorizontalLayout([
+                this.operation === "transfer" ? new FlexRowLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
-                    getAs().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
+                    getAs().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState, outterClass: "marginRight" }) : null,
                     new TextField({ label: "To User", val: this.toUserState })
                 ]) : null,
-                new HorizontalLayout([
+                new FlexRowLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
                         getValue: (): boolean => this.getState<LS>().recursive
                     })
-                ]),
+                ], "marginTop"),
                 new ButtonBar([
                     new Button(TransferNodeDlg.operationName(this.operation), this.transfer, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
