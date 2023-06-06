@@ -38,7 +38,7 @@ export class AdminView extends AppTab<any, AdminView> {
     };
 
     sectionTitle(title: string): Heading {
-        return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
     override preRender(): boolean {

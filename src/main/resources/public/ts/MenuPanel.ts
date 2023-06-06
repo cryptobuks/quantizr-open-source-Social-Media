@@ -20,11 +20,13 @@ import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { MenuPanelState } from "./Interfaces";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { SettingsTab } from "./tabs/data/SettingsTab";
 import { TTSTab } from "./tabs/data/TTSTab";
 
 export class MenuPanel extends Div {
@@ -36,11 +38,11 @@ export class MenuPanel extends Div {
         super(null, {
             id: C.ID_MENU,
             role: "tablist",
-            className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
+            className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel")
         });
         MenuPanel.inst = this;
         if (!MenuPanel.initialized) {
-            MenuPanel.activeMenu.add("Options");
+            MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
             MenuPanel.initialized = true;
         }
         this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
@@ -118,11 +120,18 @@ export class MenuPanel extends Div {
 
     static toggleEditMode = () => {
         S.edit.setEditMode(!getAs().userPrefs.editMode);
-        
+
     }
     static toggleInfoMode = () => {
         S.edit.setShowMetaData(!getAs().userPrefs.showMetaData);
     }
+
+    static userSettings = () => {
+        SettingsTab.tabSelected = true;
+        S.tabUtil.selectTab(C.TAB_SETTINGS);
+    }
+
+    static userProfile = () => { new UserProfileDlg(null).open(); }
 
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
@@ -205,9 +214,9 @@ export class MenuPanel extends Div {
         const allowEditMode = !ast.isAnonUser;
         const fullScreenViewer = S.util.fullscreenViewerActive();
 
-        children.push(new Menu(state, "Options", [
+        children.push(new Menu(state, C.OPTIONS_MENU_TEXT, [
             new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
-            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData)
+            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
         ]));
 
         const bookmarkItems = [];
@@ -441,6 +450,11 @@ export class MenuPanel extends Div {
 
                 // todo-1: need "Show Incomming" transfers menu option
             ], null, this.makeHelpIcon(":transfers")));
+
+            children.push(new Menu(state, "Account", [
+                new MenuItem("Profile", MenuPanel.userProfile),
+                new MenuItem("Settings", MenuPanel.userSettings)
+            ]));
         }
 
         // //need to make export safe for end users to use (regarding file sizes)

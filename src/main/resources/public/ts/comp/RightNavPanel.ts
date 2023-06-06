@@ -8,7 +8,6 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { SettingsTab } from "../tabs/data/SettingsTab";
 import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
 import { FlexRowLayout } from "./core/FlexRowLayout";
@@ -170,16 +169,6 @@ export class RightNavPanel extends Div {
                             }) : null
                         ]),
                         new Divc({ className: "marginBottom" }, [
-                            !ast.isAnonUser ? new Icon({
-                                className: "fa fa-gear fa-lg marginRight clickable",
-                                onClick: () => {
-                                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                                    SettingsTab.tabSelected = true;
-                                    S.tabUtil.selectTab(C.TAB_SETTINGS);
-                                },
-                                title: "Edit Account Settings"
-                            }) : null,
-
                             textToSpeech, 
                             addNoteButton
                         ]),

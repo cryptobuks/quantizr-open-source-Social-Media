@@ -24,7 +24,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
     }
 
     sectionTitle(title: string): Heading {
-        return new Heading(5, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
     override preRender(): boolean {

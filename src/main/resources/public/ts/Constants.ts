@@ -49,6 +49,7 @@ export class Constants {
     static TAB_ADMIN: string = "adminTab";
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
+    static OPTIONS_MENU_TEXT = "Options";
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
