@@ -66,12 +66,12 @@ export class LeftNavPanel extends Div {
 
         this.setChildren([
             new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
-                !ast.isAnonUser || ast.anonShowLHSMenu ? new Img({
+                new Img({
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
-                }) : null,
+                }),
 
                 // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                 // which is in a different class.
@@ -100,10 +100,8 @@ export class LeftNavPanel extends Div {
                     }) : null
                 ])
             ]),
-            ast.isAnonUser ? null : new MenuPanel(),
-
-            // if anon user
-            ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
+            ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+            new MenuPanel(),
         ]);
         return true;
     }

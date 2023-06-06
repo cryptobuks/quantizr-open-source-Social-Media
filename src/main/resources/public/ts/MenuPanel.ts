@@ -42,7 +42,8 @@ export class MenuPanel extends Div {
         });
         MenuPanel.inst = this;
         if (!MenuPanel.initialized) {
-            MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
+            // if anon user keep the page very clean and don't show this.
+            if (!getAs().isAnonUser) MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
             MenuPanel.initialized = true;
         }
         this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
@@ -215,11 +216,9 @@ export class MenuPanel extends Div {
         const fullScreenViewer = S.util.fullscreenViewerActive();
 
         children.push(new Menu(state, C.OPTIONS_MENU_TEXT, [
-            new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
+            ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
-        ]));
-        
-        children.push(new Menu(state, "Protocol", [
+            new MenuItemSeparator(),
             new MenuItem("Nostr", () => S.util.setProtocol(J.Constant.NETWORK_NOSTR), true, () => getAs().protocolFilter == J.Constant.NETWORK_NOSTR),
             new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
         ]));
@@ -319,19 +318,21 @@ export class MenuPanel extends Div {
 
         const createMenuItems: CompIntf[] = [];
         const types = S.plugin.getAllTypes();
-        const recentTypes = ast.userProfile.recentTypes ? ast.userProfile.recentTypes.split(",") : null;
+        const recentTypes = ast.userProfile && ast.userProfile.recentTypes ? ast.userProfile.recentTypes.split(",") : null;
         let typesAdded = false;
 
-        types.forEach((type: TypeIntf, k: string) => {
-            if (type.schemaOrg && !(recentTypes?.includes(k))) {
-                return;
-            }
-            typesAdded = true;
-            if (ast.isAdminUser || type.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null), //
-                    !ast.isAnonUser && !!hltNode));
-            }
-        });
+        if (!ast.isAnonUser) {
+            types.forEach((type: TypeIntf, k: string) => {
+                if (type.schemaOrg && !(recentTypes?.includes(k))) {
+                    return;
+                }
+                typesAdded = true;
+                if (ast.isAdminUser || type.getAllowUserSelect()) {
+                    createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null), //
+                        !ast.isAnonUser && !!hltNode));
+                }
+            });
+        }
 
         if (!ast.isAnonUser) {
             if (typesAdded) createMenuItems.push(new MenuItemSeparator());
