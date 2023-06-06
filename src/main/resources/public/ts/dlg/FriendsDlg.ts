@@ -129,6 +129,12 @@ export class FriendsDlg extends DialogBase {
         const filteredFriends = state.friends?.map(friend => {
             if (!friend) return null;
 
+            // if this is a nostr user and we're not filtering for nostr, return
+            if (friend.userName.startsWith(".") && ast.protocolFilter !== J.Constant.NETWORK_NOSTR) return null;
+
+            // if this is an ActPub user and we're not filtering for ActPub, return
+            if (friend.userName.indexOf("@") !== -1 && ast.protocolFilter !== J.Constant.NETWORK_ACTPUB) return null;
+
             if ((!searchText || this.friendMatchesString(friend, searchText)) &&
                 (!tagSearch || this.friendMatchesString(friend, tagSearch))) {
                 return friend;
