@@ -43,7 +43,7 @@ export class MenuPanel extends Div {
         MenuPanel.inst = this;
         if (!MenuPanel.initialized) {
             // if anon user keep the page very clean and don't show this.
-            if (!getAs().isAnonUser) MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
+            MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
             MenuPanel.initialized = true;
         }
         this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
@@ -218,7 +218,9 @@ export class MenuPanel extends Div {
         children.push(new Menu(state, C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
-            new MenuItemSeparator(),
+         ]));
+
+        children.push(new Menu(state, "Protocol", [    
             new MenuItem("Nostr", () => S.util.setProtocol(J.Constant.NETWORK_NOSTR), true, () => getAs().protocolFilter == J.Constant.NETWORK_NOSTR),
             new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
         ]));

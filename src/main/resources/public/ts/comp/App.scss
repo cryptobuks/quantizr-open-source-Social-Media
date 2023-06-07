@@ -26,6 +26,7 @@ body {
     margin-right: 0px !important;
     height: 100vh;
     overflow: hidden;
+    border: 1px solid gray;
 }
 
 .smallLogoButton {
@@ -87,18 +88,15 @@ body {
 }
 
 .rightNavPanel {
-    padding-top: 12px;
-    padding-left: $smallGap;
     height: 100%;
     overflow-y: scroll;
-    padding-bottom: 40px;
+    padding: $smallGap $smallGap 20px $smallGap;
 }
 
 .leftNavPanel {
     height: 100%;
     overflow-y: scroll;
-    padding-top: 12px;
-    padding-bottom: 20px;
+    padding: $smallGap $smallGap 20px $smallGap;
 }
 
 .scrollY {
