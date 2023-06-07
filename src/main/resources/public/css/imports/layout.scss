@@ -156,6 +156,14 @@
     align-items: flex-start;
 }
 
+// Note: This is to be used inside a flexRowLayout. 'auto' margins on something directly inside
+// a display=flex container has a very special meaning, which is to consume (use up) all available space
+// on the left or right of something. So this auto margin left has the effect of pushing
+// the element as far to the right as it can go.
+.flexFloatRight {
+    margin-left: auto;
+}
+
 .flexRowAlignBottom {
     align-items: end;
 }

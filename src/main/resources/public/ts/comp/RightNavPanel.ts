@@ -166,14 +166,14 @@ export class RightNavPanel extends Div {
                                     PubSub.pub(C.PUBSUB_closeNavPanel);
                                     new UserProfileDlg(null).open();
                                 }
-                            }) : null
-                        ]),
-                        new Divc({ className: "marginBottom" }, [
-                            textToSpeech, 
-                            addNoteButton
+                            }) : null,
                         ]),
                         loginSignupDiv,
-                    ])
+                    ]),
+                    new Divc({ className: "flexFloatRight" }, [
+                        textToSpeech, 
+                        addNoteButton
+                    ]),
                 ], "fullWidth"),
                 // new Divc({ className: "marginBottom" }, [
                 //     new ButtonBar([
