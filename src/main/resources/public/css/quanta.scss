@@ -21,6 +21,13 @@ $custom-control-indicator-size: 1.75rem; // This gives us awesome large checkbox
 $form-select-indicator-color: lightGray;
 
 @import "../node_modules/bootstrap/scss/bootstrap";
+
+// By adding font-awesome into our SCSS here we consolildate all CSS into
+// one big CSS file called 'quanta.css', which we import directly into the HTML
+// (see also: #css-imports-disabled)
+$fa-font-path: "../fonts/fa";
+@import "../node_modules/font-awesome/scss/font-awesome";
+
 @import "bootswatch.scss";
 $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 

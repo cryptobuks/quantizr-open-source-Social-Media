@@ -9,6 +9,7 @@ src/main/resources/public/node_modules/
 src/main/resources/public/public/node/
 src/main/resources/public/.vscode/
 src/main/resources/public/bundle.js
+src/main/resources/public/fonts/fa
 
 src/main/resources/server/node_modules
 src/main/resources/server/build

@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-dev": "webpack --config webpack.dev.js",
-    "build-prod": "webpack --mode production --config webpack.prod.js"
+    "build-prod": "webpack --mode production --config webpack.prod.js",
+    "sass-dev": "sass --quiet --style=expanded css/quanta.scss:dist/quanta.css",
+    "sass-prod": "sass --quiet --no-source-map --style=compressed css/quanta.scss:dist/quanta.css"
   },
   "author": "Clay Ferguson",
   "license": "MIT",

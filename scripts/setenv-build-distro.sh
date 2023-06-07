@@ -10,6 +10,7 @@ export PRJPARENT=$(dirname "$PRJROOT")
 
 export QUANTA_VER=2.15
 export WEBPACK_SCRIPT=build-prod
+export SASS_SCRIPT=sass-prod
 
 # always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
 # builds we run on our machine should ever target to the 'subnode/repo:'

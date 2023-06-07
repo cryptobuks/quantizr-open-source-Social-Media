@@ -1,8 +1,18 @@
-import "bootstrap";
-import "font-awesome/css/font-awesome.min.css";
+
+// DO NOT DELETE (I want to keep the capability to go back to this if needed)
+// (see also: #css-imports-disabled)
+// import "bootstrap";
+// import "font-awesome/css/font-awesome.min.css";
+
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "../css/quanta.scss";
+
+// I decided there's far too much unnecessary complexity involved in combining the CSS into
+// the JS, because we don't have any component-specific CSS or any other reason to do this
+// and the net effect is that it just makes the JS bundle even larger when it's already too big.
+// DO NOT DELETE (I want to keep the capability to go back to this if needed)
+// (see also: #css-imports-disabled)
+// import "../css/quanta.scss";
 import AppContainer from "./comp/core/AppContainer";
 import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 import { Factory } from "./Factory";

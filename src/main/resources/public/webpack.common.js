@@ -9,6 +9,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 
 const isProduction = process.argv[process.argv.indexOf("--mode") + 1] === "production";
 const env = isProduction ? "prod" : "dev";
+const cacheBuster = new Date().getTime();
 
 console.log("Webpack Build: " + env);
 
@@ -28,7 +29,8 @@ const plugins = [
         template: "indexTemplate.html",
         publicPath: "/dist",
         scriptLoading: "module",
-        inject: "body"
+        inject: "body",
+        cacheBuster
     }),
 
     new HtmlWebpackPlugin({
@@ -102,20 +104,22 @@ module.exports = {
                     }]
                 },
 
-                {
-                    // handles both scss or css files.
-                    test: /\.(sc|c)ss$/i,
-                    use: [
-                        // isProduction ? MiniCssExtractPlugin.loader : 
-                        {
-                            loader: "style-loader"
-                        },
-                        {
-                            loader: "css-loader"
-                        }, {
-                            loader: "sass-loader"
-                        }]
-                },
+                // DO NOT DELETE (I want to keep the capability to go back to this if needed)
+                // (see also: #css-imports-disabled)
+                // {
+                //     // handles both scss or css files.
+                //     test: /\.(sc|c)ss$/i,
+                //     use: [
+                //         // isProduction ? MiniCssExtractPlugin.loader : 
+                //         {
+                //             loader: "style-loader"
+                //         },
+                //         {
+                //             loader: "css-loader"
+                //         }, {
+                //             loader: "sass-loader"
+                //         }]
+                // },
                 {
                     test: /\.htm$/,
                     use: [{

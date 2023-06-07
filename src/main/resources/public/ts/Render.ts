@@ -1,5 +1,8 @@
 import highlightjs from "highlight.js";
-import "highlight.js/styles/dark.css";
+
+// DO NOT DELETE (I want to keep the capability to go back to this if needed)
+// (see also: #css-imports-disabled)
+// import "highlight.js/styles/dark.css";
 import { marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import { toArray } from "react-emoji-render";

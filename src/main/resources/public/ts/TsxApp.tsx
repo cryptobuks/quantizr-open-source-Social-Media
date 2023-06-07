@@ -1,5 +1,7 @@
 import React from "react";
-import "../css/imports/tsx-test.scss";
+
+// This will currently be broken now that CSS is no longer using module imports our app.
+// import "../css/imports/tsx-test.scss";
 
 // Example use:
 // http://localhost:8182/demo/tsx-test
