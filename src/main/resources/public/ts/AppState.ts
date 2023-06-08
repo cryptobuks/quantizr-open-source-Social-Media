@@ -205,4 +205,6 @@ export class AppState {
     nodeHistoryLocked: boolean;
 
     nostrQueryRunning: boolean = false;
+
+    expandedMenus: Set<string> = new Set<string>();
 }

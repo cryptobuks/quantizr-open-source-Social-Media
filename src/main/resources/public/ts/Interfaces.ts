@@ -92,7 +92,3 @@ export interface NodePrivilegesInfo {
     aclEntries: J.AccessControlInfo[];
     owners: string[];
 }
-
-export interface MenuPanelState {
-    expanded: Set<string>;
-}

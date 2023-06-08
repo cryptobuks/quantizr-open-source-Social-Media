@@ -1,4 +1,4 @@
-import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { asyncDispatch, dispatch, getAs, promiseDispatch } from "./AppContext";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Tag } from "./comp/core/Tag";
@@ -21,7 +21,6 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { MenuPanelState } from "./Interfaces";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -29,10 +28,25 @@ import { S } from "./Singletons";
 import { SettingsTab } from "./tabs/data/SettingsTab";
 import { TTSTab } from "./tabs/data/TTSTab";
 
+PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
+    // These menu options are too important to have the user just "maybe" happen to find them
+    // when needed so we actively set the expansion state based on context of what user is doing.
+    if (tabId === C.TAB_FEED || tabId == C.TAB_TRENDING) {
+        asyncDispatch("menuExpandChanged", s => {
+            S.nav.changeMenuExpansion(s, "expand", C.PROTOCOL_MENU_TEXT);
+            S.nav.changeMenuExpansion(s, "collapse", C.OPTIONS_MENU_TEXT);
+        });
+    }
+    else if (tabId === C.TAB_MAIN) {
+        asyncDispatch("menuExpandChanged", s => {
+            S.nav.changeMenuExpansion(s, "expand", C.OPTIONS_MENU_TEXT);
+            S.nav.changeMenuExpansion(s, "collapse", C.PROTOCOL_MENU_TEXT);
+        });
+    }
+});
+
 export class MenuPanel extends Div {
-    static activeMenu: Set<string> = new Set<string>();
     static initialized: boolean = false;
-    static inst: MenuPanel;
 
     constructor() {
         super(null, {
@@ -40,13 +54,13 @@ export class MenuPanel extends Div {
             role: "tablist",
             className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel")
         });
-        MenuPanel.inst = this;
         if (!MenuPanel.initialized) {
             // if anon user keep the page very clean and don't show this.
-            MenuPanel.activeMenu.add(C.OPTIONS_MENU_TEXT);
+            dispatch("autoExpandOptionsMenu", s => {
+                s.expandedMenus.add(C.OPTIONS_MENU_TEXT);
+            });
             MenuPanel.initialized = true;
         }
-        this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
     }
 
     // leaving for reference how to open this.
@@ -193,7 +207,6 @@ export class MenuPanel extends Div {
 
     override preRender(): boolean {
         const ast = getAs();
-        const state = this.getState<MenuPanelState>();
 
         const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
@@ -215,12 +228,12 @@ export class MenuPanel extends Div {
         const allowEditMode = !ast.isAnonUser;
         const fullScreenViewer = S.util.fullscreenViewerActive();
 
-        children.push(new Menu(state, C.OPTIONS_MENU_TEXT, [
+        children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
-         ]));
+        ]));
 
-        children.push(new Menu(state, "Protocol", [    
+        children.push(new Menu(C.PROTOCOL_MENU_TEXT, [
             new MenuItem("Nostr", () => S.util.setProtocol(J.Constant.NETWORK_NOSTR), true, () => getAs().protocolFilter == J.Constant.NETWORK_NOSTR),
             new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
         ]));
@@ -243,14 +256,14 @@ export class MenuPanel extends Div {
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
-                children.push(new Menu(state, C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
+                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
             }
         }
 
         if (!ast.isAnonUser) {
             const systemFolderLinks = this.getSystemFolderLinks();
 
-            children.push(new Menu(state, "Folders", [
+            children.push(new Menu("Folders", [
                 new MenuItem("My Account", S.nav.navToMyAccntRoot),
                 new MenuItem("My Home", MenuPanel.openHomeNode),
                 new MenuItem("My Posts", MenuPanel.openPostsNode),
@@ -266,7 +279,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "People", [
+            children.push(new Menu("People", [
                 new MenuItem("Friends", MenuPanel.editFriends),
                 new MenuItem("Followers", MenuPanel.showFollowers),
                 new MenuItem("Blocked", MenuPanel.showBlockedUsers),
@@ -281,7 +294,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Edit", [
+            children.push(new Menu("Edit", [
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 
@@ -348,11 +361,11 @@ export class MenuPanel extends Div {
             }, //
                 !ast.isAnonUser && !!hltNode));
 
-            children.push(new Menu(state, "Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
+            children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Search", [
+            children.push(new Menu("Search", [
                 new MenuItem("By Content", MenuPanel.searchByContent, !!hltNode), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
@@ -387,7 +400,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Timeline", [
+            children.push(new Menu("Timeline", [
                 // Backing out the Chat Room feature for now.
                 // new MenuItem("Live Rev-Chron (Chat Room)", S.nav.messagesNodeFeed, hltNode?.id != null),
                 // new MenuItemSeparator(), //
@@ -400,7 +413,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Calendar", [
+            children.push(new Menu("Calendar", [
                 new MenuItem("Display", MenuPanel.showCalendar, !!hltNode),
                 new MenuItemSeparator(), //
                 new MenuItem("Future", MenuPanel.calendarFutureDates, !!hltNode), //
@@ -410,7 +423,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Tools", [
+            children.push(new Menu("Tools", [
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
                 new MenuItem("Import", MenuPanel.import, importFeatureEnabled),
@@ -430,7 +443,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Info", [
+            children.push(new Menu("Info", [
                 // I decided with this on the toolbar we don't need it repliated here.
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
@@ -442,7 +455,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Node Stats", MenuPanel.nodeStats) //
             ], null, this.makeHelpIcon(":menu-node-info")));
 
-            children.push(new Menu(state, "Shortcuts", [
+            children.push(new Menu("Shortcuts", [
                 new MenuItem("Set Link Source", MenuPanel.setLinkSource, ast.userPrefs.editMode && selNodeIsMine), //
                 new MenuItem("Set Link Target", MenuPanel.setLinkTarget, ast.userPrefs.editMode), //
                 new MenuItem("Link Nodes", MenuPanel.linkNodes, ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget)
@@ -450,7 +463,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Transfer", [
+            children.push(new Menu("Transfer", [
                 new MenuItem("Transfer", MenuPanel.transferNode, selNodeIsMine && !transferring), //
                 new MenuItem("Accept", MenuPanel.acceptTransfer, selNodeIsMine && transferring), //
                 new MenuItem("Reject", MenuPanel.rejectTransfer, selNodeIsMine && transferring), //
@@ -459,7 +472,7 @@ export class MenuPanel extends Div {
                 // todo-1: need "Show Incomming" transfers menu option
             ], null, this.makeHelpIcon(":transfers")));
 
-            children.push(new Menu(state, "Account", [
+            children.push(new Menu("Account", [
                 new MenuItem("Profile", MenuPanel.userProfile),
                 new MenuItem("Settings", MenuPanel.userSettings)
             ]));
@@ -578,23 +591,3 @@ export class MenuPanel extends Div {
         }
     }
 }
-
-// Object will have 'op' and 'name' props
-PubSub.sub(C.PUBSUB_menuExpandChanged, (payload: any) => {
-    MenuPanel.inst?.onMount(() => {
-        const state = MenuPanel.inst.getState<MenuPanelState>();
-        if (payload.op === "toggle") {
-            if (state.expanded.has(payload.name)) {
-                state.expanded.delete(payload.name);
-            }
-            else {
-                state.expanded.add(payload.name);
-            }
-        }
-        else if (payload.op === "expand") {
-            state.expanded.add(payload.name);
-        }
-        // NOTE: We don't have the need for a "collapse" option currently
-        MenuPanel.inst.mergeState(state);
-    });
-});

@@ -761,4 +761,21 @@ export class Nav {
             name: J.Constant.FEED_PUB
         });
     }
+
+    changeMenuExpansion = (ast: AppState, op: string, menuName: string) => {
+        if (op === "toggle") {
+            if (ast.expandedMenus.has(menuName)) {
+                ast.expandedMenus.delete(menuName);
+            }
+            else {
+                ast.expandedMenus.add(menuName);
+            }
+        }
+        else if (op === "expand") {
+            ast.expandedMenus.add(menuName);
+        }
+        else if (op === "collapse") {
+            ast.expandedMenus.delete(menuName);
+        }
+    }
 }

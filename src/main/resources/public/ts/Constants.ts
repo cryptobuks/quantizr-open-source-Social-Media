@@ -50,6 +50,7 @@ export class Constants {
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
     static OPTIONS_MENU_TEXT = "Options";
+    static PROTOCOL_MENU_TEXT = "Network";
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
@@ -70,7 +71,6 @@ export class Constants {
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";
     static readonly PUBSUB_closeNavPanel = "PUBSUB_closeNavPanel";
-    static readonly PUBSUB_menuExpandChanged = "PUBSUB_menuExpandChanged";
     static readonly PUBSUB_dispatcherReady = "PUBSUB_dispatcherReady";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
