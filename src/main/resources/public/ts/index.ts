@@ -25,8 +25,7 @@ import TsxApp from "./TsxApp";
 ImportTest.check();
 console.log("index.ts finished imports");
 
-// This is how we run the main app (normal flow)
-window.addEventListener("load", async (event) => {
+const processAppLoad = async () => {
     const root = createRoot(document.getElementById("app"));
     const factory = new Factory();
     await S.quanta.loadConfig();
@@ -60,4 +59,8 @@ window.addEventListener("load", async (event) => {
 
     root.render(React.createElement(appComp));
     factory.initApp();
+}
+
+window.addEventListener("load", async (event) => {
+    setTimeout(processAppLoad, 10);
 });
