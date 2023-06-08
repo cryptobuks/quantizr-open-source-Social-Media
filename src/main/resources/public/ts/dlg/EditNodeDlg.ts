@@ -728,7 +728,7 @@ export class EditNodeDlg extends DialogBase {
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
-            new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
+            new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary"),
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", "File", {

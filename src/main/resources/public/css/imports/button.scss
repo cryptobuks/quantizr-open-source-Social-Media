@@ -40,6 +40,14 @@
     border: 1px solid slategrey;
 }
 
+.btn:active {
+    border: 1px solid slategrey;
+}
+
+.btn:focus {
+    border: 1px solid slategrey;
+}
+
 .errorBackButton {
     margin-top: 1.5rem;
     font-weight: 700;
@@ -56,10 +64,6 @@
     // font-size: $fontSize;
     white-space: nowrap;
     padding-left: 6px;
-}
-
-.attentionButton {
-    background-color: green;
 }
 
 .pasteButton {

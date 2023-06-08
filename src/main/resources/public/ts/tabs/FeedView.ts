@@ -279,7 +279,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     ast.isAnonUser ? null : friendsTagDropDown,
                     ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "attentionButton")
+                    }, "btn-primary")
                 ])
             ]),
             new Divc({ className: "feedView" }, children)
