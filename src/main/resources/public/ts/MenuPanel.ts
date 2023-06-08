@@ -37,7 +37,7 @@ PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
             S.nav.changeMenuExpansion(s, "collapse", C.OPTIONS_MENU_TEXT);
         });
     }
-    else if (tabId === C.TAB_MAIN) {
+    else if (tabId === C.TAB_MAIN || tabId === C.TAB_DOCUMENT) {
         asyncDispatch("menuExpandChanged", s => {
             S.nav.changeMenuExpansion(s, "expand", C.OPTIONS_MENU_TEXT);
             S.nav.changeMenuExpansion(s, "collapse", C.PROTOCOL_MENU_TEXT);

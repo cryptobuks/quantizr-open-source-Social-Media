@@ -23,7 +23,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     allowHeader: boolean = true;
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
-    pagingContainerClass: string = "marginBottom marginTop"; // used to have 'text-center' to center buttons
+    pagingContainerClass: string = "marginBottom marginTop";
 
     constructor(data: TabIntf<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
