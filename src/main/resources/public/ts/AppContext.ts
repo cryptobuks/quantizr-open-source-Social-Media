@@ -1,7 +1,5 @@
 import { createContext, useReducer } from "react";
 import { AppState } from "./AppState";
-import { Constants as C } from "./Constants";
-import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
 /* Redux Replacement!!
@@ -62,7 +60,6 @@ export function getAs(): AppState {
  */
 export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
-    PubSub.pub(C.PUBSUB_dispatcherReady);
 }
 
 export function asyncDispatch(type: string, func: StateModFunc) {

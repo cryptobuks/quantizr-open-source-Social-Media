@@ -8,16 +8,15 @@ inside their constructors because there is no guarantee that all (or any) of the
 been constructed yet.
 */
 import { Attachment } from "./Attachment";
-import { Constants as C } from "./Constants";
+import { Crypto } from "./Crypto";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
-import { Crypto } from "./Crypto";
 import { LocalDB } from "./LocalDB";
 import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
+import { Nostr } from "./Nostr";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
-import { PubSub } from "./PubSub";
 import { Quanta } from "./Quanta";
 import { Render } from "./Render";
 import { RpcUtil } from "./RpcUtil";
@@ -28,7 +27,6 @@ import { SpeechEngine } from "./SpeechEngine";
 import { TabUtil } from "./TabUtil";
 import { User } from "./User";
 import { Util } from "./Util";
-import { Nostr } from "./Nostr";
 import { View } from "./View";
 
 console.log("Factory.ts imports complete");
@@ -70,17 +68,6 @@ export class Factory {
             S.util.logErr(e, msg);
             alert(msg);
             throw e;
-        }
-    }
-
-    initApp() {
-        try {
-            console.log("calling factory.initApp()");
-            PubSub.subSingleOnce(C.PUBSUB_dispatcherReady, S.quanta.initApp);
-        }
-        catch (e) {
-            alert("initApp failed: " + e);
-            S.util.logErr(e, "initApp failed.");
         }
     }
 }

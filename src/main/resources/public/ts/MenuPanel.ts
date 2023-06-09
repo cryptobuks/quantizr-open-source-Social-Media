@@ -56,7 +56,7 @@ export class MenuPanel extends Div {
         });
         if (!MenuPanel.initialized) {
             // if anon user keep the page very clean and don't show this.
-            dispatch("autoExpandOptionsMenu", s => {
+            asyncDispatch("autoExpandOptionsMenu", s => {
                 s.expandedMenus.add(C.OPTIONS_MENU_TEXT);
             });
             MenuPanel.initialized = true;
