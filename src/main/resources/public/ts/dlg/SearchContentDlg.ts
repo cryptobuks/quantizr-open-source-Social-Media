@@ -74,7 +74,7 @@ export class SearchContentDlg extends DialogBase {
                 new Clearfix(),
 
                 new FlexRowLayout([
-                    ast.userProfile.blockedWords ? new Checkbox("Blocked Words", null, {
+                    ast.userProfile?.blockedWords ? new Checkbox("Blocked Words", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.blockedWords = checked;
                             this.mergeState<LS>({ blockedWords: checked });

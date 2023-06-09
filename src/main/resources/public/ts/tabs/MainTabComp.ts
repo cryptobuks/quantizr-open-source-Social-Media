@@ -72,14 +72,14 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         this.setChildren([
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
-            ast.isAnonUser || !ast.node ? null : (this.headingBar = new TabHeading([
+            !ast.node ? null : (this.headingBar = new TabHeading([
                 new Divc({ className: "tinyMarginTop float-end" }, [
-                    !ast.isAnonUser ? new Icon({
+                    new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
                         title: "Show Document View",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
-                    }) : null,
+                    }),
 
                     new Icon({
                         className: "fa fa-search fa-lg buttonBarIcon",
