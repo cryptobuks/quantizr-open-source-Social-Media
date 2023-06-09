@@ -1328,6 +1328,10 @@ export class Nostr {
                         const e = document.getElementById(elmId);
                         if (e) {
                             e.addEventListener("click", () => {
+                                if (getAs().isAnonUser) {
+                                    S.util.showMessage("You must be logged in to request specific Nostr content.", "Nostr", true);
+                                    return;
+                                }
                                 S.nostr.searchId(ref.event.id, ref.event.relays, false, node);
                             });
                         }
