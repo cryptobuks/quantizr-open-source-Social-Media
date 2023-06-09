@@ -14,8 +14,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Sort;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
@@ -23,9 +24,9 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.jupyter.JupyterCell;
 import quanta.model.jupyter.JupyterCodeMirrorMode;
+import quanta.model.jupyter.JupyterKernelSpec;
 import quanta.model.jupyter.JupyterLangInfo;
 import quanta.model.jupyter.JupyterMetadata;
-import quanta.model.jupyter.JupyterKernelSpec;
 import quanta.model.jupyter.JupyterNB;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -35,10 +36,9 @@ import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.TreeNode;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for exporting to archives (ZIP and TAR).
@@ -76,7 +76,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + prop.getAdminDataFolder());
 		}
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(ms, nodeId);
+
+		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null);
+		SubNode node = rootNode.node;
+
 		String fileName = snUtil.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
@@ -93,7 +96,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			auth.ownerAuth(ms, node);
 			ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
-			recurseNode("../", "", node, nodeStack, 0, null);
+			recurseNode("../", "", rootNode, nodeStack, 0, null);
 			if (req.isIncludeHTML()) {
 				StringBuilder out = new StringBuilder();
 				appendHtmlBegin("", out);
@@ -165,8 +168,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	private void recurseNode(String rootPath, String parentFolder, SubNode node, ArrayList<SubNode> nodeStack, int level,
+	private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
 			String parentId) {
+		SubNode node = tn.node;
 		if (node == null)
 			return;
 		// If a node has a property "noexport" (added by power users) then this node will not be exported.
@@ -181,16 +185,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		 */
 		processNodeExport(session, parentFolder, "", node, true, fileName, level, true);
 		String folder = node.getIdStr();
-		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		if (iter != null) {
-			for (SubNode n : iter) {
-				String noExp = n.getStr(NodeProp.NO_EXPORT);
+
+		if (tn.children != null) {
+			for (TreeNode c : tn.children) {
+				String noExp = c.node.getStr(NodeProp.NO_EXPORT);
 				if (noExp != null) {
 					continue;
 				}
-				nodeStack.add(n);
-				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, n.getIdStr());
-				nodeStack.remove(n);
+				nodeStack.add(c.node);
+				recurseNode(rootPath + "../", parentFolder + "/" + folder, c, nodeStack, level + 1, c.node.getIdStr());
+				nodeStack.remove(c.node);
 			}
 		}
 	}
