@@ -228,7 +228,7 @@ body {
 .headingBar {
     padding-top: 8px;
     margin-bottom: 8px;
-    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    border-bottom: 8px solid $nodeBorderBottomColor;
     background-color: $body-bg;
     position: sticky;
     top: 0;
@@ -239,7 +239,7 @@ body {
 .headingBarMobile {
     padding-top: 8px;
     margin-bottom: 8px;
-    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    border-bottom: 8px solid $nodeBorderBottomColor;
     background-color: $body-bg;
     min-height: 4em;
 }

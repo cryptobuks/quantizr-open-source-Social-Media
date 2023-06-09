@@ -332,8 +332,8 @@ export class Nav {
                 }
                 node = res.node;
             }
-            S.srch.showDocument(node, false);
-        }, 250);
+            S.srch.showDocument(node);
+        }, 10);
     }
 
     runTimeline = (evt: Event) => {

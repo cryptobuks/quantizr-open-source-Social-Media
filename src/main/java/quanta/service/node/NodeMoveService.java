@@ -305,7 +305,7 @@ public class NodeMoveService extends ServiceBase {
 		boolean removeOrphans = !fast;
 		BulkOperations bops = null;
 		int batchSize = 0;
-		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false, null)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}

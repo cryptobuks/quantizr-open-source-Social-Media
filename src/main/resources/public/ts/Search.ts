@@ -248,7 +248,7 @@ export class Search {
         });
     }
 
-    showDocument = async (node: J.NodeInfo, growPage: boolean) => {
+    showDocument = async (node: J.NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -256,18 +256,8 @@ export class Search {
             return;
         }
 
-        // set startNode to the last node we had at the end of the current document
-        let startNode: J.NodeInfo = null;
-        if (growPage) {
-            const info = DocumentTab.inst.props as DocumentRSInfo;
-            if (info.results?.length > 0) {
-                startNode = info.results[info.results.length - 1];
-            }
-        }
-
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
             rootId: node.id,
-            startNodeId: startNode ? startNode.id : node.id,
             includeComments: getAs().userPrefs.showReplies
         });
 
@@ -286,14 +276,12 @@ export class Search {
             DocumentTab.inst.openGraphComps = [];
             const info = DocumentTab.inst.props as DocumentRSInfo;
 
-            if (!growPage) {
-                info.endReached = false;
-                S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
-            }
+            info.endReached = true;
+            S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
 
             // set 'results' if this is the top of page being rendered, or else append results if we
             // were pulling down more items at the end of the doc.
-            info.results = growPage ? info.results.concat(res.searchResults) : res.searchResults;
+            info.results = res.searchResults;
             info.node = node;
             S.tabUtil.selectTabStateOnly(DocumentTab.inst.id);
         });

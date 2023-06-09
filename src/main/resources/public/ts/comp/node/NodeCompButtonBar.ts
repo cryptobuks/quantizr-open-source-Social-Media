@@ -221,7 +221,7 @@ export class NodeCompButtonBar extends Div {
                 ast.isAdminUser
             )) {
             if (S.nav.parentVisibleToUser()) {
-                upLevelButton = new IconButton("fa-folder", "Up Level", {
+                upLevelButton = new IconButton("fa-folder", "Up", {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.navUpLevelClick,
                     title: "Go to Parent Node"

@@ -60,7 +60,7 @@ public class SyncToMFSService extends ServiceBase {
 		try {
 			auth.ownerAuth(ms, node);
 			// Get all public nodes under the subgraph
-			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true, true, true);
+			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true, true, true, null);
 			/*
 			 * process the root node then all subgraph nodes, which will write the JSON of each node to an MFS
 			 * file, and add the generated filenames of all files to the 'allNodePaths' set.

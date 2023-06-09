@@ -924,7 +924,7 @@ public class NodeEditService extends ServiceBase {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			if (req.isRecursive()) {
 				StringBuilder sb = new StringBuilder();
-				for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, true, false, false)) {
+				for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, true, false, false, null)) {
 					nodeCount++;
 					sb.append(n.getPath());
 					sb.append("-");
@@ -1018,7 +1018,7 @@ public class NodeEditService extends ServiceBase {
 		if (req.isRecursive()) {
 			// todo-1: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
 			// but leave as ALL node for the admin who might specify the 'from'?
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
 			}
@@ -1146,7 +1146,7 @@ public class NodeEditService extends ServiceBase {
 			content = content.trim();
 			int baseLevel = XString.getHeadingLevel(content);
 			int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
 				int slashCount = StringUtils.countMatches(n.getPath(), "/");
 				int level = baseLevel + (slashCount - baseSlashCount);
 				if (level > 6)
@@ -1250,7 +1250,7 @@ public class NodeEditService extends ServiceBase {
 			cachedChanges++;
 		}
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
 				if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
 					replacements++;
 					cachedChanges++;

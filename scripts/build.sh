@@ -32,6 +32,7 @@ cd ${PRJROOT}/pom/common
 # from this common pom. Both POMS are necessary!
 echo "mvn install the /pom/common/pom.xml into repo"
 mvn -T 1C install -Dmaven.javadoc.skip=true
+verifySuccess "Maven install commmon pom"
 
 cd ${PRJROOT}
 
@@ -45,6 +46,8 @@ echo "Maven CLEAN package ${mvn_profile}"
 # This run is required only to ensure TypeScript generated files are up to date.
 # Always do the same profile here (dev-vscode)
 mvn -T 1C package -DskipTests=true -Pdev-vscode
+verifySuccess "Maven install commmon dev-vscode (typescript gen)"
+
 cp src/main/resources/public/ts/JavaIntf.ts src/main/resources/quanta-common/JavaIntf.ts
 
 cd ${PRJROOT}/src/main/resources/quanta-common

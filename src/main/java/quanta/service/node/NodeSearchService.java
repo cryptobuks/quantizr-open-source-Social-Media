@@ -102,21 +102,14 @@ public class NodeSearchService extends ServiceBase {
 	@PerfMon(category = "search")
 	public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
 		RenderDocumentResponse res = new RenderDocumentResponse();
-		PerfMonEvent perf = new PerfMonEvent(0, null, ms.getUserName());
 		List<NodeInfo> results = new LinkedList<>();
 		res.setSearchResults(results);
-		SubNode node = read.getNode(ms, new ObjectId(req.getRootId()));
-		if (!(node != null)) {
-			return res;
-		}
-		perf.chain("rendDoc:GetNode");
-		boolean adminOnly = acl.isAdminOwned(node);
 		HashSet<String> truncates = new HashSet<>();
-		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), req.isIncludeComments(), truncates);
+		List<SubNode> nodes = read.getFlatSubGraph(ms, req.getRootId(), req.isIncludeComments());
+
 		int counter = 0;
-		perf.chain("rendDoc:getDocList");
 		for (SubNode n : nodes) {
-			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
+			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
 					false, false, false, true, null, false);
 			if (info != null) {
 				if (truncates.contains(n.getIdStr())) {
@@ -124,7 +117,6 @@ public class NodeSearchService extends ServiceBase {
 				}
 				results.add(info);
 			}
-			perf.chain("rendDoc:converted");
 		}
 		return res;
 	}
@@ -480,7 +472,7 @@ public class NodeSearchService extends ServiceBase {
 			// has the side effect of cleaning out orphans.
 			// Note doAuth is saying here if there's any potential secrets in the results then use doAuth=true
 			boolean doAuth = wordMap != null || tagMap != null || mentionMap != null;
-			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth);
+			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth, null);
 		}
 		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
 		HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;

@@ -607,7 +607,7 @@ export class Edit {
         else if (ast.activeTab === C.TAB_DOCUMENT) {
             const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
             if (data) {
-                S.srch.showDocument(data.props.node, false);
+                S.srch.showDocument(data.props.node);
             }
         }
         else {

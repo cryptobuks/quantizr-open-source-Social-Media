@@ -79,32 +79,6 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		log.debug("*****************************************************************************************");
 	}
 
-	private void testDocOrderQuery() {
-		arun.run(as -> {
-			String rootId = "631503fdb6acb76f73971fec";
-			SubNode rootNode = read.getNode(as, rootId);
-			log.debug("______________________________________");
-			// log.debug("START: " + rootNode.getContent());
-			// iterate from root first.
-			docOrderTest(as, rootId, rootId);
-			Iterable<SubNode> iter = read.getSubGraph(as, rootNode, null, -1, false, false, false);
-			// this runs a test to iterate down from every possible starting place in the subgraph
-			for (SubNode n : iter) {
-				log.debug("______________________________________");
-				// log.debug("START: " + n.getContent());
-				docOrderTest(as, rootId, n.getIdStr());
-			}
-			return null;
-		});
-	}
-
-	private void docOrderTest(MongoSession as, String rootId, String nodeId) {
-		List<SubNode> nodes = read.genDocList(as, rootId, nodeId, true, null);
-		for (SubNode n : nodes) {
-			log.debug("CONTENT: " + n.getContent());
-		}
-	}
-
 	// "name": ":catjam:",
 	// "updated": "2020-08-25T14:05:01Z",
 	// "icon": {

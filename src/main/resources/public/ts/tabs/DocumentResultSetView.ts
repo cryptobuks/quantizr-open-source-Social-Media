@@ -2,7 +2,6 @@ import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Divc } from "../comp/core/Divc";
 import { Icon } from "../comp/core/Icon";
 import { Constants as C } from "../Constants";
@@ -49,23 +48,11 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false,
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style);
 
-        if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
-            // todo-1: We could easily make this icon clickable to render this node as the root of a new document
-            // but then we'd need to have a "back button" capability to get back to previous document render.
-            row.addChild(new Icon({
-                className: "fa fa-warning fa-lg float-end warningIcon",
-                title: "Nodes truncated. Tree too Deep."
-            }));
-            row.addChild(new Clearfix());
-        }
         return row;
     }
 
     pageChange(delta: number): void {
-        setTimeout(() => {
-            const growPage = delta !== null && delta > 0;
-            S.srch.showDocument(this.data.props.node, growPage);
-        }, 500);
+        S.nav.openDocumentView(null, getAs().node?.id);
     }
 
     getFloatRightHeaderComp = (): Comp => {

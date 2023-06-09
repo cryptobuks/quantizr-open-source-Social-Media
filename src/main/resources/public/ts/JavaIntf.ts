@@ -533,7 +533,6 @@ export interface RenderCalendarRequest extends RequestBase {
 
 export interface RenderDocumentRequest extends RequestBase {
     rootId: string;
-    startNodeId: string;
     includeComments: boolean;
 }
 
@@ -1217,7 +1216,7 @@ export const enum Constant {
 }
 
 export const enum ConstantInt {
-    ROWS_PER_PAGE = 25,
+    ROWS_PER_PAGE = 50,
 }
 
 export const enum ErrorType {
