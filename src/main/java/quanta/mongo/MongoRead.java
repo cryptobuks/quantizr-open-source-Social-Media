@@ -31,6 +31,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
+import quanta.util.TreeNode;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
@@ -1326,19 +1327,7 @@ public class MongoRead extends ServiceBase {
         return mongoUtil.find(q);
     }
 
-    class TreeNode {
-        TreeNode(SubNode node) {
-            this.node = node;
-        }
-
-        SubNode node;
-        LinkedList<TreeNode> children;
-    }
-
-    // todo-00: we can now use this method other places (like export routines) where we are traversing
-    // the tree querying for children one node at a time, which is super slow 
-    public List<SubNode> getFlatSubGraph(MongoSession ms, final String rootId, boolean includeComments) {
-        LinkedList<SubNode> doc = new LinkedList<>();
+    public TreeNode getSubGraphTree(MongoSession ms, String rootId, Criteria criteria) {
         SubNode rootNode = getNode(ms, new ObjectId(rootId));
         if (rootNode == null)
             throw new RuntimeException("unable to access node: " + rootId);
@@ -1349,13 +1338,8 @@ public class MongoRead extends ServiceBase {
         HashMap<String, TreeNode> nodeMap = new HashMap<>();
         nodeMap.put(rootNode.getPath(), rootTreeNode);
 
-        Criteria typeCriteria = null;
-        if (!includeComments) {
-            typeCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT);
-        }
-
         // first scan to build up the nodes list and nodeMap
-        for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, false, true, typeCriteria)) {
+        for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, false, true, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
             if (nodeMap.size() > 5000) {
                 throw new RuntimeException("Too much data to return. Max is 5000 nodes.");
@@ -1378,7 +1362,18 @@ public class MongoRead extends ServiceBase {
             }
             parent.children.add(n);
         });
+        return rootTreeNode;
+    }
 
+    public List<SubNode> getFlatSubGraph(MongoSession ms, final String rootId, boolean includeComments) {
+        LinkedList<SubNode> doc = new LinkedList<>();
+
+        Criteria typeCriteria = null;
+        if (!includeComments) {
+            typeCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT);
+        }
+
+        TreeNode rootTreeNode = getSubGraphTree(ms, rootId, typeCriteria);
         traverseTree(rootTreeNode, doc);
         return doc;
     }
