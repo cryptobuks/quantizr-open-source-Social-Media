@@ -160,7 +160,8 @@ export class Render {
 
         // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
         this.markedRenderer.codespan = (code: string) => {
-            return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
+            // return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
+            return `<span class='mkDownCodespan'">${code}</span>`;
         }
 
         // From Stack Overflow
