@@ -388,6 +388,10 @@ public class SessionContext extends ServiceBase {
 		return PrincipalName.ADMIN.s().equalsIgnoreCase(userName);
 	}
 
+	public boolean readFromAdminCache() {
+		return system.adminNodesCacheMap != null && !isAdmin();
+	}
+
 	public boolean isAnonUser() {
 		return PrincipalName.ANON.s().equalsIgnoreCase(userName);
 	}

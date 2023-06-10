@@ -66,6 +66,9 @@ public class UserFeedService extends ServiceBase {
 		// Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 		// Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 		SubNode searchRoot = read.getNode(ms, sc.getRootId());
+		if (searchRoot == null) {
+			return res;
+		}
 		Long lastActiveLong = searchRoot.getInt(NodeProp.LAST_ACTIVE_TIME);
 		if (lastActiveLong == 0) {
 			return res;

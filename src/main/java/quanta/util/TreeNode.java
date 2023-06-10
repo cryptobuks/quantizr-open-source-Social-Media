@@ -9,5 +9,6 @@ public class TreeNode {
     }
 
     public SubNode node;
+    public TreeNode parent;
     public LinkedList<TreeNode> children;
 }

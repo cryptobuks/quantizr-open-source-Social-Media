@@ -50,6 +50,7 @@ import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.TreeNode;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
@@ -67,8 +68,30 @@ public class SystemService extends ServiceBase {
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 	public static final ObjectMapper mapper = new ObjectMapper();
 
+	// These two cache collections are for the purpose of being sure that almost all browsing
+	// of the admin content (landing page, website) can be done without any DB querying at all and
+	// come directly from server memory.
+	public static final Object adminNodesCacheLock = new Object();
+	public TreeNode adminNodesCache;
+	public HashMap<String, TreeNode> adminNodesCacheMap;
+
 	{
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+
+	public void cacheAdminNodes() {
+		arun.run(as -> {
+			String id = prop.getUserLandingPageNode();
+			SubNode node = read.getNode(as, id, false);
+			if (node != null) {
+				synchronized (adminNodesCacheLock) {
+					adminNodesCacheMap = new HashMap<String, TreeNode>();
+					adminNodesCache = read.getSubGraphTree(as, node.getIdStr(), null, adminNodesCacheMap);
+				}
+				// log.debug("Cached Admin Nodes: " + adminNodesCacheMap.size());
+			}
+			return null;
+		});
 	}
 
 	public String rebuildIndexes() {

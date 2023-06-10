@@ -97,6 +97,7 @@ public class MongoRepository extends ServiceBase {
 			delete.removeAbandonedNodes(as);
 			// apub.refreshForeignUsers();
 			// apub.refreshFollowedUsers();
+			system.cacheAdminNodes();
 		}
 	}
 

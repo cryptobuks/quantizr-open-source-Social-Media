@@ -77,7 +77,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 		String nodeId = req.getNodeId();
 
-		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null);
+		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null, null);
 		SubNode node = rootNode.node;
 
 		String fileName = snUtil.getExportFileName(req.getFileName(), node);

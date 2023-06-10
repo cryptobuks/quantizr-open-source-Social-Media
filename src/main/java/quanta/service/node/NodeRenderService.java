@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
@@ -41,8 +43,6 @@ import quanta.util.Convert;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered on the server side.
@@ -78,6 +78,7 @@ public class NodeRenderService extends ServiceBase {
 		SubNode node = null;
 		try {
 			node = read.getNode(ms, targetId);
+
 			if (node == null && !sc.isAnonUser()) {
 				node = read.getNode(ms, sc.getRootId());
 			}

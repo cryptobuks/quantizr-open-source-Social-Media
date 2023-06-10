@@ -10,8 +10,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
@@ -40,8 +41,6 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.TreeNode;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * https://github.com/vsch/flexmark-java
@@ -92,7 +91,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null);
+		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null, null);
 		SubNode exportNode = rootNode.node;
 
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);

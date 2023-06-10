@@ -30,6 +30,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
+import quanta.service.SystemService;
 import quanta.util.ThreadLocals;
 import quanta.util.TreeNode;
 import quanta.util.Util;
@@ -48,6 +49,7 @@ public class MongoRead extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;
+    public static Sort ordinalSort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
@@ -151,6 +153,16 @@ public class MongoRead extends ServiceBase {
         if (doAuth && allowUpdate) {
             throw new RuntimeException("doAuth and allowUpdate are mutually exclusive.");
         }
+
+        if (ThreadLocals.getSC().readFromAdminCache()) {
+            synchronized (SystemService.adminNodesCacheLock) {
+                TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
+                if (tn != null) {
+                    return tn.children != null;
+                }
+            }
+        }
+
         // if the node knows it's children status (non-null value) return that.
         if (SubNode.USE_HAS_CHILDREN && !doAuth && node.getHasChildren() != null) {
             // calling booleanValue for clarity
@@ -370,9 +382,21 @@ public class MongoRead extends ServiceBase {
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
             authPending = false;
         } else
-        // If search doesn't start with a slash then it's a nodeId and not a path
+        // else if search doesn't start with a slash then it's a nodeId and not a path
         if (!identifier.startsWith("/")) {
-            ret = getNode(ms, new ObjectId(identifier), allowAuth);
+            if (ThreadLocals.getSC().readFromAdminCache()) {
+                synchronized (SystemService.adminNodesCacheLock) {
+                    TreeNode tn = system.adminNodesCacheMap.get(identifier);
+                    if (tn != null) {
+                        // log.debug("********** CACHE HIT: NODE: " + tn.node.getIdStr());
+                        ret = tn.node;
+                    }
+                }
+            }
+
+            if (ret == null) {
+                ret = getNode(ms, new ObjectId(identifier), allowAuth);
+            }
             authPending = false;
         } else
         // otherwise this is a path lookup
@@ -441,6 +465,20 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getParent(MongoSession ms, SubNode node) {
+        if (ThreadLocals.getSC().readFromAdminCache()) {
+            synchronized (SystemService.adminNodesCacheLock) {
+                TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
+                /*
+                 * Note this parent check for null here is consistent with the fact that node we might have just
+                 * found in the cache might be the root of the cache tree which doesn't keep track of what it's
+                 * parent is, so we can only return here in cases where we did find a parent
+                 */
+                if (tn != null && tn.parent != null) {
+                    return tn.parent.node;
+                }
+            }
+        }
+
         return getParent(ms, node, true);
     }
 
@@ -565,6 +603,36 @@ public class MongoRead extends ServiceBase {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
+
+        if (ThreadLocals.getSC().readFromAdminCache() && moreCriteria == null && ordinalSort.equals(sort)) {
+            TreeNode tn = null;
+            synchronized (SystemService.adminNodesCacheLock) {
+                tn = system.adminNodesCacheMap.get(node.getIdStr());
+            }
+
+            if (tn != null) {
+                if (tn.children == null) {
+                    return Collections.<SubNode>emptyList();
+                } else {
+                    // log.debug("********** CACHE HIT (CHILDREN): NODE: " + tn.node.getIdStr())
+                    List<SubNode> ret = new LinkedList<>();
+                    if (skip < 0)
+                        skip = 0;
+                    int idx = 0;
+                    for (TreeNode c : tn.children) {
+                        if (skip > 0) {
+                            skip--;
+                            continue;
+                        }
+                        if (limit <= 0 || idx++ < limit) {
+                            ret.add(c.node);
+                        }
+                    }
+                    return ret;
+                }
+            }
+        }
+
         auth.auth(ms, node, PrivilegeType.READ);
         return getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria, false);
     }
@@ -1327,12 +1395,16 @@ public class MongoRead extends ServiceBase {
         return mongoUtil.find(q);
     }
 
-    public TreeNode getSubGraphTree(MongoSession ms, String rootId, Criteria criteria) {
+    // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
+    public TreeNode getSubGraphTree(MongoSession ms, String rootId, Criteria criteria, HashMap<String, TreeNode> idMap) {
         SubNode rootNode = getNode(ms, new ObjectId(rootId));
         if (rootNode == null)
             throw new RuntimeException("unable to access node: " + rootId);
 
         TreeNode rootTreeNode = new TreeNode(rootNode);
+        if (idMap != null) {
+            idMap.put(rootNode.getIdStr(), rootTreeNode);
+        }
 
         // maps from path to node
         HashMap<String, TreeNode> nodeMap = new HashMap<>();
@@ -1348,20 +1420,33 @@ public class MongoRead extends ServiceBase {
 
         // process all nodes to add to children (as unordered children at first) to each node they go under
         nodeMap.forEach((k, n) -> {
+            if (idMap != null) {
+                idMap.put(n.node.getIdStr(), n);
+            }
             TreeNode parent = nodeMap.get(n.node.getParentPath());
 
             // since root node is not in 'nodes' we know it's a failure if we find one whose parent
             // we don't know
             if (parent == null) {
                 log.debug("Ignoring Orphan: " + n.node.getPath());
-                // skip iteration element
+                // skip iteration element (warning: not returning from this function!)
                 return;
             }
             if (parent.children == null) {
                 parent.children = new LinkedList<>();
             }
             parent.children.add(n);
+            if (n.parent == null) {
+                n.parent = parent;
+            }
         });
+
+        nodeMap.forEach((k, n) -> {
+            if (n.children != null) {
+                n.children.sort((a, b) -> a.node.getOrdinal().compareTo(b.node.getOrdinal()));
+            }
+        });
+
         return rootTreeNode;
     }
 
@@ -1373,7 +1458,7 @@ public class MongoRead extends ServiceBase {
             typeCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT);
         }
 
-        TreeNode rootTreeNode = getSubGraphTree(ms, rootId, typeCriteria);
+        TreeNode rootTreeNode = getSubGraphTree(ms, rootId, typeCriteria, null);
         traverseTree(rootTreeNode, doc);
         return doc;
     }

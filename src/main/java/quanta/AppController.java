@@ -1559,6 +1559,10 @@ public class AppController extends ServiceBase implements ErrorController {
 				case "validateDb":
 					res.getMessages().add(new InfoMessage(system.validateDb(), null));
 					break;
+				case "cacheAdminContent":
+					system.cacheAdminNodes();
+					res.getMessages().add(new InfoMessage("Done", null));
+					break;
 				case "repairDb":
 					res.getMessages().add(new InfoMessage(system.repairDb(), null));
 					break;
