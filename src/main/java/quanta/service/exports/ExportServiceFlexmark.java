@@ -38,6 +38,7 @@ import quanta.util.FileUtils;
 import quanta.util.ImageUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.TreeNode;
 import quanta.util.XString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,10 @@ public class ExportServiceFlexmark extends ServiceBase {
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
-		SubNode exportNode = read.getNode(ms, nodeId, true, null);
+
+		TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null);
+		SubNode exportNode = rootNode.node;
+
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + "." + format;
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
@@ -136,7 +140,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			if ("pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
 				markdown.append("[TOC]");
 			}
-			recurseNode(exportNode, 0);
+			recurseNode(rootNode, 0);
 			Node document = parser.parse(markdown.toString());
 			String body = renderer.render(document);
 			String html = generateHtml(body);
@@ -231,19 +235,20 @@ public class ExportServiceFlexmark extends ServiceBase {
 		}
 	}
 
-	private void recurseNode(SubNode node, int level) {
-		if (node == null)
+	private void recurseNode(TreeNode tn, int level) {
+		if (tn.node == null)
 			return;
-		processNode(node);
-		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
-		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
-			// If a node has a property "sn:noexport" (added by power users) then this node will not be
-			// exported.
-			String noExport = n.getStr(NodeProp.NO_EXPORT);
-			if (noExport != null) {
-				continue;
+		processNode(tn.node);
+		if (tn.children != null) {
+			for (TreeNode c : tn.children) {
+				// If a node has a property "sn:noexport" (added by power users) then this node will not be
+				// exported.
+				String noExport = c.node.getStr(NodeProp.NO_EXPORT);
+				if (noExport != null) {
+					continue;
+				}
+				recurseNode(c, level + 1);
 			}
-			recurseNode(n, level + 1);
 		}
 	}
 
