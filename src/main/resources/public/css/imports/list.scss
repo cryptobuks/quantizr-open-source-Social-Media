@@ -1,3 +1,21 @@
+.docIndexLink {
+    cursor: pointer;
+    white-space: nowrap;
+    padding-left: 5px;
+}
+
+.docIndexLink:hover {
+    background-color: $primary;
+}
+
+.docIndexPanel {
+    overflow-x: scroll;
+    width: 100%;
+    padding-top: $tinyGap;
+    margin-top: $tinyGap;
+    border-top: 2px solid gray;
+}
+
 .listBoxRow {
     cursor: pointer;
     //we need zero margin and padding here so that the border area around the list item

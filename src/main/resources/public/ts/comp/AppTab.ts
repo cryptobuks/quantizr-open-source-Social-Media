@@ -38,12 +38,18 @@ export class AppTab<PT = any, TT = any> extends Div {
         this.data.scrollPos = pos;
     }
 
-    scrollToNode = (nodeId: string): void => {
+    scrollToNode = (nodeId: string): boolean => {
         if (!nodeId) return;
-        const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(this.data, nodeId));
+        const domId = S.tabUtil.makeDomIdForNode(this.data, nodeId);
+        const elm = S.domUtil.domElm(domId);
         if (elm) {
             this.scrollToElm(elm);
+            return true;
         }
+        else {
+            console.log("elm not found: " + domId);
+        }
+        return false;
     }
 
     scrollToElm = (elm: HTMLElement): void => {

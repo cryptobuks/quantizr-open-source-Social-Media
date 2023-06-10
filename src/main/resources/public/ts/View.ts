@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "./AppContext";
+import { asyncDispatch, dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
@@ -13,6 +13,19 @@ declare const PROFILE: string;
 
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
+
+    jumpToIdFromIndexPanel = (id: string) => {
+        const activeTab = S.tabUtil.getActiveTabComp();
+        if (activeTab) {
+            if (activeTab.scrollToNode(id)) {
+                asyncDispatch("highlightNode", s => s.highlightNodeId = id);
+                return;
+            }
+        }
+
+        // if we fall thru to here then jump to tree, and do a query to get the data.
+        this.jumpToId(id, false);
+    }
 
     jumpToId = async (id: string, forceRenderParent: boolean = false) => {
         if (C.DEBUG_SCROLLING) {

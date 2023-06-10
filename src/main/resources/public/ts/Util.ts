@@ -13,6 +13,8 @@ import { ConfigProp } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { TrendingView } from "./tabs/TrendingView";
+import { TabIntf } from "./intf/TabIntf";
+import { DocumentRSInfo } from "./DocumentRSInfo";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -1081,6 +1083,20 @@ export class Util {
             ret = ac.principalName;
         }
         return ret;
+    }
+
+    willRenderDocIndex = (ast: AppState = null): boolean => {
+        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT, ast);
+        if (!data || !data.props) return false;
+        const info = data.props as DocumentRSInfo;
+        if (!info.results || info.results.length < 2) return false;
+
+        for (const node of info.results) {
+            if (node.hasChildren) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Leave this at the END of the module since it makes calls to methods that might not be created at

@@ -206,4 +206,6 @@ export class AppState {
     nostrQueryRunning: boolean = false;
 
     expandedMenus: Set<string> = new Set<string>();
+
+    menuIndexToggle: string = "menu";
 }

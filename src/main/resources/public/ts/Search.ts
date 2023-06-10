@@ -266,6 +266,7 @@ export class Search {
                 DocumentTab.inst.openGraphComps = [];
                 const info = DocumentTab.inst.props as DocumentRSInfo;
                 info.endReached = true;
+                s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             });
             return;
         }
@@ -275,7 +276,6 @@ export class Search {
             if (!DocumentTab.inst) return;
             DocumentTab.inst.openGraphComps = [];
             const info = DocumentTab.inst.props as DocumentRSInfo;
-
             info.endReached = true;
             S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
 
@@ -283,6 +283,7 @@ export class Search {
             // were pulling down more items at the end of the doc.
             info.results = res.searchResults;
             info.node = node;
+            s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             S.tabUtil.selectTabStateOnly(DocumentTab.inst.id);
         });
     }

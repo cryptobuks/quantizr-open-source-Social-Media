@@ -1,4 +1,5 @@
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
@@ -43,7 +44,11 @@ export class TabUtil {
     }
 
     makeDomIdForNode = (tabData: TabIntf<any>, id: string) => {
-       return tabData.id + "_" + id;
+        // todo-0: for legacy reasons we have a different id formatting for main tree, and this inconsistent is bad and needs to be fixed.
+        if (tabData.id == C.TAB_MAIN) {
+            return S.nav._UID_ROWID_PREFIX + id;
+        }
+        return tabData.id + "_" + id;
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
@@ -127,8 +132,10 @@ export class TabUtil {
         return data ? data.inst : null;
     }
 
-    getAppTabData = (tabId: string): TabIntf => {
-        const ast = getAs();
+    // ast param is important because sometimes we do pass in an 'ast' that's not 'committed' yet
+    // for this method to use, and in that case we can't call getAs() to get state
+    getAppTabData = (tabId: string, ast: AppState = null): TabIntf => {
+        ast = ast || getAs();
         if (!ast.tabData) return null;
         return ast.tabData.find(d => d.id === tabId);
     }

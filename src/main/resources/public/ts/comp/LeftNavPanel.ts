@@ -1,5 +1,6 @@
 import { dispatch, getAs } from "../AppContext";
 import { Constants as C } from "../Constants";
+import { DocIndexPanel } from "../DocIndexPanel";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
@@ -9,6 +10,8 @@ import { FeedTab } from "../tabs/data/FeedTab";
 import { TabPanelButtons } from "./TabPanelButtons";
 import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
+import { RadioButton } from "./core/RadioButton";
+import { RadioButtonGroup } from "./core/RadioButtonGroup";
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -64,6 +67,35 @@ export class LeftNavPanel extends Div {
             myMessages = null;
         }
 
+        let showDocIndex = S.util.willRenderDocIndex();
+
+        const docIndexToggle = showDocIndex ? new RadioButtonGroup([
+            new Span(null, null, [
+                new RadioButton("Doc Index", false, "docIndexToggle", null, {
+                    setValue: (checked: boolean) => {
+                        dispatch("ToggleMenuIndex", s => {
+                            s.menuIndexToggle = "index";
+                        });
+                    },
+                    getValue: (): boolean => getAs().menuIndexToggle == "index"
+                }, "form-check-inline marginRight")
+            ]),
+            new Span(null, null, [
+                new RadioButton("Menu", false, "docIndexToggle", null, {
+                    setValue: (checked: boolean) => {
+                        dispatch("ToggleMenuIndex", s => {
+                            s.menuIndexToggle = "menu";
+                        });
+                    },
+                    getValue: (): boolean => getAs().menuIndexToggle == "menu"
+                }, "form-check-inline marginRight")
+            ])
+        ], "marginTop") : null;
+
+        if (showDocIndex) {
+            showDocIndex = ast.menuIndexToggle == "index";
+        }
+
         this.setChildren([
             new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                 new Img({
@@ -101,7 +133,9 @@ export class LeftNavPanel extends Div {
                 ])
             ]),
             ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
-            new MenuPanel(),
+            docIndexToggle,
+            showDocIndex ? new DocIndexPanel() : null,
+            showDocIndex ? null : new MenuPanel(),
         ]);
         return true;
     }
