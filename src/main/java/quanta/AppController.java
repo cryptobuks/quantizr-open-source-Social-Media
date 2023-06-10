@@ -758,8 +758,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			// res.setMessage("Export of Markdown to IPFS not yet available.");
 			// res.setSuccess(false);
 			// }
-			// ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
-			// svc.export(ms, req, res);
 			// } //
 			// ================================================
 			if ("zip".equalsIgnoreCase(req.getExportExt())) {
@@ -786,8 +784,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);
-			} else //
-			{
+			} else {
 				throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
 			}
 			return res;
