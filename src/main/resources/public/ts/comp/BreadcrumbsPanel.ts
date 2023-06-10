@@ -5,7 +5,6 @@ import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
-import { Icon } from "./core/Icon";
 
 export class BreadcrumbsPanel extends Div {
     constructor() {
@@ -46,14 +45,6 @@ export class BreadcrumbsPanel extends Div {
                     return new Span("...", { className: "marginRight" });
                 }
             }).filter(c => !!c);
-        }
-
-        if (children.length > 0 && !ast.userPrefs.showParents) {
-            children.push(new Icon({
-                className: "fa fa-level-down fa-lg showParentsIcon",
-                title: "Toggle: Show Parent on page",
-                onClick: S.edit.toggleShowParents
-            }));
         }
 
         return new Diva(children);

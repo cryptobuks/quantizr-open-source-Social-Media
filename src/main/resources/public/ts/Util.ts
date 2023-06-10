@@ -903,7 +903,6 @@ export class Util {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: 0,
                     jumpToRss: false
                 });
 
@@ -936,9 +935,6 @@ export class Util {
     saveUserPrefs = async (mod: StateModFunc) => {
         await promiseDispatch("SetUserPreferences", s => {
             mod(s);
-            if (!s.userPrefs.showParents && s.node) {
-                s.node.parents = null;
-            }
         });
 
         const ast = getAs();

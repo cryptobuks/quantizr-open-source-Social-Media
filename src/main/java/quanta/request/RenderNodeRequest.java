@@ -21,9 +21,7 @@ public class RenderNodeRequest extends RequestBase {
 	private boolean upLevel;
 	private boolean renderParentIfLeaf;
 	private boolean forceRenderParent;
-	// specifies how many levels ABOVE the requested node to get. To load parentNodes property in the
-	// response.
-	private int parentCount;
+
 	// indicates that if the node pointed to is an 'RSS Type', then instead of rendering it we just
 	// return
 	// a responce that indicates RSS so the client can then issue a request to display the RSS Feed.
@@ -77,10 +75,6 @@ public class RenderNodeRequest extends RequestBase {
 		return this.forceRenderParent;
 	}
 	
-	public int getParentCount() {
-		return this.parentCount;
-	}
-	
 	public boolean isJumpToRss() {
 		return this.jumpToRss;
 	}
@@ -120,10 +114,6 @@ public class RenderNodeRequest extends RequestBase {
 	
 	public void setForceRenderParent(final boolean forceRenderParent) {
 		this.forceRenderParent = forceRenderParent;
-	}
-	
-	public void setParentCount(final int parentCount) {
-		this.parentCount = parentCount;
 	}
 	
 	public void setJumpToRss(final boolean jumpToRss) {

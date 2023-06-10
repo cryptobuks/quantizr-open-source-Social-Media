@@ -63,7 +63,6 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0,
                 jumpToRss: false
             });
             this.upLevelResponse(res, null, true);
@@ -102,7 +101,6 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0,
                 jumpToRss: false
             });
 
@@ -152,8 +150,6 @@ export class Nav {
     }
 
     openContentNode = async (nodePathOrId: string, jumpToRss: boolean) => {
-        const ast = getAs();
-
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: nodePathOrId,
@@ -165,7 +161,6 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0,
                 jumpToRss
             });
 
@@ -280,7 +275,6 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: ast.userPrefs.showParents ? 1 : 0,
                     jumpToRss: false
                 });
 
@@ -323,7 +317,6 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: true,
-                    parentCount: 0,
                     jumpToRss: false
                 });
                 if (!res.node) {
@@ -385,7 +378,6 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: true,
-                parentCount: 0,
                 jumpToRss: false
             });
 

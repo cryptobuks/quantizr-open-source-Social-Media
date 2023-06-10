@@ -433,7 +433,6 @@ export class Edit {
     //             goToLastPage: false,
     //             forceIPFSRefresh: false,
     //             singleNode: true,
-    //             parentCount: ast.userPrefs.showParents ? 1 : 0,
     //             jumpToRss: false
     //         });
 
@@ -585,11 +584,6 @@ export class Edit {
     // #add-prop
     setAutoRefreshFeed = async (autoRefreshFeed: boolean) => {
         return S.util.saveUserPrefs(s => s.userPrefs.autoRefreshFeed = autoRefreshFeed);
-    }
-
-    toggleShowParents = async () => {
-        await S.util.saveUserPrefs(s => s.userPrefs.showParents = !s.userPrefs.showParents);
-        S.quanta.refresh();
     }
 
     setShowComments = async (showReplies: boolean): Promise<void> => {

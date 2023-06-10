@@ -12,14 +12,15 @@ public class UserPreferences {
 	private boolean nsfw;
 	private boolean showProps;
 	private boolean autoRefreshFeed; // #add-prop
-	private boolean showParents;
 	private boolean showReplies;
 	private boolean rssHeadlinesOnly;
 	// valid Range = 4 thru 8, inclusive.
 	private long mainPanelCols = 6;
 	// not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging
+	
 	@JsonProperty(required = false)
 	private boolean enableIPSM;
+
 	@JsonProperty(required = false)
 	private long maxUploadFileSize;
 
@@ -63,10 +64,6 @@ public class UserPreferences {
 		return this.autoRefreshFeed;
 	}
 	
-	public boolean isShowParents() {
-		return this.showParents;
-	}
-	
 	public boolean isShowReplies() {
 		return this.showReplies;
 	}
@@ -97,10 +94,6 @@ public class UserPreferences {
 
 	public void setAutoRefreshFeed(final boolean autoRefreshFeed) {
 		this.autoRefreshFeed = autoRefreshFeed;
-	}
-
-	public void setShowParents(final boolean showParents) {
-		this.showParents = showParents;
 	}
 
 	public void setShowReplies(final boolean showReplies) {

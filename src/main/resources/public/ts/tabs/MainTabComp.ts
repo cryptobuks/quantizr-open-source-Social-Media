@@ -12,7 +12,6 @@ import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
-import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
@@ -58,8 +57,8 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 ast.pageMessage ? new Html(ast.pageMessage, { className: "alert alert-info float-end" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 
-                // if we have some parents to display...
-                ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
+                // // if we have some parents to display...
+                // ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
 
                 new Divc({ className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
                     new NodeCompMainNode(this.data),
@@ -76,7 +75,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 new Divc({ className: "tinyMarginTop float-end" }, [
                     new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
-                        title: "Show Document View",
+                        title: "Show Document View\n\n(All content on a single page)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
                     }),

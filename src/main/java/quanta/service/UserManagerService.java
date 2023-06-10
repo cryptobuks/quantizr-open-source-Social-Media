@@ -547,7 +547,6 @@ public class UserManagerService extends ServiceBase {
 			prefsNode.set(NodeProp.USER_PREF_NSFW, reqUserPrefs.isNsfw());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
 			prefsNode.set(NodeProp.USER_PREF_AUTO_REFRESH_FEED, reqUserPrefs.isAutoRefreshFeed()); // #add-prop
-			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS, reqUserPrefs.isShowParents());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
 			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
 			prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
@@ -555,7 +554,6 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
 			userPrefs.setNsfw(reqUserPrefs.isNsfw());
 			userPrefs.setShowProps(reqUserPrefs.isShowProps());
-			userPrefs.setShowParents(reqUserPrefs.isShowParents());
 			userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
@@ -987,7 +985,6 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
 			userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
 			userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop
-			userPrefs.setShowParents(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PARENTS));
 			userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
 			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
 			long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA);

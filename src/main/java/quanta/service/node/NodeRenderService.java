@@ -182,33 +182,12 @@ public class NodeRenderService extends ServiceBase {
 			}
 		}
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
-		// Collect all the parents we need to based on parentCount
-		LinkedList<NodeInfo> parentNodes = new LinkedList<>();
-		SubNode highestUpParent = node;
-		int parentCount = req.getParentCount();
-		boolean done = false;
-		while (!done && parentCount-- > 0) {
-			try {
-				highestUpParent = read.getParent(ms, highestUpParent);
-				if (highestUpParent != null) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false,
-							Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false);
-					if (nodeInfo != null) {
-						// each parent up goes on top of list for correct rendering order on client.
-						parentNodes.addFirst(nodeInfo);
-					}
-				}
-			} catch (Exception e) {
-				done = true;
-			}
-			// if we run into any errors collecting children we can ignore them.
-		}
+
 		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
 		res.setBreadcrumbs(breadcrumbs);
-		render.getBreadcrumbs(ms, highestUpParent, breadcrumbs);
+		render.getBreadcrumbs(ms, node, breadcrumbs);
 		NodeInfo nodeInfo = render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
 		if (nodeInfo != null) {
-			nodeInfo.setParents(parentNodes);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 		} else {

@@ -543,7 +543,6 @@ export interface RenderNodeRequest extends RequestBase {
     upLevel: boolean;
     renderParentIfLeaf: boolean;
     forceRenderParent: boolean;
-    parentCount: number;
     jumpToRss: boolean;
     goToLastPage: boolean;
     singleNode: boolean;
@@ -1126,7 +1125,6 @@ export interface NodeInfo {
     lastChild: boolean;
     parent: NodeInfo;
     children: NodeInfo[];
-    parents: NodeInfo[];
     linkedNodes: NodeInfo[];
     likes: string[];
     imgId: string;
@@ -1147,7 +1145,6 @@ export interface UserPreferences {
     nsfw: boolean;
     showProps: boolean;
     autoRefreshFeed: boolean;
-    showParents: boolean;
     showReplies: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
@@ -1266,7 +1263,6 @@ export const enum NodeProp {
     USER_PREF_NSFW = "sn:nsfw",
     USER_PREF_SHOW_PROPS = "sn:showProps",
     USER_PREF_AUTO_REFRESH_FEED = "sn:autoRefreshFeed",
-    USER_PREF_SHOW_PARENTS = "sn:showParents",
     USER_PREF_SHOW_REPLIES = "sn:showReplies",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",

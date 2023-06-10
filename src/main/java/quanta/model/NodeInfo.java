@@ -64,10 +64,7 @@ public class NodeInfo {
 	 */
 	private NodeInfo parent;
 	private List<NodeInfo> children;
-	// This is optional, and will be non-empty whenever we're wanting not just the children of this node
-	// but all the parents up to a certain number of parents, up towards the root, however many levels
-	// up.
-	private LinkedList<NodeInfo> parents;
+	
 	private LinkedList<NodeInfo> linkedNodes;
 	private List<String> likes;
 	private String imgId;
@@ -243,10 +240,6 @@ public class NodeInfo {
 		return this.children;
 	}
 	
-	public LinkedList<NodeInfo> getParents() {
-		return this.parents;
-	}
-	
 	public LinkedList<NodeInfo> getLinkedNodes() {
 		return this.linkedNodes;
 	}
@@ -377,10 +370,6 @@ public class NodeInfo {
 	
 	public void setChildren(final List<NodeInfo> children) {
 		this.children = children;
-	}
-	
-	public void setParents(final LinkedList<NodeInfo> parents) {
-		this.parents = parents;
 	}
 	
 	public void setLinkedNodes(final LinkedList<NodeInfo> linkedNodes) {

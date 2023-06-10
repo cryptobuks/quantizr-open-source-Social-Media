@@ -70,7 +70,6 @@ export class View {
                 goToLastPage: false,
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0,
                 jumpToRss: a.jumpToRss
             });
 
@@ -155,7 +154,6 @@ export class View {
                 goToLastPage,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0,
                 jumpToRss: false
             });
 

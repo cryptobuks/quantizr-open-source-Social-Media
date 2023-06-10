@@ -66,13 +66,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                             getValue: (): boolean => ast.userPrefs.nsfw
                         }),
 
-                        new Checkbox("Parent Node", { className: "bigMarginLeft" }, {
-                            setValue: async (checked: boolean) => {
-                                await S.util.saveUserPrefs(s => s.userPrefs.showParents = checked);
-                            },
-                            getValue: (): boolean => ast.userPrefs.showParents
-                        }),
-
                         new Checkbox("Comments", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.edit.setShowReplies(checked),
                             getValue: (): boolean => ast.userPrefs.showReplies
