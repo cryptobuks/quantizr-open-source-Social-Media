@@ -45,7 +45,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: Validator = new Validator();
 
-    constructor() {
+    constructor(private searchRoot: J.NodeInfo = null) {
         super("Search");
         this.onMount(() => { this.searchTextField?.focus(); });
         this.mergeState<LS>(SearchContentDlg.dlgState);
@@ -225,8 +225,7 @@ export class SearchContentDlg extends DialogBase {
     }
 
     graph = () => {
-        // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode();
+        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -247,8 +246,7 @@ export class SearchContentDlg extends DialogBase {
     }
 
     search = async (deleteMatches: boolean) => {
-        // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode();
+        const node =  this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

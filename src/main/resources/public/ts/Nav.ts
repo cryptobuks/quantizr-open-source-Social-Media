@@ -293,10 +293,12 @@ export class Nav {
 
     runSearch = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        this.clickTreeNode(null, id);
+        if (!id) return;
+        const node = S.nodeUtil.findNode(id);
+        if (!node) return;
         setTimeout(() => {
-            new SearchContentDlg().open();
-        }, 250);
+            new SearchContentDlg(node).open();
+        }, 10);
     }
 
     openDocumentView = (evt: Event, id: string) => {
@@ -331,15 +333,13 @@ export class Nav {
 
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        this.clickTreeNode(null, id);
+        if (!id) return;
+        const node = S.nodeUtil.findNode(id);
+        if (!node) return;
 
         setTimeout(() => {
-            const node = MainTab.inst?.findNode(id);
-            if (!node) {
-                return;
-            }
             S.srch.timeline(node, "mtm", null, "Rev-chron by Modify Time", 0, true);
-        }, 750);
+        }, 10);
     }
 
     openNodeFeed = async (evt: Event, id: string) => {

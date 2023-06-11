@@ -6,12 +6,14 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Html } from "./comp/core/Html";
 import { getAs } from "./AppContext";
+import { Clearfix } from "./comp/core/Clearfix";
 
 export class DocIndexPanel extends Div {
     static initialized: boolean = false;
 
     constructor() {
         super();
+        this.attribs.className = "docIndexPanel";
     }
 
     override preRender(): boolean {
@@ -33,9 +35,14 @@ export class DocIndexPanel extends Div {
             }
         }
         if (count < 2) return false;
-        const html = new Html(index, { className: "docIndexPanel" });
+        const html = new Html(index);
         html.purifyHtml = false;
-        this.setChildren([html]);
+
+        let backToDocLink = null;
+        if (ast.activeTab != C.TAB_DOCUMENT) {
+            backToDocLink = new Div("Back to Doc", { className: "backToDocLink float-end", onClick: () => S.tabUtil.selectTab(C.TAB_DOCUMENT) })
+        }
+        this.setChildren([backToDocLink, backToDocLink ? new Clearfix() : null, html]);
         return true;
     }
 
