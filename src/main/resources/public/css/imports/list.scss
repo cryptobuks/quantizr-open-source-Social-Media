@@ -2,6 +2,18 @@
     cursor: pointer;
     white-space: nowrap;
     padding-left: 5px;
+    border: 2px transparent;
+}
+
+.docIndexLinkHighlight {
+    cursor: pointer;
+    white-space: nowrap;
+    padding-left: 5px;
+    border: 2px solid purple;
+}
+
+.docNodeHighlight {
+    border: 2px solid purple;
 }
 
 .docIndexLink:hover {

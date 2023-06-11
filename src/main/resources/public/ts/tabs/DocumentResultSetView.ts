@@ -51,12 +51,37 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         return row;
     }
 
-    pageChange(delta: number): void {
+    override pageChange(delta: number): void {
         S.nav.openDocumentView(null, getAs().node?.id);
     }
 
-    getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp = (): Comp => {
         return new Divc({ className: "float-end" }, [
+            new Checkbox("Indent", {
+                className: "bigMarginLeft",
+                title: "Indent the Document based on content hierarchy"
+            }, {
+                setValue: (checked: boolean) => {
+                    dispatch("DocIndent", s => {
+                        s.docIndent = checked;
+                    });
+                },
+                getValue: (): boolean => {
+                    return getAs().docIndent;
+                }
+            }),
+            new Checkbox("Comments", {
+                className: "marginLeft",
+                title: "Include all the Comment Nodes in the Document"
+            }, {
+                setValue: async (checked: boolean) => {
+                    await S.edit.setShowComments(checked);
+                    this.pageChange(null);
+                },
+                getValue: (): boolean => {
+                    return getAs().userPrefs.showReplies;
+                }
+            }),
             new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search Subnodes",
@@ -72,35 +97,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         ]);
     }
 
-    extraPagingComps = (): Comp[] => {
-        return [
-            new Divc({ className: "extraPagingComps" }, [
-                new Checkbox("Indent", {
-                    className: "bigMarginLeft",
-                    title: "Indent the Document based on content hierarchy"
-                }, {
-                    setValue: (checked: boolean) => {
-                        dispatch("DocIndent", s => {
-                            s.docIndent = checked;
-                        });
-                    },
-                    getValue: (): boolean => {
-                        return getAs().docIndent;
-                    }
-                }),
-                new Checkbox("Comments", {
-                    className: "marginLeft",
-                    title: "Include all the Comment Nodes in the Document"
-                }, {
-                    setValue: async (checked: boolean) => {
-                        await S.edit.setShowComments(checked);
-                        this.pageChange(null);
-                    },
-                    getValue: (): boolean => {
-                        return getAs().userPrefs.showReplies;
-                    }
-                })
-            ])
-        ];
+    override extraPagingComps = (): Comp[] => {
+        return null;
     }
 }

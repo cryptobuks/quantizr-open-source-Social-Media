@@ -11,7 +11,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
         data.inst = this;
     }
 
-    pageChange(delta: number): void {
+    override pageChange(delta: number): void {
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
@@ -22,11 +22,11 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
             page, this.data.props.recursive);
     }
 
-    extraPagingComps = (): Comp[] => {
+    override extraPagingComps = (): Comp[] => {
         return null;
     }
 
-    getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp = (): Comp => {
         return null;
     }
 }

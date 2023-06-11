@@ -64,6 +64,7 @@ export class AppState {
 
     node: J.NodeInfo;
     highlightNodeId: string = null;
+    indexHighlightNode: string = null;
     endReached: boolean;
 
     /* Node Ids to move */

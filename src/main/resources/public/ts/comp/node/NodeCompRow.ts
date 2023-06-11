@@ -144,7 +144,19 @@ export class NodeCompRow extends Div {
             this.attribs.className = "boostRow";
         }
         else {
-            this.attribs.className = (layoutClass || "") + (selected ? " activeRow" : " inactiveRow");
+            let selectionClass;
+            if (selected) {
+                selectionClass = " activeRow";
+            }
+            else {
+                if (this.node.id == ast.indexHighlightNode) {
+                    selectionClass = " docNodeHighlight";
+                }
+                else {
+                    selectionClass = " inactiveRow";
+                }
+            }
+            this.attribs.className = (layoutClass || "") + selectionClass;
             const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
             this.attribs.style = style;
         }

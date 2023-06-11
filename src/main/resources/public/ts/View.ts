@@ -1,4 +1,4 @@
-import { asyncDispatch, dispatch, getAs } from "./AppContext";
+import { promiseDispatch, dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
@@ -14,11 +14,11 @@ declare const PROFILE: string;
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    jumpToIdFromIndexPanel = (id: string) => {
+    jumpToIdFromIndexPanel = async (id: string) => {
+        await promiseDispatch("highlightNode", s => s.indexHighlightNode = id);
         const activeTab = S.tabUtil.getActiveTabComp();
         if (activeTab) {
-            if (activeTab.scrollToNode(id)) {
-                asyncDispatch("highlightNode", s => s.highlightNodeId = id);
+            if (activeTab.scrollToNode(id, true)) {
                 return;
             }
         }

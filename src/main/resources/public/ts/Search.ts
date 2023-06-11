@@ -666,7 +666,12 @@ export class Search {
         };
 
         if (extraStyle) {
+            // I have a feeling this code is dead. check it. todo-0
             attrs.style = extraStyle;
+        }
+
+        if (node.id == ast.indexHighlightNode) {
+            attrs.className += " docNodeHighlight";
         }
 
         // special case, if node is owned by admin and we're not admin, never show header, unless the ALLOW flag is true

@@ -16,7 +16,7 @@ export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSe
         this.showContentHeading = false;
     }
 
-    pageChange(delta: number): void {
+    override pageChange(delta: number): void {
         let page = this.data.props.page;
 
         // Yes the check against null IS required. Don't change.
@@ -30,11 +30,11 @@ export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSe
         return new Div("@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "tabTitle" });
     }
 
-    extraPagingComps = (): Comp[] => {
+    override extraPagingComps = (): Comp[] => {
         return null;
     }
 
-    getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp = (): Comp => {
         return null;
     }
 }

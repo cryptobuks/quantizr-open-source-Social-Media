@@ -277,6 +277,12 @@ export class Util {
         return s;
     }
 
+    trimLeadingChars = (s: string, char: string) => {
+        if (!s) return s;
+        // this would trim leading and trailing: .replace(/^#+|#+$/g, '');
+        return s.replace(new RegExp(`^${char}+`, "g"), "");
+    }
+
     arrayClone(a: any[]): any[] {
         if (!a) return null;
         if (a.length === 0) return [];

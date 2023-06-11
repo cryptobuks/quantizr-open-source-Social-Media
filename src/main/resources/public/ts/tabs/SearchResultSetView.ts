@@ -11,7 +11,7 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
         data.inst = this;
     }
 
-    pageChange(delta: number) {
+    override pageChange(delta: number) {
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
@@ -34,11 +34,11 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
             false);
     }
 
-    extraPagingComps = (): Comp[] => {
+    override extraPagingComps = (): Comp[] => {
         return null;
     }
 
-    getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp = (): Comp => {
         return null;
     }
 }

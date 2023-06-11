@@ -5,6 +5,7 @@ import { Div } from "./comp/core/Div";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Html } from "./comp/core/Html";
+import { getAs } from "./AppContext";
 
 export class DocIndexPanel extends Div {
     static initialized: boolean = false;
@@ -18,6 +19,7 @@ export class DocIndexPanel extends Div {
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
         if (!info.results || info.results.length < 2) return false;
+        const ast = getAs();
 
         let index = "";
         let count = 0;
@@ -25,7 +27,8 @@ export class DocIndexPanel extends Div {
         for (const node of info.results) {
             if (node.hasChildren) {
                 const level = S.util.countChars(node.path, "/") - baseSlashCount;
-                index += `<div style="margin-left: ${level * 12}px" class="docIndexLink" onClick="S.view.jumpToIdFromIndexPanel('${node.id}')">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
+                const clazz = ast.indexHighlightNode == node.id ? "docIndexLinkHighlight" : "docIndexLink";
+                index += `<div style="margin-left: ${level * 12}px" class="${clazz}" onClick="S.view.jumpToIdFromIndexPanel('${node.id}')">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
                 count++;
             }
         }
@@ -52,8 +55,9 @@ export class DocIndexPanel extends Div {
         if (idx !== -1) {
             content = content.substring(0, idx);
         }
+        content = S.util.trimLeadingChars(content, "#");
 
         if (content.length > 80) content = content.substring(0, 80) + "...";
-        return S.domUtil.escapeHtml(content);
+        return S.domUtil.escapeHtml(content).trim();
     }
 }
