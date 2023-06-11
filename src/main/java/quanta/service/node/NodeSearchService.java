@@ -441,7 +441,7 @@ public class NodeSearchService extends ServiceBase {
 			q.addCriteria(crit);
 			q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 			q.limit(TRENDING_LIMIT);
-			iter = mongoUtil.find(q);
+			iter = opsw.find(ms, q);
 		} else
 		/*
 		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user

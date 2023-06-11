@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class SessionContext extends ServiceBase {
 
 	private static Logger log = LoggerFactory.getLogger(SessionContext.class);
+	private String command;
 	private HttpSession session;
 	private String urlIdFailMsg;
 	private String userMsg;
@@ -608,5 +609,13 @@ public class SessionContext extends ServiceBase {
 
 	public void setLoadNostrIdRelays(String loadNostrIdRelays) {
 		this.loadNostrIdRelays = loadNostrIdRelays;
+	}
+
+	public String getCommand() {
+		return command;
+	}
+
+	public void setCommand(String command) {
+		this.command = command;
 	}
 }

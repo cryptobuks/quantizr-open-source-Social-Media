@@ -39,6 +39,10 @@
 
 .radioLabel {
     margin-right: 14px;
+
+    // warning: for bizarre reasons I haven't researched if there's no margin here then the HORIZONTAL alignment 
+    // gets messed up. Be careful changing this.
+    margin-bottom: 10px; 
 }
 
 .radioButtonsBar {

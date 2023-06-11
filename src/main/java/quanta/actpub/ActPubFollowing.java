@@ -355,7 +355,7 @@ public class ActPubFollowing extends ServiceBase {
                 return null;
             q.limit(ConstantInt.ROWS_PER_PAGE.val());
             q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
-            Iterable<SubNode> iterable = mongoUtil.find(q);
+            Iterable<SubNode> iterable = opsw.find(ms, q);
             List<NodeInfo> searchResults = new LinkedList<>();
             int counter = 0;
             for (SubNode node : iterable) {
@@ -375,7 +375,7 @@ public class ActPubFollowing extends ServiceBase {
         Query q = findFollowingOfUser_query(ms, userName);
         if (q == null)
             return null;
-        return mongoUtil.find(q);
+        return opsw.find(ms, q);
     }
 
     public long countFollowingOfUser(MongoSession ms, String userDoingAction, String userName, String actorUrl) {

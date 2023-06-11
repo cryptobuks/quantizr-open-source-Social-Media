@@ -156,7 +156,7 @@ export class NodeCompButtonBar extends Div {
                     }, null, "fa-edit");
                 }
 
-                if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !ast.nodesToMove) {
+                if (this.node.type !== J.NodeType.REPO_ROOT && !ast.nodesToMove) {
                     cutNodeIcon = new Icon({
                         className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",

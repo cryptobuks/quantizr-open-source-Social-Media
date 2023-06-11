@@ -782,7 +782,7 @@ public class UserManagerService extends ServiceBase {
 		}
 		// If we don't know the account id of the person doing the follow, then look it up.
 		if (accntIdDoingFollow == null) {
-			SubNode followerAcctNode = arun.run(s -> read.getUserNodeByUserName(ms, userDoingFollow, false));
+			SubNode followerAcctNode = arun.run(s -> read.getUserNodeByUserName(s, userDoingFollow, false));
 			if (followerAcctNode == null) {
 				throw new RuntimeException("Unable to find user: " + userDoingFollow);
 			}
@@ -1391,6 +1391,7 @@ public class UserManagerService extends ServiceBase {
 		});
 	}
 
+	// todo-0: this should be max REMAINING size right? how much space user has left?
 	public int getMaxUploadSize(MongoSession ms) {
 		if (ms.isAnon()) {
 			return 0;

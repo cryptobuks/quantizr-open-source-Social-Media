@@ -72,8 +72,8 @@ public class ImportZipService extends ImportArchiveBase {
 		try {
 			targetPath = node.getPath();
 			this.session = ms;
-			// todo-2: replace with the true amount of storage this user has remaining. Admin is unlimited.
-			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;
+			int maxFileSize = user.getMaxUploadSize(ms);
+			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : maxFileSize;
 			is = new LimitedInputStreamEx(inputStream, maxSize);
 			zis = new ZipArchiveInputStream(is);
 			ZipArchiveEntry entry;

@@ -49,6 +49,8 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             //     });
             // }
 
+            const pageNodeIsCut = ast.nodesToMove && ast.nodesToMove.find(id => id === ast.node.id);
+
             contentDiv = new Divc({
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
@@ -62,7 +64,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
 
                 new Divc({ className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
                     new NodeCompMainNode(this.data),
-                    new NodeCompMainList(this.data)
+                    pageNodeIsCut ? null : new NodeCompMainList(this.data)
                 ])
             ]);
         }

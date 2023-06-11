@@ -3,6 +3,8 @@ package quanta.actpub;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,8 @@ import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
-import quanta.util.Util;
+import quanta.model.client.PrincipalName;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // @CrossOrigin is done by AppFilter.
 /**
@@ -77,7 +77,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
 			HttpServletResponse res) throws Exception {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return;
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apLog.trace("Redirecting to: " + url);
 		res.sendRedirect(url);
@@ -86,20 +87,18 @@ public class ActPubController extends ServiceBase {
 	/*
 	 * This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page
 	 */
-	//
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_HTML})
 	public void getHTMLForUserId(//
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
 			HttpServletResponse res) throws Exception {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return;
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apLog.trace("Redirecting to: " + url);
 		res.sendRedirect(url);
 	}
 
-	//
-	//
 	/**
 	 * Actor GET
 	 */
@@ -108,7 +107,8 @@ public class ActPubController extends ServiceBase {
 	@ResponseBody
 	public Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return null;
 		apLog.trace("getActor: " + userName);
 		APOPerson ret = apub.generatePersonObj(userName);
 		if (ret != null) {
@@ -157,7 +157,8 @@ public class ActPubController extends ServiceBase {
 			@RequestBody byte[] body, //
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return null;
 		try {
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, body);
@@ -205,7 +206,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return null;
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(req, userName, minId);
@@ -244,7 +246,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return null;
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollower.generateFollowersPage(userName, minId);
@@ -273,7 +276,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-		Util.failIfAdmin(userName);
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
+			return null;
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);

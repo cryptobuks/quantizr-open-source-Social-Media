@@ -211,8 +211,9 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser && ast.protocolFilter === J.Constant.NETWORK_NOSTR && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Secure DM", this.sendSecureDM, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
-                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
+                    // todo-0; removing this, for now, becasue bug is reported, but it's low priority feature.
+                    // !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
+                    //    ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
                         ? new Button("Mentions", () => this.searchMentions(this.getUserName(false)), { title: "Find all Public Mentions of this person" }) : null,

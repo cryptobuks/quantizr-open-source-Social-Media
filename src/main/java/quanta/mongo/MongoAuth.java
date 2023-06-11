@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component
 public class MongoAuth extends ServiceBase {
-	
+
 	private static Logger log = LoggerFactory.getLogger(MongoAuth.class);
 	private static final boolean verbose = false;
 	private static final Object adminSessionLck = new Object();
@@ -85,7 +85,7 @@ public class MongoAuth extends ServiceBase {
 		// if we found the node get property from it to return.
 		if (accntNode != null) {
 			propVal = accntNode.getStr(prop);
-		} else 
+		} else
 		// else we have to lookup the node from the DB, and then cache it if found
 		{
 			accntNode = read.getNode(ms, accountId);
@@ -111,8 +111,8 @@ public class MongoAuth extends ServiceBase {
 				String name = null;
 				if (PrincipalName.PUBLIC.s().equals(userNodeId)) {
 					name = PrincipalName.PUBLIC.s();
-				} else  //
-				if (userNodeId != null) {
+				} //
+				else if (userNodeId != null) {
 					SubNode accountNode = read.getNode(ms, userNodeId);
 					if (accountNode != null) {
 						name = accountNode.getStr(NodeProp.USER);
@@ -138,7 +138,8 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
 		// if parent or child is null or parent is an ACCOUNT node do nothing here.
-		if (parent == null || parent.isType(NodeType.ACCOUNT) || child == null) return;
+		if (parent == null || parent.isType(NodeType.ACCOUNT) || child == null)
+			return;
 		// log.debug("childNode: " + child.getIdStr() + " being created under " + parent.getIdStr());
 		/*
 		 * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
@@ -154,7 +155,7 @@ public class MongoAuth extends ServiceBase {
 					child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
 				}
 			}
-		} else 
+		} else
 		/*
 		 * otherwise if not a FRIEND node we just share to the owner of the parent node
 		 */
@@ -175,7 +176,8 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	public void shareToAllNostrUsers(ArrayList<ArrayList<String>> tags, SubNode child) {
-		if (tags == null) return;
+		if (tags == null)
+			return;
 		// Scan all "p" (people) tags to include sharing for them.
 		for (ArrayList<String> itm : tags) {
 			if ("p".equals(itm.get(0))) {
@@ -229,47 +231,40 @@ public class MongoAuth extends ServiceBase {
 
 	public boolean isAllowedUserName(String userName) {
 		userName = userName.trim();
-		return  //
-		!userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.PUBLIC.s()) &&  //
-		!userName.equalsIgnoreCase(PrincipalName.ANON.s());
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.PUBLIC.s()) && //
+				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	/*
-	 * Adds authorization to any Criteria and returns the updated criteria. Filters to get only nodes
-	 * that are publi OR are shared to the current user. For single node lookups we won't need this
-	 * because we can do it the old way and be faster, but for queries of multiple records (page
-	 * rendering, timeline, search, etc.) we need to build this security right into the query using this
-	 * method.
+	 * Filters to get only nodes that are public OR are shared to the current user. For single node
+	 * lookups we won't need this because we can do it the old way and be faster, but for queries of
+	 * multiple records (page rendering, timeline, search, etc.) we need to build this security right
+	 * into the query using this method.
 	 */
-	public Criteria addSecurityCriteria(MongoSession ms, Criteria crit) {
-		// NOTE: If we're the admin we return criteria without adding security.
-		if (ms.isAdmin()) return crit;
-		List<Criteria> orCriteria = new LinkedList<>();
+	public Criteria getSecurity(MongoSession ms) {
+		List<Criteria> ors = new LinkedList<>();
 		SessionContext sc = ThreadLocals.getSC();
 		SubNode myAcntNode = null;
+
 		// note, anonymous users end up keeping myAcntNode null here. anon will nave null rootID here.
 		if (sc.getRootId() != null) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 		}
+
 		// node is public
-		orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+		ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+
 		// if we have a user add their privileges in addition to public.
 		if (myAcntNode != null) {
 			// or node is shared to us
-			orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
+			ors.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 			// or node is OWNED by us
-			orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
+			ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
 			// or node was Transferred by us
-			orCriteria.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
+			ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
 		}
-		if (orCriteria.size() > 0) {
-			if (crit == null) {
-				crit = new Criteria();
-			}
-			// crit = crit.orOperator(orCriteria);
-			crit = crit.andOperator(new Criteria().orOperator(orCriteria));
-		}
-		return crit;
+
+		return new Criteria().orOperator(ors);
 	}
 
 	public void ownerAuth(SubNode node) {
@@ -281,7 +276,8 @@ public class MongoAuth extends ServiceBase {
 		if (node == null) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
-		if (node.adminUpdate) return;
+		if (node.adminUpdate)
+			return;
 		if (ms == null) {
 			ms = ThreadLocals.getMongoSession();
 		}
@@ -297,20 +293,23 @@ public class MongoAuth extends ServiceBase {
 			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(ms));
 		}
 		if (!ms.getUserNodeId().equals(node.getOwner())) {
-			log.error("Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): " + XString.prettyPrint(node));
+			log.error("Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): "
+					+ XString.prettyPrint(node));
 			throw new NodeAuthFailedException();
 		}
 	}
 
 	public void requireAdmin(MongoSession ms) {
-		if (!ms.isAdmin()) throw new RuntimeEx("auth fail");
+		if (!ms.isAdmin())
+			throw new RuntimeEx("auth fail");
 	}
 
 	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
 		try {
 			auth(ms, node, PrivilegeType.WRITE);
 		} catch (RuntimeException e) {
-			log.debug("session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr() + " and was refused.");
+			log.debug("session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr()
+					+ " and was refused.");
 			throw e;
 		}
 	}
@@ -322,10 +321,13 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 		// this adminUpdate flag is specifically for the purpose if disabling auth checks
-		if (node.adminUpdate) return;
-		if (verbose) log.trace("auth: " + node.getPath());
+		if (node.adminUpdate)
+			return;
+		if (verbose)
+			log.trace("auth: " + node.getPath());
 		if (ms.isAdmin()) {
-			if (verbose) log.trace("you are admin. auth success.");
+			if (verbose)
+				log.trace("you are admin. auth success.");
 			return; // admin can do anything. skip auth
 		}
 		auth(ms, node, Arrays.asList(privs));
@@ -352,10 +354,12 @@ public class MongoAuth extends ServiceBase {
 		}
 		// admin has full power over all nodes
 		if (ms.isAdmin()) {
-			if (verbose) log.trace("auth granted. you\'re admin.");
+			if (verbose)
+				log.trace("auth granted. you\'re admin.");
 			return;
 		}
-		if (verbose) log.trace("auth path " + node.getPath() + " for " + ms.getUserName());
+		if (verbose)
+			log.trace("auth path " + node.getPath() + " for " + ms.getUserName());
 		if (priv == null || priv.size() == 0) {
 			throw new RuntimeEx("privileges not specified.");
 		}
@@ -365,18 +369,22 @@ public class MongoAuth extends ServiceBase {
 		if (ms.getUserNodeId() != null) {
 			// if this session user is the owner of this node, then they have full power
 			if (ms.getUserNodeId().equals(node.getOwner())) {
-				if (verbose) log.trace("allow: user " + ms.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
+				if (verbose)
+					log.trace("allow: user " + ms.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
 				return;
 			}
 			if (ms.getUserNodeId().equals(node.getTransferFrom())) {
-				if (verbose) log.trace("allow: user " + ms.getUserName() + " is transferring node. accountId: " + node.getTransferFrom().toHexString());
+				if (verbose)
+					log.trace("allow: user " + ms.getUserName() + " is transferring node. accountId: "
+							+ node.getTransferFrom().toHexString());
 				return;
 			}
 		}
 		String sessionUserNodeId = ms.getUserNodeId() != null ? ms.getUserNodeId().toHexString() : null;
 		// log.debug("nodeAuth userAcctId=" + sessionUserNodeId);
 		if (nodeAuth(node, sessionUserNodeId, priv)) {
-			if (verbose) log.trace("nodeAuth success");
+			if (verbose)
+				log.trace("nodeAuth success");
 			return;
 		}
 		// Don't log this. It happens in normal flow cases.
@@ -463,7 +471,7 @@ public class MongoAuth extends ServiceBase {
 		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			principalName = PrincipalName.PUBLIC.s();
-		} else 
+		} else
 		/* else we need the user name */
 		{
 			SubNode principalNode = read.getNode(ms, principalId, false, null);
@@ -482,7 +490,8 @@ public class MongoAuth extends ServiceBase {
 				avatarVer = att != null ? att.getBin() : null;
 			}
 		}
-		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, nostrNpub, nostrRelays, avatarVer, foreignAvatarUrl);
+		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, nostrNpub, nostrRelays,
+				avatarVer, foreignAvatarUrl);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}
@@ -495,14 +504,16 @@ public class MongoAuth extends ServiceBase {
 	 * being shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public'
 	 * in sharedTo instead
 	 */
-	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, Sort sort, int limit, ObjectId ownerIdMatch) {
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, Sort sort,
+			int limit, ObjectId ownerIdMatch) {
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (q == null) return null;
+		if (q == null)
+			return null;
 		if (sort != null) {
 			q.with(sort);
 		}
 		q.limit(limit);
-		return mongoUtil.find(q);
+		return opsw.find(ms, q);
 	}
 
 	/*
@@ -512,7 +523,8 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public long countSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (q == null) return 0L;
+		if (q == null)
+			return 0L;
 		Long ret = ops.count(q, SubNode.class);
 		return ret;
 	}
@@ -547,7 +559,8 @@ public class MongoAuth extends ServiceBase {
 	 * incorrect nodes to wrong users because ownerIdMatch forces only the owner running the query to
 	 * see their own nodes only
 	 */
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch, Sort sort, int limit) {
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch, Sort sort,
+			int limit) {
 		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 		if (sort != null) {
 			q.with(sort);
@@ -556,7 +569,7 @@ public class MongoAuth extends ServiceBase {
 			q.skip(skip);
 		}
 		q.limit(limit);
-		return mongoUtil.find(q);
+		return opsw.find(ms, q);
 	}
 
 	/* Finds nodes that have any sharing on them at all */
@@ -575,8 +588,8 @@ public class MongoAuth extends ServiceBase {
 		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
 		 * children.
 		 */
-		Criteria criteria =  //
-		Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)).and(SubNode.AC).ne(null);
+		Criteria criteria =
+				Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)).and(SubNode.AC).ne(null);
 		if (ownerIdMatch != null) {
 			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
 		}
@@ -599,7 +612,8 @@ public class MongoAuth extends ServiceBase {
 		for (String userName : tags.keySet()) {
 			APObj val = tags.get(userName);
 			// ignore of this is something else like a Hashtag
-			if (!(val instanceof APOMention)) continue;
+			if (!(val instanceof APOMention))
+				continue;
 			userName = XString.stripIfStartsWith(userName, "@");
 			SubNode acctNode = read.getUserNodeByUserName(ms, userName);
 			/*

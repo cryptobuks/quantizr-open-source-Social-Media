@@ -103,6 +103,7 @@ public class ThreadLocals {
 	}
 
 	public static void setSC(SessionContext sc) {
+		if (sc==null) return;
 		if (sessionContext != null) {
 			sessionContext.set(sc);
 		}

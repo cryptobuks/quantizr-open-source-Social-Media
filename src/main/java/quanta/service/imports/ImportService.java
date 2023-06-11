@@ -59,6 +59,7 @@ public class ImportService extends ServiceBase {
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 					ImportZipService impSvc = (ImportZipService) context.getBean(ImportZipService.class);
 					impSvc.importFromStream(ms, in, node, false);
+					node.setHasChildren(true);
 					update.saveSession(ms);
 				} else
 				// Import TAR files (non GZipped)
@@ -67,6 +68,7 @@ public class ImportService extends ServiceBase {
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 					ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
 					impSvc.importFromStream(ms, in, node, false);
+					node.setHasChildren(true);
 					update.saveSession(ms);
 				} else
 				// Import TAR.GZ (GZipped TAR)
@@ -75,11 +77,12 @@ public class ImportService extends ServiceBase {
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 					ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
 					impSvc.importFromZippedStream(ms, in, node, false);
+					node.setHasChildren(true);
 					update.saveSession(ms);
 				} else {
 					throw ExUtil.wrapEx("Only ZIP, TAR, TAR.GZ files are supported for importing.");
 				}
-				node.setHasChildren(true);
+				
 			} catch (Exception ex) {
 				throw ExUtil.wrapEx(ex);
 			} finally {

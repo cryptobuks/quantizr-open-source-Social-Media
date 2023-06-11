@@ -1,7 +1,10 @@
 
 package quanta.mail;
 
+import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
@@ -10,8 +13,6 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Deamon for sending emails.
@@ -36,7 +37,7 @@ public class EmailSenderDaemon extends ServiceBase {
 	 * 
 	 * Runs immediately at startup, and then every 10 seconds
 	 */
-	@Scheduled(fixedDelay = 10000)
+	@Scheduled(fixedDelay = 30000)
 	public void run() {
 		if (run || !MongoRepository.fullInit)
 			return;
@@ -56,10 +57,10 @@ public class EmailSenderDaemon extends ServiceBase {
 			}
 			if (--runCountdown <= 0) {
 				runCountdown = INTERVAL_SECONDS;
-				arun.run((MongoSession ms) -> {
-					Iterable<SubNode> mailNodes = outbox.getMailNodes(ms);
-					if (mailNodes != null) {
-						sendAllMail(ms, mailNodes);
+				arun.run(as -> {
+					LinkedList<SubNode> mailNodes = mongoUtil.asList(outbox.getMailNodes(as));
+					if (mailNodes.size() > 0) {
+						sendAllMail(as, mailNodes);
 					}
 					return null;
 				});

@@ -306,7 +306,7 @@ public class ActPubService extends ServiceBase {
         Query q = arun.run(as -> apFollower.getPeopleByUserName_query(as, null, userName));
         if (q == null)
             return;
-        Iterable<SubNode> iterator = mongoUtil.find(q);
+        Iterable<SubNode> iterator = opsw.find(null, q);
         for (SubNode node : iterator) {
             // log.debug("follower: " + XString.prettyPrint(node));
             /*

@@ -403,7 +403,9 @@ public class UserFeedService extends ServiceBase {
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
 		}
+		
 		q.addCriteria(crit);
+
 		// if we have a node id this is like a chat room type, and so we sort by create time.
 		if (req.getNodeId() != null) {
 			q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
@@ -416,7 +418,7 @@ public class UserFeedService extends ServiceBase {
 		if (req.getPage() > 0) {
 			q.skip(MAX_FEED_ITEMS * req.getPage());
 		}
-		Iterable<SubNode> iter = mongoUtil.find(q);
+		Iterable<SubNode> iter = opsw.find(ms, q);
 		int skipped = 0;
 		for (SubNode node : iter) {
 			/*
@@ -478,6 +480,7 @@ public class UserFeedService extends ServiceBase {
 					continue;
 				}
 			}
+
 			try {
 				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, false,
 						true, true, boostedNodeVal, false);

@@ -26,6 +26,7 @@ import quanta.mongo.MongoCreate;
 import quanta.mongo.MongoDelete;
 import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
+import quanta.mongo.MongoTemplateWrapper;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
 import quanta.service.AclService;
@@ -156,6 +157,7 @@ public class ServiceBase {
 	public static FriendType friendType;
 	public static RoomType roomType;
 	public static RssFeedType rssType;
+	public static MongoTemplateWrapper opsw;
 	public static MongoTemplate ops;
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
@@ -244,6 +246,7 @@ public class ServiceBase {
 			roomType = getBean(ctx, RoomType.class);
 			rssType = getBean(ctx, RssFeedType.class);
 			mongoRepo = getBean(ctx, MongoRepository.class);
+			opsw = getBean(ctx, MongoTemplateWrapper.class);
 			crypto = getBean(ctx, CryptoService.class);
 			schema = getBean(ctx, SchemaOrgService.class);
 			nostr = getBean(ctx, NostrService.class);

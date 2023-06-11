@@ -42,6 +42,7 @@ public class CallProcessor extends ServiceBase {
 			throw ExUtil.wrapEx("Server not available.");
 		}
 		SessionContext sc = ThreadLocals.getSC();
+		sc.setCommand(command);
 		if (sc == null || !SessionContext.sessionExists(sc)) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}

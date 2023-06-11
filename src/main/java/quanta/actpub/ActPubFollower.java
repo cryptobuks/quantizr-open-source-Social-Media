@@ -159,7 +159,7 @@ public class ActPubFollower extends ServiceBase {
         Query q = getPeopleByUserName_query(ms, null, userName);
         if (q == null)
             return null;
-        return mongoUtil.find(q);
+        return opsw.find(ms, q);
     }
 
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
@@ -170,7 +170,7 @@ public class ActPubFollower extends ServiceBase {
                 return null;
             q.limit(ConstantInt.ROWS_PER_PAGE.val());
             q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
-            Iterable<SubNode> iterable = mongoUtil.find(q);
+            Iterable<SubNode> iterable = opsw.find(as, q);
             List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
             int counter = 0;
             for (SubNode node : iterable) {
@@ -227,10 +227,9 @@ public class ActPubFollower extends ServiceBase {
                 return null;
             }
         }
-        Criteria crit = //
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH))
-                        .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
-                        .is(NodeType.FRIEND.s());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH))
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
+                .is(NodeType.FRIEND.s());
         q.addCriteria(crit);
         return q;
     }

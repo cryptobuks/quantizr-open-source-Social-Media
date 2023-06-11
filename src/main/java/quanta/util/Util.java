@@ -212,10 +212,4 @@ public class Util {
 		// }
 		// }
 	}
-
-	public static void failIfAdmin(String userName) {
-		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
-			throw new RuntimeException("Admin not allowed");
-		}
-	}
 }

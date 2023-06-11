@@ -296,7 +296,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
-                            S.util.showMessage("Upload failed. You're out of storage space on the server.", "Warning");
+                            S.util.showMessage("Upload failed. You're out of storage space.", "Warning");
                         }
                         return;
                     }

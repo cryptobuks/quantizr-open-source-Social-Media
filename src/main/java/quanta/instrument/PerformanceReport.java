@@ -40,11 +40,7 @@ public class PerformanceReport {
 			}
 		}
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable( //
-					//
-					//
-					//
-					//
+			sb.append(htmlTable(
 					htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows));
 		}
 		// calculate totals per person
@@ -94,10 +90,7 @@ public class PerformanceReport {
 			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
 		}
 		if (!rows.isEmpty()) {
-			sb.append(htmlTable( //
-					//
-					//
-					htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
+			sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
 		}
 		sb.append(getTimesPerCategory());
 		sb.append("</body></html>");
@@ -162,14 +155,10 @@ public class PerformanceReport {
 					}
 				}
 				if (!rows.isEmpty()) {
-					set += //
-							//
-							//
-							//
-							//
-							"<br>" + htmlTable(htmlTr(
-									htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id"))
-									+ rows) + "<br>";
+					set += "<br>" + htmlTable(
+							htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id"))
+									+ rows)
+							+ "<br>";
 				}
 			}
 		}
@@ -207,15 +196,8 @@ public class PerformanceReport {
 	}
 
 	public static String htmlStyle() {
-		return //
-		//
-		//
-		//
-		//
-		//
-		//
-		"<style>\n" + "table, th, td {\n" + "padding: 5px;\n" + "border: 1px solid black;\n" + "border-collapse: collapse;\n"
-				+ "}\n" + "body {padding: 20px;}"
+		return "<style>\n" + "table, th, td {\n" + "padding: 5px;\n" + "border: 1px solid black;\n"
+				+ "border-collapse: collapse;\n" + "}\n" + "body {padding: 20px;}"
 				+ "html, body {font-family: \'Courier New\', \'Courier\', \'Roboto\', \'Verdana\', \'Helvetica\', \'Arial\', \'sans-serif\' !important}"
 				+ //
 				"</style>";

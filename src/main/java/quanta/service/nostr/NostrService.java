@@ -450,7 +450,7 @@ public class NostrService extends ServiceBase {
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(id);
 		q.addCriteria(crit);
-		SubNode ret = mongoUtil.findOne(q);
+		SubNode ret = opsw.findOne(ms, q);
 		if (allowAuth) {
 			SubNode _ret = ret;
 			// we run with 'ms' if it's non-null, or with admin if ms is null

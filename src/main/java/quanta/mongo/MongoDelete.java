@@ -84,7 +84,7 @@ public class MongoDelete extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s());
 		q.addCriteria(crit);
 		HashSet<String> keys = new HashSet<>();
-		Iterable<SubNode> nodes = mongoUtil.find(q);
+		Iterable<SubNode> nodes = opsw.find(ms, q);
 		for (SubNode node : nodes) {
 			if (node.getOwner() == null) continue;
 			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID);
@@ -155,15 +155,12 @@ public class MongoDelete extends ServiceBase {
 	public long deleteUnderPath(MongoSession ms, String path) {
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
-		Criteria crit = auth.addSecurityCriteria(ms, null);
-		if (crit != null) {
-			q.addCriteria(crit);
-		}
+		
 		SubNode parent = read.getNode(ms, path);
 		if (parent != null) {
 			parent.setHasChildren(false);
 		}
-		DeleteResult res = ops.remove(q, SubNode.class);
+		DeleteResult res = opsw.remove(ms, q);
 		return res.getDeletedCount();
 	}
 
@@ -242,14 +239,14 @@ public class MongoDelete extends ServiceBase {
 		// log.debug("Deleting by prop=" + prop + " val=" + val);
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PROPS + "." + prop).is(val);
-		crit = auth.addSecurityCriteria(ms, crit);
 		q.addCriteria(crit);
+		
 		// since we're deleting all nodes matching the query 'q' we set the parents of all those nodes do
 		// unknown children state
 		bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
 		// look for all calls to 'ops.remove' just to doublecheck none of them need the above
 		// 'bulkSetPropValOnParents'
-		DeleteResult res = ops.remove(q, SubNode.class);
+		DeleteResult res = opsw.remove(ms, q);
 		log.debug("Nodes deleted: " + res.getDeletedCount());
 	}
 
@@ -344,7 +341,7 @@ public class MongoDelete extends ServiceBase {
 				// query to see if node's parent exists.
 				Query q = new Query();
 				q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
-				SubNode parent = mongoUtil.findOne(q);
+				SubNode parent = opsw.findOne(null, q);
 				// if parent node doesn't exist, this is an orphan we can delete.
 				if (parent == null) {
 					// log.debug("orphan[" + node.getPath() + "]: " + node.getContent());
@@ -680,7 +677,6 @@ public class MongoDelete extends ServiceBase {
 		// blocked user
 		// nodes either, so for now we just delete if the type is a comment
 		crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
-		crit = auth.addSecurityCriteria(ms, crit);
 		criterias.add(crit);
 		if (!StringUtils.isEmpty(text)) {
 			if (fuzzy) {
@@ -726,6 +722,7 @@ public class MongoDelete extends ServiceBase {
 		for (CriteriaDefinition c : criterias) {
 			q.addCriteria(c);
 		}
-		ops.remove(q, SubNode.class);
+		
+		opsw.remove(ms, q);
 	}
 }

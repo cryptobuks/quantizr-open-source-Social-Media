@@ -42,7 +42,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         let style = null;
         if (ast.docIndent) {
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
-            style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
+            style = indentLevel > 0 ? { marginLeft: "" + (indentLevel * 25) + "px" } : null;
         }
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false,

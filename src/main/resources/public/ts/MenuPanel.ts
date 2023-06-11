@@ -300,9 +300,6 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
 
-                // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
-                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !!ast.nodesToMove), //
-
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
                 new MenuItem("Set Headings", S.edit.setHeadings, selNodeIsMine), //
@@ -317,8 +314,12 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Move to Top", S.edit.moveNodeToTop, canMoveUp), //
                 new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, canMoveDown), //
-
                 new MenuItemSeparator(), //
+
+                new MenuItem("Cut", S.edit.cutSelNodes, selNodeIsMine ), //
+                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !!ast.nodesToMove), //
+                new MenuItemSeparator(), //
+                
                 new MenuItem("Delete", S.edit.deleteSelNodes, selNodeIsMine) //
 
                 // todo-2: disabled during mongo conversion

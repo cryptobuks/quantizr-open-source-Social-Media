@@ -63,7 +63,7 @@ public class ExportJsonService extends ServiceBase {
 			Query q = new Query();
 			Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
 			q.addCriteria(crit);
-			Iterable<SubNode> iter = mongoUtil.find(q);
+			Iterable<SubNode> iter = opsw.find(ms, q);
 			BufferedOutputStream os = null;
 			try {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
