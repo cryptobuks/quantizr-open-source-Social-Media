@@ -44,11 +44,7 @@ export class TabUtil {
     }
 
     makeDomIdForNode = (tabData: TabIntf<any>, id: string) => {
-        // todo-0: for legacy reasons we have a different id formatting for main tree, and this inconsistent is bad and needs to be fixed.
-        if (tabData.id == C.TAB_MAIN) {
-            return S.nav._UID_ROWID_PREFIX + id;
-        }
-        return tabData.id + "_" + id;
+        return tabData.id + id;
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */

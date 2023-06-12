@@ -289,7 +289,7 @@ export class View {
                     return;
                 }
 
-                const elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
+                const elm = S.domUtil.domElm(C.TAB_MAIN + node.id);
                 if (elm) {
                     // ---------------------------
                     // scrollIntoView works, but is off a bit because we have a 'sticky' header covering up

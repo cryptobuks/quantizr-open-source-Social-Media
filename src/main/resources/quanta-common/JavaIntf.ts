@@ -1123,7 +1123,6 @@ export interface NodeInfo {
     hasChildren: boolean;
     cipherKey: string;
     lastChild: boolean;
-    parent: NodeInfo;
     children: NodeInfo[];
     linkedNodes: NodeInfo[];
     likes: string[];

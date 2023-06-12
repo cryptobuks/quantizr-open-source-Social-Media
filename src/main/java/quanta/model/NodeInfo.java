@@ -62,7 +62,6 @@ public class NodeInfo {
 	 * the context for the reply of a post, which entails showing the parent of the reply above the
 	 * reply
 	 */
-	private NodeInfo parent;
 	private List<NodeInfo> children;
 	
 	private LinkedList<NodeInfo> linkedNodes;
@@ -232,10 +231,6 @@ public class NodeInfo {
 		return this.lastChild;
 	}
 	
-	public NodeInfo getParent() {
-		return this.parent;
-	}
-	
 	public List<NodeInfo> getChildren() {
 		return this.children;
 	}
@@ -362,10 +357,6 @@ public class NodeInfo {
 
 	public void setLastChild(final boolean lastChild) {
 		this.lastChild = lastChild;
-	}
-	
-	public void setParent(final NodeInfo parent) {
-		this.parent = parent;
 	}
 	
 	public void setChildren(final List<NodeInfo> children) {

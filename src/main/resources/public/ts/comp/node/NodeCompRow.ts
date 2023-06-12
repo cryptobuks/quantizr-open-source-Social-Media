@@ -29,7 +29,7 @@ export class NodeCompRow extends Div {
         public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div,
         private renderingBoost: boolean) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + node.id
+            id: C.TAB_MAIN + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });

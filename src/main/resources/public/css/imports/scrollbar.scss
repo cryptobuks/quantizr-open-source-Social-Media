@@ -23,6 +23,7 @@ $scrollBarWidth: 20px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: $scrollThumb;
+    border: 1px solid gray;
 }
 
 textarea::-webkit-scrollbar {
@@ -44,4 +45,5 @@ textarea::-webkit-scrollbar-thumb {
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: $scrollThumb;
     cursor: pointer;
+    border: 1px solid gray;
 }

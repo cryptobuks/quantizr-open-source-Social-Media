@@ -37,7 +37,6 @@ export class MainTab implements TabIntf<any> {
     findNodeRecursive = (node: J.NodeInfo, id: string, level: number): J.NodeInfo => {
         if (!node) return null;
         if (node.id === id) return node;
-        if (node.parent?.id === id) return node.parent;
         if (node.boostedNode?.id === id) return node.boostedNode;
 
         if (level < 3 && node.children) {

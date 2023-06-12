@@ -983,22 +983,6 @@ export class Util {
         });
     }
 
-    // todo-2: need to decide if I want this. It's disabled currently (not called)
-    removeRedundantFeedItems = (feedRes: J.NodeInfo[]): J.NodeInfo[] => {
-        if (!feedRes || feedRes.length === 0) return feedRes;
-
-        // first build teh set of ids that that are in 'ni.parent.id'
-        const idSet: Set<string> = new Set<string>();
-        feedRes.forEach(ni => {
-            if (ni.parent) {
-                idSet.add(ni.parent.id);
-            }
-        });
-
-        // now return filtered list only for items where 'id' is not in the set above.
-        return feedRes.filter(ni => !idSet.has(ni.id));
-    }
-
     /* show metadata if the user has the setting ON or if on POSTS node or a COMMENT node as the
         top page-root node */
     showMetaData = (ast: AppState, node: J.NodeInfo) => {

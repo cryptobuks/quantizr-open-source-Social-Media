@@ -443,7 +443,6 @@ export class Search {
 
         dispatch("RenderFeedResults", s => {
             FeedTab.inst.openGraphComps = [];
-            // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
             // once user requests their stuff, turn off the new messages count indicator.
             if (FeedTab.inst.props.feedFilterToMe) {
@@ -568,10 +567,9 @@ export class Search {
     }
 
     /*
-     * Renders a single line of search results on the search results page.
+     * Renders a single line of search results on the search results page
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number,
-        isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
+    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, jumpButton: boolean, allowHeader: boolean,
         allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
         extraStyle: any): Comp => {
         const ast = getAs();
@@ -584,13 +582,6 @@ export class Search {
             allowFooter = true;
         }
 
-        /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
-        item we are rendering */
-        let parentItem: Comp = null;
-        if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle);
-        }
-
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
         let clazz = isFeed ? "feedNode" : "resultsNode";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
@@ -598,15 +589,6 @@ export class Search {
             S.render.allowFadeInId = false;
             clazz += " fadeInRowBkgClz";
             S.quanta.fadeStartTime = new Date().getTime();
-        }
-
-        if (isParent) {
-            clazz += " inactiveFeedRowParent";
-        }
-        else {
-            if (parentItem) {
-                clazz += " inactiveFeedRow";
-            }
         }
 
         const allowDelete = tabData.id !== C.TAB_DOCUMENT;
@@ -665,7 +647,7 @@ export class Search {
 
         const attrs: any = {
             // yes the 'tabData.id' looks odd here as a class, and it's only used for lookups for scrolling logic.
-            className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
+            className: `${clazz} ${divClass} ${tabData.id}`,
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             [C.NODE_ID_ATTR]: node.id,
             onClick: async () => {
@@ -677,7 +659,7 @@ export class Search {
         };
 
         if (extraStyle) {
-            // I have a feeling this code is dead. check it. todo-0
+            // I have a feeling this code is dead. check it. todo-1
             attrs.style = extraStyle;
         }
 
@@ -701,18 +683,7 @@ export class Search {
             allowFooter ? new Clearfix() : null
         ]);
 
-        // if we have a parentItem wrap it and 'itemDiv' in a container Div
-        if (parentItem) {
-            return new Divc({
-                className: isParent ? "userFeedItemParent" : divClass,
-                // the "_p_" differentiates the parent from the 'div' which is just "_" delimeter (see above)
-                id: tabData.id + "_p_" + node.id
-            }, [parentItem, itemDiv]);
-        }
-        // othwersize 'div' itself is what we need to return, without an unnecessary div wrapping it.
-        else {
-            return itemDiv;
-        }
+        return itemDiv;
     }
 
     clickSearchNode = async (id: string) => {

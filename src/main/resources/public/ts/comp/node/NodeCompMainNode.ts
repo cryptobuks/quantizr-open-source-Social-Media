@@ -19,7 +19,7 @@ export class NodeCompMainNode extends Div {
 
     constructor(public tabData: TabIntf<any>) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + getAs().node.id
+            id: C.TAB_MAIN + getAs().node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });

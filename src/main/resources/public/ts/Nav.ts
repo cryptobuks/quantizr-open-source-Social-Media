@@ -16,8 +16,6 @@ import { MainTab } from "./tabs/data/MainTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class Nav {
-    _UID_ROWID_PREFIX: string = "row_";
-
     displayingHome = (): boolean => {
         const ast = getAs();
         if (!ast.node) return false;

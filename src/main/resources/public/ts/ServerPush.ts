@@ -131,9 +131,6 @@ export class ServerPush {
         }
         else {
             FeedTab.inst.props.feedResults.unshift(nodeInfo);
-            // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
-            // then remove the nodeInfo.id from the list because it would be redundant in the list.
-            // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
         }
     }
 
@@ -192,10 +189,6 @@ export class ServerPush {
                 if (!isMine) {
                     S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                 }
-
-                // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
-                // then remove the nodeInfo.id from the list because it would be redundant in the list.
-                // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
             }
             // or finally if autoRefresh is off we just set feedDirty, and it's up to the user to click refresh
             // button themselves.
