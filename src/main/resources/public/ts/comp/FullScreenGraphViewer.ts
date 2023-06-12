@@ -270,6 +270,7 @@ export class FullScreenGraphViewer extends Main {
             singleNode: true,
             jumpToRss: false
         });
+        S.nodeUtil.processInboundNode(res.node);
 
         if (res?.node) {
             d.data.name = res.node.content;

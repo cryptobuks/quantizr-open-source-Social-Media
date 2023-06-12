@@ -747,20 +747,6 @@ export class Util {
         return userName && userName.indexOf("@") === -1;
     }
 
-    // Queries the url for 'Open Graph' data and sendes it back using the callback.
-    loadOpenGraph = async (url: string, callback: Function) => {
-        try {
-            const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
-                url
-            }, true);
-            callback(res.openGraph);
-        }
-        catch (e) {
-            S.util.logErr(e);
-            callback(null);
-        }
-    }
-
     sendTestEmail = async () => {
         await S.rpcUtil.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         this.showMessage("Send Test Email Initiated.", "Note");

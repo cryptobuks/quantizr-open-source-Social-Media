@@ -35,6 +35,7 @@ export class Search {
             shareTarget,
             accessOption
         });
+        S.nodeUtil.processInboundNodes(res.searchResults);
 
         if (res.searchResults?.length > 0) {
             dispatch("RenderSearchResults", s => {
@@ -66,6 +67,7 @@ export class Search {
             nodeId: node.id,
             loadOthers: true
         });
+        S.nodeUtil.processInboundNodes(res.nodes);
 
         // console.log("res=" + S.util.prettyPrint(res));
 
@@ -81,6 +83,7 @@ export class Search {
                 nodeId: node.id,
                 loadOthers: true
             });
+            S.nodeUtil.processInboundNodes(res.nodes);
         }
 
         if (res.nodes?.length > 0) {
@@ -128,6 +131,7 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.GetRepliesViewRequest, J.GetRepliesViewResponse>("getNodeRepliesView", {
             nodeId: node.id
         });
+        S.nodeUtil.processInboundNodes(res.nodes);
 
         if (res.nodes && res.nodes.length > 0) {
             dispatch("RenderRepliesResults", s => {
@@ -197,6 +201,7 @@ export class Search {
                 requireAttachment,
                 deleteMatches
             });
+            S.nodeUtil.processInboundNodes(res.searchResults);
 
             if (res.success && deleteMatches) {
                 S.util.showMessage("Matches were deleted.", "Warning");
@@ -260,6 +265,7 @@ export class Search {
             rootId: node.id,
             includeComments: getAs().userPrefs.showReplies
         });
+        S.nodeUtil.processInboundNodes(res.searchResults);
 
         if (!res.searchResults || res.searchResults.length === 0) {
             dispatch("RenderDocumentResults", s => {
@@ -319,6 +325,7 @@ export class Search {
             requireAttachment: false,
             deleteMatches: false
         });
+        S.nodeUtil.processInboundNodes(res.searchResults);
 
         if (page === 0 && (!res.searchResults || res.searchResults.length === 0)) {
             S.util.showMessage("Nothing found", "Timeline");
@@ -429,6 +436,10 @@ export class Search {
             applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks,
             protocol: ast.protocolFilter
         });
+        // console.log("INBOUND NODE FEED: " + S.util.prettyPrint(res.searchResults));
+        // console.log("log check 1");
+        S.nodeUtil.processInboundNodes(res.searchResults);
+        //console.log("log check 2");
 
         dispatch("RenderFeedResults", s => {
             FeedTab.inst.openGraphComps = [];

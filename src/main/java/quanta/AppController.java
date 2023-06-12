@@ -631,7 +631,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	// We don't perfMonitor this because the bottleneck is hopefully the foreign server. @PerfMon
 	@RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {

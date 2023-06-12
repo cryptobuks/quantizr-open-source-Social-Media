@@ -118,6 +118,7 @@ export class EditNodeDlgUtil {
             saveToActPub: ast.protocolFilter === J.Constant.NETWORK_ACTPUB,
             nostrEvent: S.nostr.makeNostrEventWrapper(nostrEvent, editNode.id)
         });
+        S.nodeUtil.processInboundNode(res.node);
 
         if (!res?.success) {
             return false;
@@ -412,6 +413,7 @@ export class EditNodeDlgUtil {
             singleNode: true,
             jumpToRss: false
         });
+        S.nodeUtil.processInboundNode(res.node);
 
         if (res.node) {
             node.attachments = res.node.attachments;

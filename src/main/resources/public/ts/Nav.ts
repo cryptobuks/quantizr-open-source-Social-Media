@@ -65,6 +65,8 @@ export class Nav {
                 singleNode: false,
                 jumpToRss: false
             });
+
+            S.nodeUtil.processInboundNode(res.node);
             this.upLevelResponse(res, null, true);
         }
         catch (e) {
@@ -103,6 +105,7 @@ export class Nav {
                 singleNode: false,
                 jumpToRss: false
             });
+            S.nodeUtil.processInboundNode(res.node);
 
             if (processingDelete) {
                 S.quanta.refresh();
@@ -163,6 +166,7 @@ export class Nav {
                 singleNode: false,
                 jumpToRss
             });
+            S.nodeUtil.processInboundNode(res.node);
 
             // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
             // the actual RSS feed that this node defines.
@@ -277,6 +281,7 @@ export class Nav {
                     singleNode: false,
                     jumpToRss: false
                 });
+                S.nodeUtil.processInboundNode(res.node);
 
                 this.navPageNodeResponse(res);
             }
@@ -321,6 +326,7 @@ export class Nav {
                     singleNode: true,
                     jumpToRss: false
                 });
+                S.nodeUtil.processInboundNode(res.node);
                 if (!res.node) {
                     // todo-1: in this code path we should show an error message ON the Document Tab.
                     return;
@@ -380,6 +386,7 @@ export class Nav {
                 singleNode: true,
                 jumpToRss: false
             });
+            S.nodeUtil.processInboundNode(res.node);
 
             if (!res.node) return;
 

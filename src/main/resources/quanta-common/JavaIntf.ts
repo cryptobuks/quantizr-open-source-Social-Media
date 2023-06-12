@@ -1321,6 +1321,7 @@ export const enum NodeProp {
     BOOST = "boost",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
+    OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
 }
 

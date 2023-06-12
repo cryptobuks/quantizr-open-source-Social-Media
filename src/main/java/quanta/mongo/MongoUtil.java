@@ -10,6 +10,8 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
@@ -44,8 +46,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Verious utilities related to MongoDB persistence

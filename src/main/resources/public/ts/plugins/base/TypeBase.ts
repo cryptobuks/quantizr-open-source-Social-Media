@@ -213,8 +213,9 @@ export class TypeBase implements TypeIntf {
             const children: CompIntf[] = [comp];
             let count = 0;
             comp.urls.forEach((url: string) => {
-                // allow max of 10 urls.
-                if (count++ < 20) {
+                // allow max of 50 urls.
+                if (count++ < 50) {
+                    // console.log("OG: id=" + node.id + " url=" + url);
                     const og = new OpenGraphPanel(tabData, comp.getId("og" + count + "_"), url,
                         isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);

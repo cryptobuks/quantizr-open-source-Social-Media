@@ -385,4 +385,31 @@ export class NodeUtil {
         }
         return val;
     }
+
+    processInboundNodes = (nodes: J.NodeInfo[]) => {
+        if (!nodes) return;
+        for (const node of nodes) {
+            this.processInboundNode(node);
+        }
+    }
+
+    processInboundNode = (node: J.NodeInfo) => {
+        if (!node) return;
+        const tags: string[] = S.props.getPropObj(J.NodeProp.OPEN_GRAPH, node);
+        if (tags) {
+            for (const t of tags) {
+                const og: any = JSON.parse(t);
+                if (!S.quanta.openGraphData.has(og.url)) {
+                    S.quanta.openGraphData.set(og.url, og);
+                }
+            }
+        }
+        if (node.boostedNode) {
+            this.processInboundNode(node.boostedNode);
+        }
+        if (node.children) {
+            this.processInboundNodes(node.children);
+        }
+    }
 }
+

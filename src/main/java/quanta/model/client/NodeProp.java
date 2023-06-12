@@ -219,6 +219,7 @@ public enum NodeProp {
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 
+    OPEN_GRAPH("sn:og"), 
     TRUNCATED("trunc");
 
     @JsonValue

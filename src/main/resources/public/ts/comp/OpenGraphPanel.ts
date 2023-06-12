@@ -19,6 +19,7 @@ interface LS { // Local State
 
 export class OpenGraphPanel extends Div {
     loading: boolean;
+    observer: IntersectionObserver;
 
     constructor(private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, private allowBookmarkIcon: boolean, private includeImage: boolean) {
@@ -40,45 +41,22 @@ export class OpenGraphPanel extends Div {
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         const og = S.quanta.openGraphData.get(this.url);
         if (!og) {
-            const observer = new IntersectionObserver(entries => //
+            this.observer = new IntersectionObserver(entries => //
+                // note: processOgEntry itself is async but we should not await for it here, because this is part of the
+                // intersection observer we don't want to block.
                 entries.forEach(entry => this.processOgEntry(entry, elm)));
-            observer.observe(elm.parentElement);
+            this.observer.observe(elm.parentElement);
         }
         else {
             this.mergeState<LS>({ og });
         }
     }
 
-    processOgEntry = (entry: any, elm: HTMLElement) => {
+    processOgEntry = async (entry: any, elm: HTMLElement) => {
         if (!entry.isIntersecting) return;
-        const og = S.quanta.openGraphData.get(this.url);
-        if (!og) {
-            if (!this.loading) {
-                this.loading = true;
-                S.util.loadOpenGraph(this.url, (og: J.OpenGraph) => {
-                    this.loading = false;
-                    og = og || {
-                        title: null,
-                        description: null,
-                        image: null,
-                        url: null,
-                        mime: null
-                    };
-                    // observer.disconnect();
-                    S.quanta.openGraphData.set(this.url, og);
-                    // this.processOgImage(this.url, og); // <-- DO NOT DELETE
-                    if (!elm.isConnected) {
-                        return;
-                    }
-                    this.mergeState<LS>({ og });
-                });
-            }
-        }
-        else {
-            // this.processOgImage(this.url, og); // <-- DO NOT DELETE
-            this.mergeState<LS>({ og });
-        }
-        this.loadNext();
+        this.disconnect();
+        await this.loadOpenGraph();
+        await this.loadNext();
     }
 
     // DO NOT DELETE (#inline-image-rendering)
@@ -98,49 +76,81 @@ export class OpenGraphPanel extends Div {
     performance optimization to help the user experience and is not a core part of the logic for
      'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down thru content
      even including content with lots and lots of openGraph queries happening in the background. */
-    loadNext = () => {
+    loadNext = async () => {
         let found = false;
         let count = 0;
-        if (!this.tabData) return;
+        if (!this.tabData || !this.tabData.openGraphComps) return;
 
-        this.tabData.openGraphComps.forEach(o => {
+        for (const comp of this.tabData.openGraphComps) {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {
-                    const og = S.quanta.openGraphData.get(o.url);
-                    if (!og) {
-                        if (!o.loading) {
-                            o.loading = true;
-                            S.util.loadOpenGraph(o.url, (og: J.OpenGraph) => {
-                                o.loading = false;
-                                if (!og) {
-                                    og = {
-                                        title: null,
-                                        description: null,
-                                        image: null,
-                                        url: null,
-                                        mime: null
-                                    };
-                                }
-                                S.quanta.openGraphData.set(o.url, og);
-                                // this.processOgImage(o.url, og); // <-- DO NOT DELETE
-                                if (!o.getRef()) {
-                                    return;
-                                }
-                                o.mergeState({ og });
-                            });
-                        }
-                    }
-                    else {
-                        // this.processOgImage(o.url, og); // <-- DO NOT DELETE
-                        o.mergeState({ og });
-                    }
+                    comp.loadOpenGraph();
                 }
             }
-            else if (o.getId() === this.getId()) {
+            else if (comp.getId() === this.getId()) {
                 found = true;
             }
-        });
+        }
+    }
+
+    private loadOpenGraph = async () => {
+        if (this.loading) return;
+        let og = S.quanta.openGraphData.get(this.url);
+        if (!og) {
+            if (!this.loading) {
+                try {
+                    this.loading = true;
+                    og = await this.queryOpenGraph(this.url);
+                } finally {
+                    this.loading = false;
+                }
+
+                og = og || {
+                    title: null,
+                    description: null,
+                    image: null,
+                    url: this.url,
+                    mime: null
+                };
+    
+                S.quanta.openGraphData.set(this.url, og);
+                // this.processOgImage(o.url, og); // <-- DO NOT DELETE
+                if (!this.getRef()) {
+                    return;
+                }
+                this.mergeState<LS>({ og });
+            }
+        }
+        else {
+            // this.processOgImage(o.url, og); // <-- DO NOT DELETE
+            this.mergeState<LS>({ og });
+        }
+    }
+
+    disconnect = () => {
+        if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+        }
+    }
+
+    // Queries the url for 'Open Graph' data and sendes it back using the callback. All types of NodeInfo objects
+    // we ever get from the server should already have the open graph property (sn:og) set on them so normally
+    // the only time this method ever runs will be when browsing an RSS feed.
+    queryOpenGraph = async (url: string): Promise<J.OpenGraph> => {
+        if (!url) return null;
+        // console.log("QUERY OG for " + url);
+        try {
+            const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+                url
+            }, true);
+            return res.openGraph;
+        }
+        catch (e) {
+            S.util.logErr(e);
+            return null;
+        }
     }
 
     override preRender(): boolean {

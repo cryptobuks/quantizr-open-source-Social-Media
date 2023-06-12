@@ -1134,8 +1134,7 @@ public class MongoRead extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(pathToQuery))
                 .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$").and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
         q.addCriteria(crit);
-        // todo-0: insecure query here, for legacy reasons. verify no security risk.
-        SubNode ret = opsw.findOne(null, q);
+        SubNode ret = opsw.findOne(ms, q);
         if (allowAuth) {
             SubNode _ret = ret;
             // we run with 'ms' if it's non-null, or with admin if ms is null

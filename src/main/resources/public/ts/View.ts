@@ -85,6 +85,7 @@ export class View {
                 singleNode: false,
                 jumpToRss: a.jumpToRss
             });
+            S.nodeUtil.processInboundNode(res.node);
 
             // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
             // the actual RSS feed that this node defines.
@@ -169,6 +170,7 @@ export class View {
                 singleNode: false,
                 jumpToRss: false
             });
+            S.nodeUtil.processInboundNode(res.node);
 
             if (!res.node) return;
 

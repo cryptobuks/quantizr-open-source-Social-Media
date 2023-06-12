@@ -129,8 +129,8 @@ export class NodeCompMarkdown extends Html {
             if (!e.href) return;
             let href = e.href.trim();
             href = S.util.stripIfEndsWith(href, "/");
+            href = S.util.stripIfEndsWith(href, "\\");
             const hrefWithSlash = href;
-            href = S.util.replaceAll(href, "/?", "?");
 
             /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
             trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */

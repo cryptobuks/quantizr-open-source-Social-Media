@@ -98,6 +98,14 @@ public class Convert extends ServiceBase {
 			}
 		}
 		attach.fixAllAttachmentMimes(node);
+
+		/*
+		 * We only parse openGraph upon demand (lazily) right here, when a node is accessed, because doing
+		 * this work unnecessarily when the node is saved would a huge waste of both bandwidth and storage,
+		 * so nodes will only have the sn:og property set here if it's ever been accessed
+		 */
+		openGraph.parseNode(node);
+
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
@@ -185,6 +193,7 @@ public class Convert extends ServiceBase {
 		if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
 			logicalOrdinal = read.generateLogicalOrdinal(ms, node);
 		}
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
 				owner, ownerId, nostrPubKey, //
