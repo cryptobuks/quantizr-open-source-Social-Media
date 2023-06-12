@@ -90,6 +90,7 @@ public class UserFeedService extends ServiceBase {
 	 * person or that person to us queried in a single list.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
+		// log.debug("GEN FEED: " + XString.prettyPrint(req));
 		/*
 		 * if bidirectional means query for the conversation between me and the other person (both senders),
 		 * and we do that always for now when toUser is present.
@@ -152,8 +153,10 @@ public class UserFeedService extends ServiceBase {
 		if (!testQuery && doAuth && req.getToPublic()) {
 			orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
+
 		SubNode myAcntNode = null;
 		String searchForUserName = null;
+
 		if (doAuth && req.getMyMentions()) {
 			searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
 		} else
@@ -179,6 +182,7 @@ public class UserFeedService extends ServiceBase {
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
+
 		Query q = new Query();
 		// initialize criteria using the Path to select the correct sub-graph of the tree
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
@@ -189,6 +193,7 @@ public class UserFeedService extends ServiceBase {
 		// limit to just markdown types (no type), and comments
 		// IMPORTANT: see long comment above where we have similar type filtering.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s());
+
 		// Nostr
 		if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
 			List<Criteria> orCrit = new LinkedList<>();
@@ -207,6 +212,7 @@ public class UserFeedService extends ServiceBase {
 			orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
 			crit = crit.andOperator(new Criteria().orOperator(orCrit));
 		}
+
 		boolean allowBadWords = true;
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
@@ -260,21 +266,13 @@ public class UserFeedService extends ServiceBase {
 				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 			if (myAcntNode != null) {
-				// sharing from us to the other user.
-				orCriteria.add(
-						// where node is owned by us.
-						//
-						// and the node has any sharing on it.
-						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner())
-								.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
-				// sharing from the other user to us.
+				// sharing from us to the other user.where node is owned by us and the node has any sharing on it.
+				orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner())
+						.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
+				// sharing from the other user to us. where node is owned by us. and the node has any sharing on it.
 				if (bidirectional) {
-					orCriteria.add(
-							// where node is owned by us.
-							//
-							// and the node has any sharing on it.
-							Criteria.where(SubNode.OWNER).is(toUserNode.getOwner())
-									.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
+					orCriteria.add(Criteria.where(SubNode.OWNER).is(toUserNode.getOwner())
+							.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
 				}
 			}
 		}
@@ -283,11 +281,8 @@ public class UserFeedService extends ServiceBase {
 				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 			if (myAcntNode != null) {
-				orCriteria.add(
-						// where node is owned by us.
-						//
-						// and the node has any sharing on it.
-						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()).and(SubNode.AC).ne(null));
+				// where node is owned by us. and the node has any sharing on it.
+				orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()).and(SubNode.AC).ne(null));
 			}
 		}
 		if (!testQuery && doAuth && req.getFromFriends()) {
@@ -353,10 +348,11 @@ public class UserFeedService extends ServiceBase {
 		if (orCriteria.size() > 0) {
 			crit = crit.orOperator(orCriteria);
 		}
-		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get
-		// something like
-		// a node with text "Clay's Node" created and it will be empty, and we don't need them showing up in
-		// the feeds.
+		/*
+		 * exclude all user's home nodes from appearing in the results. When a user signs up they'll get
+		 * something like a node with text "Clay's Node" created and it will be empty, and we don't need
+		 * them showing up in the feeds.
+		 */
 		crit = crit.and(SubNode.NAME).ne(NodeName.HOME);
 		TextCriteria textCriteria = null;
 		// Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.
@@ -378,6 +374,7 @@ public class UserFeedService extends ServiceBase {
 				}
 			}
 		}
+
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			if (textCriteria == null) {
 				textCriteria = TextCriteria.forDefaultLanguage();
@@ -393,6 +390,7 @@ public class UserFeedService extends ServiceBase {
 			}
 			textCriteria.matching(text);
 		}
+
 		if (searchForUserName != null) {
 			if (textCriteria == null) {
 				textCriteria = TextCriteria.forDefaultLanguage();
@@ -403,7 +401,7 @@ public class UserFeedService extends ServiceBase {
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
 		}
-		
+
 		q.addCriteria(crit);
 
 		// if we have a node id this is like a chat room type, and so we sort by create time.
@@ -418,7 +416,9 @@ public class UserFeedService extends ServiceBase {
 		if (req.getPage() > 0) {
 			q.skip(MAX_FEED_ITEMS * req.getPage());
 		}
-		Iterable<SubNode> iter = opsw.find(ms, q);
+
+		Iterable<SubNode> iter = opsw.find(ms, q, req.getToPublic(), //
+				req.getFromFriends() || req.getMyMentions() || req.getToMe(), req.getFromMe());
 		int skipped = 0;
 		for (SubNode node : iter) {
 			/*

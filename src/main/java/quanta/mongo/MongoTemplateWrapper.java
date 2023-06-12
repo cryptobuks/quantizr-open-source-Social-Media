@@ -4,6 +4,7 @@ package quanta.mongo;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.result.DeleteResult;
@@ -24,7 +25,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public DeleteResult remove(MongoSession ms, Query query, Class<?> entityClass) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, false, false, true);
 		if (logging) {
 			log("remove", ms, query);
 			start = System.currentTimeMillis();
@@ -40,7 +41,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public long count(MongoSession ms, Query query, Class<?> entityClass) {
 		long start = 0L;
-		secure(ms, query);
+		// not needed -> secure(ms, query, true, true, true);
 		if (logging) {
 			log("count", ms, query);
 			start = System.currentTimeMillis();
@@ -55,7 +56,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public boolean exists(MongoSession ms, Query query, Class<?> entityClass) {
 		long start = 0L;
-		secure(ms, query);
+		// not needed -> secure(ms, query, true, true, true);
 		if (logging) {
 			log("exists", ms, query);
 			start = System.currentTimeMillis();
@@ -69,8 +70,12 @@ public class MongoTemplateWrapper extends ServiceBase {
 	}
 
 	public <T> List<T> find(MongoSession ms, Query query, Class<T> entityClass) {
+		return find(ms, query, entityClass, true, true, true);
+	}
+
+	public <T> List<T> find(MongoSession ms, Query query, Class<T> entityClass, boolean allowPublic, boolean toMe, boolean mine) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, allowPublic, toMe, mine);
 		if (logging) {
 			log("find", ms, query);
 			start = System.currentTimeMillis();
@@ -86,7 +91,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public <T> T findOne(MongoSession ms, Query query, Class<T> entityClass) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, true, true, true);
 		if (logging) {
 			log("findOne", ms, query);
 			start = System.currentTimeMillis();
@@ -102,7 +107,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public DeleteResult remove(MongoSession ms, Query query) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, false, false, true);
 		if (logging) {
 			log("remove", ms, query);
 			start = System.currentTimeMillis();
@@ -118,7 +123,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public long count(MongoSession ms, Query query) {
 		long start = 0L;
-		secure(ms, query);
+		// not needed -> secure(ms, query, true, true, true);
 		if (logging) {
 			log("count", ms, query);
 			start = System.currentTimeMillis();
@@ -133,7 +138,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public boolean exists(MongoSession ms, Query query) {
 		long start = 0L;
-		secure(ms, query);
+		// not needed -> secure(ms, query, true, true, true);
 		if (logging) {
 			log("exists", ms, query);
 			start = System.currentTimeMillis();
@@ -147,8 +152,12 @@ public class MongoTemplateWrapper extends ServiceBase {
 	}
 
 	public List<SubNode> find(MongoSession ms, Query query) {
+		return find(ms, query, true, true, true);
+	}
+
+	public List<SubNode> find(MongoSession ms, Query query, boolean allowPublic, boolean toMe, boolean mine) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, allowPublic, toMe, mine);
 		if (logging) {
 			log("find", ms, query);
 			start = System.currentTimeMillis();
@@ -164,7 +173,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
 	public SubNode findOne(MongoSession ms, Query query) {
 		long start = 0L;
-		secure(ms, query);
+		secure(ms, query, true, true, true);
 		if (logging) {
 			log("findOne", ms, query);
 			start = System.currentTimeMillis();
@@ -186,9 +195,12 @@ public class MongoTemplateWrapper extends ServiceBase {
 				+ query.toString());
 	}
 
-	private void secure(MongoSession ms, Query query) {
+	private void secure(MongoSession ms, Query query, boolean allowPublic, boolean toMe, boolean mine) {
 		if (ms != null && !ms.isAdmin()) {
-			query.addCriteria(auth.getSecurity(ms));
+			Criteria secCrit = auth.getSecurity(ms, allowPublic, toMe, mine);
+			if (secCrit != null) {
+				query.addCriteria(secCrit);
+			}
 		}
 	}
 }

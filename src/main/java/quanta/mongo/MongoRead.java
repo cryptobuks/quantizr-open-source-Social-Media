@@ -915,7 +915,10 @@ public class MongoRead extends ServiceBase {
          */
         if ("contentLength".equals(sortField)) {
             if (!ms.isAdmin()) {
-                criterias.add(auth.getSecurity(ms));
+                Criteria secCrit = auth.getSecurity(ms);
+                if (secCrit != null) {
+                    criterias.add(secCrit);
+                }
             }
             List<AggregationOperation> aggOps = new LinkedList<>();
             /*

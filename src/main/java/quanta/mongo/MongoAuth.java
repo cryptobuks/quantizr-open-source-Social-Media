@@ -235,35 +235,50 @@ public class MongoAuth extends ServiceBase {
 				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
+	public Criteria getSecurity(MongoSession ms) {
+		return getSecurity(ms, true, true, true);
+	}
+
 	/*
 	 * Filters to get only nodes that are public OR are shared to the current user. For single node
 	 * lookups we won't need this because we can do it the old way and be faster, but for queries of
 	 * multiple records (page rendering, timeline, search, etc.) we need to build this security right
 	 * into the query using this method.
 	 */
-	public Criteria getSecurity(MongoSession ms) {
+	public Criteria getSecurity(MongoSession ms, boolean allowPublic, boolean toMe, boolean mine) {
+		if (!allowPublic && !toMe && !mine)
+			return null;
+
 		List<Criteria> ors = new LinkedList<>();
 		SessionContext sc = ThreadLocals.getSC();
-		SubNode myAcntNode = null;
-
-		// note, anonymous users end up keeping myAcntNode null here. anon will nave null rootID here.
-		if (sc.getRootId() != null) {
-			myAcntNode = read.getNode(ms, sc.getRootId());
-		}
 
 		// node is public
-		ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
-
-		// if we have a user add their privileges in addition to public.
-		if (myAcntNode != null) {
-			// or node is shared to us
-			ors.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
-			// or node is OWNED by us
-			ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
-			// or node was Transferred by us
-			ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
+		if (allowPublic) {
+			ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
 
+		// anon users will nave null rootID here.
+		if ((toMe || mine) && sc.getRootId() != null) {
+			SubNode myAcntNode = read.getNode(ms, sc.getRootId());
+
+			// if we have a user add their privileges in addition to public.
+			if (myAcntNode != null) {
+				if (toMe) {
+					// or node is shared to us
+					ors.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
+				}
+
+				if (mine) {
+					// or node is OWNED by us
+					ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
+					// or node was Transferred by us
+					ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
+				}
+			}
+		}
+
+		if (ors.size() == 0)
+			return null;
 		return new Criteria().orOperator(ors);
 	}
 
