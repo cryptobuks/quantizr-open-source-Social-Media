@@ -107,7 +107,7 @@ public class OpenGraphService extends ServiceBase {
 	// Parsese the content for any HTML links and attempts to get the OpenGraph from the network
 	// and puts the opengraph object into node properties.
 	//
-	// todo-0: for now this method is 'cumulative' and never removes unused OG entries like if a node
+	// todo-1: for now this method is 'cumulative' and never removes unused OG entries like if a node
 	// is edited, but we will take care of that when we are calling this during SAVEs.
 	public void parseNode(SubNode node) {
 		ArrayList<String> ogList = (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);

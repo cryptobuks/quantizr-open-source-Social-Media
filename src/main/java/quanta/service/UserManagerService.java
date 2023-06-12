@@ -1391,8 +1391,7 @@ public class UserManagerService extends ServiceBase {
 		});
 	}
 
-	// todo-0: this should be max REMAINING size right? how much space user has left?
-	public int getMaxUploadSize(MongoSession ms) {
+	public long getUserStorageQuota(MongoSession ms) {
 		if (ms.isAnon()) {
 			return 0;
 		}
@@ -1404,6 +1403,26 @@ public class UserManagerService extends ServiceBase {
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;
 		}
-		return (int) ret;
+		return ret;
+	}
+
+	public long getUserStorageRemaining(MongoSession ms) {
+		if (ms.isAnon()) {
+			return 0;
+		}
+		if (ms.isAdmin()) {
+			return Integer.MAX_VALUE;
+		}
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, ThreadLocals.getSC().getUserName()));
+		if (userNode == null)
+			return 0L;
+
+		long quota = userNode.getInt(NodeProp.BIN_QUOTA);
+		if (quota == 0) {
+			return Const.DEFAULT_USER_QUOTA;
+		}
+
+		long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
+		return quota - binTotal;
 	}
 }

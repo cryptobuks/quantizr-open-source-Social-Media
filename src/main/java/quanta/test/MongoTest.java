@@ -235,7 +235,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		try {
 			SubNode node = create.createNode(ms, "/binaries");
 			update.save(ms, node);
-			int maxFileSize = user.getMaxUploadSize(ms);
+			long maxFileSize = user.getUserStorageRemaining(ms);
 			attach.writeStream(ms, false, "", node, new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png", null);
 			update.save(ms, node);
 			log.debug("inserted root for binary testing.", null, "image/png", null);

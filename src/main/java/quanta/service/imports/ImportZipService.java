@@ -72,8 +72,8 @@ public class ImportZipService extends ImportArchiveBase {
 		try {
 			targetPath = node.getPath();
 			this.session = ms;
-			int maxFileSize = user.getMaxUploadSize(ms);
-			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : maxFileSize;
+			long maxFileSize = user.getUserStorageRemaining(ms);
+			long maxSize = sc.isAdmin() ? Integer.MAX_VALUE : maxFileSize;
 			is = new LimitedInputStreamEx(inputStream, maxSize);
 			zis = new ZipArchiveInputStream(is);
 			ZipArchiveEntry entry;

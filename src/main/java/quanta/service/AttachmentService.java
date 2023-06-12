@@ -109,7 +109,8 @@ public class AttachmentService extends ServiceBase {
 		UploadResponse resp = new UploadResponse();
 		List<String> payloads = new LinkedList<String>();
 		resp.setPayloads(payloads);
-		int maxFileSize = user.getMaxUploadSize(ms);
+		long maxFileSize = user.getUserStorageRemaining(ms);
+		
 		for (MultipartFile uploadFile : uploadFiles) {
 			String contentType = uploadFile.getContentType();
 			// Right now we only support parsing EML files.
@@ -167,7 +168,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 			auth.ownerAuth(node);
-			int maxFileSize = user.getMaxUploadSize(ms);
+			long maxFileSize = user.getUserStorageRemaining(ms);
 			int imageCount = 0;
 			/*
 			 * if uploading multiple files check quota first, to make sure there's space for all files before we
@@ -364,7 +365,7 @@ public class AttachmentService extends ServiceBase {
 		BufferedImage bufImg = null;
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
-		int maxFileSize = user.getMaxUploadSize(ms);
+		long maxFileSize = user.getUserStorageRemaining(ms);
 		Attachment att = null;
 		if (importMode) {
 			att = node.getAttachment(attName, false, false);
@@ -814,7 +815,7 @@ public class AttachmentService extends ServiceBase {
 	 */
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
-			int maxFileSize, boolean storeLocally) {
+			long maxFileSize, boolean storeLocally) {
 		if (mimeType == null) {
 			mimeType = getMimeTypeFromUrl(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
@@ -839,18 +840,15 @@ public class AttachmentService extends ServiceBase {
 			return;
 		}
 		if (maxFileSize <= 0) {
-			maxFileSize = user.getMaxUploadSize(ms);
+			maxFileSize = user.getUserStorageRemaining(ms);
 		}
 		ms = ThreadLocals.ensure(ms);
 		LimitedInputStreamEx limitedIs = null;
 		try {
 			URL url = new URL(sourceUrl);
 			int timeout = 20;
-			RequestConfig config = //
-					//
-					//
-					RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-							.setSocketTimeout(timeout * 1000).build();
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
 			/*
 			 * if this is an image extension, handle it in a special way, mainly to extract the width, height
 			 * from it

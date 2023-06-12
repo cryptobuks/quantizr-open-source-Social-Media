@@ -183,7 +183,7 @@ public class IPFSService extends ServiceBase {
         try {
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, user.getMaxUploadSize(ms));
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, user.getUserStorageRemaining(ms));
             bodyMap.add("file", makeFileEntity(lis, fileName));
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
@@ -202,8 +202,7 @@ public class IPFSService extends ServiceBase {
                 } catch (Exception e) {
                 }
                 // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate
-                // that
-                // until we design better around it, and return a null.
+                // that until we design better around it, and return a null.
                 // log.debug("Unable to parse response string: " + body);
                 // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
             }
