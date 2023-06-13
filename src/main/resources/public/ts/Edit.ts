@@ -1103,20 +1103,7 @@ export class Edit {
             this.createSubNodeResponse(res, false, null);
         }
         else {
-            setTimeout(() => {
-                S.view.refreshTree({
-                    nodeId: null,
-                    zeroOffset: true,
-                    renderParentIfLeaf: false,
-                    highlightId: null,
-                    forceIPFSRefresh: false,
-                    scrollToTop: false,
-                    allowScroll: true,
-                    setTab: true,
-                    forceRenderParent: false,
-                    jumpToRss: false
-                });
-            }, 500);
+            S.util.flashMessage("Saved in Notes folder", "Saved", true);
         }
     }
 

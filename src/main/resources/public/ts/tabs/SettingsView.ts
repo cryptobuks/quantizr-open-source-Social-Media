@@ -29,28 +29,28 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
     override preRender(): boolean {
         const ast = getAs();
-        const horzClass = "marginTop marginBottom accountSettingsSection"; // horizontalLayoutComp
+        const horzClass = "marginTop marginBottom settingsSection";
 
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
             ]),
 
-            new Divc({ className: "accountSettingsPanel" }, [
+            new Divc({ className: "settingsPanel" }, [
                 // -----------------------
                 this.sectionTitle("Account"),
                 new FlexRowLayout([
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
+                    ]),
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Clear Browser Storage", async () => {
                             await S.localDB.clearStores();
                             S.util.showMessage("Browser Storage cleared successfully");
-                        })
-                    ]),
-                    new Divc({ className: "accountSettingsCol" }, [
+                        }),
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),
                         this.settingsLink("Blocked Words", S.edit.editBlockedWords),
                         S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null
@@ -60,7 +60,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("View Options"),
                 new FlexRowLayout([
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         new Checkbox("Sensitive Content", { className: "bigMarginLeft" }, {
                             setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
                             getValue: (): boolean => ast.userPrefs.nsfw
@@ -72,7 +72,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         })
                     ]),
 
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         new Checkbox("Properties", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
@@ -95,7 +95,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     { key: "6", val: "Medium" },
                     { key: "7", val: "Wide" },
                     { key: "8", val: "Very Wide" }
-                ], "contentWidthSelection", "bigMarginLeft marginTop", {
+                ], "contentWidthSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
                     setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),
@@ -108,9 +108,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Nostr"),
                 new FlexRowLayout([
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Show Private Key", S.nostr.showPrivateKey),
                         this.settingsLink("Change Private Key", S.nostr.editPrivateKey),
+                    ]),
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Relays", () => new EditNostrKeyAndRelaysDlg().open())
                     ])
                 ], horzClass),
@@ -118,11 +120,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Tools"),
                 new FlexRowLayout([
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Test Microphone", () => new MediaRecorderDlg(false, false).open()), //
                         this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
                     ]),
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("My GEO Location", S.nav.geoLocation), //
                         this.settingsLink("About Browser", S.util.showBrowserInfo)
                     ])
@@ -131,10 +133,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Danger Zone"),
                 new FlexRowLayout([
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Bulk Delete", S.edit.bulkDelete)
                     ]),
-                    new Divc({ className: "accountSettingsCol" }, [
+                    new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Close Account", S.user.closeAccount)
                     ])
                 ], horzClass)

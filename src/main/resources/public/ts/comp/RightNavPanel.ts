@@ -68,15 +68,14 @@ export class RightNavPanel extends Div {
             displayName = displayName || ast.node.owner;
         }
 
-        // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
-        //     className: "fa fa-clipboard fa-lg marginRight clickable",
-        //     onClick: () => {
-        //         PubSub.pub(C.PUBSUB_closeNavPanel);
-        //         // todo-3: would be nice if this detected an image and save as attachment.
-        //         S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-        //     },
-        //     title: "Save clipboard"
-        // }) : null;
+        const clipboardPasteButton = ast.userPrefs.editMode ? new Icon({
+            className: "fa fa-clipboard fa-lg marginRight clickable",
+            onClick: () => {
+                PubSub.pub(C.PUBSUB_closeNavPanel);
+                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+            },
+            title: "Save clipboard"
+        }) : null;
 
         const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable",
@@ -172,6 +171,7 @@ export class RightNavPanel extends Div {
                     ]),
                     new Divc({ className: "flexFloatRight" }, [
                         textToSpeech, 
+                        clipboardPasteButton,
                         addNoteButton
                     ]),
                 ], "fullWidth"),
