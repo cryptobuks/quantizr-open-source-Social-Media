@@ -317,6 +317,9 @@ public class NostrService extends ServiceBase {
 		Date timestamp = new Date(nevent.getCreatedAt() * 1000);
 		newNode.setCreateTime(timestamp);
 		newNode.setModifyTime(timestamp);
+
+		openGraph.parseNode(newNode, true);
+
 		update.save(as, newNode, false);
 		eventNodeIds.add(newNode.getIdStr());
 		saveCount.inc();

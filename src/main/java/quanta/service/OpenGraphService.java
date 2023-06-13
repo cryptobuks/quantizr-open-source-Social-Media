@@ -39,7 +39,7 @@ public class OpenGraphService extends ServiceBase {
 	public OpenGraph getOpenGraph(String url) {
 		url = XString.stripIfEndsWith(url, "/");
 		url = XString.stripIfEndsWith(url, "\\");
-		
+
 		// if the url is cached (even if null) then return whatever's in the cache
 		synchronized (ogCache) {
 			if (ogCache.containsKey(url)) {
@@ -104,19 +104,30 @@ public class OpenGraphService extends ServiceBase {
 		return elm != null ? elm.attr("content") : null;
 	}
 
-	// Parsese the content for any HTML links and attempts to get the OpenGraph from the network
+	// Parses the content for any HTML links and attempts to get the OpenGraph from the network
 	// and puts the opengraph object into node properties.
 	//
 	// todo-1: for now this method is 'cumulative' and never removes unused OG entries like if a node
 	// is edited, but we will take care of that when we are calling this during SAVEs.
-	public void parseNode(SubNode node) {
-		ArrayList<String> ogList = (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
-
-		if (StringUtils.isEmpty(node.getContent()))
+	public void parseNode(SubNode node, boolean reset) {
+		if (StringUtils.isEmpty(node.getContent())) {
+			if (reset) {
+				node.set(NodeProp.OPEN_GRAPH.s(), null);
+			}
 			return;
+		}
+
+		if (node.getContent().toLowerCase().indexOf("http") == -1) {
+			if (reset) {
+				node.set(NodeProp.OPEN_GRAPH.s(), null);
+			}
+			return;
+		}
+
+		ArrayList<String> ogList = reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 
 		// Adding the " " to the end is a hack because my regex isn't perfect (todo-1: fix the regex)
-		Matcher matcher = urlPattern.matcher(node.getContent()+" ");
+		Matcher matcher = urlPattern.matcher(node.getContent() + " ");
 
 		while (matcher.find()) {
 			if (ogList == null) {

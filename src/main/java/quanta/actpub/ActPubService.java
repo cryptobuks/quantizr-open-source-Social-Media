@@ -1013,6 +1013,7 @@ public class ActPubService extends ServiceBase {
         }
         SubNode newNode = create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null,
                 toAccountNode.getId(), true, true);
+
         // If we're updating a node, find what the ID should be and we can just put that ID value into
         // newNode
         if (action.equals(APType.Update)) {
@@ -1086,6 +1087,7 @@ public class ActPubService extends ServiceBase {
         // to be included when they shouldn't). We'll see.
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
         addAttachments(ms, newNode, obj);
+        openGraph.parseNode(newNode, true);
         update.save(ms, newNode, false);
         try {
             push.pushNodeUpdateToBrowsers(ms, null, newNode);

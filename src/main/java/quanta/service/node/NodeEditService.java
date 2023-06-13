@@ -152,6 +152,7 @@ public class NodeEditService extends ServiceBase {
 		}
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 		newNode.touch();
+
 		// NOTE: Be sure to get nodeId off 'req' here, instead of the var
 		if (req.isReply() && req.getNodeId() != null) {
 			newNode.set(NodeProp.INREPLYTO, req.getNodeId());
@@ -236,6 +237,7 @@ public class NodeEditService extends ServiceBase {
 				newNode.set(NodeProp.BOOST, innerBoost != null ? innerBoost : req.getBoostTarget());
 			}
 		}
+		openGraph.parseNode(newNode, true);
 		update.save(ms, newNode);
 		/*
 		 * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
@@ -319,6 +321,7 @@ public class NodeEditService extends ServiceBase {
 		update.saveIfDirty(ms, parentNode);
 		// We save this right away, before calling convertToNodeInfo in case that method does any Db related
 		// stuff where it's expecting the node to exist.
+		openGraph.parseNode(newNode, true);
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
 				Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, //
@@ -385,6 +388,7 @@ public class NodeEditService extends ServiceBase {
 		String content = title != null ? "#### " + title + "\n" : "";
 		content += data;
 		newNode.setContent(content);
+		openGraph.parseNode(newNode, true);
 		newNode.touch();
 		update.save(ms, newNode);
 		res.setMessage("Drop Accepted: Created link to: " + data);

@@ -102,9 +102,11 @@ public class Convert extends ServiceBase {
 		/*
 		 * We only parse openGraph upon demand (lazily) right here, when a node is accessed, because doing
 		 * this work unnecessarily when the node is saved would a huge waste of both bandwidth and storage,
-		 * so nodes will only have the sn:og property set here if it's ever been accessed
+		 * so nodes will only have the sn:og property set here if it's ever been accessed.
+		 * 
+		 * todo-0: soon we can remove this, because the data gets set during 'saves'
 		 */
-		openGraph.parseNode(node);
+		openGraph.parseNode(node, false);
 
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
