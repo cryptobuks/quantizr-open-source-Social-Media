@@ -74,7 +74,7 @@ public class CryptoService extends ServiceBase {
 					return false;
 				}
 				String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-				// log.debug("*************** (verify) Setting key on user nodeId: " + ownerAccntNode.getIdStr() + "
+				// log.debug("(verify) Setting key on user nodeId: " + ownerAccntNode.getIdStr() + "
 				// to "
 				// + pubKeyJson);
 				if (pubKeyJson == null) {

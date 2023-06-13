@@ -131,7 +131,6 @@ public class ActPubFollowing extends ServiceBase {
                         return null;
                     }
                     log.debug("getLongUserNameFromActorUrl: " + activity.getActor()); // + "\n" +
-                    // XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
                     // this will lookup the user AND import if it's a non-existant user
                     SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, null, followerUserName, false, true);
@@ -290,8 +289,6 @@ public class ActPubFollowing extends ServiceBase {
         if (url == null)
             return null;
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
-        // ActPubService.outboxQueryCount++;
-        // ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Following: " + XString.prettyPrint(outbox));
         return outbox;
     }
@@ -307,14 +304,12 @@ public class ActPubFollowing extends ServiceBase {
     public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId,
             boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
         final List<String> following = new LinkedList<>();
-        // log.debug("getFollowing of user: " + userName);
         arun.run(as -> {
             Iterable<SubNode> iter = findFollowingOfUser(as, userName);
             for (SubNode n : iter) {
                 if (queueForRefresh && blockedUserIds != null && !blockedUserIds.contains(n.getId())) {
                     apub.queueUserForRefresh(n.getStr(NodeProp.USER), true);
                 }
-                // log.debug(" Found Friend Node: " + n.getIdStr());
                 // if this Friend node is a foreign one it will have the actor url property
                 String remoteActorId = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                 // this will be non-null if it's a remote account.
@@ -420,9 +415,7 @@ public class ActPubFollowing extends ServiceBase {
          * query all the direct children under the friendsListNode, that are FRIEND type although they
          * should all be FRIEND types.
          */
-        Criteria crit = //
-                //
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(friendsListNode.getPath()))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(friendsListNode.getPath()))
                         .and(SubNode.TYPE).is(NodeType.FRIEND.s());
         q.addCriteria(crit);
         return q;

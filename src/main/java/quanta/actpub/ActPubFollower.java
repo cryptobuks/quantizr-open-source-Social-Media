@@ -70,14 +70,12 @@ public class ActPubFollower extends ServiceBase {
                     if (apub.saveFediverseName(followerActorUrl)) {
                     }
                 } else
-                // log.debug("follower: " + followerActorUrl);
                 {
                     log.debug("Unexpected follower item class: " + obj.getClass().getName());
                 }
             } catch (Exception e) {
                 log.error("Failed processing collection item.", e);
             }
-            // always iterate all.
             return true;
         });
         return ret;
@@ -87,8 +85,6 @@ public class ActPubFollower extends ServiceBase {
         if (url == null)
             return null;
         APObj outbox = apUtil.getRemoteAP(ms, userMakingRequest, url);
-        // ActPubService.outboxQueryCount++;
-        // ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Followers: " + XString.prettyPrint(outbox));
         return outbox;
     }

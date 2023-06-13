@@ -112,7 +112,6 @@ public class UserManagerService extends ServiceBase {
 		LoginResponse res = new LoginResponse();
 		SessionContext sc = ThreadLocals.getSC();
 		SubNode userNode = null;
-		// log.debug("login: " + XString.prettyPrint(req));
 		/* Anonymous user */
 		if (req.getUserName() == null || PrincipalName.ANON.s().equals(req.getUserName())) {
 			log.debug("Anonymous user login.");
@@ -122,7 +121,6 @@ public class UserManagerService extends ServiceBase {
 		} else
 		/* Admin Login */
 		if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
-			// log.debug("AdminLogin root=: " + XString.prettyPrint(mongoUtil.getSystemRootNode()));
 			// springLogin throws exception if it fails.
 			springLogin(req.getUserName(), req.getPassword(), httpReq);
 			sc.setAuthenticated(req.getUserName(), null);
@@ -194,7 +192,6 @@ public class UserManagerService extends ServiceBase {
 	public void processLogin(MongoSession ms, LoginResponse res, SubNode userNode, String userName, String asymEncKey,
 			String sigKey, String nostrNpub, String nostrPubKey) {
 		SessionContext sc = ThreadLocals.getSC();
-		// log.debug("processLogin: " + userName);
 		if (userNode == null) {
 			userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 		}
@@ -225,12 +222,9 @@ public class UserManagerService extends ServiceBase {
 			userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
 		if (!StringUtils.isEmpty(sigKey))
 			userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
-		// log.debug("*************** (login) Setting key on user nodeId: " + userNode.getIdStr() + " to " +
-		// sigKey);
 		ThreadLocals.getSC().pubSigKey = null;
 		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
 		ensureValidCryptoKeys(userNode);
-		// log.debug("SAVING USER NODE: "+XString.prettyPrint(userNode));
 		update.save(ms, userNode);
 	}
 
@@ -278,7 +272,6 @@ public class UserManagerService extends ServiceBase {
 		userStats.forEach((ObjectId key, UserStats stat) -> {
 			SubNode node = read.getNode(ms, key);
 			if (node != null) {
-				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.set(NodeProp.BIN_TOTAL, stat.binUsage);
 			} else {
 				log.debug("Node not found by key: " + key);
@@ -311,7 +304,6 @@ public class UserManagerService extends ServiceBase {
 		if (binTotal == null) {
 			binTotal = 0L;
 		}
-		// log.debug("before binTotal=" + binTotal);
 		binTotal += binSize;
 		if (binTotal < 0) {
 			binTotal = 0L;
@@ -320,7 +312,6 @@ public class UserManagerService extends ServiceBase {
 		if (!ms.isAdmin() && binTotal > userQuota) {
 			throw new OutOfSpaceException();
 		}
-		// log.debug("after binTotal=" + binTotal);
 		userNode.set(NodeProp.BIN_TOTAL, binTotal);
 	}
 
@@ -478,8 +469,6 @@ public class UserManagerService extends ServiceBase {
 				if (!StringUtils.isEmpty(req.getSigKey())) {
 					// force pubSigKey to regenerate as needed by setting to null
 					ThreadLocals.getSC().pubSigKey = null;
-					// log.debug("*************** (saveKeys) Setting key on user nodeId: " + userNode.getIdStr() + " to
-					// " + req.getSigKey());
 					userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
 				}
 				if (!StringUtils.isEmpty(req.getNostrNpub()) && !StringUtils.isEmpty(req.getNostrPubKey())) {
@@ -557,8 +546,6 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
-			// log.debug("saveUserPreferences: [hashCode=" + userPrefs.hashCode() + "] " +
-			// XString.prettyPrint(userPrefs));
 			res.setSuccess(true);
 			return null;
 		});
@@ -633,7 +620,6 @@ public class UserManagerService extends ServiceBase {
 					if (keyGenResult == null) {
 						log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
 					} else
-					// return null;
 					{
 						userNode.set(NodeProp.USER_IPFS_KEY, sc.getRootId());
 						log.debug("Key Gen Result: " + XString.prettyPrint(keyGenResult));
@@ -715,7 +701,6 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
-		// apLog.trace("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
 		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(delUserNodeId); //
@@ -778,7 +763,7 @@ public class UserManagerService extends ServiceBase {
 		// duplicate variable because of lambdas below
 		String userToFollow = _userToFollow;
 		if (userToFollow.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
-			return "You can\'t be friends with the admin.";
+			return "You can't be friends with the admin.";
 		}
 		// If we don't know the account id of the person doing the follow, then look it up.
 		if (accntIdDoingFollow == null) {
@@ -797,7 +782,7 @@ public class UserManagerService extends ServiceBase {
 		SubNode followerFriendList =
 				read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 		if (followerFriendList == null) {
-			log.debug("Can\'t access Friend list for: " + userDoingFollow);
+			log.debug("Can't access Friend list for: " + userDoingFollow);
 			return;
 		}
 		/*

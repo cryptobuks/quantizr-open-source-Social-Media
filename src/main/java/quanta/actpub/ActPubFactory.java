@@ -311,11 +311,6 @@ public class ActPubFactory extends ServiceBase {
 					/*
 					 * Note: this is a self-reference, and must be identical to the URL that returns this object
 					 */
-					//
-					//
-					//
-					//
-					//
 					new APOPerson().put(APObj.id, apUtil.makeActorUrlForUserName(userName)).put(APObj.did, did)
 							.put(APObj.preferredUsername, userName).put(APObj.name, displayName)
 							.put(APObj.published, DateUtil.isoStringFromDate(userNode.getCreateTime())).put(APObj.icon, //
@@ -339,21 +334,10 @@ public class ActPubFactory extends ServiceBase {
 					}
 				}
 			}
-			//
-			//
-			//
-			//
-			//
 			/*
 			 * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
 			 * this in our ActPubController. We tolerate Mastodon breaking spec here.
 			 */
-			//
-			//
-			//
-			//
-			//
-			//
 			actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO))
 					.put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName)
 					.put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName)

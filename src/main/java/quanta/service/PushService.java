@@ -139,7 +139,6 @@ public class PushService extends ServiceBase {
 			 * even probably to be sure each session is only doing one emit at a time.
 			 */
 			synchronized (pushEmitter) {
-				// log.debug("Pushing to User: " + sc.getUserName());
 				try {
 					SseEventBuilder event = //
 							//

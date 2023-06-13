@@ -110,7 +110,7 @@ public class AttachmentService extends ServiceBase {
 		List<String> payloads = new LinkedList<String>();
 		resp.setPayloads(payloads);
 		long maxFileSize = user.getUserStorageRemaining(ms);
-		
+
 		for (MultipartFile uploadFile : uploadFiles) {
 			String contentType = uploadFile.getContentType();
 			// Right now we only support parsing EML files.
@@ -696,11 +696,7 @@ public class AttachmentService extends ServiceBase {
 				IOUtils.copy(acis, os);
 				os.flush();
 			};
-			return //
-			//
-			//
-			//
-			ResponseEntity.ok().contentLength(file.length())
+			return ResponseEntity.ok().contentLength(file.length())
 					.header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + file.getName() + "\"")
 					.contentType(MediaType.parseMediaType(mimeType)).body(stream);
 		} catch (Exception ex) {
@@ -803,15 +799,14 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	/**
-	 * @param mimeHint This is an additional string invented because IPFS urls don't contain the file
-	 *        extension always and in that case we need to get it from the IPFS filename itself and
-	 *        that's what the hint is in that case. Normally however mimeHint is null
+	 * mimeHint This is an additional string invented because IPFS urls don't contain the file extension
+	 * always and in that case we need to get it from the IPFS filename itself and that's what the hint
+	 * is in that case. Normally however mimeHint is null
 	 * 
-	 *        'inputStream' is a retrofit to this function for when we want to just call this method and
-	 *        get an inputStream handed back that can be read from. Normally the inputStream Val is null
-	 *        and not used.
+	 * 'inputStream' is a retrofit to this function for when we want to just call this method and get an
+	 * inputStream handed back that can be read from. Normally the inputStream Val is null and not used.
 	 * 
-	 *        NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
+	 * NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
 	 */
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,

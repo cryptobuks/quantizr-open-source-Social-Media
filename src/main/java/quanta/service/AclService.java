@@ -190,6 +190,7 @@ public class AclService extends ServiceBase {
 		}
 		String cipherKey = node.getStr(NodeProp.ENC_KEY);
 		String mapKey = null;
+
 		/* If we are sharing to public, then that's the map key */
 		if (PrincipalName.PUBLIC.s().equalsIgnoreCase(principal)) {
 			if (cipherKey != null) {
@@ -236,6 +237,7 @@ public class AclService extends ServiceBase {
 				}
 			}
 		}
+
 		HashMap<String, AccessControl> acl = node.getAc();
 		/* initialize acl to a map if it's null, or if we're sharing to public */
 		if (acl == null) {
@@ -250,6 +252,7 @@ public class AclService extends ServiceBase {
 		}
 		String prvs = "";
 		boolean authAdded = false;
+		
 		/* Scan all the privileges to be added to this principal (rd, rw, etc) */
 		for (String priv : privileges) {
 			/* If this privilege is not already on ac.prvs string then append it */
@@ -261,6 +264,7 @@ public class AclService extends ServiceBase {
 				prvs += priv;
 			}
 		}
+		
 		if (authAdded) {
 			ac.setPrvs(prvs);
 			acl.put(mapKey, ac);

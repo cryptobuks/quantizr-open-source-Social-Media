@@ -48,15 +48,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// web.debug(true); // #DEBUG-SECURITY
-		//
-		//
-		//
-		//
-		//
-		//
-		//
-		//
-		//
 		web.ignoring().antMatchers(AppController.API_PATH + "/getConfig").antMatchers(AppController.API_PATH + "/login")
 				.antMatchers(AppController.API_PATH + "/bin/**").antMatchers(AppController.API_PATH + "/anonPageLoad")
 				.antMatchers(AppController.API_PATH + "/getUserProfile").antMatchers(AppController.API_PATH + "/serverPush")

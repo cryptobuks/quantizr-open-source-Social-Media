@@ -35,7 +35,6 @@ public class GraphNodesService extends ServiceBase {
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");
 		mapByPath.put(gnode.getPath(), gnode);
-		// log.debug("Root Node Path: " + node.getPath());
 		try {
 			Iterable<SubNode> results = null;
 			// Run subgraph query to get all nodes if no search text provided
@@ -118,8 +117,6 @@ public class GraphNodesService extends ServiceBase {
 			if (parent != null) {
 				parent.addChild(n);
 			} else
-			// log.debug("Parent Name "+parent.getName()+" now has
-			// childCount="+parent.getChildren().size());
 			{
 				log.debug("Top level node??:" + n);
 			}

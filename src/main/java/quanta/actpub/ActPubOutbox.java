@@ -94,7 +94,6 @@ public class ActPubOutbox extends ServiceBase {
             }
             Val<Integer> count = new Val<>(0);
             final SubNode _userNode = userNode;
-            // log.debug("scanning outbox orderedCollection");
             apUtil.iterateCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
                 try {
                     // if (ok(obj)) {
@@ -167,7 +166,6 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APOOrderedCollection generateOutbox(String userName) {
-        // log.debug("Generate outbox for userName: " + userName);
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
         APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
@@ -241,7 +239,6 @@ public class ActPubOutbox extends ServiceBase {
                     // for now all we do is show results in log file until we prove this works.
                     try {
                         // auth.auth(userSess, node, PrivilegeType.READ);
-                        // log.debug("auth granted.");
                         /*
                          * final step is just validate the signature.
                          * 
@@ -256,11 +253,11 @@ public class ActPubOutbox extends ServiceBase {
                                 apCrypto.verifySignature(httpReq, pubKey, null);
                                 log.debug("Sig ok.");
                             } catch (
-                            // this will remain PUBLIC until we set it here.
-                            // by commenting out this settor of sharedTo, we can leave this 'experimental' block harmlessly
-                            // turned on
-                            // just so we collect the logging to tell us if my assumptions are correct.
-                            // sharedTo = actorAccnt.getIdStr();
+                            /*
+                             * this will remain PUBLIC until we set it here. by commenting out this settor of sharedTo, we can
+                             * leave this 'experimental' block harmlessly turned on just so we collect the logging to tell us if
+                             * my assumptions are correct. sharedTo = actorAccnt.getIdStr();
+                             */
                             Exception e) {
                                 log.error("Sig failed: getOutboxItems user=" + userName);
                                 return null;
@@ -286,12 +283,10 @@ public class ActPubOutbox extends ServiceBase {
                 if (minId == null) {
                     collecting = true;
                 }
-                // log.debug("collecting = " + collecting);
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(_sharedTo);
                 for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
-                    // log.debug("OUTBOX ID: " + child.getIdStr());
                     // as a general security rule never send back any admin nodes.
                     if (child.getOwner().equals(as.getUserNodeId())) {
                         continue;
@@ -324,10 +319,7 @@ public class ActPubOutbox extends ServiceBase {
                                 }
                                 ret = new APOAnnounce(actor, id, published, boostedId);
                             }
-                        } else
-                        // log.debug("Outbound Announce (from outbox): " + XString.prettyPrint(ret));
-                        {
-                            // log.debug("not a boost.");
+                        } else {
                             ret = apFactory.makeAPOCreateNote(as, userName, nodeIdBase, child);
                         }
                         if (ret != null) {

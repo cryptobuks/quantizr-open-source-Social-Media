@@ -111,7 +111,6 @@ public class ActPubService extends ServiceBase {
             List<String> toUserNames = new LinkedList<String>();
             toUserNames.add(toActorId);
             APOLike message = apFactory.newLike(node.getIdStr() + "-like", apId, fromActor, toUserNames, null);
-            // log.debug("Sending Like message: "+XString.prettyPrint(message));
             String privateKey = apCrypto.getPrivateKey(ms, userDoingLike);
             apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
         });
@@ -131,7 +130,6 @@ public class ActPubService extends ServiceBase {
      * contain all the mentions that exist in the text of the message.
      */
     public void sendObjOutbound(MongoSession ms, SubNode parent, SubNode node, boolean forceSendToPublic) {
-        // log.debug("sendObjOutbound: " + XString.prettyPrint(node));
         exec.run(() -> {
             try {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
@@ -223,8 +221,7 @@ public class ActPubService extends ServiceBase {
                 if (toUserNames.size() > 0) {
                     sendMessageToUsers(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
                 }
-            } catch ( //
-            Exception e) {
+            } catch (Exception e) {
                 log.error("sendNote failed", e);
                 throw new RuntimeException(e);
             }
@@ -268,7 +265,6 @@ public class ActPubService extends ServiceBase {
                         }
                     }
                 }
-                // String apId = parent.getStringProp(NodeProp.OBJECT_ID.s());
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
@@ -308,7 +304,6 @@ public class ActPubService extends ServiceBase {
             return;
         Iterable<SubNode> iterator = opsw.find(null, q);
         for (SubNode node : iterator) {
-            // log.debug("follower: " + XString.prettyPrint(node));
             /*
              * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
              * node which is in node.ownerId
@@ -320,7 +315,6 @@ public class ActPubService extends ServiceBase {
                 if (followerUserName.contains("@")) {
                     String sharedInbox = followerAccount.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                     if (sharedInbox != null) {
-                        // log.debug("SharedInbox: " + sharedInbox);
                         sharedInboxes.add(sharedInbox);
                     } else
                     // not all users have a shared inbox, and the ones that don't we collect here...
@@ -344,9 +338,7 @@ public class ActPubService extends ServiceBase {
             attachments = new APList();
             for (Attachment att : atts) {
                 if (att.getBin() != null && att.getMime() != null) {
-                    attachments.val( //
-                            //
-                            //
+                    attachments.val(
                             /*
                              * NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
                              * sharing meaning they can be visible to at least someone other than it's owner.
@@ -393,7 +385,6 @@ public class ActPubService extends ServiceBase {
             if (userHost.equals(prop.getMetaHost())) {
                 throw new RuntimeException("not foreign user.");
             }
-            // log.debug("to Foreign User: " + toUserName);
             APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, userName);
             if (webFinger == null) {
                 apLog.trace("Unable to get webfinger for " + userName);
@@ -406,7 +397,6 @@ public class ActPubService extends ServiceBase {
             }
             APOActor toActorObj = apUtil.getActorByUrl(ms, userDoingAction, toActorUrl);
             if (toActorObj != null) {
-                // log.debug(" actor: " + toActorUrl);
                 val = apStr(toActorObj, apProp);
             }
         }
@@ -458,7 +448,6 @@ public class ActPubService extends ServiceBase {
                         fromActor = apUtil.makeActorUrlForUserName(fromUser);
                     }
                     String userDoingPost = ThreadLocals.getSC().getUserName();
-                    // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
                     String privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
                     apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
@@ -765,7 +754,6 @@ public class ActPubService extends ServiceBase {
             // find or create an actual node that will hold the target (i.e. thing being boosted)
             SubNode boostedNode = apUtil.loadObject(as, null, objectIdUrl);
             if (boostedNode != null) {
-                // log.debug("BOOSTING: " + XString.prettyPrint(boostedNode));
                 // get account node for person doing the boosting
                 SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
                 if (actorAccountNode != null) {
@@ -829,7 +817,6 @@ public class ActPubService extends ServiceBase {
             log.debug("user not found: " + actor.getId());
             return;
         }
-        log.debug("got Actor: " + actorAccnt.getIdStr());
         if (!encodedKey.equals(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM))) {
             throw new RuntimeException("wrong public key");
         }
@@ -875,15 +862,15 @@ public class ActPubService extends ServiceBase {
                 replyToId = inReplyTo.substring(lastIdx + 1);
             }
         }
-        // DO NOT DELETE (THIS MAY COME BACK)
-        // by removing this line, we change the design to where inbound replies always go into user's POSTS
-        // node, rather than underneath the node they're replying to. I'm leaving this line here in case
-        // there
-        // are scenarios in the future where we might want this old functionality back where replies go in
-        // to
-        // subnodes under the thing bring replied to,.
-        // nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
         /*
+         * DO NOT DELETE (THIS MAY COME BACK)
+         * 
+         * by removing this line, we change the design to where inbound replies always go into user's POSTS
+         * node, rather than underneath the node they're replying to. I'm leaving this line here in case
+         * there are scenarios in the future where we might want this old functionality back where replies
+         * go in to subnodes under the thing bring replied to,. nodeBeingRepliedTo = read.getNode(as,
+         * replyToId, false, null);
+         *
          * If a foreign user is replying to a specific node, we put the reply under that node
          * 
          * NOTE: yes this is code path is intentionally disabled by commenting out the setting of
@@ -1321,7 +1308,6 @@ public class ActPubService extends ServiceBase {
     private void addAttachments(MongoSession ms, SubNode node, Object obj) {
         List<?> attachments = apList(obj, APObj.attachment, false);
         if (attachments == null) {
-            // log.debug("no attachments.");
             return;
         }
         for (Object att : attachments) {
@@ -1378,7 +1364,6 @@ public class ActPubService extends ServiceBase {
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
-        // log.debug("queueForRefresh: " + apUserName);
         // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
         if (!prop.isActPubEnabled()) {
             return;
@@ -1589,11 +1574,8 @@ public class ActPubService extends ServiceBase {
             fName.setName(name);
             fName.setCreateTime(Calendar.getInstance().getTime());
             try {
-                // log.debug("Saving Name: " + fName.getName());
                 ops.save(fName);
-            } catch (
-            // Thread.sleep(500);
-            Exception e) {
+            } catch (Exception e) {
             }
             // this will happen for every duplicate. so A LOT!
         }
@@ -1635,7 +1617,6 @@ public class ActPubService extends ServiceBase {
                     // we query for only the foreign users this local user is following
                     List<String> following =
                             apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
-                    // log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
                     synchronized (apCache.followedUsers) {
                         apCache.followedUsers.addAll(following);
                     }

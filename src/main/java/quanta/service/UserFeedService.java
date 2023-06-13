@@ -90,7 +90,6 @@ public class UserFeedService extends ServiceBase {
 	 * person or that person to us queried in a single list.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
-		// log.debug("GEN FEED: " + XString.prettyPrint(req));
 		/*
 		 * if bidirectional means query for the conversation between me and the other person (both senders),
 		 * and we do that always for now when toUser is present.
@@ -498,7 +497,6 @@ public class UserFeedService extends ServiceBase {
 			res.setEndReached(true);
 		}
 		res.setSuccess(true);
-		// log.debug("search results count: " + counter);
 		return res;
 	}
 
@@ -534,7 +532,6 @@ public class UserFeedService extends ServiceBase {
 			for (SubNode node : nodeList) {
 				String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
 				if (userNodeId != null) {
-					// log.debug("BLOCKED: " + userNodeId);
 					set.add(new ObjectId(userNodeId));
 				}
 			}

@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -70,8 +71,6 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /* Proof of Concept RSS Publishing */
 @Component
@@ -170,7 +169,6 @@ public class RSSFeedService extends ServiceBase {
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		try {
 			for (String url : urls) {
-				// log.debug("Processing Feed: " + url);
 				SyndFeed inFeed = getFeed(url, true);
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
@@ -208,7 +206,6 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	public SyndFeed getFeed(final String url, boolean fromCache) {
-		// log.debug("getFeed: " + url);
 		/*
 		 * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
 		 * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
@@ -253,11 +250,8 @@ public class RSSFeedService extends ServiceBase {
 			 * best theory for why is that my restTemplate is doing something special that fixes these issues.
 			 */
 			if (USE_HTTP_READER) {
-				RequestConfig config = //
-						//
-						//
-						RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-								.setSocketTimeout(timeout * 1000).build();
+				RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+						.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
 				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 				HttpGet request = new HttpGet(url);
 				request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
@@ -416,7 +410,6 @@ public class RSSFeedService extends ServiceBase {
 		rf.setEntries(rssEntries);
 		if (feed.getEntries() != null) {
 			for (SyndEntry entry : feed.getEntries()) {
-				// log.debug("Entry: " + XString.prettyPrint(entry));
 				RssFeedEntry e = new RssFeedEntry();
 				if (addFeedTitles) {
 					e.setParentFeedTitle(feedNameOfItem.get(entry.hashCode()));
@@ -434,7 +427,6 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private boolean processEntry(SyndEntry entry, RssFeedEntry e) {
-		// log.debug("entry: " + entry.getTitle());
 		if (entry.getDescription() != null) {
 			e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
 		}

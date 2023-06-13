@@ -150,7 +150,6 @@ public class ActPubUtil extends ServiceBase {
         if (webFinger == null)
             return null;
         Object self = getLinkByRel(webFinger, "self");
-        // log.debug("Self Link: " + XString.prettyPrint(self));
         String actorUrl = null;
         if (self != null) {
             actorUrl = apStr(self, APObj.href);
@@ -245,9 +244,7 @@ public class ActPubUtil extends ServiceBase {
                 // mapper.readValue(response.getBody(), new TypeReference<>() {});
                 ret = (APObj) mapper.readValue(response.getBody(), clazz);
             }
-        } catch (
-        // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
-        HttpClientErrorException.Gone goneEx) {
+        } catch (HttpClientErrorException.Gone goneEx) {
             log.debug("http says Gone: " + url);
             return null;
         } catch (HttpClientErrorException.Forbidden forbiddenEx) {
@@ -326,7 +323,6 @@ public class ActPubUtil extends ServiceBase {
             apCache.actorsByUrl.put(url, actor);
             apCache.actorsByUserName.put(userName, actor);
         }
-        // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
     }
 
@@ -395,7 +391,6 @@ public class ActPubUtil extends ServiceBase {
         String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
         finger = getJson(ms, APObj.class, userDoingAction, url, APConst.MTYPE_JRD_JSON);
         if (finger != null) {
-            // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(userName, finger);
         } else {
             apCache.webFingerFailsByUserName.add(userName);
@@ -406,7 +401,6 @@ public class ActPubUtil extends ServiceBase {
     public APObj postJson(String url, String body, HttpHeaders headers, MediaType postType) {
         APObj ret = null;
         try {
-            // log.debug("postJson to: " + url);
             if (headers == null) {
                 headers = new HttpHeaders();
             }
@@ -475,8 +469,6 @@ public class ActPubUtil extends ServiceBase {
         if (actor == null) {
             return null;
         }
-        // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
-        // XString.prettyPrint(actor));
         return getLongUserNameFromActor(actor);
     }
 
@@ -497,7 +489,6 @@ public class ActPubUtil extends ServiceBase {
             if (port != -1 && port != 80 && port != 443) {
                 host += ":" + String.valueOf(port);
             }
-            // log.debug("long user name: " + shortUserName + "@" + host);
             return apStr(actor, APObj.preferredUsername) + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
@@ -567,7 +558,6 @@ public class ActPubUtil extends ServiceBase {
          */
         int maxPageQueries = 5;
         int pageQueries = 0;
-        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
         int count = 0;
         /*
          * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
@@ -585,7 +575,6 @@ public class ActPubUtil extends ServiceBase {
             items = apList(collectionObj, APObj.items, false);
         }
         if (items != null) {
-            // log.debug("orderedItems(a): " + XString.prettyPrint(orderedItems));
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
@@ -605,7 +594,6 @@ public class ActPubUtil extends ServiceBase {
          */
         Object firstPage = apObj(collectionObj, APObj.first);
         if (firstPage != null) {
-            // log.debug("First Page Url: " + XString.prettyPrint(firstPage));
             if (++pageQueries > maxPageQueries)
                 return;
             Object ocPage = null;
@@ -613,7 +601,6 @@ public class ActPubUtil extends ServiceBase {
             if (firstPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) firstPage);
             } else
-            // log.debug("ocPage(a): " + XString.prettyPrint(ocPage));
             // else consider firstPage to be the ACTUAL first page object
             {
                 ocPage = firstPage;
@@ -624,7 +611,6 @@ public class ActPubUtil extends ServiceBase {
                     items = apList(ocPage, APObj.items, false);
                 }
                 if (items != null) {
-                    // log.debug("orderedItems(b): " + XString.prettyPrint(orderedItems));
                     for (Object item : items) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
@@ -636,7 +622,6 @@ public class ActPubUtil extends ServiceBase {
                             } else
                             // if no apId that's fine, just process item.
                             if (!apIdSet.contains(apId)) {
-                                // log.debug("Iterate Collection Item: " + apId);
                                 if (!observer.item(item))
                                     return;
                                 apIdSet.add(apId);
@@ -654,15 +639,12 @@ public class ActPubUtil extends ServiceBase {
                 }
                 Object nextPage = apObj(ocPage, APObj.next);
                 if (nextPage != null) {
-                    // log.debug("nextPage: " + XString.prettyPrint(nextPage));
                     if (++pageQueries > maxPageQueries)
                         return;
                     // if nextPage is a string consider that a reference to the URL of the page and get it
                     if (nextPage instanceof String) {
                         ocPage = getRemoteAP(ms, userDoingAction, (String) nextPage);
-                    } else
-                    // log.debug("ocPage(d): " + XString.prettyPrint(ocPage));
-                    {
+                    } else {
                         ocPage = nextPage;
                     }
                 } else {
@@ -672,7 +654,6 @@ public class ActPubUtil extends ServiceBase {
         }
         Object lastPage = apObj(collectionObj, APObj.last);
         if (lastPage != null) {
-            // log.debug("Last Page Url: " + lastPage);
             if (++pageQueries > maxPageQueries)
                 return;
             Object ocPage = null;
@@ -680,7 +661,6 @@ public class ActPubUtil extends ServiceBase {
             if (lastPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) lastPage);
             } else
-            // log.debug("ocPage(c): " + XString.prettyPrint(ocPage));
             // else it's the page object
             {
                 ocPage = lastPage;
@@ -691,7 +671,6 @@ public class ActPubUtil extends ServiceBase {
                     items = apList(ocPage, APObj.items, false);
                 }
                 if (items != null) {
-                    // log.debug("orderedItems(c): " + XString.prettyPrint(orderedItems));
                     for (Object item : items) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
@@ -703,7 +682,6 @@ public class ActPubUtil extends ServiceBase {
                             } else
                             // else process it with apId
                             if (!apIdSet.contains(apId)) {
-                                // log.debug("Iterate Collection Item: " + apId);
                                 if (!observer.item(item))
                                     return;
                                 apIdSet.add(apId);
@@ -785,12 +763,10 @@ public class ActPubUtil extends ServiceBase {
         }
         String userDoingAction = ThreadLocals.getSC().getUserName();
         apUtil.iterateCollection(ms, userDoingAction, repliesObj, 100, obj -> {
-            // log.debug("REPLY: " + XString.prettyPrint(obj));
             // If a reply is the string assume that's the URL to the object
             if (obj instanceof String) {
                 NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
                 if (replyNodeInfo != null) {
-                    // log.debug("reply (BY URL): " + XString.prettyPrint(replyNodeInfo));
                     replyNodes.add(replyNodeInfo);
                 }
             } else
@@ -799,7 +775,6 @@ public class ActPubUtil extends ServiceBase {
                 APObj apObj = new APObj((Map) obj);
                 NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
                 if (replyNodeInfo != null) {
-                    // log.debug("reply (BY OBJ): " + XString.prettyPrint(replyNodeInfo));
                     replyNodes.add(replyNodeInfo);
                 }
             } else {
@@ -1020,7 +995,6 @@ public class ActPubUtil extends ServiceBase {
      * if allowFiltering==false that means allow foreign languages, profanity, etc.
      */
     public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
-        // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
         if (url == null)
             return null;
         if (apUtil.isLocalUrl(url)) {
