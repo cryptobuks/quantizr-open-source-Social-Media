@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APOActor;
@@ -13,12 +15,10 @@ import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Holds all the global caches related to AP.
- * 
+ *
  * #todo-optimization: need timer that cleans each of these out once every 8hrs.
  */
 @Component
@@ -58,7 +58,7 @@ public class ActPubCache extends ServiceBase {
      * just the users that are followed by FollowBot?) so that when we're doing the WebCrawl to pull
      * down outbox content we can potentially skip this these users with the assumption they will be
      * SENDING inbound posts live as they're created, meaning we don't need to CRAWL (pull) them.
-     * 
+     *
      * BUT we need to keep track of WHICH users are sending inbound to us these posts and ONLY THEN
      * would we assume we don't want to actually try to CRAWL their outbox to get their data (in the
      * theoretically possible case where their instance for some reason isn't *honoring* our follow, or

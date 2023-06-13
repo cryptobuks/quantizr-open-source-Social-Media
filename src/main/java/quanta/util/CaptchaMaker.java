@@ -40,7 +40,6 @@ public class CaptchaMaker {
 
     /* writes captcha image out to stream */
     public static byte[] makeCaptcha(String captchaCode) {
-
         /* set some parameters */
         int len = captchaCode.length();
         int imgWidth = len * CAPTCHA_CHAR_SIZE;

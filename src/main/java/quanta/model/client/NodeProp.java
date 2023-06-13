@@ -2,14 +2,14 @@ package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum NodeProp {  
+public enum NodeProp {
     NOSTR_RELAYS("sn:relays"),
-    
+
     // NOTE: We store both npub and PubKey so that searching works MongoDB full text searching works.
     NOSTR_USER_NPUB("sn:npub"),
     NOSTR_USER_PUBKEY("sn:nopk"),
 
-    NOSTR_TAGS("sn:ntags"), 
+    NOSTR_TAGS("sn:ntags"),
     NOSTR_NAME("sn:nosName"),
     NOSTR_USER_NAME("sn:nosUserName"),
     NOSTR_NIP05("sn:nosNip05"),
@@ -26,7 +26,7 @@ public enum NodeProp {
 
     // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
     // Note: we have no ACT_PUB prefix on this to reflect that not just ActPub URLs we can have for inReplyTo but we also
-    // can have just a NodeId to a local node well. 
+    // can have just a NodeId to a local node well.
     INREPLYTO("ap:objInReplyTo"), //
 
     // For "AP Note" Objects (per spec) this is the "url" property on the node.
@@ -77,7 +77,8 @@ public enum NodeProp {
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc"), AUDIO_URL("sn:audioUrl"),
+    RSS_FEED_SRC("sn:rssFeedSrc"),
+    AUDIO_URL("sn:audioUrl"),
 
     USER_PREF_PUBLIC_KEY("sn:publicKey"), //
     USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //
@@ -118,7 +119,7 @@ public enum NodeProp {
     USER_TAGS("sn:tags"), //
     USER_BLOCK_WORDS("sn:blockWords"), //
     USER_RECENT_TYPES("sn:recentTypes"), //
-    
+
     PWD_HASH("sn:pwdHash"), //
     VOTE("vote"), //
 
@@ -188,7 +189,7 @@ public enum NodeProp {
 
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.
-     * 
+     *
      * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey"
      * props are the keys used and only the public key exists on the server for that E2E encryption.
      */
@@ -219,7 +220,7 @@ public enum NodeProp {
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 
-    OPEN_GRAPH("sn:og"), 
+    OPEN_GRAPH("sn:og"),
     TRUNCATED("trunc");
 
     @JsonValue

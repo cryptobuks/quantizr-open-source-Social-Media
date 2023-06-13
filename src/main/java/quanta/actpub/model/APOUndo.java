@@ -7,6 +7,7 @@ import quanta.actpub.APConst;
  * Undo object
  */
 public class APOUndo extends APOActivity {
+
     public APOUndo(Map<?, ?> obj) {
         super(obj);
     }

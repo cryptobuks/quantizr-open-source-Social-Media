@@ -1,6 +1,7 @@
-
 package quanta.service.ipfs;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -22,8 +25,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -36,8 +37,6 @@ import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
@@ -62,7 +61,6 @@ public class IPFSPubSub extends ServiceBase {
     public void handleContextRefresh(ContextRefreshedEvent event) {
         ServiceBase.init(event.getApplicationContext());
         log.debug("ContextRefreshedEvent");
-        // log.debug("Checking swarmPeers");
         // swarmPeers();
         if (prop.ipfsEnabled() && IPSM_ENABLE) {
             exec.run(() -> {
@@ -76,18 +74,24 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void setOptions() {
-        if (!prop.ipfsEnabled())
-            return;
+        if (!prop.ipfsEnabled()) return;
         // Only used this for some testing (shouldn't be required?)
         // if these are the defaults ?
         LinkedHashMap<String, Object> res = null;
         // Pubsub.Router="floodsub" | "gossipsub"
         // todo-2: we can add this to the startup bash scripts along with the CORS configs?
-        res = Cast.toLinkedHashMap(
-                ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
+        res =
+            Cast.toLinkedHashMap(
+                ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class)
+            );
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true",
-                LinkedHashMap.class));
+        res =
+            Cast.toLinkedHashMap(
+                ipfs.postForJsonReply(
+                    ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true",
+                    LinkedHashMap.class
+                )
+            );
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 
@@ -177,8 +181,7 @@ public class IPFSPubSub extends ServiceBase {
     // clear throttle counters every minute.
     @Scheduled(fixedDelay = DateUtil.MINUTE_MILLIS)
     public void clearThrottles() {
-        if (!MongoRepository.fullInit)
-            return;
+        if (!MongoRepository.fullInit) return;
         synchronized (fromCounter) {
             fromCounter.clear();
         }
@@ -187,10 +190,8 @@ public class IPFSPubSub extends ServiceBase {
     public void processInboundEvent(Map<String, Object> msg) {
         checkIpfs();
         String from = (String) msg.get("from");
-        if (from == null)
-            return;
-        if (throttle(from))
-            return;
+        if (from == null) return;
+        if (throttle(from)) return;
         String data = (String) msg.get("data");
         // String seqno = (String) msg.get("seqno");
         String payload = (new String(Base64.getDecoder().decode(data)));
@@ -217,14 +218,12 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private void processInboundPayload(String payload) {
-        if (payload == null)
-            return;
+        if (payload == null) return;
         ServerPushInfo pushInfo = null;
         payload = payload.trim();
         if (payload.startsWith("{") && payload.endsWith("}")) {
             IPSMMessage msg = parseIpsmPayload(payload);
-            if (msg == null)
-                return;
+            if (msg == null) return;
             String message = getMessageText(msg);
             pushInfo = new IPSMPushInfo(message);
         } else {
@@ -235,14 +234,12 @@ public class IPFSPubSub extends ServiceBase {
             if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
                 continue;
             }
-            // log.debug("Pushing to session: sc.user: " + sc.getUserName() + " " + payload);
             push.sendServerPushInfo(sc, pushInfo);
         }
     }
 
     private String getMessageText(IPSMMessage msg) {
-        if (msg == null || msg.getContent() == null)
-            return null;
+        if (msg == null || msg.getContent() == null) return null;
         StringBuilder sb = new StringBuilder();
         for (IPSMData data : msg.getContent()) {
             String text = ipfsCat.getString(data.getData());
@@ -272,7 +269,6 @@ public class IPFSPubSub extends ServiceBase {
     // Default signature scheme: 'pkcs1-sha256'
     public boolean verifySignature(IPSMMessage msg) {
         String strDat = String.valueOf(msg.getTs()) + XString.compactPrint(msg.getContent());
-        // log.debug("strDat=" + strDat);
         return true;
     }
 }

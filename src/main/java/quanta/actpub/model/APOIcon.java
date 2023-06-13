@@ -3,6 +3,7 @@ package quanta.actpub.model;
 import java.util.Map;
 
 public class APOIcon extends APObj {
+
     public APOIcon(Map<?, ?> obj) {
         super(obj);
     }

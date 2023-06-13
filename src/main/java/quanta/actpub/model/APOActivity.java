@@ -3,9 +3,11 @@ package quanta.actpub.model;
 import static quanta.actpub.model.AP.apAPObj;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
+
 import java.util.Map;
 
 public class APOActivity extends APObj {
+
     public APOActivity() {}
 
     public APOActivity(Map<?, ?> obj) {

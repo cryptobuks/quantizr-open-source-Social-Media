@@ -1,4 +1,3 @@
-
 package quanta.service.exports;
 
 import java.io.FileOutputStream;
@@ -6,11 +5,11 @@ import java.io.InputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 @Scope("prototype")
@@ -44,7 +43,6 @@ public class ExportZipService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        // log.debug("Add Entry3: " + fileName + " bytes.length=" + bytes.length);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
             // I saw this in an example but haven't tried using it.
@@ -65,7 +63,6 @@ public class ExportZipService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        // log.debug("Add Entry4: " + fileName);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
             entry.setSize(length);

@@ -7,14 +7,18 @@ import quanta.actpub.APConst;
  * Update object.
  */
 public class APOUpdate extends APOActivity {
+
     public APOUpdate(Map<?, ?> obj) {
         super(obj);
     }
 
     public APOUpdate() {
-        put(context, new APList() //
+        put(
+            context,
+            new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage()));
+                .val(new APOLanguage())
+        );
         put(type, APType.Update);
     }
 

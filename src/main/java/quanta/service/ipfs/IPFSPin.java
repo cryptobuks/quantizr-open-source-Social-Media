@@ -1,10 +1,11 @@
-
 package quanta.service.ipfs;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
@@ -15,8 +16,6 @@ import quanta.mongo.model.SubNode;
 import quanta.util.Cast;
 import quanta.util.Util;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSPin extends ServiceBase {
@@ -30,8 +29,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public String verify() {
-        if (!prop.ipfsEnabled())
-            return "\nIPFS not enabled.";
+        if (!prop.ipfsEnabled()) return "\nIPFS not enabled.";
         String url = API_PIN + "/verify";
         // LinkedHashMap<String, Object> res =
         // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
@@ -43,23 +41,19 @@ public class IPFSPin extends ServiceBase {
 
     public boolean remove(String cid) {
         checkIpfs();
-        // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
         return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public boolean add(String cid) {
-        if (cid == null)
-            return false;
+        if (cid == null) return false;
         checkIpfs();
-        // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
         return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public LinkedHashMap<String, Object> getPins() {
-        if (!prop.ipfsEnabled())
-            return null;
+        if (!prop.ipfsEnabled()) return null;
         LinkedHashMap<String, Object> pins = null;
         HashMap<String, Object> res = null;
         try {
@@ -76,8 +70,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
-        if (!prop.ipfsEnabled())
-            return;
+        if (!prop.ipfsEnabled()) return;
         exec.run(() -> {
             // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
             /*
@@ -86,8 +79,7 @@ public class IPFSPin extends ServiceBase {
              */
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
-            if (node == null)
-                return;
+            if (node == null) return;
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             String ipfsLink = att.getIpfsLink();

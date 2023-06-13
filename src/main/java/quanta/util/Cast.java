@@ -11,19 +11,20 @@ import quanta.model.ipfs.dag.DagNode;
  * time to time are unavoidable in Java
  */
 public class Cast {
-	/* Convert to hashmap of String to Object */
-	@SuppressWarnings("unchecked")
-	public static LinkedHashMap<String, Object> toLinkedHashMap(Object obj) {
-		return (LinkedHashMap<String, Object>) obj;
-	}
 
-	@SuppressWarnings("unchecked")
-	public static HashMap<String, Object> toHashMap(Object obj) {
-		return (HashMap<String, Object>) obj;
-	}
+    /* Convert to hashmap of String to Object */
+    @SuppressWarnings("unchecked")
+    public static LinkedHashMap<String, Object> toLinkedHashMap(Object obj) {
+        return (LinkedHashMap<String, Object>) obj;
+    }
 
-	@SuppressWarnings("unchecked")
-	public static DagNode toDagNode(Object obj) {
-		return (DagNode) obj;
-	}
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Object> toHashMap(Object obj) {
+        return (HashMap<String, Object>) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static DagNode toDagNode(Object obj) {
+        return (DagNode) obj;
+    }
 }

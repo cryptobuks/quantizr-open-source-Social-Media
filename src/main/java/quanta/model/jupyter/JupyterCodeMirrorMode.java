@@ -1,18 +1,19 @@
-
 package quanta.model.jupyter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JupyterCodeMirrorMode {
+
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("version")
     private Integer version;
-    
+
     public String getName() {
         return this.name;
     }
-    
+
     public Integer getVersion() {
         return this.version;
     }
@@ -26,9 +27,8 @@ public class JupyterCodeMirrorMode {
     public void setVersion(final Integer version) {
         this.version = version;
     }
-    
-    public JupyterCodeMirrorMode() {
-    }
+
+    public JupyterCodeMirrorMode() {}
 
     public JupyterCodeMirrorMode(final String name, final Integer version) {
         this.name = name;

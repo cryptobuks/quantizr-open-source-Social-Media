@@ -1,8 +1,10 @@
-
 package quanta.service.ipfs;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -10,11 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSName extends ServiceBase {
@@ -32,24 +31,28 @@ public class IPFSName extends ServiceBase {
         checkIpfs();
         Map<String, Object> ret = null;
         try {
-            if (key == null)
-                throw new RuntimeException("Key is required for publishing.");
+            if (key == null) throw new RuntimeException("Key is required for publishing.");
             String url = API_NAME + "/publish?arg=" + cid + "&key=" + key;
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Publishing IPNS: " + url);
-            ResponseEntity<String> response =
-                    ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = ipfs.restTemplateNoTimeout.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+            );
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
-        // ret output:
-        // {
-        // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
-        // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
-        // }
-        Exception e) {
+            // ret output:
+            // {
+            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
+            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
+            Exception e
+        ) {
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;

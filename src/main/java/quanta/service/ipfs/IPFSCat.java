@@ -1,16 +1,15 @@
-
 package quanta.service.ipfs;
 
 import java.io.InputStream;
 import java.net.URL;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSCat extends ServiceBase {
@@ -25,7 +24,7 @@ public class IPFSCat extends ServiceBase {
 
     /**
      * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the string.
-     * 
+     *
      * NOTE: The hash is allowed to have a subpath here.
      */
     public String getString(String hash) {
@@ -33,12 +32,14 @@ public class IPFSCat extends ServiceBase {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<String> response =
-                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response = ipfs.restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                Util.getBasicRequestEntity(),
+                String.class
+            );
             ret = response.getBody();
-        } catch (
-        // log.debug("IPFS post cat. Ret " + response.getStatusCode() + "] " + ret);
-        Exception e) {
+        } catch (Exception e) {
             log.error("Failed to cat: " + hash, e);
         }
         return ret;

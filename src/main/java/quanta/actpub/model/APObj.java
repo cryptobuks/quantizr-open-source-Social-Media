@@ -1,6 +1,7 @@
 package quanta.actpub.model;
 
 import static quanta.actpub.model.AP.apStr;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,17 +10,18 @@ import java.util.Map;
  * what the property typoes of any reply will be so we just use a map, which can successfully
  * unmarshall any format of JSON thrown at us, and then we can let out getter methods be smart
  * enough to extract what we need out of these objects.
- * 
+ *
  * todo-2: Consider a refactor to use: org.json.JSONObject, and org.json.JSONArray, instead of this
  * APObj
  */
 public class APObj extends HashMap<String, Object> {
+
     public static final String id = "id";
     public static final String context = "@context";
     public static final String type = "type";
     public static final String did = "did";
     public static final String language = "@language"; // NOTE: I had this as "language" for a long time, which I guess was
-                                                       // getting ignored
+    // getting ignored
     public static final String object = "object";
     public static final String actor = "actor";
     public static final String published = "published";

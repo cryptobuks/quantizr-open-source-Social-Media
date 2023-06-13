@@ -14,14 +14,26 @@ public class APONote extends APObj {
     }
 
     public APONote() {
-        put(context, new APList() //
+        put(
+            context,
+            new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage()));
+                .val(new APOLanguage())
+        );
         put(type, APType.Note);
     }
 
-    public APONote(String id, String published, String attributedTo, String summary, String url, String repliesUrl,
-            boolean sensitive, String content, APList to) {
+    public APONote(
+        String id,
+        String published,
+        String attributedTo,
+        String summary,
+        String url,
+        String repliesUrl,
+        boolean sensitive,
+        String content,
+        APList to
+    ) {
         this();
         put(APObj.id, id);
         put(APObj.published, published);

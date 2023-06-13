@@ -1,15 +1,15 @@
-
 package quanta.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import quanta.model.client.NodeLink;
 import org.springframework.data.annotation.Transient;
+import quanta.model.client.NodeLink;
 
 public class GraphNode {
+
     private String id;
     private int level;
     private boolean highlight;
@@ -29,8 +29,7 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (childIds != null && childIds.contains(child.getId()))
-            return;
+        if (childIds != null && childIds.contains(child.getId())) return;
         if (children == null) {
             children = new LinkedList<>();
         }

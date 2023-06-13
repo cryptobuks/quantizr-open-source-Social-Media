@@ -1,7 +1,7 @@
-
 package quanta.model;
 
 public class IPInfo {
+
     private Object lock = new Object();
     private long lastRequestTime;
 

@@ -2,6 +2,8 @@ package quanta.actpub;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -14,15 +16,15 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Methods related to generating AP Replies endpoing
  */
 @Component
 public class ActPubReplies extends ServiceBase {
+
     private static Logger log = LoggerFactory.getLogger(ActPubReplies.class);
+
     @Autowired
     private ActPubLog apLog;
 
@@ -61,9 +63,12 @@ public class ActPubReplies extends ServiceBase {
                         nodes.add(child);
                     }
                 }
-                Iterable<SubNode> iter = read.findNodesByProp(as, //
-                        NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(),
-                        nodeId);
+                Iterable<SubNode> iter = read.findNodesByProp(
+                    as, //
+                    NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
+                    NodeProp.INREPLYTO.s(),
+                    nodeId
+                );
                 for (SubNode child : iter) {
                     if (AclService.isPublic(as, child)) {
                         nodes.add(child);

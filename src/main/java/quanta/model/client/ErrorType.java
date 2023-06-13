@@ -1,25 +1,25 @@
 package quanta.model.client;
 
 public enum ErrorType {
-	/* Can read the node and entire subgraph of nodes it contains */
-	OUT_OF_SPACE("oos"), //
+    /* Can read the node and entire subgraph of nodes it contains */
+    OUT_OF_SPACE("oos"), //
 
-	// not used yet.
-	TIMEOUT("timeout"), //
-	
-	AUTH("auth"); //
+    // not used yet.
+    TIMEOUT("timeout"), //
 
-	public final String name;
+    AUTH("auth"); //
 
-	private ErrorType(String name) {
-		this.name = name;
-	}
+    public final String name;
 
-	public String toString() {
-		return name;
-	}
+    private ErrorType(String name) {
+        this.name = name;
+    }
 
-	public String s() {
-		return name;
-	}
+    public String toString() {
+        return name;
+    }
+
+    public String s() {
+        return name;
+    }
 }

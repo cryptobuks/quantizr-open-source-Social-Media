@@ -1,17 +1,16 @@
-
 package quanta.types;
 
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class TypePluginMgr extends ServiceBase {
-    
+
     private static Logger log = LoggerFactory.getLogger(TypePluginMgr.class);
     private static HashMap<String, TypeBase> types = new HashMap<>();
 

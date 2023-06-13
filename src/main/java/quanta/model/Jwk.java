@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 // just for holding modulus(n) and exponent(e)
 public class Jwk {
+
     private String e;
     private String n;
 

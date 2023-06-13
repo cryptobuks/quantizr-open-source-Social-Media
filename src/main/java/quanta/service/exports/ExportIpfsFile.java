@@ -1,6 +1,7 @@
 package quanta.service.exports;
 
 public class ExportIpfsFile {
+
     private String fileName;
     private String cid;
     private String mime;

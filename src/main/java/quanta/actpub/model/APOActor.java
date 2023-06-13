@@ -3,6 +3,7 @@ package quanta.actpub.model;
 import java.util.Map;
 
 public class APOActor extends APObj {
+
     public APOActor() {
         super();
     }

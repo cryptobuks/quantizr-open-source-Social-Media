@@ -1,28 +1,34 @@
-
 package quanta.model.jupyter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JupyterLangInfo {
+
     @JsonProperty("codemirror_mode")
     private JupyterCodeMirrorMode codeMirrorMode;
+
     @JsonProperty("file_extension")
     private String fileExtension;
+
     @JsonProperty("mimetype")
     private String mimeType;
+
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("nbconvert_exporter")
     private String nbConvertExporter;
+
     @JsonProperty("pygments_lexer")
     private String pygmentsLexer;
+
     @JsonProperty("version")
     private String version;
-    
+
     public JupyterCodeMirrorMode getCodeMirrorMode() {
         return this.codeMirrorMode;
     }
-    
+
     public String getFileExtension() {
         return this.fileExtension;
     }
@@ -30,7 +36,7 @@ public class JupyterLangInfo {
     public String getMimeType() {
         return this.mimeType;
     }
-    
+
     public String getName() {
         return this.name;
     }
@@ -38,11 +44,11 @@ public class JupyterLangInfo {
     public String getNbConvertExporter() {
         return this.nbConvertExporter;
     }
-    
+
     public String getPygmentsLexer() {
         return this.pygmentsLexer;
     }
-    
+
     public String getVersion() {
         return this.version;
     }
@@ -81,11 +87,18 @@ public class JupyterLangInfo {
     public void setVersion(final String version) {
         this.version = version;
     }
-    
-    public JupyterLangInfo() {
-    }
-    
-    public JupyterLangInfo(final JupyterCodeMirrorMode codeMirrorMode, final String fileExtension, final String mimeType, final String name, final String nbConvertExporter, final String pygmentsLexer, final String version) {
+
+    public JupyterLangInfo() {}
+
+    public JupyterLangInfo(
+        final JupyterCodeMirrorMode codeMirrorMode,
+        final String fileExtension,
+        final String mimeType,
+        final String name,
+        final String nbConvertExporter,
+        final String pygmentsLexer,
+        final String version
+    ) {
         this.codeMirrorMode = codeMirrorMode;
         this.fileExtension = fileExtension;
         this.mimeType = mimeType;

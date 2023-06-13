@@ -1,17 +1,18 @@
 package quanta.model.client;
 
-import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Transient;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {
+
     private Integer ordinal = 0;
     private Integer width = 0;
     private Integer height = 0;

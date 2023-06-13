@@ -11,12 +11,12 @@ import quanta.exception.OutOfSpaceException;
  */
 public class LimitedInputStreamEx extends LimitedInputStream {
 
-	public LimitedInputStreamEx(InputStream pIn, long pSizeMax) {
-		super(pIn, pSizeMax);
-	}
+    public LimitedInputStreamEx(InputStream pIn, long pSizeMax) {
+        super(pIn, pSizeMax);
+    }
 
-	@Override
-	protected void raiseError(long pSizeMax, long pCount) throws IOException {
-		throw new OutOfSpaceException();
-	}
+    @Override
+    protected void raiseError(long pSizeMax, long pCount) throws IOException {
+        throw new OutOfSpaceException();
+    }
 }

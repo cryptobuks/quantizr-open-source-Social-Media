@@ -11,51 +11,51 @@ import java.util.regex.Pattern;
  * Some simple string pattern matching utilities.
  */
 public class StringPatternMatcher {
-	private ArrayList<String> patternList = new ArrayList<>();
 
-	public StringPatternMatcher() {}
+    private ArrayList<String> patternList = new ArrayList<>();
 
-	public void addPattern(String searchPattern) {
-		synchronized (patternList) {
-			String search = searchPattern;
-			search = search.trim();
-			// search = "\\A" + search + "\\z";
-			search = search.replace("*", ".*");
-			// search = search.replace("?", ".*");
-			// search = "(?i)" + search;
+    public StringPatternMatcher() {}
 
-			patternList.add(search);
-		}
-	}
+    public void addPattern(String searchPattern) {
+        synchronized (patternList) {
+            String search = searchPattern;
+            search = search.trim();
+            // search = "\\A" + search + "\\z";
+            search = search.replace("*", ".*");
+            // search = search.replace("?", ".*");
+            // search = "(?i)" + search;
 
-	public void clearPatterns() {
-		synchronized (patternList) {
-			patternList.clear();
-		}
-	}
+            patternList.add(search);
+        }
+    }
 
-	public boolean matches(String text) {
-		synchronized (patternList) {
-			for (String pattern : patternList) {
-				if (Pattern.compile(pattern).matcher(text).matches()) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
+    public void clearPatterns() {
+        synchronized (patternList) {
+            patternList.clear();
+        }
+    }
 
-	public void addListOfPatterns(String input) {
-		if (input == null || input.length() == 0)
-			return;
+    public boolean matches(String text) {
+        synchronized (patternList) {
+            for (String pattern : patternList) {
+                if (Pattern.compile(pattern).matcher(text).matches()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 
-		StringTokenizer t = new StringTokenizer(input, ",", true);
-		String token;
-		while (t.hasMoreTokens()) {
-			token = t.nextToken();
-			if (!token.equals(",")) {
-				addPattern(token);
-			}
-		}
-	}
+    public void addListOfPatterns(String input) {
+        if (input == null || input.length() == 0) return;
+
+        StringTokenizer t = new StringTokenizer(input, ",", true);
+        String token;
+        while (t.hasMoreTokens()) {
+            token = t.nextToken();
+            if (!token.equals(",")) {
+                addPattern(token);
+            }
+        }
+    }
 }

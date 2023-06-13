@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NodeLink {
+
     private Integer ordinal = 0;
     private String nodeId;
     private String name;

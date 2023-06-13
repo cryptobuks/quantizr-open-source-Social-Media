@@ -3,6 +3,7 @@ package quanta.actpub.model;
 import java.util.Map;
 
 public class APOUrl extends APObj {
+
     public APOUrl(Map<?, ?> obj) {
         super(obj);
     }

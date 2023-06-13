@@ -5,6 +5,7 @@ package quanta.actpub.model;
 // "name" : "#kittens"
 
 public class APOHashtag extends APObj {
+
     APOHashtag() {
         put(type, APType.Hashtag);
     }

@@ -7,6 +7,7 @@ import quanta.actpub.APConst;
  * Announce object
  */
 public class APOAnnounce extends APOActivity {
+
     public APOAnnounce(Map<?, ?> obj) {
         super(obj);
     }

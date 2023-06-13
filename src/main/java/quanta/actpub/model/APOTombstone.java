@@ -1,6 +1,7 @@
 package quanta.actpub.model;
 
 public class APOTombstone extends APObj {
+
     public APOTombstone() {
         // not adding this. Mastodon doesn't.
         // put(context, new APList() //

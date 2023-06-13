@@ -8,23 +8,27 @@ import quanta.actpub.APConst;
  * Like object
  */
 public class APOLike extends APOActivity {
+
     public APOLike(Map<?, ?> obj) {
         super(obj);
     }
 
     public APOLike() {
-        put(context, new APList() //
+        put(
+            context,
+            new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage()));
+                .val(new APOLanguage())
+        );
         put(type, APType.Like);
     }
 
     /*
      * actor: ActorID (url) of person doing the like
-     * 
+     *
      * id = unique ID of this like object. (I'm going to try to use a fake on of these, now, we don't
      * support "likes" collections)
-     * 
+     *
      * objectId: id of thing being liked
      */
     public APOLike(String id, String objectId, String actor, List<String> to, List<String> cc) {

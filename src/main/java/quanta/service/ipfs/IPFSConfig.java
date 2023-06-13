@@ -1,14 +1,13 @@
-
 package quanta.service.ipfs;
 
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.Cast;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSConfig extends ServiceBase {

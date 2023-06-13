@@ -4,6 +4,9 @@ import static quanta.actpub.model.AP.apHasProps;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -16,6 +19,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -29,8 +34,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOWebFinger;
@@ -55,8 +58,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * AP-related utilities
@@ -65,8 +66,10 @@ import org.slf4j.LoggerFactory;
 public class ActPubUtil extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubUtil.class);
+
     @Autowired
     private ActPubLog apLog;
+
     private static final int MAX_THREAD_NODES = 200;
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -93,28 +96,26 @@ public class ActPubUtil extends ServiceBase {
 
     /*
      * input: clay@server.com
-     * 
+     *
      * output: server.com
      */
     public String getHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
-        if (atIdx == -1)
-            return null;
+        if (atIdx == -1) return null;
         return userName.substring(atIdx + 1);
     }
 
     /*
      * input: clay@server.com
-     * 
+     *
      * output: clay
-     * 
+     *
      * todo-1: make this still work even if input is (@clay@server.com) and also make sure this fix
      * won't simultaneously break something else.
      */
     public String stripHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
-        if (atIdx == -1)
-            return userName;
+        if (atIdx == -1) return userName;
         return userName.substring(0, atIdx);
     }
 
@@ -125,7 +126,7 @@ public class ActPubUtil extends ServiceBase {
 
     /*
      * Builds the unique set of hosts from a list of userNames (not used currently)
-     * 
+     *
      * Looks like this isn't being used.
      */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
@@ -147,8 +148,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public String getActorUrlFromWebFingerObj(Object webFinger) {
-        if (webFinger == null)
-            return null;
+        if (webFinger == null) return null;
         Object self = getLinkByRel(webFinger, "self");
         String actorUrl = null;
         if (self != null) {
@@ -163,8 +163,7 @@ public class ActPubUtil extends ServiceBase {
      */
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = apList(webFinger, APObj.links, false);
-        if (linksList == null)
-            return null;
+        if (linksList == null) return null;
         for (Object link : linksList) {
             if (rel.equals(apStr(link, APObj.rel))) {
                 return link;
@@ -223,7 +222,6 @@ public class ActPubUtil extends ServiceBase {
      */
     @PerfMon(category = "apUtil")
     public APObj getJson(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
-        // log.debug("getJson: " + url);
         APObj ret = null;
         int responseCode = 0;
         try {
@@ -251,8 +249,16 @@ public class ActPubUtil extends ServiceBase {
             log.debug("http says Forbidden: " + url);
             return null;
         } catch (Exception e) {
-            log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class=" + e.getClass().getName()
-                    + " respCode=" + responseCode);
+            log.debug(
+                "failed getting json: " +
+                url +
+                " -> " +
+                e.getMessage() +
+                " ex.class=" +
+                e.getClass().getName() +
+                " respCode=" +
+                responseCode
+            );
             return null;
         }
         return ret;
@@ -265,16 +271,22 @@ public class ActPubUtil extends ServiceBase {
     }
 
     /* Posts to all inboxes */
-    public void securePostEx(HashSet<String> inboxes, String fromActor, String privateKey, String actor, APObj message,
-            MediaType postType) {
-        if (inboxes == null)
-            return;
+    public void securePostEx(
+        HashSet<String> inboxes,
+        String fromActor,
+        String privateKey,
+        String actor,
+        APObj message,
+        MediaType postType
+    ) {
+        if (inboxes == null) return;
         for (String inbox : inboxes) {
             try {
                 apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
             } catch (
-            // catch error from any server, and ignore, go to next server to send to.
-            Exception e) {
+                // catch error from any server, and ignore, go to next server to send to.
+                Exception e
+            ) {
                 apLog.trace("failed to post to: " + inbox);
             }
         }
@@ -298,15 +310,14 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
      * app restarts at least.
-     * 
+     *
      * #todo-optimization: look for places we call this to get data we HAVE or should have locally, for
      * example to get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox)
      * ...so we can definitely do a little optimization here around this
      */
     @PerfMon(category = "apUtil")
     public APOActor getActorByUrl(MongoSession ms, String userDoingAction, String url) {
-        if (url == null)
-            return null;
+        if (url == null) return null;
         apub.saveFediverseName(url);
         // first try to return from cache.
         APOActor actor = apCache.actorsByUrl.get(url);
@@ -344,15 +355,15 @@ public class ActPubUtil extends ServiceBase {
 
     /*
      * https://server.org/.well-known/webfinger?resource=acct:someuser@server.org
-     * 
+     *
      * Get WebFinger from foreign server
-     * 
+     *
      * 'resource' examples:
-     * 
+     *
      * someuser@server.org (normal Fediverse, no port)
-     * 
+     *
      * someuser@ip:port (special testing mode, insecure)
-     * 
+     *
      * #todo-optimization: check for any calls to this where we could've gotten the needed data locally
      */
     public APObj getWebFinger(MongoSession ms, String userDoingAction, String resource) {
@@ -406,15 +417,15 @@ public class ActPubUtil extends ServiceBase {
             }
             headers.setAccept(List.of(APConst.MTYPE_ACT_JSON, APConst.MTYPE_JSON));
             String appName = prop.getConfigText("brandingAppName");
-            if (appName == null)
-                appName = "Quanta";
+            if (appName == null) appName = "Quanta";
             // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
             headers.add("user-agent", appName + "; https://" + prop.getMetaHost() + " <fake@email.com>");
             headers.setContentType(postType);
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            log.trace("POST: " + body + "\nTO: " + url + " RESULT: " + response.getStatusCode() + " response="
-                    + response.getBody());
+            log.trace(
+                "POST: " + body + "\nTO: " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody()
+            );
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
             throw new RuntimeException(e);
@@ -530,10 +541,8 @@ public class ActPubUtil extends ServiceBase {
             long unixtime = dateFormat.parse(date).getTime();
             long now = System.currentTimeMillis();
             long diff = now - unixtime;
-            if (diff > 30000L)
-                throw new IllegalArgumentException("Date is too far in the future (difference: " + diff + "ms)");
-            if (diff < -30000L)
-                throw new IllegalArgumentException("Date is too far in the past (difference: " + diff + "ms)");
+            if (diff > 30000L) throw new IllegalArgumentException("Date is too far in the future (difference: " + diff + "ms)");
+            if (diff < -30000L) throw new IllegalArgumentException("Date is too far in the past (difference: " + diff + "ms)");
         } catch (Exception e) {
             throw new RuntimeException("Failed checking time on http request.");
         }
@@ -547,10 +556,14 @@ public class ActPubUtil extends ServiceBase {
         return url != null && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
-    public void iterateCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
-            ActPubObserver observer) {
-        if (collectionObj == null)
-            return;
+    public void iterateCollection(
+        MongoSession ms,
+        String userDoingAction,
+        Object collectionObj,
+        int maxCount,
+        ActPubObserver observer
+    ) {
+        if (collectionObj == null) return;
         /*
          * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
          * and really just one page would be ideal if not for the fact that some servers return an empty
@@ -582,8 +595,7 @@ public class ActPubUtil extends ServiceBase {
                 if (!observer.item(obj)) {
                     return;
                 }
-                if (++count >= maxCount)
-                    return;
+                if (++count >= maxCount) return;
             }
         }
         /*
@@ -594,15 +606,12 @@ public class ActPubUtil extends ServiceBase {
          */
         Object firstPage = apObj(collectionObj, APObj.first);
         if (firstPage != null) {
-            if (++pageQueries > maxPageQueries)
-                return;
+            if (++pageQueries > maxPageQueries) return;
             Object ocPage = null;
             // if firstPage contained a String consider it a URL to the page and get it.
             if (firstPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) firstPage);
-            } else
-            // else consider firstPage to be the ACTUAL first page object
-            {
+            } else { // else consider firstPage to be the ACTUAL first page object
                 ocPage = firstPage;
             }
             while (ocPage != null) {
@@ -617,30 +626,21 @@ public class ActPubUtil extends ServiceBase {
                             String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
                             if (apId == null) {
-                                if (!observer.item(item))
-                                    return;
-                            } else
-                            // if no apId that's fine, just process item.
-                            if (!apIdSet.contains(apId)) {
-                                if (!observer.item(item))
-                                    return;
+                                if (!observer.item(item)) return;
+                            } else if (!apIdSet.contains(apId)) { // if no apId that's fine, just process item.
+                                if (!observer.item(item)) return;
                                 apIdSet.add(apId);
                             }
-                        } else
-                        // otherwise item is probably a 'String' but whatever it is we call 'item' on
-                        // it.
+                        } else // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
                         {
-                            if (!observer.item(item))
-                                return;
+                            if (!observer.item(item)) return;
                         }
-                        if (++count >= maxCount)
-                            return;
+                        if (++count >= maxCount) return;
                     }
                 }
                 Object nextPage = apObj(ocPage, APObj.next);
                 if (nextPage != null) {
-                    if (++pageQueries > maxPageQueries)
-                        return;
+                    if (++pageQueries > maxPageQueries) return;
                     // if nextPage is a string consider that a reference to the URL of the page and get it
                     if (nextPage instanceof String) {
                         ocPage = getRemoteAP(ms, userDoingAction, (String) nextPage);
@@ -654,15 +654,12 @@ public class ActPubUtil extends ServiceBase {
         }
         Object lastPage = apObj(collectionObj, APObj.last);
         if (lastPage != null) {
-            if (++pageQueries > maxPageQueries)
-                return;
+            if (++pageQueries > maxPageQueries) return;
             Object ocPage = null;
             // if lastPage is a string it's the url
             if (lastPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) lastPage);
-            } else
-            // else it's the page object
-            {
+            } else { // else it's the page object
                 ocPage = lastPage;
             }
             if (ocPage != null) {
@@ -677,24 +674,16 @@ public class ActPubUtil extends ServiceBase {
                             String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
                             if (apId == null) {
-                                if (!observer.item(item))
-                                    return;
-                            } else
-                            // else process it with apId
-                            if (!apIdSet.contains(apId)) {
-                                if (!observer.item(item))
-                                    return;
+                                if (!observer.item(item)) return;
+                            } else if (!apIdSet.contains(apId)) { // else process it with apId
+                                if (!observer.item(item)) return;
                                 apIdSet.add(apId);
                             }
-                        } else
-                        // otherwise item is probably a 'String' but whatever it is we call 'item' on
-                        // it.
+                        } else // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
                         {
-                            if (!observer.item(item))
-                                return;
+                            if (!observer.item(item)) return;
                         }
-                        if (++count >= maxCount)
-                            return;
+                        if (++count >= maxCount) return;
                     }
                 }
             }
@@ -703,8 +692,7 @@ public class ActPubUtil extends ServiceBase {
 
     /* Try to generate the best 'inReplyTo' that TARGETS this node */
     public String buildUrlForReplyTo(MongoSession ms, SubNode node) {
-        if (node == null)
-            return null;
+        if (node == null) return null;
         // try this property first.
         String replyTo = node.getStr(NodeProp.OBJECT_ID);
         // fall back to this...
@@ -724,8 +712,7 @@ public class ActPubUtil extends ServiceBase {
      * friend is deleted
      */
     public void deleteNodeNotify(ObjectId nodeId) {
-        if (!MongoRepository.fullInit)
-            return;
+        if (!MongoRepository.fullInit) return;
         arun.run(as -> {
             SubNode node = read.getNode(as, nodeId);
             if (node != null && node.isType(NodeType.FRIEND)) {
@@ -755,33 +742,36 @@ public class ActPubUtil extends ServiceBase {
             return;
         }
         Map<String, Object> repliesObj = node.getObj(NodeProp.ACT_PUB_REPLIES.s(), Map.class);
-        if (repliesObj == null)
-            return;
+        if (repliesObj == null) return;
         String type = apStr(repliesObj, APObj.type);
         if (!APType.Collection.equals(type) && !APType.OrderedCollection.equals(type)) {
             return;
         }
         String userDoingAction = ThreadLocals.getSC().getUserName();
-        apUtil.iterateCollection(ms, userDoingAction, repliesObj, 100, obj -> {
-            // If a reply is the string assume that's the URL to the object
-            if (obj instanceof String) {
-                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
-                if (replyNodeInfo != null) {
-                    replyNodes.add(replyNodeInfo);
+        apUtil.iterateCollection(
+            ms,
+            userDoingAction,
+            repliesObj,
+            100,
+            obj -> {
+                // If a reply is the string assume that's the URL to the object
+                if (obj instanceof String) {
+                    NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
+                    if (replyNodeInfo != null) {
+                        replyNodes.add(replyNodeInfo);
+                    }
+                } else if (obj instanceof Map) { // else we try as a data object
+                    APObj apObj = new APObj((Map) obj);
+                    NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
+                    if (replyNodeInfo != null) {
+                        replyNodes.add(replyNodeInfo);
+                    }
+                } else {
+                    log.debug("Unhandled Reply Type: " + obj.getClass().getName());
                 }
-            } else
-            // else we try as a data object
-            if (obj instanceof Map) {
-                APObj apObj = new APObj((Map) obj);
-                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
-                if (replyNodeInfo != null) {
-                    replyNodes.add(replyNodeInfo);
-                }
-            } else {
-                log.debug("Unhandled Reply Type: " + obj.getClass().getName());
+                return true;
             }
-            return true;
-        });
+        );
     }
 
     public GetThreadViewResponse getNodeReplies(MongoSession ms, String nodeId) {
@@ -789,11 +779,23 @@ public class ActPubUtil extends ServiceBase {
         LinkedList<NodeInfo> nodes = new LinkedList<>();
         // get node that's going to have it's ancestors gathered
         SubNode node = read.getNode(ms, nodeId);
-        if (node == null)
-            return res;
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, //
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, //
-                false, true, true, null, false);
+        if (node == null) return res;
+        NodeInfo info = convert.convertToNodeInfo(
+            false,
+            ThreadLocals.getSC(),
+            ms,
+            node,
+            false, //
+            Convert.LOGICAL_ORDINAL_IGNORE,
+            false,
+            false,
+            false, //
+            false,
+            true,
+            true,
+            null,
+            false
+        );
         nodes.add(info);
         String apReplies = node.getStr(NodeProp.ACT_PUB_REPLIES);
         if (apReplies != null) {
@@ -809,7 +811,7 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
      * towards the root of the tree.
-     * 
+     *
      * NOTE: If nostrNodeIds is provided (non-null) we use it to completely determine the thread
      * content, rather than looking at tree parents or IN_REPLY_TO.
      */
@@ -839,24 +841,57 @@ public class ActPubUtil extends ServiceBase {
                  * point to further places 'logically above' (in this conversation thread)
                  */
                 boolean topNode =
-                        node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS) || node.isType(NodeType.ACCOUNT);
+                    node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
-                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
-                            false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, //
-                            false, true, true, null, //
-                            true);
+                    info =
+                        convert.convertToNodeInfo(
+                            false,
+                            ThreadLocals.getSC(),
+                            ms,
+                            node, //
+                            false,
+                            Convert.LOGICAL_ORDINAL_IGNORE,
+                            false,
+                            false,
+                            false, //
+                            false,
+                            true,
+                            true,
+                            null, //
+                            true
+                        );
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
-                        Iterable<SubNode> iter =
-                                read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0);
+                        Iterable<SubNode> iter = read.getChildren(
+                            ms,
+                            node,
+                            Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME),
+                            20,
+                            0
+                        );
                         HashSet<String> childIds = new HashSet<>();
                         List<NodeInfo> children = new LinkedList<>();
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, //
-                                        child, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true,
-                                        null, false));
+                                children.add(
+                                    convert.convertToNodeInfo(
+                                        false,
+                                        ThreadLocals.getSC(),
+                                        ms, //
+                                        child,
+                                        false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        true,
+                                        true,
+                                        null,
+                                        false
+                                    )
+                                );
                             }
                         }
                         /*
@@ -873,14 +908,34 @@ public class ActPubUtil extends ServiceBase {
                         }
                         // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                         // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                        iter = read.findNodesByProp(ms, //
-                                NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")", NodeProp.INREPLYTO.s(),
-                                replyTargetId);
+                        iter =
+                            read.findNodesByProp(
+                                ms, //
+                                NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
+                                NodeProp.INREPLYTO.s(),
+                                replyTargetId
+                            );
                         for (SubNode child : iter) {
                             // if we didn't already add above, add now
                             if (!childIds.contains(child.getIdStr())) {
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false));
+                                children.add(
+                                    convert.convertToNodeInfo(
+                                        false,
+                                        ThreadLocals.getSC(),
+                                        ms,
+                                        child,
+                                        false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE,
+                                        false,
+                                        false,
+                                        false,
+                                        false,
+                                        true,
+                                        true,
+                                        null,
+                                        false
+                                    )
+                                );
                             }
                         }
                         if (children.size() > 0) {
@@ -896,10 +951,7 @@ public class ActPubUtil extends ServiceBase {
                 // go thru an inReplyTo, rather than be based on tree structure.
                 // SubNode parent = topNode ? null : read.getParent(ms, node);
                 SubNode parent = null;
-                if (topNode) {
-                } else
-                // leave parent == null;
-                {
+                if (topNode) {} else { // leave parent == null;
                     parent = read.getParent(ms, node);
                 }
                 boolean top = parent != null && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
@@ -913,14 +965,10 @@ public class ActPubUtil extends ServiceBase {
                         if (inReplyTo.contains(":")) {
                             // then loadObject will get it from DB or else resort to getting it from network
                             parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
-                        } else
-                        // if inReplyTo not a URL, treat it as a nodeId
-                        {
+                        } else { // if inReplyTo not a URL, treat it as a nodeId
                             parent = read.getNode(ms, inReplyTo);
                         }
-                    } else
-                    // else try to get the node being replied to as if this is a NostrNode
-                    {
+                    } else { // else try to get the node being replied to as if this is a NostrNode
                         Val<Boolean> nodeMissing = new Val<Boolean>(false);
                         parent = nostr.getNodeBeingRepliedTo(ms, node, nodeMissing);
                         if (nodeMissing.getVal()) {
@@ -973,17 +1021,43 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
-                false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
-                true, false, true, true, null, false);
+        NodeInfo info = convert.convertToNodeInfo(
+            false,
+            ThreadLocals.getSC(),
+            ms,
+            node, //
+            false,
+            Convert.LOGICAL_ORDINAL_IGNORE,
+            false,
+            false, //
+            true,
+            false,
+            true,
+            true,
+            null,
+            false
+        );
         return info;
     }
 
     public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
-                false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
-                true, false, true, true, null, false);
+        NodeInfo info = convert.convertToNodeInfo(
+            false,
+            ThreadLocals.getSC(),
+            ms,
+            node, //
+            false,
+            Convert.LOGICAL_ORDINAL_IGNORE,
+            false,
+            false, //
+            true,
+            false,
+            true,
+            true,
+            null,
+            false
+        );
         return info;
     }
 
@@ -991,12 +1065,11 @@ public class ActPubUtil extends ServiceBase {
      * Loads the foreign object into Quanta under the foreign account representing that user, and
      * returns it. Returns existing node if found instead. If there's no account created yet for the
      * user we create the account
-     * 
+     *
      * if allowFiltering==false that means allow foreign languages, profanity, etc.
      */
     public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
-        if (url == null)
-            return null;
+        if (url == null) return null;
         if (apUtil.isLocalUrl(url)) {
             int lastIdx = url.lastIndexOf("=");
             if (lastIdx != -1) {
@@ -1040,15 +1113,32 @@ public class ActPubUtil extends ServiceBase {
                         SubNode accountNode = apub.getAcctNodeByActorUrl(as, userDoingAction, ownerActorUrl);
                         if (accountNode != null) {
                             String apUserName = accountNode.getStr(NodeProp.USER);
-                            SubNode outboxNode =
-                                    read.getUserNodeByType(as, apUserName, accountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
-                                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
+                            SubNode outboxNode = read.getUserNodeByType(
+                                as,
+                                apUserName,
+                                accountNode,
+                                "### Posts",
+                                NodeType.ACT_PUB_POSTS.s(),
+                                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                                NodeName.POSTS
+                            );
                             if (outboxNode == null) {
                                 log.debug("no outbox for user: " + apUserName);
                                 return null;
                             }
-                            node = apub.saveInboundForeignObj(as, userDoingAction, accountNode, outboxNode, obj, APType.Create,
-                                    null, null, false, null);
+                            node =
+                                apub.saveInboundForeignObj(
+                                    as,
+                                    userDoingAction,
+                                    accountNode,
+                                    outboxNode,
+                                    obj,
+                                    APType.Create,
+                                    null,
+                                    null,
+                                    false,
+                                    null
+                                );
                         }
                         return node;
                     });
@@ -1108,29 +1198,23 @@ public class ActPubUtil extends ServiceBase {
                 }
             }
         }
-        if (node.set(NodeProp.USER_BIO, apStr(actor, APObj.summary)))
-            changed = true;
-        if (node.set(NodeProp.DISPLAY_NAME, apStr(actor, APObj.name)))
-            changed = true;
+        if (node.set(NodeProp.USER_BIO, apStr(actor, APObj.summary))) changed = true;
+        if (node.set(NodeProp.DISPLAY_NAME, apStr(actor, APObj.name))) changed = true;
         String actorId = apStr(actor, APObj.id);
         if (actorId == null) {
             log.debug("no actorId on object: " + XString.prettyPrint(actor));
         }
         // this is the URL of the Actor JSON object
-        if (node.set(NodeProp.ACT_PUB_ACTOR_ID, actorId))
-            changed = true;
+        if (node.set(NodeProp.ACT_PUB_ACTOR_ID, actorId)) changed = true;
         // update cache just because we can
         apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), apStr(actor, APObj.inbox));
-        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, apStr(actor, APObj.inbox)))
-            changed = true;
+        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, apStr(actor, APObj.inbox))) changed = true;
         // this is the URL of the HTML of the actor.
-        if (node.set(NodeProp.ACT_PUB_ACTOR_URL, apStr(actor, APObj.url)))
-            changed = true;
+        if (node.set(NodeProp.ACT_PUB_ACTOR_URL, apStr(actor, APObj.url))) changed = true;
         // get the pubKey so we can save into our account node
         String pubKey = apCrypto.getEncodedPubKeyFromActorObj(actor);
         // this is the PublicKey.pubKeyPem, of the user
-        if (node.set(NodeProp.ACT_PUB_KEYPEM, pubKey))
-            changed = true;
+        if (node.set(NodeProp.ACT_PUB_KEYPEM, pubKey)) changed = true;
         return changed;
     }
 

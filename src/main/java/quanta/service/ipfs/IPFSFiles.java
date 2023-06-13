@@ -1,4 +1,3 @@
-
 package quanta.service.ipfs;
 
 import java.io.ByteArrayInputStream;
@@ -8,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.client.MFSDirEntry;
@@ -22,8 +23,6 @@ import quanta.request.GetIPFSFilesRequest;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSFiles extends ServiceBase {
@@ -70,12 +69,22 @@ public class IPFSFiles extends ServiceBase {
         ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
     }
 
-    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
-            Val<Integer> streamSize) {
+    public MerkleLink addFileFromStream(
+        MongoSession ms,
+        String fileName,
+        InputStream stream,
+        String mimeType,
+        Val<Integer> streamSize
+    ) {
         checkIpfs();
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
-        return ipfs.writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
-                null, streamSize);
+        return ipfs.writeFromStream(
+            ms,
+            API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true",
+            stream,
+            null,
+            streamSize
+        );
     }
 
     public IPFSDirStat pathStat(String path) {
@@ -116,7 +125,6 @@ public class IPFSFiles extends ServiceBase {
                     } else {
                         log.debug("dump: " + entryPath);
                         // String readTest = readFile(entryPath);
-                        // log.debug("readTest: " + readTest);
                         if (allFilePaths != null) {
                             allFilePaths.add(entryPath);
                         }
@@ -159,8 +167,7 @@ public class IPFSFiles extends ServiceBase {
         String mfsPath = req.getFolder() == null ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
         // opps, not a path
-        if (!mfsPath.startsWith("/"))
-            return null;
+        if (!mfsPath.startsWith("/")) return null;
         IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
         if (pathStat != null) {
             cid.setVal(pathStat.getHash());

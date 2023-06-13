@@ -1,4 +1,3 @@
-
 package quanta.service;
 
 import java.util.ArrayList;
@@ -23,143 +22,142 @@ import quanta.util.XString;
 
 @Component
 public class OpenGraphService extends ServiceBase {
-	Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
 
-	private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
-	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
-	public static final String BROWSER_USER_AGENT =
-			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
+    Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
 
-	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
-		GetOpenGraphResponse res = new GetOpenGraphResponse();
-		res.setOpenGraph(getOpenGraph(ogReq.getUrl()));
-		return res;
-	}
+    private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
+    public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
+    public static final String BROWSER_USER_AGENT =
+        "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
 
-	public OpenGraph getOpenGraph(String url) {
-		url = XString.stripIfEndsWith(url, "/");
-		url = XString.stripIfEndsWith(url, "\\");
+    public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
+        GetOpenGraphResponse res = new GetOpenGraphResponse();
+        res.setOpenGraph(getOpenGraph(ogReq.getUrl()));
+        return res;
+    }
 
-		// if the url is cached (even if null) then return whatever's in the cache
-		synchronized (ogCache) {
-			if (ogCache.containsKey(url)) {
-				return ogCache.get(url);
-			}
-		}
+    public OpenGraph getOpenGraph(String url) {
+        url = XString.stripIfEndsWith(url, "/");
+        url = XString.stripIfEndsWith(url, "\\");
 
-		OpenGraph openGraph = null;
-		try {
-			openGraph = parseOpenGraph(url);
-		} catch (Exception e) {
-			String mime = attach.getMimeTypeFromUrl(url);
-			openGraph = new OpenGraph();
-			openGraph.setMime(mime);
-		}
+        // if the url is cached (even if null) then return whatever's in the cache
+        synchronized (ogCache) {
+            if (ogCache.containsKey(url)) {
+                return ogCache.get(url);
+            }
+        }
 
-		// we can't trust what we get back from servers, but we do need to be sure URL is correct here
-		// ourselves.
-		openGraph.setUrl(url);
+        OpenGraph openGraph = null;
+        try {
+            openGraph = parseOpenGraph(url);
+        } catch (Exception e) {
+            String mime = attach.getMimeTypeFromUrl(url);
+            openGraph = new OpenGraph();
+            openGraph.setMime(mime);
+        }
 
-		// we allow storing a null if we got back a null. Cache it so we don't try again.
-		synchronized (ogCache) {
-			ogCache.put(url, openGraph);
-		}
+        // we can't trust what we get back from servers, but we do need to be sure URL is correct here
+        // ourselves.
+        openGraph.setUrl(url);
 
-		return openGraph;
-	}
+        // we allow storing a null if we got back a null. Cache it so we don't try again.
+        synchronized (ogCache) {
+            ogCache.put(url, openGraph);
+        }
 
-	public OpenGraph parseOpenGraph(String urlStr) throws Exception {
-		// log.debug("JSoup parsing URL: " + urlStr);
-		OpenGraph openGraph = new OpenGraph();
-		Connection con = Jsoup.connect(urlStr);
-		/*
-		 * this browseragent thing is important to trick servers into sending us the LARGEST versions of the
-		 * images
-		 */
-		con.userAgent(BROWSER_USER_AGENT);
-		Document doc = con.get();
+        return openGraph;
+    }
 
-		// todo-2: add site_name, type, url, twitter:url, twitter:card (like og:type)
-		openGraph.setTitle(getOg(doc, "og:title"));
-		if (openGraph.getTitle() == null) {
-			openGraph.setTitle(getOg(doc, "twitter:title"));
-		}
-		openGraph.setUrl(getOg(doc, "og:url"));
-		if (openGraph.getUrl() == null) {
-			openGraph.setUrl(getOg(doc, "twitter:url"));
-		}
-		openGraph.setDescription(getOg(doc, "og:description"));
-		if (openGraph.getDescription() == null) {
-			openGraph.setDescription(getOg(doc, "twitter:description"));
-		}
-		openGraph.setImage(getOg(doc, "og:image"));
-		if (openGraph.getImage() == null) {
-			openGraph.setImage(getOg(doc, "twitter:image"));
-		}
-		return openGraph;
-	}
+    public OpenGraph parseOpenGraph(String urlStr) throws Exception {
+        OpenGraph openGraph = new OpenGraph();
+        Connection con = Jsoup.connect(urlStr);
+        /*
+         * this browseragent thing is important to trick servers into sending us the LARGEST versions of the
+         * images
+         */
+        con.userAgent(BROWSER_USER_AGENT);
+        Document doc = con.get();
 
-	private String getOg(Document doc, String prop) {
-		Elements elm = doc.select("meta[property=" + prop + "]");
-		return elm != null ? elm.attr("content") : null;
-	}
+        // todo-2: add site_name, type, url, twitter:url, twitter:card (like og:type)
+        openGraph.setTitle(getOg(doc, "og:title"));
+        if (openGraph.getTitle() == null) {
+            openGraph.setTitle(getOg(doc, "twitter:title"));
+        }
+        openGraph.setUrl(getOg(doc, "og:url"));
+        if (openGraph.getUrl() == null) {
+            openGraph.setUrl(getOg(doc, "twitter:url"));
+        }
+        openGraph.setDescription(getOg(doc, "og:description"));
+        if (openGraph.getDescription() == null) {
+            openGraph.setDescription(getOg(doc, "twitter:description"));
+        }
+        openGraph.setImage(getOg(doc, "og:image"));
+        if (openGraph.getImage() == null) {
+            openGraph.setImage(getOg(doc, "twitter:image"));
+        }
+        return openGraph;
+    }
 
-	// Parses the content for any HTML links and attempts to get the OpenGraph from the network
-	// and puts the opengraph object into node properties.
-	//
-	// todo-1: for now this method is 'cumulative' and never removes unused OG entries like if a node
-	// is edited, but we will take care of that when we are calling this during SAVEs.
-	public void parseNode(SubNode node, boolean reset) {
-		if (StringUtils.isEmpty(node.getContent())) {
-			if (reset) {
-				node.set(NodeProp.OPEN_GRAPH.s(), null);
-			}
-			return;
-		}
+    private String getOg(Document doc, String prop) {
+        Elements elm = doc.select("meta[property=" + prop + "]");
+        return elm != null ? elm.attr("content") : null;
+    }
 
-		if (node.getContent().toLowerCase().indexOf("http") == -1) {
-			if (reset) {
-				node.set(NodeProp.OPEN_GRAPH.s(), null);
-			}
-			return;
-		}
+    // Parses the content for any HTML links and attempts to get the OpenGraph from the network
+    // and puts the opengraph object into node properties.
+    //
+    // todo-1: for now this method is 'cumulative' and never removes unused OG entries like if a node
+    // is edited, but we will take care of that when we are calling this during SAVEs.
+    public void parseNode(SubNode node, boolean reset) {
+        if (StringUtils.isEmpty(node.getContent())) {
+            if (reset) {
+                node.set(NodeProp.OPEN_GRAPH.s(), null);
+            }
+            return;
+        }
 
-		ArrayList<String> ogList = reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
+        if (node.getContent().toLowerCase().indexOf("http") == -1) {
+            if (reset) {
+                node.set(NodeProp.OPEN_GRAPH.s(), null);
+            }
+            return;
+        }
 
-		// Adding the " " to the end is a hack because my regex isn't perfect (todo-1: fix the regex)
-		Matcher matcher = urlPattern.matcher(node.getContent() + " ");
+        ArrayList<String> ogList = reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 
-		while (matcher.find()) {
-			if (ogList == null) {
-				ogList = new ArrayList<>();
-			}
-			String url = node.getContent().substring(matcher.start(0), matcher.end(0));
+        // Adding the " " to the end is a hack because my regex isn't perfect (todo-1: fix the regex)
+        Matcher matcher = urlPattern.matcher(node.getContent() + " ");
 
-			// Stripping slashes is a hack because my regex isn't perfect (todo-1: fix the regex)
-			url = XString.stripIfEndsWith(url, "/");
-			url = XString.stripIfEndsWith(url, "\\");
+        while (matcher.find()) {
+            if (ogList == null) {
+                ogList = new ArrayList<>();
+            }
+            String url = node.getContent().substring(matcher.start(0), matcher.end(0));
 
-			// set load=false if we already have this URL in our ogList
-			boolean load = true;
-			for (String urlCheck : ogList) {
-				// just finding the URL is a hack but will be fine for now, to avoid parsing JSON
-				if (urlCheck.contains(url)) {
-					load = false;
-					break;
-				}
-			}
-			if (!load)
-				continue;
+            // Stripping slashes is a hack because my regex isn't perfect (todo-1: fix the regex)
+            url = XString.stripIfEndsWith(url, "/");
+            url = XString.stripIfEndsWith(url, "\\");
 
-			OpenGraph og = getOpenGraph(url);
-			ogList.add(XString.compactPrint(og));
+            // set load=false if we already have this URL in our ogList
+            boolean load = true;
+            for (String urlCheck : ogList) {
+                // just finding the URL is a hack but will be fine for now, to avoid parsing JSON
+                if (urlCheck.contains(url)) {
+                    load = false;
+                    break;
+                }
+            }
+            if (!load) continue;
 
-			// if more than 50 links in content then ignore the rest
-			if (ogList.size() > 50) {
-				break;
-			}
-		}
+            OpenGraph og = getOpenGraph(url);
+            ogList.add(XString.compactPrint(og));
 
-		node.set(NodeProp.OPEN_GRAPH.s(), ogList);
-	}
+            // if more than 50 links in content then ignore the rest
+            if (ogList.size() > 50) {
+                break;
+            }
+        }
+
+        node.set(NodeProp.OPEN_GRAPH.s(), ogList);
+    }
 }

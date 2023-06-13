@@ -1,12 +1,11 @@
-
 package quanta.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component("ActPubTest")
 public class ActPubTest extends ServiceBase implements TestIntf {
@@ -20,8 +19,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
             if (prop.getHostAndPort().contains("//q2:")) {
                 testConnection("q1:8184");
             }
-        } finally {
-        }
+        } finally {}
     }
 
     /**

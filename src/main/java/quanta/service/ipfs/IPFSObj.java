@@ -1,9 +1,11 @@
-
 package quanta.service.ipfs;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,13 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSObj extends ServiceBase {
@@ -42,16 +41,12 @@ public class IPFSObj extends ServiceBase {
             log.debug("REQ: " + url);
             ResponseEntity<String> result = ipfs.restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
-            // log.debug("RAW RESULT: " + result.getBody());
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
                 ret = XString.jsonMapper.readValue(result.getBody(), MerkleNode.class);
                 ret.setHash(hash);
                 ret.setContentType(contentType.getType());
             }
-        } catch (
-        // String formatted = XString.prettyPrint(ret);
-        // log.debug(formatted);
-        Exception e) {
+        } catch (Exception e) {
             log.error("Failed in restTemplate.getForEntity", e);
         }
         return ret;
@@ -66,9 +61,7 @@ public class IPFSObj extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = ipfs.restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
-        } catch (
-        // log.debug("new Object: " + XString.prettyPrint(ret));
-        Exception e) {
+        } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;
@@ -109,7 +102,8 @@ public class IPFSObj extends ServiceBase {
             filePath = fileCid;
         }
         return objectOperation(
-                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
+            API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true"
+        );
     }
 
     public IPFSObjectStat objectStat(String cid, boolean humanReadable) {

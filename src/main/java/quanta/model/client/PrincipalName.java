@@ -3,7 +3,6 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PrincipalName {
-
     // FollowBot is the account admins can use to "curate" the public
     // Fediverse feed.
     FOLLOW_BOT("FollowBot"), //

@@ -1,24 +1,26 @@
-
 package quanta.model.ipfs.dag;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DagLink {
+
     @JsonProperty("Name")
     private String name;
+
     @JsonProperty("Hash")
     private MerkleCid hash;
+
     @JsonProperty("Tsize")
     private Integer tsize;
 
     public String getName() {
         return this.name;
     }
-    
+
     public MerkleCid getHash() {
         return this.hash;
     }
-    
+
     public Integer getTsize() {
         return this.tsize;
     }
@@ -37,7 +39,6 @@ public class DagLink {
     public void setTsize(final Integer tsize) {
         this.tsize = tsize;
     }
-    
-    public DagLink() {
-    }
+
+    public DagLink() {}
 }

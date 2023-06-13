@@ -1,15 +1,18 @@
-
 package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MFSDirEntry {
+
     @JsonProperty("Name")
     private String name;
+
     @JsonProperty("Type")
     private Integer type;
+
     @JsonProperty("Size")
     private Integer size;
+
     @JsonProperty("Hash")
     private String hash;
 
@@ -24,7 +27,7 @@ public class MFSDirEntry {
     public String getName() {
         return this.name;
     }
-    
+
     public Integer getType() {
         return this.type;
     }
@@ -32,7 +35,7 @@ public class MFSDirEntry {
     public Integer getSize() {
         return this.size;
     }
-    
+
     public String getHash() {
         return this.hash;
     }
@@ -56,7 +59,6 @@ public class MFSDirEntry {
     public void setHash(final String hash) {
         this.hash = hash;
     }
-    
-    public MFSDirEntry() {
-    }
+
+    public MFSDirEntry() {}
 }

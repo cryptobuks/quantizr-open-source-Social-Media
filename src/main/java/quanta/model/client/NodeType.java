@@ -3,9 +3,8 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeType {
-
     // INTERNAL types
-    ACCOUNT("sn:account"),//
+    ACCOUNT("sn:account"), //
     REPO_ROOT("sn:repoRoot"), //
     INBOX("sn:inbox"), //
     INBOX_ENTRY("sn:inboxEntry"), //
@@ -14,10 +13,10 @@ public enum NodeType {
     BOOKMARK("sn:bookmark"), //
     BOOKMARK_LIST("sn:bookmarkList"), //
     EXPORTS("sn:exports"), //
-    CALCULATOR("sn:calculator"),//
-    CALENDAR("sn:calendar"),//
+    CALCULATOR("sn:calculator"), //
+    CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
-    
+
     RSS_FEED("sn:rssfeed"), //
     RSS_FEEDS("sn:rssfeeds"), //
     FRIEND_LIST("sn:friendList"), //
@@ -27,7 +26,7 @@ public enum NodeType {
     ACT_PUB_POSTS("ap:posts"), //
 
     NONE("u"), //same as 'markdown' really (untyped, default to markdown)
-    NOSTR_ENC_DM("sn:ned"), // 
+    NOSTR_ENC_DM("sn:ned"), //
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //

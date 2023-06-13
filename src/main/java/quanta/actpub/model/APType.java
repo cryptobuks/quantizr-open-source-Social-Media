@@ -4,6 +4,7 @@ package quanta.actpub.model;
  * ActivityPub types
  */
 public class APType {
+
     public static final String Create = "Create";
     public static final String Note = "Note";
     public static final String Video = "Video";

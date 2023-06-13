@@ -32,8 +32,7 @@ public class AP {
      * the first one containing the prop val as a property of it
      */
     public static Object apParseList(List list, String prop) {
-        if (list == null)
-            return null;
+        if (list == null) return null;
         for (Object element : list) {
             // see if we can get it, no matter what type element is
             Val<Object> val = getFromMap(element, prop);
@@ -63,16 +62,27 @@ public class AP {
                 return null;
             } else {
                 if (warnIfMissing) {
-                    ExUtil.warn("unhandled type on apStr() return val: "
-                            + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object")
-                            + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+                    ExUtil.warn(
+                        "unhandled type on apStr() return val: " +
+                        (val.getVal() != null ? val.getVal().getClass().getName() : "null on object") +
+                        "\nUnable to get property " +
+                        prop +
+                        " from obj " +
+                        XString.prettyPrint(obj)
+                    );
                 }
                 return null;
             }
         }
         if (warnIfMissing) {
-            ExUtil.warn("unhandled type on apStr(): " + (obj != null ? obj.getClass().getName() : "null")
-                    + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn(
+                "unhandled type on apStr(): " +
+                (obj != null ? obj.getClass().getName() : "null") +
+                "\nUnable to get property " +
+                prop +
+                " from obj " +
+                XString.prettyPrint(obj)
+            );
         }
         return null;
     }
@@ -88,8 +98,14 @@ public class AP {
                 return ((Boolean) val.getVal()).booleanValue();
             }
         }
-        ExUtil.warn("unhandled type on apBool(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn(
+            "unhandled type on apBool(): " +
+            (obj != null ? obj.getClass().getName() : "null") +
+            "Unable to get property " +
+            prop +
+            " from obj " +
+            XString.prettyPrint(obj)
+        );
         return false;
     }
 
@@ -106,8 +122,14 @@ public class AP {
                 return Integer.valueOf((String) val.getVal());
             }
         }
-        ExUtil.warn("unhandled type on apInt(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn(
+            "unhandled type on apInt(): " +
+            (obj != null ? obj.getClass().getName() : "null") +
+            "Unable to get property " +
+            prop +
+            " from obj " +
+            XString.prettyPrint(obj)
+        );
         return 0;
     }
 
@@ -120,8 +142,14 @@ public class AP {
                 return DateUtil.parseISOTime((String) val.getVal());
             }
         }
-        ExUtil.warn("unhandled type on apDate(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn(
+            "unhandled type on apDate(): " +
+            (obj != null ? obj.getClass().getName() : "null") +
+            "Unable to get property " +
+            prop +
+            " from obj " +
+            XString.prettyPrint(obj)
+        );
         return null;
     }
 
@@ -130,13 +158,9 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else
-            // if we got an instance of a list return it
-            if (val.getVal() instanceof List<?>) {
+            } else if (val.getVal() instanceof List<?>) { // if we got an instance of a list return it
                 return (List<?>) val.getVal();
-            } else
-            // if we expected a list and found a String, that's ok, return a list with one entry
-            // the address 'to' and 'cc' properties can have this happen often.
+            } else // the address 'to' and 'cc' properties can have this happen often. // if we expected a list and found a String, that's ok, return a list with one entry
             if (allowConvertString && val.getVal() instanceof String) {
                 return Arrays.asList(val.getVal());
             }
@@ -155,9 +179,16 @@ public class AP {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         } else {
-            ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: "
-                    + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
-                    + XString.prettyPrint(obj));
+            ExUtil.warn(
+                "[1]getting prop " +
+                prop +
+                " from unsupported container type: " +
+                (obj != null ? obj.getClass().getName() : "null") +
+                "Unable to get property " +
+                prop +
+                " from obj " +
+                XString.prettyPrint(obj)
+            );
         }
         return null;
     }
@@ -190,8 +221,7 @@ public class AP {
      * in.
      */
     public static APObj typeFromFactory(Object obj) {
-        if (obj == null)
-            return null;
+        if (obj == null) return null;
         APObj ret = null;
         if (obj instanceof APObj) {
             ret = (APObj) obj;
@@ -223,7 +253,6 @@ public class AP {
             case APType.Note:
                 return new APONote(ret);
             default:
-                // log.debug("using APObj for type: " + obj.getType());
                 break;
         }
         return ret;

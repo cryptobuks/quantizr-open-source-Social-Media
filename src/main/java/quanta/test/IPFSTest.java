@@ -1,15 +1,14 @@
-
 package quanta.test;
 
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component("IPFSTest")
 public class IPFSTest extends ServiceBase implements TestIntf {
@@ -82,7 +81,6 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             // "Path" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
             // }
             // verify = ipfs.dagGet(ipnsName);
-            // log.debug("verifyIPNS!: " + verify);
             // --------------
             ml = ipfsDag.putString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null);
             log.debug("Cid (Second Version)=" + ml.getCid().getPath());
@@ -106,8 +104,7 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("Querying for MerkleNode...");
             MerkleNode mnode = ipfsObj.getMerkleNode(hash, "json");
             log.debug("MerkleNode: " + XString.prettyPrint(mnode));
-        } finally {
-        }
+        } finally {}
         // String merkContent = ipfs.objectCat(hash);
     }
 }

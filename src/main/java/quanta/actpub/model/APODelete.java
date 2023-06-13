@@ -7,14 +7,18 @@ import quanta.actpub.APConst;
  * Delete object.
  */
 public class APODelete extends APOActivity {
+
     public APODelete(Map<?, ?> obj) {
         super(obj);
     }
 
     public APODelete() {
-        put(context, new APList() //
+        put(
+            context,
+            new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage()));
+                .val(new APOLanguage())
+        );
         put(type, APType.Delete);
     }
 

@@ -2,6 +2,7 @@ package quanta.actpub;
 
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
+
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APOActor;
@@ -31,8 +34,6 @@ import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Crypto functions for AP
@@ -67,8 +68,13 @@ public class ActPubCrypto extends ServiceBase {
         return privateKey;
     }
 
-    public void parseHttpHeaderSig(HttpServletRequest httpReq, Val<String> keyId, Val<String> signature, boolean requireDigest,
-            Val<List<String>> headers) {
+    public void parseHttpHeaderSig(
+        HttpServletRequest httpReq,
+        Val<String> keyId,
+        Val<String> signature,
+        boolean requireDigest,
+        Val<List<String>> headers
+    ) {
         String reqSig = httpReq.getHeader("Signature");
         if (reqSig == null) {
             throw new RuntimeException("Signature missing from http header.");
@@ -80,8 +86,7 @@ public class ActPubCrypto extends ServiceBase {
         for (String sigTok : sigToks) {
             int equalIdx = sigTok.indexOf("=");
             // ignore tokens not containing equals
-            if (equalIdx == -1)
-                continue;
+            if (equalIdx == -1) continue;
             String key = sigTok.substring(0, equalIdx);
             String val = sigTok.substring(equalIdx + 1);
             if (val.charAt(0) == '\"') {
@@ -95,20 +100,15 @@ public class ActPubCrypto extends ServiceBase {
                 signature.setVal(val);
             }
         }
-        if (keyId.getVal() == null)
-            throw new RuntimeException("Header signature missing \'keyId\'");
-        if (headers == null)
-            throw new RuntimeException("Header signature missing \'headers\'");
-        if (signature == null)
-            throw new RuntimeException("Header signature missing \'signature\'");
-        if (!headers.getVal().contains("(request-target)"))
-            throw new RuntimeException("(request-target) is not in signed headers");
-        if (!headers.getVal().contains("date"))
-            throw new RuntimeException("date is not in signed headers");
-        if (!headers.getVal().contains("host"))
-            throw new RuntimeException("host is not in signed headers");
-        if (requireDigest && !headers.getVal().contains("digest"))
-            throw new RuntimeException("digest is not in signed headers");
+        if (keyId.getVal() == null) throw new RuntimeException("Header signature missing \'keyId\'");
+        if (headers == null) throw new RuntimeException("Header signature missing \'headers\'");
+        if (signature == null) throw new RuntimeException("Header signature missing \'signature\'");
+        if (!headers.getVal().contains("(request-target)")) throw new RuntimeException(
+            "(request-target) is not in signed headers"
+        );
+        if (!headers.getVal().contains("date")) throw new RuntimeException("date is not in signed headers");
+        if (!headers.getVal().contains("host")) throw new RuntimeException("host is not in signed headers");
+        if (requireDigest && !headers.getVal().contains("digest")) throw new RuntimeException("digest is not in signed headers");
     }
 
     // todo-2: need a version of this method that wraps the logic of going and getting the publickey
@@ -140,21 +140,16 @@ public class ActPubCrypto extends ServiceBase {
             if (!verifier.verify(sigBytes)) {
                 throw new RuntimeException("Signature verify failed.");
             }
-        } catch (
-        // log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) :
-        // "none"));
-        Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public String getEncodedPubKeyFromActorObj(APOActor actorObj) {
         Object pubKey = apObj(actorObj, APObj.publicKey);
-        if (pubKey == null)
-            return null;
+        if (pubKey == null) return null;
         String pubKeyPem = apStr(pubKey, APObj.publicKeyPem);
-        if (pubKeyPem == null)
-            return null;
+        if (pubKeyPem == null) return null;
         // WARNING: This is a REGEX. replaceAll() uses REGEX., we extract out just the data part of the key
         return pubKeyPem.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
     }
@@ -177,7 +172,6 @@ public class ActPubCrypto extends ServiceBase {
                     pkey = getPublicKeyFromEncoding(pkEncoded);
                 }
             }
-            // log.debug("Got PK by Node: " + accntNode.getIdStr());
             // #todo-optimization: this block will eventually be unneeded once all accounts have pkey in them.
             if (pkey == null) {
                 log.debug("NOTE: actorUrl " + actorUrl + " doesn\'t have pkey in account node yet");
@@ -203,8 +197,7 @@ public class ActPubCrypto extends ServiceBase {
     }
 
     public PublicKey getPublicKeyFromEncoding(String pkeyEncoded) {
-        if (pkeyEncoded == null)
-            return null;
+        if (pkeyEncoded == null) return null;
         PublicKey pubKey = null;
         byte[] key = Base64.getDecoder().decode(pkeyEncoded);
         try {
@@ -224,9 +217,7 @@ public class ActPubCrypto extends ServiceBase {
             // request-target
             if (header.equals("(request-target)")) {
                 value = httpReq.getMethod().toLowerCase() + " " + httpReq.getRequestURI();
-            } else
-            // digest
-            if (header.equals("digest")) {
+            } else if (header.equals("digest")) { // digest
                 value = httpReq.getHeader(header);
                 /*
                  * if we have body bytes and they don't hash to be what the header claims they should be then that's
@@ -237,9 +228,7 @@ public class ActPubCrypto extends ServiceBase {
                         throw new RuntimeException("body digest compare fail.");
                     }
                 }
-            } else
-            // all other headers
-            {
+            } else { // all other headers
                 value = httpReq.getHeader(header);
             }
             sigParts.add(header + ": " + value);
@@ -261,8 +250,14 @@ public class ActPubCrypto extends ServiceBase {
         return false;
     }
 
-    public void loadSignatureHeaderVals(HttpHeaders headers, String privKeyStr, String urlStr, String actor, byte[] bodyBytes,
-            String method) {
+    public void loadSignatureHeaderVals(
+        HttpHeaders headers,
+        String privKeyStr,
+        String urlStr,
+        String actor,
+        byte[] bodyBytes,
+        String method
+    ) {
         try {
             // try to get the key from the cache first
             PrivateKey privKey = apCache.privateKeys.get(privKeyStr);
@@ -283,8 +278,8 @@ public class ActPubCrypto extends ServiceBase {
             String digestHeader = digestFromBodyBytes(bodyBytes);
             URL url = new URL(urlStr);
             String strToSign = //
-                    //
-                    "(request-target): " + method + " " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date;
+                //
+                "(request-target): " + method + " " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date;
             if (digestHeader != null) {
                 strToSign += "\ndigest: " + digestHeader;
             }
@@ -297,11 +292,14 @@ public class ActPubCrypto extends ServiceBase {
              * it but be sure not to break compatability when doing so.
              */
             String headerSig = //
-                    //
-                    headerPair("keyId", actor + "#main-key") + ","
-                            + headerPair("headers", "(request-target) host date" + (digestHeader != null ? " digest" : "")) + ","
-                            + headerPair("algorithm", "rsa-sha256") + "," + //
-                            headerPair("signature", Base64.getEncoder().encodeToString(signature));
+                //
+                headerPair("keyId", actor + "#main-key") +
+                "," +
+                headerPair("headers", "(request-target) host date" + (digestHeader != null ? " digest" : "")) +
+                "," +
+                headerPair("algorithm", "rsa-sha256") +
+                "," + //
+                headerPair("signature", Base64.getEncoder().encodeToString(signature));
             headers.add("Host", url.getHost());
             headers.add("Date", date);
             headers.add("Signature", headerSig);
@@ -318,8 +316,8 @@ public class ActPubCrypto extends ServiceBase {
     private String digestFromBodyBytes(byte[] bytes) {
         try {
             return bytes != null
-                    ? DIGEST_ALGO + "=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance(DIGEST_ALGO).digest(bytes))
-                    : null;
+                ? DIGEST_ALGO + "=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance(DIGEST_ALGO).digest(bytes))
+                : null;
         } catch (Exception e) {
             throw new RuntimeException("failed making digest.");
         }
@@ -330,8 +328,13 @@ public class ActPubCrypto extends ServiceBase {
     }
 
     /* Returns true if signaure check is successful */
-    public boolean verifySignature(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes,
-            Val<String> keyEncoded) {
+    public boolean verifySignature(
+        HttpServletRequest httpReq,
+        Object payload,
+        String actorUrl,
+        byte[] bodyBytes,
+        Val<String> keyEncoded
+    ) {
         PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
         if (pubKey == null) {
             return false;

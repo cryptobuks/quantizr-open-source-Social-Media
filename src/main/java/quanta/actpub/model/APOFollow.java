@@ -7,6 +7,7 @@ import quanta.actpub.APConst;
  * Follow object
  */
 public class APOFollow extends APOActivity {
+
     public APOFollow(Map<?, ?> obj) {
         super(obj);
     }
@@ -39,7 +40,6 @@ public class APOFollow extends APOActivity {
         // This format is known to work on all platforms except Pleroma. Never have gotten Pleroma to work
         // Pleroma always sends back a 400 error.
         put(APObj.object, target);
-
         // NOTE: This Person object is the format I've seen some servers use, and we do support this format
         // for inbound follows.
         // put(APObj.object, new APOPerson(target));

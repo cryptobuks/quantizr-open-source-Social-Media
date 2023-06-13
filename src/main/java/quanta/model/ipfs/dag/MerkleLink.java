@@ -1,22 +1,25 @@
-
 package quanta.model.ipfs.dag;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MerkleLink {
+
     @JsonProperty("Name")
     private String name;
+
     @JsonProperty("Hash")
     private String hash;
+
     @JsonProperty("Size")
     private Integer size;
+
     @JsonProperty("Cid")
     private MerkleCid cid;
-    
+
     public String getName() {
         return this.name;
     }
-    
+
     public String getHash() {
         return this.hash;
     }
@@ -24,7 +27,7 @@ public class MerkleLink {
     public Integer getSize() {
         return this.size;
     }
-    
+
     public MerkleCid getCid() {
         return this.cid;
     }
@@ -48,7 +51,6 @@ public class MerkleLink {
     public void setCid(final MerkleCid cid) {
         this.cid = cid;
     }
-    
-    public MerkleLink() {
-    }
+
+    public MerkleLink() {}
 }

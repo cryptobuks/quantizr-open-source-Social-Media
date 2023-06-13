@@ -1,7 +1,7 @@
-
 package quanta.model.client;
 
 public class APTag {
+
     private String name;
     private String href;
     private String type;
@@ -17,7 +17,7 @@ public class APTag {
     public String getType() {
         return this.type;
     }
-    
+
     public void setName(final String name) {
         this.name = name;
     }
@@ -29,7 +29,6 @@ public class APTag {
     public void setType(final String type) {
         this.type = type;
     }
-    
-    public APTag() {
-    }
+
+    public APTag() {}
 }

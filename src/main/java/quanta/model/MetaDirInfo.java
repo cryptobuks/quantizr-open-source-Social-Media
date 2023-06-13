@@ -1,13 +1,13 @@
-
 package quanta.model;
 
-import java.util.LinkedList;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.LinkedList;
 
 public class MetaDirInfo {
+
     @JsonProperty("files")
     private LinkedList<String> files;
-    
+
     public LinkedList<String> getFiles() {
         return this.files;
     }
@@ -16,7 +16,6 @@ public class MetaDirInfo {
     public void setFiles(final LinkedList<String> files) {
         this.files = files;
     }
-    
-    public MetaDirInfo() {
-    }
+
+    public MetaDirInfo() {}
 }

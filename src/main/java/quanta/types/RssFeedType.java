@@ -23,8 +23,7 @@ public class RssFeedType extends TypeBase {
         String feedSrc = node.getStr(NodeProp.RSS_FEED_SRC);
 
         // if no content or it's encrypted return
-        if (feedSrc == null || feedSrc.startsWith(Constant.ENC_TAG.s()))
-            return;
+        if (feedSrc == null || feedSrc.startsWith(Constant.ENC_TAG.s())) return;
 
         List<String> lines = XString.tokenizeWithDelims(feedSrc, "\n\r");
         if (lines == null) {

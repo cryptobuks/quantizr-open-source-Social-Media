@@ -1,28 +1,32 @@
-
 package quanta.model.ipfs.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IPFSDirStat {
+
     @JsonProperty("Hash")
     private String hash;
+
     @JsonProperty("Size")
     private Integer size;
+
     @JsonProperty("CumulativeSize")
     private Integer cumulativeSize;
+
     @JsonProperty("Blocks")
     private Integer blocks;
+
     @JsonProperty("Type")
     private String type;
 
     public String getHash() {
         return this.hash;
     }
-    
+
     public Integer getSize() {
         return this.size;
     }
-    
+
     public Integer getCumulativeSize() {
         return this.cumulativeSize;
     }
@@ -30,12 +34,12 @@ public class IPFSDirStat {
     public Integer getBlocks() {
         return this.blocks;
     }
-    
+
     public String getType() {
         return this.type;
     }
 
-    @JsonProperty("Hash")    
+    @JsonProperty("Hash")
     public void setHash(final String hash) {
         this.hash = hash;
     }
@@ -60,6 +64,5 @@ public class IPFSDirStat {
         this.type = type;
     }
 
-    public IPFSDirStat() {
-    }
+    public IPFSDirStat() {}
 }

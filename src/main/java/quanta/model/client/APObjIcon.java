@@ -1,7 +1,7 @@
-
 package quanta.model.client;
 
 public class APObjIcon {
+
     private String type;
     private String mediaType;
     private String url;

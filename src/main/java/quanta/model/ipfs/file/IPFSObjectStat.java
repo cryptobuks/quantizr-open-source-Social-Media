@@ -1,26 +1,31 @@
-
 package quanta.model.ipfs.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IPFSObjectStat {
+
     @JsonProperty("BlockSize")
     private Integer blockSize;
+
     @JsonProperty("CumulativeSize")
     private Integer cumulativeSize;
+
     @JsonProperty("DataSize")
     private Integer dataSize;
+
     @JsonProperty("Hash")
     private String hash;
+
     @JsonProperty("LinksSize")
     private Integer linksSize;
+
     @JsonProperty("NumLinks")
     private Integer numLinks;
-    
+
     public Integer getBlockSize() {
         return this.blockSize;
     }
-    
+
     public Integer getCumulativeSize() {
         return this.cumulativeSize;
     }
@@ -28,15 +33,15 @@ public class IPFSObjectStat {
     public Integer getDataSize() {
         return this.dataSize;
     }
-    
+
     public String getHash() {
         return this.hash;
     }
-    
+
     public Integer getLinksSize() {
         return this.linksSize;
     }
-    
+
     public Integer getNumLinks() {
         return this.numLinks;
     }
@@ -71,6 +76,5 @@ public class IPFSObjectStat {
         this.numLinks = numLinks;
     }
 
-    public IPFSObjectStat() {
-    }
+    public IPFSObjectStat() {}
 }

@@ -1,19 +1,18 @@
-
 package quanta.request;
 
 import quanta.request.base.RequestBase;
 
 public class AppDropRequest extends RequestBase {
-	private String data;
 
-	public String getData() {
-		return this.data;
-	}
+    private String data;
 
-	public void setData(final String data) {
-		this.data = data;
-	}
+    public String getData() {
+        return this.data;
+    }
 
-	public AppDropRequest() {
-	}
+    public void setData(final String data) {
+        this.data = data;
+    }
+
+    public AppDropRequest() {}
 }

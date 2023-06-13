@@ -1,4 +1,3 @@
-
 package quanta.util;
 
 import java.io.File;
@@ -55,7 +54,6 @@ public class MimeTypeUtils {
                 mimeType = getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
             }
         }
-        // log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
         return mimeType;
     }
 

@@ -43,12 +43,16 @@ public class ActPubController extends ServiceBase {
     /**
      * WebFinger GET
      */
-    @RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET,
-            produces = {APConst.CTYPE_JRD_JSON, APConst.CTYPE_ACT_JSON})
+    @RequestMapping(
+        value = APConst.PATH_WEBFINGER,
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_JRD_JSON, APConst.CTYPE_ACT_JSON }
+    )
     @ResponseBody
-    public Object webFinger( //
-            @RequestParam(value = "resource", required = true) String resource, //
-            HttpServletRequest req) {
+    public Object webFinger(
+        @RequestParam(value = "resource", required = true) String resource, //
+        HttpServletRequest req
+    ) {
         apLog.trace("getWebFinger: " + resource);
         APObj ret = apUtil.generateWebFinger(resource);
         if (ret != null) {
@@ -74,12 +78,12 @@ public class ActPubController extends ServiceBase {
      * NOTE: This is returning the HTML of the HOME, not a JSON value
      */
     @RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
-    public void mastodonGetUser( //
-            @PathVariable(value = "userName", required = true) String userName, //
-            HttpServletRequest req, //
-            HttpServletResponse res) throws Exception {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return;
+    public void mastodonGetUser(
+        @PathVariable(value = "userName", required = true) String userName,
+        HttpServletRequest req,
+        HttpServletResponse res
+    ) throws Exception {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return;
         String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
         apLog.trace("Redirecting to: " + url);
         res.sendRedirect(url);
@@ -88,13 +92,13 @@ public class ActPubController extends ServiceBase {
     /*
      * This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page
      */
-    @RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = {APConst.CTYPE_HTML})
-    public void getHTMLForUserId( //
-            @PathVariable(value = "userName", required = true) String userName, //
-            HttpServletRequest req, //
-            HttpServletResponse res) throws Exception {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return;
+    @RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { APConst.CTYPE_HTML })
+    public void getHTMLForUserId(
+        @PathVariable(value = "userName", required = true) String userName, //
+        HttpServletRequest req,
+        HttpServletResponse res
+    ) throws Exception {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return;
         String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
         apLog.trace("Redirecting to: " + url);
         res.sendRedirect(url);
@@ -103,13 +107,14 @@ public class ActPubController extends ServiceBase {
     /**
      * Actor GET
      */
-    @RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
-            produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+    @RequestMapping(
+        value = APConst.ACTOR_PATH + "/{userName}",
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON }
+    )
     @ResponseBody
-    public Object actor( //
-            @PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return null;
+    public Object actor(@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return null;
         apLog.trace("getActor: " + userName);
         APOPerson ret = apub.generatePersonObj(userName);
         if (ret != null) {
@@ -123,12 +128,13 @@ public class ActPubController extends ServiceBase {
     /**
      * Shared Inbox POST
      */
-    @RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST,
-            produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+    @RequestMapping(
+        value = APConst.PATH_INBOX,
+        method = RequestMethod.POST,
+        produces = { APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON }
+    )
     @ResponseBody
-    public Object sharedInboxPost( //
-            @RequestBody byte[] body, //
-            HttpServletRequest req) {
+    public Object sharedInboxPost(@RequestBody byte[] body, HttpServletRequest req) {
         try {
             ActPubService.inboxCount++;
             apub.processInboxPost(req, body);
@@ -145,15 +151,18 @@ public class ActPubController extends ServiceBase {
      * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
      * and the post to the user simultaneously.
      */
-    @RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
-            produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+    @RequestMapping(
+        value = APConst.PATH_INBOX + "/{userName}",
+        method = RequestMethod.POST,
+        produces = { APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON }
+    )
     @ResponseBody
-    public Object inboxPost( //
-            @RequestBody byte[] body, //
-            @PathVariable(value = "userName", required = true) String userName, //
-            HttpServletRequest httpReq) {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return null;
+    public Object inboxPost(
+        @RequestBody byte[] body,
+        @PathVariable(value = "userName", required = true) String userName,
+        HttpServletRequest httpReq
+    ) {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return null;
         try {
             ActPubService.inboxCount++;
             apub.processInboxPost(httpReq, body);
@@ -166,10 +175,9 @@ public class ActPubController extends ServiceBase {
     /**
      * GET JSON of object
      */
-    @RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
+    @RequestMapping(value = { "/" }, method = RequestMethod.GET, produces = { APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON })
     @ResponseBody
-    public Object getJsonObj(HttpServletRequest req, //
-            @RequestParam(value = "id", required = false) String id) {
+    public Object getJsonObj(HttpServletRequest req, @RequestParam(value = "id", required = false) String id) {
         try {
             APObj ret = apOutbox.getResource(req, id);
             if (ret != null) {
@@ -189,15 +197,19 @@ public class ActPubController extends ServiceBase {
     /**
      * Outbox GET
      */
-    @RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
-            produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+    @RequestMapping(
+        value = APConst.PATH_OUTBOX + "/{userName}",
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON }
+    )
     @ResponseBody
     public Object outbox( //
-            @PathVariable(value = "userName", required = true) String userName,
-            @RequestParam(value = "min_id", required = false) String minId,
-            @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return null;
+        @PathVariable(value = "userName", required = true) String userName,
+        @RequestParam(value = "min_id", required = false) String minId,
+        @RequestParam(value = "page", required = false) String page,
+        HttpServletRequest req
+    ) {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return null;
         APObj ret = null;
         if (APConst.TRUE.equals(page)) {
             ret = apOutbox.generateOutboxPage(req, userName, minId);
@@ -227,15 +239,19 @@ public class ActPubController extends ServiceBase {
     /**
      * Followers GET
      */
-    @RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
-            produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+    @RequestMapping(
+        value = APConst.PATH_FOLLOWERS + "/{userName}",
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON }
+    )
     @ResponseBody
-    public Object getFollowers( //
-            @PathVariable(value = "userName", required = false) String userName,
-            @RequestParam(value = "min_id", required = false) String minId,
-            @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return null;
+    public Object getFollowers(
+        @PathVariable(value = "userName", required = false) String userName,
+        @RequestParam(value = "min_id", required = false) String minId,
+        @RequestParam(value = "page", required = false) String page,
+        HttpServletRequest req
+    ) {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return null;
         APObj ret = null;
         if (APConst.TRUE.equals(page)) {
             ret = apFollower.generateFollowersPage(userName, minId);
@@ -255,15 +271,19 @@ public class ActPubController extends ServiceBase {
     /**
      * Following GET
      */
-    @RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
-            produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+    @RequestMapping(
+        value = APConst.PATH_FOLLOWING + "/{userName}",
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON }
+    )
     @ResponseBody
     public Object getFollowing( //
-            @PathVariable(value = "userName", required = false) String userName,
-            @RequestParam(value = "min_id", required = false) String minId,
-            @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
-            return null;
+        @PathVariable(value = "userName", required = false) String userName,
+        @RequestParam(value = "min_id", required = false) String minId,
+        @RequestParam(value = "page", required = false) String page,
+        HttpServletRequest req
+    ) {
+        if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim())) return null;
         APObj ret = null;
         if (APConst.TRUE.equals(page)) {
             ret = apFollowing.generateFollowingPage(userName, minId);
@@ -283,11 +303,16 @@ public class ActPubController extends ServiceBase {
     /**
      * Replies GET
      */
-    @RequestMapping(value = APConst.PATH_REPLIES + "/{nodeId}", method = RequestMethod.GET,
-            produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
+    @RequestMapping(
+        value = APConst.PATH_REPLIES + "/{nodeId}",
+        method = RequestMethod.GET,
+        produces = { APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON }
+    )
     @ResponseBody
     public Object getReplies( //
-            @PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
+        @PathVariable(value = "nodeId", required = true) String nodeId,
+        HttpServletRequest req
+    ) {
         APObj ret = apReplies.generateReplies(nodeId);
         if (ret != null) {
             HttpHeaders hdr = new HttpHeaders();

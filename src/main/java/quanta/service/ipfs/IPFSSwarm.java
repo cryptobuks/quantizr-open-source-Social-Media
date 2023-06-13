@@ -1,9 +1,11 @@
-
 package quanta.service.ipfs;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,13 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSSwarm extends ServiceBase {
@@ -31,8 +30,7 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public Map<String, Object> connect(String peer) {
-        if (!prop.ipfsEnabled())
-            return null;
+        if (!prop.ipfsEnabled()) return null;
         Map<String, Object> ret = null;
         try {
             log.debug("Swarm connect: " + peer);
@@ -68,8 +66,7 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public void connect() {
-        if (!prop.ipfsEnabled())
-            return;
+        if (!prop.ipfsEnabled()) return;
         arun.run(as -> {
             List<String> adrsList = getConnectAddresses(as);
             if (adrsList != null) {

@@ -1,13 +1,15 @@
-
 package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NostrMetadata {
+
     private String name;
     private String username;
+
     @JsonProperty("display_name")
     private String displayName;
+
     private String about;
     private String picture;
     private String banner;
@@ -22,7 +24,7 @@ public class NostrMetadata {
     public String getUsername() {
         return this.username;
     }
-    
+
     public String getDisplayName() {
         return this.displayName;
     }
@@ -34,7 +36,7 @@ public class NostrMetadata {
     public String getPicture() {
         return this.picture;
     }
-    
+
     public String getBanner() {
         return this.banner;
     }
@@ -42,7 +44,7 @@ public class NostrMetadata {
     public String getWebsite() {
         return this.website;
     }
-    
+
     public String getNip05() {
         return this.nip05;
     }
@@ -63,7 +65,7 @@ public class NostrMetadata {
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
-    
+
     public void setAbout(final String about) {
         this.about = about;
     }
@@ -71,11 +73,11 @@ public class NostrMetadata {
     public void setPicture(final String picture) {
         this.picture = picture;
     }
-    
+
     public void setBanner(final String banner) {
         this.banner = banner;
     }
-    
+
     public void setWebsite(final String website) {
         this.website = website;
     }
@@ -88,6 +90,5 @@ public class NostrMetadata {
         this.reactions = reactions;
     }
 
-    public NostrMetadata() {
-    }
+    public NostrMetadata() {}
 }

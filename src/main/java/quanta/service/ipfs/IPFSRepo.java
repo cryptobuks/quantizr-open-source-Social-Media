@@ -1,14 +1,13 @@
-
 package quanta.service.ipfs;
 
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.Cast;
 import quanta.util.XString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSRepo extends ServiceBase {
@@ -33,8 +32,7 @@ public class IPFSRepo extends ServiceBase {
     }
 
     public String gc() {
-        if (!prop.ipfsEnabled())
-            return "IPFS Disabled.";
+        if (!prop.ipfsEnabled()) return "IPFS Disabled.";
         String url = API_REPO + "/gc";
         // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
         // LinkedHashMap.class));

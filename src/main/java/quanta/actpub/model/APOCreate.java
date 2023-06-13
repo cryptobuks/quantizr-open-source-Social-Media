@@ -7,15 +7,19 @@ import quanta.actpub.APConst;
  * Create object.
  */
 public class APOCreate extends APOActivity {
+
     public APOCreate(Map<?, ?> obj) {
         super(obj);
     }
 
     public APOCreate() {
         super();
-        put(context, new APList() //
+        put(
+            context,
+            new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage()));
+                .val(new APOLanguage())
+        );
         put(type, APType.Create);
     }
 

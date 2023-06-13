@@ -1,4 +1,3 @@
-
 package quanta.service.ipfs;
 
 import java.io.InputStream;
@@ -6,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -21,8 +22,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class IPFSDag extends ServiceBase {
@@ -40,8 +39,12 @@ public class IPFSDag extends ServiceBase {
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
-            ResponseEntity<String> response =
-                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response = ipfs.restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                Util.getBasicRequestEntity(),
+                String.class
+            );
             ret = response.getBody();
             log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {
@@ -69,8 +72,7 @@ public class IPFSDag extends ServiceBase {
             return null;
         }
         // oops, looks like a path
-        if (req.getFolder().startsWith("/"))
-            return null;
+        if (req.getFolder().startsWith("/")) return null;
         cid.setVal(req.getFolder());
         folder.setVal(req.getFolder());
         DagNode dagNode = getNode(req.getFolder());

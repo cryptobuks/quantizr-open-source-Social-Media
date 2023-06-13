@@ -7,6 +7,7 @@ import java.util.List;
  * List of objects
  */
 public class APList extends LinkedList<Object> {
+
     public APList() {}
 
     public APList(List<?> val) {

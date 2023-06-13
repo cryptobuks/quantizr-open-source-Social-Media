@@ -3,6 +3,7 @@ package quanta.actpub.model;
 import quanta.actpub.APConst;
 
 public class APOOrderedCollectionPage extends APObj {
+
     public APOOrderedCollectionPage() {
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.OrderedCollectionPage);

@@ -4,6 +4,7 @@ import java.util.Collection;
 import quanta.actpub.APConst;
 
 public class APOOrderedCollection extends APObj {
+
     public APOOrderedCollection() {
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.OrderedCollection);
