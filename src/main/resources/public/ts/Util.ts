@@ -834,7 +834,6 @@ export class Util {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             await promiseDispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
-                console.log("Bookmarks Found: " + S.util.prettyPrint(s.bookmarks));
             });
         }
     }

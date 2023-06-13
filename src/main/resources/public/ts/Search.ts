@@ -435,11 +435,9 @@ export class Search {
             loadFriendsTags,
             applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks,
             protocol: ast.protocolFilter
-        });
+        }, true);
         // console.log("INBOUND NODE FEED: " + S.util.prettyPrint(res.searchResults));
-        // console.log("log check 1");
         S.nodeUtil.processInboundNodes(res.searchResults);
-        //console.log("log check 2");
 
         dispatch("RenderFeedResults", s => {
             FeedTab.inst.openGraphComps = [];

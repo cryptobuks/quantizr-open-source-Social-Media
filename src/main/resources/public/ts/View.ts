@@ -169,7 +169,9 @@ export class View {
                 forceIPFSRefresh: false,
                 singleNode: false,
                 jumpToRss: false
-            });
+            }, 
+            // query as background mode if growing page
+            growingPage);
             S.nodeUtil.processInboundNode(res.node);
 
             if (!res.node) return;
