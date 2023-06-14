@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.EventPublisher;
 import quanta.config.ServiceBase;
+import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 
@@ -58,6 +60,15 @@ public class MongoRepository extends ServiceBase {
                     }
                 )
             );
+    }
+
+    /* Once per day rebuild indexes */
+    @Scheduled(fixedDelay = DateUtil.DAY_MILLIS)
+    public void rebuildIndexes() {
+        arun.run(as -> {
+            mongoUtil.rebuildIndexes(as);
+            return null;
+        });
     }
 
     @PreDestroy
