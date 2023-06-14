@@ -76,7 +76,7 @@ public class UserFeedService extends ServiceBase {
         String myId = searchRoot.getOwner().toHexString();
         crit = crit.and(SubNode.AC + "." + myId).ne(null);
         q.addCriteria(crit);
-        long count = ops.count(q, SubNode.class);
+        long count = opsw.count(null, q);
         res.setNumNew((int) count);
         return res;
     }
@@ -364,7 +364,7 @@ public class UserFeedService extends ServiceBase {
         // Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.
         if (!req.getFromMe() && !req.getFromFriends()) {
             // Filter USER_BLOCK_WORDS if user has defined any
-            SubNode userNode = read.getNode(ms, ThreadLocals.getSC().getUserNodeId(), false);
+            SubNode userNode = opsw.findById(null, ThreadLocals.getSC().getUserNodeId());
             if (userNode != null) {
                 String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
                 if (StringUtils.isNotEmpty(blockedWords)) {

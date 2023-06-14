@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
@@ -51,7 +52,7 @@ public class MongoTemplateWrapper extends ServiceBase {
             start = System.currentTimeMillis();
         }
 
-        long count = ops.count(query, entityClass);
+        long count = opsw.count(null, query);
         if (logging) {
             log.debug("count=" + count + "t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
@@ -140,7 +141,7 @@ public class MongoTemplateWrapper extends ServiceBase {
             start = System.currentTimeMillis();
         }
 
-        long count = ops.count(query, SubNode.class);
+        long count = opsw.count(null, query);
         if (logging) {
             log.debug("count: " + count + " t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
@@ -197,6 +198,15 @@ public class MongoTemplateWrapper extends ServiceBase {
                 " t=" +
                 DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true)
             );
+        }
+        return obj;
+    }
+
+    public SubNode findById(MongoSession ms, Object id) {
+        if (id == null) return null;
+        SubNode obj = ops.findById(id, SubNode.class);
+        if (obj != null && ms != null) {
+            auth.auth(ms, obj, PrivilegeType.READ);
         }
         return obj;
     }

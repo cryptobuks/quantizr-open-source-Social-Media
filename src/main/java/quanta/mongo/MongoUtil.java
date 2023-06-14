@@ -106,28 +106,6 @@ public class MongoUtil extends ServiceBase {
         return ret;
     }
 
-    /**
-     * Runs the mongo 'findById' but if it finds a node that's already in memory we return the memory
-     * object.
-     *
-     * NOTE: All security checks are done external to this method.
-     */
-    @PerfMon
-    public SubNode findById(ObjectId objId) {
-        if (objId == null) return null;
-        // NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
-        return mongoUtil.ops_findById(objId);
-    }
-
-    @PerfMon
-    public SubNode ops_findById(ObjectId objId) {
-        return ops.findById(objId, SubNode.class);
-    }
-
-    public SubNode findByIdNoCache(ObjectId objId) {
-        return ops.findById(objId, SubNode.class);
-    }
-
     /*
      * Takes a path like "/a/b/" OR "/a/b" and finds any random longer path that's not currently used.
      * Note that since we don't require to end with "/" this function can be extending an existing leaf

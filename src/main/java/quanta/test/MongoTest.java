@@ -90,7 +90,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
     public void testComplexProperties() {
         String nodeId = "61bffa8a0e86eb44d1f04dc6";
         MongoSession as = asUser(PrincipalName.ADMIN.s());
-        SubNode node = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+        SubNode node = opsw.findById(null, new ObjectId(nodeId));
         // APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
         node.set(
             NodeProp.ACT_PUB_TAG,
@@ -115,13 +115,12 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
     public void testDirtyReads() {
         String nodeId = "61bcdd5b47596e66a7a11ce5";
-        MongoSession as = asUser(PrincipalName.ADMIN.s());
-        SubNode node1 = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+        SubNode node1 = opsw.findById(null, new ObjectId(nodeId));
         node1.setContent("content from MongoTest.testDirtyReads");
         log.debug("node1: hashCode=" + node1.hashCode());
         // This will verify that the MongoEventListener is capable of detecting the dirty read and
         // logging a warning about it.
-        SubNode node2 = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+        SubNode node2 = opsw.findById(null, new ObjectId(nodeId));
         log.debug("node2: hashCode=" + node2.hashCode());
         // update.saveSession(ms);
     }

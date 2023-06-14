@@ -131,7 +131,7 @@ public class CallProcessor extends ServiceBase {
                     if (e.getMessage() != null) {
                         orb.setMessage("Failed: " + e.getMessage());
                     } else {
-                        orb.setMessage("Failed.");
+                        orb.setMessage("Oops, something went wrong.");
                     }
                 }
                 orb.setStackTrace(ExceptionUtils.getStackTrace(e));

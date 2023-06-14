@@ -453,7 +453,7 @@ public class ActPubFollowing extends ServiceBase {
     public long countFollowingOfLocalUser(MongoSession ms, String userName) {
         Query q = findFollowingOfUser_query(ms, userName);
         if (q == null) return 0;
-        return ops.count(q, SubNode.class);
+        return opsw.count(null, q);
     }
 
     private Query findFollowingOfUser_query(MongoSession ms, String userName) {

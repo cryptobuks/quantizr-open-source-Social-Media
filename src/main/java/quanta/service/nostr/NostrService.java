@@ -487,19 +487,7 @@ public class NostrService extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(id);
         q.addCriteria(crit);
-        SubNode ret = opsw.findOne(ms, q);
-        if (allowAuth) {
-            SubNode _ret = ret;
-            // we run with 'ms' if it's non-null, or with admin if ms is null
-            arun.run(
-                ms,
-                as -> {
-                    auth.auth(as, _ret, PrivilegeType.READ);
-                    return null;
-                }
-            );
-        }
-        return ret;
+        return opsw.findOne(allowAuth ? ms : null, q);
     }
 
     public boolean isNostrNode(SubNode node) {

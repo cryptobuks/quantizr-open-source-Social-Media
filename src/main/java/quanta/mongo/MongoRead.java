@@ -54,7 +54,7 @@ public class MongoRead extends ServiceBase {
     public SubNode getDbRoot() {
         synchronized (dbRootsLock) {
             if (dbRoot == null) {
-                dbRoot = findNodeByPath(NodePath.ROOT_PATH);
+                dbRoot = findNodeByPath(null, NodePath.ROOT_PATH);
             }
             return dbRoot;
         }
@@ -191,7 +191,7 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read")
     public long getNodeCount() {
         Query q = new Query();
-        return ops.count(q, SubNode.class);
+        return opsw.count(null, q);
     }
 
     /* If this 'path' is known to exist and never needs to be validated, return true */
@@ -305,7 +305,7 @@ public class MongoRead extends ServiceBase {
              * pass a null session here to cause adminSession to be used which is required to get a user node,
              * but it always safe to get this node this way here.
              */
-            userNode = getUserNodeByUserName(null, userName);
+            userNode = getUserNodeByUserName(allowAuth ? ms : null, userName);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
                 return null;
@@ -318,12 +318,7 @@ public class MongoRead extends ServiceBase {
             name = name.substring(colonIdx + 1);
         }
         q.addCriteria(Criteria.where(SubNode.NAME).is(name).and(SubNode.OWNER).is(nodeOwnerId));
-        SubNode ret = opsw.findOne(ms, q);
-        if (ret != null) {}
-        if (allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
-        }
-        return ret;
+        return opsw.findOne(allowAuth ? ms : null, q);
     }
 
     @PerfMon(category = "read(m,i)")
@@ -361,7 +356,6 @@ public class MongoRead extends ServiceBase {
             );
         }
         SubNode ret = null;
-        boolean authPending = true;
         if (identifier.startsWith(".")) {
             ret = nostr.getNodeByNostrId(ms, identifier, allowAuth);
         } //
@@ -374,7 +368,6 @@ public class MongoRead extends ServiceBase {
         } //
         else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
-            authPending = false;
         } //
         else if (!identifier.startsWith("/")) { // else if search doesn't start with a slash then it's a nodeId and not a path
             if (ThreadLocals.getSC() != null && ThreadLocals.getSC().readFromAdminCache()) {
@@ -387,24 +380,20 @@ public class MongoRead extends ServiceBase {
             }
 
             if (ret == null) {
-                ret = getNode(ms, new ObjectId(identifier), allowAuth);
+                ret = opsw.findById(allowAuth ? ms : null, new ObjectId(identifier));
             }
-            authPending = false;
         } else { // otherwise this is a path lookup
-            ret = findNodeByPath(identifier);
-        }
-        if (authPending && allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
+            ret = findNodeByPath(ms, identifier);
         }
         return ret;
     }
 
     @PerfMon(category = "read")
-    public SubNode findNodeByPath(String path) {
+    public SubNode findNodeByPath(MongoSession ms, String path) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.PATH).is(path));
-        return opsw.findOne(null, q);
+        return opsw.findOne(ms, q);
     }
 
     public boolean pathExists(String path) {
@@ -422,21 +411,13 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read(m,o)")
     public SubNode getNode(MongoSession ms, ObjectId objId) {
-        return getNode(ms, objId, true);
+        return opsw.findById(ms, objId);
     }
 
     @PerfMon(category = "read")
     public SubNode getOwner(MongoSession ms, SubNode node, boolean allowAuth) {
-        return getNode(ms, node.getOwner(), allowAuth);
-    }
-
-    @PerfMon(category = "read(m,o,a)")
-    public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth) {
-        SubNode ret = mongoUtil.findById(objId);
-        if (ret != null && allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
-        }
-        return ret;
+        if (node == null) return null;
+        return opsw.findById(allowAuth ? ms : null, node.getOwner());
     }
 
     /*
@@ -446,11 +427,11 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read(m,o,a,r)")
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
-        SubNode ret = getNode(ms, objId, allowAuth);
+        SubNode ret = opsw.findById(allowAuth ? ms : null, objId);
 
         while (ret == null && retries-- > 0) {
             Util.sleep(3000);
-            ret = getNode(ms, objId, allowAuth);
+            ret = opsw.findById(allowAuth ? ms : null, objId);
         }
         return ret;
     }
@@ -493,11 +474,7 @@ public class MongoRead extends ServiceBase {
          * If node is in pending area take the pending part out of the path to get the real parent
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
-        SubNode ret = getNode(ms, parentPath, allowAuth, null);
-        if (ret != null && allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
-        }
-        return ret;
+        return getNode(ms, parentPath, allowAuth, null);
     }
 
     @PerfMon(category = "read")
@@ -704,7 +681,7 @@ public class MongoRead extends ServiceBase {
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
         q.limit(1);
-        SubNode nodeFound = opsw.findOne(ms, q);
+        SubNode nodeFound = opsw.findOne(null, q);
         if (nodeFound == null) {
             return 0L;
         }
@@ -735,7 +712,7 @@ public class MongoRead extends ServiceBase {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).lt(node.getOrdinal()));
         q.limit(1);
-        return opsw.findOne(ms, q);
+        return opsw.findOne(null, q);
     }
 
     // if 'parent' of 'node' is known it should be passed in, or else null passed in, and parent will be
@@ -760,7 +737,7 @@ public class MongoRead extends ServiceBase {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).gt(node.getOrdinal()));
         q.limit(1);
-        return opsw.findOne(ms, q);
+        return opsw.findOne(null, q);
     }
 
     /*
@@ -1145,19 +1122,7 @@ public class MongoRead extends ServiceBase {
                 .and(SubNode.TYPE)
                 .is(NodeType.ACCOUNT.s());
         q.addCriteria(crit);
-        SubNode ret = opsw.findOne(ms, q);
-        if (allowAuth) {
-            SubNode _ret = ret;
-            // we run with 'ms' if it's non-null, or with admin if ms is null
-            arun.run(
-                ms,
-                as -> {
-                    auth.auth(as, _ret, PrivilegeType.READ);
-                    return null;
-                }
-            );
-        }
-        return ret;
+        return opsw.findOne(allowAuth ? ms : null, q);
     }
 
     @PerfMon(category = "read")
@@ -1184,23 +1149,11 @@ public class MongoRead extends ServiceBase {
             .where(SubNode.PATH)
             .regex(mongoUtil.regexDirectChildrenOfPath(pathToQuery))
             .and(SubNode.PROPS + "." + NodeProp.USER)
-            .regex("^" + user + "$")
+            .is(user)
             .and(SubNode.TYPE)
             .is(NodeType.ACCOUNT.s());
         q.addCriteria(crit);
-        SubNode ret = opsw.findOne(ms, q);
-        if (allowAuth) {
-            SubNode _ret = ret;
-            // we run with 'ms' if it's non-null, or with admin if ms is null
-            arun.run(
-                ms,
-                as -> {
-                    auth.auth(as, _ret, PrivilegeType.READ);
-                    return null;
-                }
-            );
-        }
-        return ret;
+        return opsw.findOne(allowAuth ? ms : null, q);
     }
 
     /*
@@ -1286,9 +1239,7 @@ public class MongoRead extends ServiceBase {
             .and(SubNode.TYPE)
             .is(type);
         q.addCriteria(crit);
-        SubNode ret = opsw.findOne(ms, q);
-        auth.auth(ms, ret, PrivilegeType.READ);
-        return ret;
+        return opsw.findOne(ms, q);
     }
 
     // ========================================================================
@@ -1586,6 +1537,6 @@ public class MongoRead extends ServiceBase {
             .and(SubNode.ORDINAL)
             .lt(node.getOrdinal());
         q.addCriteria(crit);
-        return ops.count(q, SubNode.class);
+        return opsw.count(null, q);
     }
 }

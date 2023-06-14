@@ -48,7 +48,7 @@ public class MongoUpdate extends ServiceBase {
     public void setParentHasChildren(SubNode node) {
         if (node == null) return;
         arun.run(as -> {
-            SubNode parent = read.findNodeByPath(node.getParentPath());
+            SubNode parent = read.findNodeByPath(null, node.getParentPath());
             if (parent != null) {
                 parent.setHasChildren(true);
             }
@@ -68,8 +68,7 @@ public class MongoUpdate extends ServiceBase {
                 ops.save(node);
                 return null;
             });
-        } else // thread. // otherwise leave same/current threadlocals as is and MongoEventListener will auth based on this
-        {
+        } else { // thread. // otherwise leave same/current threadlocals as is and MongoEventListener will auth based on this
             ops.save(node);
         }
         ThreadLocals.clean(node);
@@ -160,13 +159,9 @@ public class MongoUpdate extends ServiceBase {
                     SubNode ipfsNode = read.findByIPFSPinned(as, pin);
                     Attachment att = ipfsNode.getFirstAttachment();
                     // if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
-                    if (
-                        ipfsNode == null
-                    ) {} else // to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
-                    // are
-                    // 'backing' the MFS file storage don't even appear in the pinning system.
-                    // ipfsNode = read.findByCID(as, pin);
-                    {
+                    if (ipfsNode == null) {
+                        //
+                    } else { // ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
                         attachment = true;
                     }
                     if (ipfsNode != null) {

@@ -234,7 +234,7 @@ public class ActPubFollower extends ServiceBase {
     public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
         Query q = getPeopleByUserName_query(ms, userNode, userName);
         if (q == null) return 0L;
-        return ops.count(q, SubNode.class);
+        return opsw.count(null, q);
     }
 
     /* caller can pass userName only or else pass userNode if it's already available */

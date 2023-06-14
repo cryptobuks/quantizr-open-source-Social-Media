@@ -650,6 +650,7 @@ public class AttachmentService extends ServiceBase {
             if (auth.isAnAccountNode(ms, node)) {
                 allowAuth = false;
             }
+
             if (allowAuth) {
                 auth.auth(ms, node, PrivilegeType.READ);
             }
@@ -661,6 +662,7 @@ public class AttachmentService extends ServiceBase {
             if (fileName == null) {
                 fileName = "filename";
             }
+
             InputStream is = getStream(ms, attName, node, allowAuth);
             if (is == null) {
                 throw new RuntimeException("Image not found.");
