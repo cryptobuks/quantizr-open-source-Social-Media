@@ -86,6 +86,7 @@ public class MongoDelete extends ServiceBase {
         q.addCriteria(crit);
         HashSet<String> keys = new HashSet<>();
         Iterable<SubNode> nodes = opsw.find(ms, q);
+
         for (SubNode node : nodes) {
             if (node.getOwner() == null) continue;
             String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID);
@@ -294,6 +295,7 @@ public class MongoDelete extends ServiceBase {
     public void bulkSetPropsByIdObjs(Collection<ObjectId> ids, String prop, Object val) {
         BulkOperations bops = null;
         int batchSize = 0;
+
         for (ObjectId id : ids) {
             bops = update.bulkOpSetPropVal(bops, id, prop, null);
             if (++batchSize > Const.MAX_BULK_OPS) {
@@ -310,6 +312,7 @@ public class MongoDelete extends ServiceBase {
     public void bulkSetPropsByIdStr(Collection<String> ids, String prop, Object val) {
         BulkOperations bops = null;
         int batchSize = 0;
+
         for (String id : ids) {
             bops = update.bulkOpSetPropVal(bops, new ObjectId(id), prop, null);
             if (++batchSize > Const.MAX_BULK_OPS) {
@@ -429,6 +432,7 @@ public class MongoDelete extends ServiceBase {
             });
         nodesProcessed.setVal(0);
         int passes = 0;
+
         while (passes++ < 20) {
             log.debug("Running Orphan Pass: " + passes);
             LongVal deletesInPass = new LongVal();
@@ -509,6 +513,7 @@ public class MongoDelete extends ServiceBase {
         List<SubNode> nodes = new LinkedList<>();
         HashSet<ObjectId> parentIds = new HashSet<>();
         int batchSize = 0;
+
         for (String nodeId : req.getNodeIds()) {
             // lookup the node we're going to delete, we call with allowAuth, becasuse it would be redundant
             // since the next thing we do is an 'ownerAuth', which is even more restrictive
@@ -748,6 +753,7 @@ public class MongoDelete extends ServiceBase {
             criterias.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
         }
         Query q = new Query();
+
         for (CriteriaDefinition c : criterias) {
             q.addCriteria(c);
         }

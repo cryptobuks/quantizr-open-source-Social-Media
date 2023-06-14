@@ -72,6 +72,7 @@ public class AclService extends ServiceBase {
         boolean batchMode = false;
         Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
         int batchSize = 0;
+
         for (SubNode n : read.getSubGraph(
             ms,
             node,
@@ -124,6 +125,7 @@ public class AclService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         boolean success = true;
+
         for (String principal : req.getPrincipals()) {
             principal = XString.stripIfStartsWith(principal, "@");
             if (!addPrivilege(ms, null, node, principal, null, req.getPrivileges(), res)) {
@@ -211,9 +213,9 @@ public class AclService extends ServiceBase {
                 throw new RuntimeEx("Cannot make an encrypted node public.");
             }
             mapKey = PrincipalName.PUBLIC.s();
-        } else/*
+        } else /*
          * otherwise we're sharing to a person so we now get their userNodeId to use as map key
-         */ {
+         */{
             // if no principal node passed in, then look it up
             if (principalNode == null) {
                 String _principal = principal;
@@ -411,8 +413,10 @@ public class AclService extends ServiceBase {
          * We walk up the tree util we get to the root, or find ownership on node, or any of it's parents
          */
         int sanityCheck = 0;
+
         while (++sanityCheck < 100) {
             List<MongoPrincipal> principals = getNodePrincipals(ms, node);
+
             for (MongoPrincipal p : principals) {
                 /*
                  * todo-3: this is a spot that can be optimized. We should be able to send just the userNodeId back
@@ -459,8 +463,7 @@ public class AclService extends ServiceBase {
             node.putAc(key, new AccessControl(null, prvs));
         } else { // otherwise first check to see if it's already added
             AccessControl ac = node.getAc().get(key);
-            if (ac != null && ac.getPrvs().equals(prvs)) {} else // else need to add it. // already had the correct ac, nothing to do here
-            {
+            if (ac != null && ac.getPrvs().equals(prvs)) {} else { // else need to add it. // already had the correct ac, nothing to do here
                 node.putAc(key, new AccessControl(null, prvs));
             }
         }

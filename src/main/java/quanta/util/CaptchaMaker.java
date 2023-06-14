@@ -25,6 +25,7 @@ public class CaptchaMaker {
     /* returns a random string of at least 5 numeric characters */
     public static String createCaptchaString() {
         StringBuilder captcha = new StringBuilder();
+
         while (captcha.length() < CAPTCHA_NUM_CHARS) {
             /* add random character between 0 and 9 */
             captcha.append(String.valueOf(rand.nextInt(10)));
@@ -62,6 +63,7 @@ public class CaptchaMaker {
             g.setFont(fontKnown);
         } else {
             int fontPoints = 12;
+
             while (fontPoints < 50) {
                 g.setFont(fontKnown = new Font("Courier New", Font.BOLD, fontPoints));
 

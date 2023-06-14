@@ -49,6 +49,7 @@ public class ImportTarService extends ImportArchiveBase {
             this.session = ms;
             zis = new TarArchiveInputStream(is);
             TarArchiveEntry entry;
+
             while ((entry = zis.getNextTarEntry()) != null) {
                 if (!entry.isDirectory()) {
                     processFile(entry, zis, userNode.getOwner());

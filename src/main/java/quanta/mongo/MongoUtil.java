@@ -145,6 +145,7 @@ public class MongoUtil extends ServiceBase {
             return path;
         }
         int tries = 0;
+
         while (true) {
             /*
              * Append one random char to path. Statistically if we keep adding characters it becomes
@@ -247,7 +248,8 @@ public class MongoUtil extends ServiceBase {
         // ensure node starts with /r/p
         if (pending && !node.getPath().startsWith(pendingPath)) {
             node.setPath(node.getPath().replace(rootPath, pendingPath));
-        } else if (!pending && node.getPath().startsWith(pendingPath)) { // ensure node starts with /r and not /r/p
+        } //
+        else if (!pending && node.getPath().startsWith(pendingPath)) { // ensure node starts with /r and not /r/p
             // get pendingPath out of the path, first
             String path = node.getPath().replace(pendingPath, rootPath);
             path = findAvailablePath(path);
@@ -312,6 +314,7 @@ public class MongoUtil extends ServiceBase {
     public int dump(String message, Iterable<SubNode> iter) {
         int count = 0;
         log.debug("    " + message);
+
         for (SubNode node : iter) {
             log.debug("    DUMP node: " + XString.prettyPrint(node));
             count++;
@@ -361,6 +364,7 @@ public class MongoUtil extends ServiceBase {
                 }
             });
         log.debug("pre scan...deleting: " + toDel.size());
+
         for (SubNode node : toDel) {
             delete.delete(ms, node);
         }
@@ -372,6 +376,7 @@ public class MongoUtil extends ServiceBase {
             null,
             null
         );
+
         for (SubNode acctNode : accntNodes) {
             String userName = acctNode.getStr(NodeProp.USER.s());
             if (userName == null) continue;
@@ -425,7 +430,8 @@ public class MongoUtil extends ServiceBase {
                 // if this is a local node
                 if (localPathPart.contains(shortPiece)) {
                     newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
-                } else if (remotePathPart.contains(shortPiece)) {
+                } //
+                else if (remotePathPart.contains(shortPiece)) {
                     newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
                 } else {
                     return;
@@ -674,9 +680,11 @@ public class MongoUtil extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         sb.append("INDEXES LIST\n:");
         List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
+
         for (IndexInfo idx : indexes) {
             List<IndexField> indexFields = idx.getIndexFields();
             sb.append("INDEX EXISTS: " + idx.getName() + "\n");
+
             for (IndexField idxField : indexFields) {
                 sb.append("    " + idxField.toString() + "\n");
             }

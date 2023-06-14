@@ -268,6 +268,7 @@ public class FileUtils extends ServiceBase {
         StringBuilder ret = new StringBuilder();
         char c;
         boolean lastWasDash = false;
+
         for (int i = 0; i < length; i++) {
             c = text.charAt(i);
             if (Character.isLetter(c) || Character.isDigit(c) || c == '.' || c == '-' || c == '_') {

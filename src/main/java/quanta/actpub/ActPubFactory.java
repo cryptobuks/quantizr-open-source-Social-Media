@@ -189,6 +189,7 @@ public class ActPubFactory extends ServiceBase {
         List<String> toActors = new LinkedList<>();
         List<String> ccActors = new LinkedList<>();
         APList tagList = includeTags ? new APList() : null;
+
         for (String userName : toUserNames) {
             try {
                 String actorUrl = null;
@@ -270,6 +271,7 @@ public class ActPubFactory extends ServiceBase {
     public List<APObj> makeAPONotes(MongoSession as, List<SubNode> nodes, SubNode parent) {
         LinkedList<APObj> items = new LinkedList<>();
         if (nodes == null || nodes.isEmpty()) return items;
+
         for (SubNode node : nodes) {
             items.add(makeAPONote(as, node, parent));
         }

@@ -203,6 +203,7 @@ public class AttachmentService extends ServiceBase {
                 }
                 // get max amount user is allowed
                 Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA);
+
                 for (MultipartFile uploadFile : uploadFiles) {
                     binTotal += uploadFile.getSize();
                     // check if user went over max and fail the API call if so.
@@ -248,8 +249,8 @@ public class AttachmentService extends ServiceBase {
             // layout
             if (imageCount >= 9) {
                 node.set(NodeProp.LAYOUT, "c3");
-            } else // switch to that layout. // otherwise, if we have enough images to lay it out into a square of 2 cols
-            if (imageCount >= 2) {
+            } //
+            else if (imageCount >= 2) { // switch to that layout. // otherwise, if we have enough images to lay it out into a square of 2 cols
                 node.set(NodeProp.LAYOUT, "c2");
             }
             update.saveSession(ms);
@@ -299,7 +300,8 @@ public class AttachmentService extends ServiceBase {
             String mkdown = mail.convertEmailToMarkdown(is);
             node.setContent(mkdown);
             update.save(ms, node);
-        } else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) { //
+        } //
+        else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) { //
             /*
              * This is a prototype-scope bean, with state for processing one import at a time
              */
@@ -531,6 +533,7 @@ public class AttachmentService extends ServiceBase {
 
     public String getNextAttachmentKey(SubNode node) {
         int imgIdx = 1;
+
         while (node.getAttachment("img" + String.valueOf(imgIdx), false, false) != null) {
             imgIdx++;
         }
@@ -978,11 +981,11 @@ public class AttachmentService extends ServiceBase {
                     sourceUrl,
                     false
                 );
-            } else/*
+            } else /*
              * if not an image extension, we can just stream directly into the database, but we want to try to
              * get the mime type first, from calling detectImage so that if we do detect its an image we can
              * handle it as one.
-             */ {
+             */{
                 if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
                     HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                     HttpGet request = new HttpGet(sourceUrl);
@@ -1326,9 +1329,9 @@ public class AttachmentService extends ServiceBase {
                                 // todo-1: does grid support bulkOp deleting?
                                 grid.delete(q);
                                 delCount++;
-                            } else/*
+                            } else /*
                              * else update the UserStats by adding the file length to the total for this user
-                             */ {
+                             */{
                                 UserStats stats = statsMap.get(subNode.getOwner());
                                 if (stats == null) {
                                     stats = new UserStats();

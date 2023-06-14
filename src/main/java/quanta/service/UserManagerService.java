@@ -120,11 +120,11 @@ public class UserManagerService extends ServiceBase {
             // just as a precaution update the sc userName to anon values
             sc.setUserName(PrincipalName.ANON.s());
             sc.setUserNodeId(null);
-        } else/* Admin Login */ if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
+        } else /* Admin Login */if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
             // springLogin throws exception if it fails.
             springLogin(req.getUserName(), req.getPassword(), httpReq);
             sc.setAuthenticated(req.getUserName(), null);
-        } else/* User Login */ {
+        } else /* User Login */{
             // lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
             userNode = arun.run(as -> read.getUserNodeByUserName(as, req.getUserName()));
             String userName = userNode.getStr(NodeProp.USER);
@@ -610,6 +610,7 @@ public class UserManagerService extends ServiceBase {
         if (blockedWords == null) return null;
         HashSet<String> wordsSet = new HashSet<>();
         StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
+
         while (t.hasMoreTokens()) {
             wordsSet.add(t.nextToken());
         }
@@ -746,7 +747,8 @@ public class UserManagerService extends ServiceBase {
         if (users.size() == 1) {
             String ret = addFriend(ms, userDoingAction, null, users.get(0));
             res.setMessage(ret);
-        } else if (users.size() > 1) { // else if following multiple users run in an async exector thread
+        } //
+        else if (users.size() > 1) { // else if following multiple users run in an async exector thread
             // For now we only allow FollowBot to do multiple-user follows
             if (!userDoingAction.equals(PrincipalName.FOLLOW_BOT.s())) {
                 throw new RuntimeException("Account not authorized for multi-follows.");
@@ -860,7 +862,8 @@ public class UserManagerService extends ServiceBase {
             if (_userNode == null) {
                 if (nostrPubKey != null) {
                     userNode = read.getUserNodeByUserName(as, "." + nostrPubKey);
-                } else if (userId == null) {
+                } //
+                else if (userId == null) {
                     userNode = read.getUserNodeByUserName(as, sessionUserName);
                 } else {
                     userNode = read.getNode(as, userId, false, null);
@@ -1266,7 +1269,8 @@ public class UserManagerService extends ServiceBase {
                 // this regex simply is "Starts with a period"
                 moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
             }
-        } else if ("blocks".equals(type)) { //
+        } //
+        else if ("blocks".equals(type)) { //
             nodeType = NodeType.BLOCKED_USERS.s();
         } else {
             throw new RuntimeException("Invalid type: " + type);
@@ -1274,6 +1278,7 @@ public class UserManagerService extends ServiceBase {
         List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, userName, true, moreCriteria);
         if (friendNodes != null) {
             List<FriendInfo> friends = new LinkedList<>();
+
             for (SubNode friendNode : friendNodes) {
                 FriendInfo fi = buildPersonInfoFromFriendNode(ms, friendNode);
                 if (fi != null) {
@@ -1392,13 +1397,15 @@ public class UserManagerService extends ServiceBase {
         int foreignApCount = 0;
         StringBuilder sb = new StringBuilder();
         Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, true, true);
+
         for (SubNode accountNode : accountNodes) {
             String userName = accountNode.getStr(NodeProp.USER);
             if (userName != null) {
                 // if account is a 'foreign server' one, then clean it up
                 if (userName.startsWith(".")) {
                     foreignNostrCount++;
-                } else if (userName.contains("@")) {
+                } //
+                else if (userName.contains("@")) {
                     foreignApCount++;
                 } else {
                     localUserCount++;

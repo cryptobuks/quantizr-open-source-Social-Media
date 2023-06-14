@@ -55,11 +55,14 @@ public class NodeMoveService extends ServiceBase {
         }
         if ("up".equals(req.getTargetName())) {
             moveNodeUp(ms, node);
-        } else if ("down".equals(req.getTargetName())) {
+        } //
+        else if ("down".equals(req.getTargetName())) {
             moveNodeDown(ms, node);
-        } else if ("top".equals(req.getTargetName())) {
+        } //
+        else if ("top".equals(req.getTargetName())) {
             moveNodeToTop(ms, node);
-        } else if ("bottom".equals(req.getTargetName())) {
+        } //
+        else if ("bottom".equals(req.getTargetName())) {
             moveNodeToBottom(ms, node);
         } else {
             throw new RuntimeEx("Invalid target type: " + req.getTargetName());
@@ -129,7 +132,8 @@ public class NodeMoveService extends ServiceBase {
             SubNode node = read.getNode(ms, nodeId);
             if (parentPath == null) {
                 parentPath = node.getParentPath();
-            } else if (!parentPath.equals(node.getParentPath())) {
+            } //
+            else if (!parentPath.equals(node.getParentPath())) {
                 res.setMessage("Failed: All nodes must be under the same parent node.");
                 res.setSuccess(false);
                 return res;
@@ -146,6 +150,7 @@ public class NodeMoveService extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         SubNode firstNode = null;
         int counter = 0;
+
         for (SubNode n : nodes) {
             if (firstNode == null) {
                 firstNode = n;
@@ -207,19 +212,18 @@ public class NodeMoveService extends ServiceBase {
         // location==inside
         if (location.equalsIgnoreCase("inside")) {
             curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
-        } else // location==inline (todo-2: rename this to inline-below -- or better yet, do an
-        // enum)
-        if (location.equalsIgnoreCase("inline")) {
+        } else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to inline-below -- or better yet, do an
             curTargetOrdinal = targetNode.getOrdinal() + 1;
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
-        } else // location==inline-above
-        if (location.equalsIgnoreCase("inline-above")) {
+        } //
+        else if (location.equalsIgnoreCase("inline-above")) { // location==inline-above
             curTargetOrdinal = targetNode.getOrdinal();
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
         }
         String sourceParentPath = null;
         List<SubNode> nodesToMove = new ArrayList<SubNode>();
         SubNode nodeParent = null;
+
         for (String nodeId : nodeIds) {
             SubNode node = read.getNode(ms, nodeId);
             auth.ownerAuth(ms, node);
@@ -313,6 +317,7 @@ public class NodeMoveService extends ServiceBase {
         boolean removeOrphans = !fast;
         BulkOperations bops = null;
         int batchSize = 0;
+
         for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
                 throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);

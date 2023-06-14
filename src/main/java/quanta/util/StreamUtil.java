@@ -19,7 +19,8 @@ public class StreamUtil {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (obj instanceof ImageReader) {
+            } //
+            else if (obj instanceof ImageReader) {
                 try {
                     ((ImageReader) obj).dispose();
                 } catch (Exception e) {

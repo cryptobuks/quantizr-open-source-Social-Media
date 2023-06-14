@@ -86,6 +86,7 @@ public class MongoRead extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PROPS + "." + prop).is(val);
         q.addCriteria(crit);
         Iterable<SubNode> iter = opsw.find(null, q);
+
         for (SubNode node : iter) {
             log.debug("NODE: " + XString.prettyPrint(node));
         }
@@ -216,6 +217,7 @@ public class MongoRead extends ServiceBase {
         int sanityCheck = 0;
         // if this is a path we KNOW exists, return false
         if (knownPath(path)) return false;
+
         while (sanityCheck++ < 1000) {
             // get parent path
             path = XString.truncAfterLast(path, "/");
@@ -297,8 +299,7 @@ public class MongoRead extends ServiceBase {
             nodeOwnerId = getDbRoot().getOwner();
         } else /*
          * If there is a colon in the name then it's of the format 'userName:nodeName'
-         */
-        {
+         */{
             String userName = name.substring(0, colonIdx);
             /*
              * pass a null session here to cause adminSession to be used which is required to get a user node,
@@ -363,16 +364,19 @@ public class MongoRead extends ServiceBase {
         boolean authPending = true;
         if (identifier.startsWith(".")) {
             ret = nostr.getNodeByNostrId(ms, identifier, allowAuth);
-        } else if (identifier.startsWith("~")) {
+        } //
+        else if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
             ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, null);
-        } else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
+        } //
+        else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
             authPending = false;
-        } else if (!identifier.startsWith("/")) { // else if search doesn't start with a slash then it's a nodeId and not a path
+        } //
+        else if (!identifier.startsWith("/")) { // else if search doesn't start with a slash then it's a nodeId and not a path
             if (ThreadLocals.getSC() != null && ThreadLocals.getSC().readFromAdminCache()) {
                 synchronized (SystemService.adminNodesCacheLock) {
                     TreeNode tn = system.adminNodesCacheMap.get(identifier);
@@ -443,6 +447,7 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read(m,o,a,r)")
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
         SubNode ret = getNode(ms, objId, allowAuth);
+
         while (ret == null && retries-- > 0) {
             Util.sleep(3000);
             ret = getNode(ms, objId, allowAuth);
@@ -526,6 +531,7 @@ public class MongoRead extends ServiceBase {
 
         Iterable<SubNode> iter = opsw.find(ms, q);
         List<String> nodeIds = new LinkedList<>();
+
         for (SubNode n : iter) {
             nodeIds.add(n.getIdStr());
         }
@@ -623,6 +629,7 @@ public class MongoRead extends ServiceBase {
                     List<SubNode> ret = new LinkedList<>();
                     if (skip < 0) skip = 0;
                     int idx = 0;
+
                     for (TreeNode c : tn.children) {
                         if (skip > 0) {
                             skip--;
@@ -911,10 +918,11 @@ public class MongoRead extends ServiceBase {
                     // to sort in order (not rev-chron)
                     sortDir = "ASC";
                     criterias.add(Criteria.where(sortField).gt(new Date().getTime()));
-                } else if ("pastOnly".equals(timeRangeType)) { //
+                } //
+                else if ("pastOnly".equals(timeRangeType)) { //
                     criterias.add(Criteria.where(sortField).lt(new Date().getTime()));
-                } else // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
-                if ("all".equals(timeRangeType)) {
+                } //
+                else if ("all".equals(timeRangeType)) { // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
                     criterias.add(Criteria.where(sortField).ne(null));
                 }
             }
@@ -977,6 +985,7 @@ public class MongoRead extends ServiceBase {
             return results.getMappedResults();
         } else { // Otherwise a standard Query.
             Query q = new Query();
+
             for (CriteriaDefinition c : criterias) {
                 q.addCriteria(c);
             }
@@ -1558,6 +1567,7 @@ public class MongoRead extends ServiceBase {
         }
 
         tn.children.sort((a, b) -> a.node.getOrdinal().compareTo(b.node.getOrdinal()));
+
         for (TreeNode tni : tn.children) {
             traverseTree(tni, doc);
 

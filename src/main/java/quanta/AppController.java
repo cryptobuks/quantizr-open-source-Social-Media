@@ -258,14 +258,17 @@ public class AppController extends ServiceBase implements ErrorController {
             boolean isHomeNodeRequest = false;
             if (nostrId != null) {
                 id = "." + nostrId;
-            } else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified using a colon in front of it, to make it detectable
+            } //
+            else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified using a colon in front of it, to make it detectable
                 if ("home".equalsIgnoreCase(nameOnUserNode)) {
                     isHomeNodeRequest = true;
                 }
                 id = ":" + userName + ":" + nameOnUserNode;
-            } else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+            } //
+            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
                 id = ":" + nameOnAdminNode;
-            } else if (!StringUtils.isEmpty(name)) {
+            } //
+            else if (!StringUtils.isEmpty(name)) {
                 id = ":" + name;
             }
             boolean hasUrlId = false;
@@ -928,9 +931,7 @@ public class AppController extends ServiceBase implements ErrorController {
                 if ("pdf".equalsIgnoreCase(req.getExportExt())) {
                     ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
                     svc.export(ms, "pdf", req, res);
-                } else // res.setSuccess(false); // res.setMessage("Export of Markdown to IPFS not yet available."); // if (req.isToIpfs()) { // else if ("md".equalsIgnoreCase(req.getExportExt())) { // } // // svc.export(ms, "html", req, res); // ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class); // else if ("html".equalsIgnoreCase(req.getExportExt())) { // and we don't need these options, but I'm leaving the code in place for now. // I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this // DO NOT DELETE (YET) // ================================================ //
-                // }
-                // } //
+                } else // } // // } // res.setSuccess(false); // res.setMessage("Export of Markdown to IPFS not yet available."); // if (req.isToIpfs()) { // else if ("md".equalsIgnoreCase(req.getExportExt())) { // } // // svc.export(ms, "html", req, res); // ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class); // else if ("html".equalsIgnoreCase(req.getExportExt())) { // and we don't need these options, but I'm leaving the code in place for now. // I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this // DO NOT DELETE (YET) // ================================================ //
                 // ================================================
                 if ("zip".equalsIgnoreCase(req.getExportExt())) {
                     if (req.isToIpfs()) {
@@ -939,14 +940,16 @@ public class AppController extends ServiceBase implements ErrorController {
                     }
                     ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
                     svc.export(ms, req, res);
-                } else if ("tar".equalsIgnoreCase(req.getExportExt())) { //
+                } //
+                else if ("tar".equalsIgnoreCase(req.getExportExt())) { //
                     if (req.isToIpfs()) {
                         res.setMessage("Export of TAR to IPFS not yet available.");
                         res.setSuccess(false);
                     }
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
                     svc.export(ms, req, res);
-                } else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) { //
+                } //
+                else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) { //
                     if (req.isToIpfs()) {
                         res.setMessage("Export of TAR.GZ to IPFS not yet available.");
                         res.setSuccess(false);
@@ -1365,7 +1368,8 @@ public class AppController extends ServiceBase implements ErrorController {
             // Node Names are identified using a colon in front of it, to make it detectable
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
                 id = ":" + userName + ":" + nameOnUserNode;
-            } else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+            } //
+            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
                 id = ":" + nameOnAdminNode;
             }
             if (id != null) {
@@ -1456,7 +1460,8 @@ public class AppController extends ServiceBase implements ErrorController {
                     attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null, response);
                     return null;
                 });
-            } else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request and if so bypass security
+            } //
+            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request and if so bypass security
                 arun.run(as -> {
                     attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null, response);
                     return null;

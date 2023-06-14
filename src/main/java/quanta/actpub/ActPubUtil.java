@@ -132,6 +132,7 @@ public class ActPubUtil extends ServiceBase {
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
         String host = prop.getMetaHost();
         HashSet<String> hosts = new HashSet<>();
+
         for (String toUserName : userNames) {
             // Ignore userNames that are not foreign server names
             if (!toUserName.contains("@")) {
@@ -164,6 +165,7 @@ public class ActPubUtil extends ServiceBase {
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = apList(webFinger, APObj.links, false);
         if (linksList == null) return null;
+
         for (Object link : linksList) {
             if (rel.equals(apStr(link, APObj.rel))) {
                 return link;
@@ -195,7 +197,8 @@ public class ActPubUtil extends ServiceBase {
                 }
                 return secureGet(url, clazz, privateKey, actor, mediaType);
             });
-        } else if (ms != null) {
+        } //
+        else if (ms != null) {
             String actor = apUtil.makeActorUrlForUserName(ms.getUserName());
             /* if private key not sent then get it using the session */
             String privateKey = apCrypto.getPrivateKey(ms, ms.getUserName());
@@ -280,6 +283,7 @@ public class ActPubUtil extends ServiceBase {
         MediaType postType
     ) {
         if (inboxes == null) return;
+
         for (String inbox : inboxes) {
             try {
                 apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
@@ -627,12 +631,12 @@ public class ActPubUtil extends ServiceBase {
                             // if no apId that's fine, just process item.
                             if (apId == null) {
                                 if (!observer.item(item)) return;
-                            } else if (!apIdSet.contains(apId)) { // if no apId that's fine, just process item.
+                            } //
+                            else if (!apIdSet.contains(apId)) { // if no apId that's fine, just process item.
                                 if (!observer.item(item)) return;
                                 apIdSet.add(apId);
                             }
-                        } else // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
-                        {
+                        } else { // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
                             if (!observer.item(item)) return;
                         }
                         if (++count >= maxCount) return;
@@ -675,12 +679,12 @@ public class ActPubUtil extends ServiceBase {
                             // if no apId that's fine, just process item.
                             if (apId == null) {
                                 if (!observer.item(item)) return;
-                            } else if (!apIdSet.contains(apId)) { // else process it with apId
+                            } //
+                            else if (!apIdSet.contains(apId)) { // else process it with apId
                                 if (!observer.item(item)) return;
                                 apIdSet.add(apId);
                             }
-                        } else // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
-                        {
+                        } else { // it. // otherwise item is probably a 'String' but whatever it is we call 'item' on
                             if (!observer.item(item)) return;
                         }
                         if (++count >= maxCount) return;
@@ -760,7 +764,8 @@ public class ActPubUtil extends ServiceBase {
                     if (replyNodeInfo != null) {
                         replyNodes.add(replyNodeInfo);
                     }
-                } else if (obj instanceof Map) { // else we try as a data object
+                } //
+                else if (obj instanceof Map) { // else we try as a data object
                     APObj apObj = new APObj((Map) obj);
                     NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
                     if (replyNodeInfo != null) {

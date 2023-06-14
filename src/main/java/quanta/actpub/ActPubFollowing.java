@@ -349,6 +349,7 @@ public class ActPubFollowing extends ServiceBase {
         final List<String> following = new LinkedList<>();
         arun.run(as -> {
             Iterable<SubNode> iter = findFollowingOfUser(as, userName);
+
             for (SubNode n : iter) {
                 if (queueForRefresh && blockedUserIds != null && !blockedUserIds.contains(n.getId())) {
                     apub.queueUserForRefresh(n.getStr(NodeProp.USER), true);
@@ -393,6 +394,7 @@ public class ActPubFollowing extends ServiceBase {
             Iterable<SubNode> iterable = opsw.find(ms, q);
             List<NodeInfo> searchResults = new LinkedList<>();
             int counter = 0;
+
             for (SubNode node : iterable) {
                 NodeInfo info = convert.convertToNodeInfo(
                     false,

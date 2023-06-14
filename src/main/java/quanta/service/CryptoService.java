@@ -165,6 +165,7 @@ public class CryptoService extends ServiceBase {
         if (sigPendingQueue.containsKey(req.getWorkloadId())) {
             BulkOperations bops = null;
             int batchSize = 0;
+
             for (NodeSigData data : req.getListToSign()) {
                 ObjectId id = new ObjectId(data.getNodeId());
                 /*
@@ -261,6 +262,7 @@ public class CryptoService extends ServiceBase {
         long sleepTime = 100;
         // we wait for up to 30 seconds for the browser to sign the nodes, before we will give up and
         // return false;
+
         while (totalTime < 30000 && sc.isLive() && sigPendingQueue.contains(pushInfo.getWorkloadId())) {
             Util.sleep(sleepTime);
             totalTime += sleepTime;

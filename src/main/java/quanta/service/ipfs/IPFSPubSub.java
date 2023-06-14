@@ -167,6 +167,7 @@ public class IPFSPubSub extends ServiceBase {
         ByteArrayOutputStream resp = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
         int r;
+
         while ((r = in.read(buf)) >= 0) {
             resp.write(buf, 0, r);
             if (buf[r - 1] == LINE_FEED) {
@@ -241,6 +242,7 @@ public class IPFSPubSub extends ServiceBase {
     private String getMessageText(IPSMMessage msg) {
         if (msg == null || msg.getContent() == null) return null;
         StringBuilder sb = new StringBuilder();
+
         for (IPSMData data : msg.getContent()) {
             String text = ipfsCat.getString(data.getData());
             sb.append(text);

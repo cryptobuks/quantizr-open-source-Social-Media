@@ -76,6 +76,7 @@ public class FileSearcher {
         ScoreDoc[] hits = results.scoreDocs;
         int numTotalHits = Math.toIntExact(results.totalHits.value);
         write(numTotalHits + " total matching documents");
+
         for (int i = 0; i < hits.length; i++) {
             Document doc = searcher.doc(hits[i].doc);
             String path = doc.get("path");

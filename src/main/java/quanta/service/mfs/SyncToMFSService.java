@@ -65,6 +65,7 @@ public class SyncToMFSService extends ServiceBase {
              * file, and add the generated filenames of all files to the 'allNodePaths' set.
              */
             processNode(node);
+
             for (SubNode n : results) {
                 processNode(n);
             }

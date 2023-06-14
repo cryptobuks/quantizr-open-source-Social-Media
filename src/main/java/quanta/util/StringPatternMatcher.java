@@ -51,6 +51,7 @@ public class StringPatternMatcher {
 
         StringTokenizer t = new StringTokenizer(input, ",", true);
         String token;
+
         while (t.hasMoreTokens()) {
             token = t.nextToken();
             if (!token.equals(",")) {

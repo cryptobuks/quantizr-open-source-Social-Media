@@ -110,6 +110,7 @@ public class ActPubFollower extends ServiceBase {
              * representing followers of this user)
              */
             Iterable<SubNode> iter = getPeopleByUserName(as, userName);
+
             for (SubNode n : iter) {
                 // the owner of the friend node is the "Follower".
                 SubNode ownerOfFriendNode = read.getNode(as, n.getOwner());
@@ -174,6 +175,7 @@ public class ActPubFollower extends ServiceBase {
             Iterable<SubNode> iterable = opsw.find(as, q);
             List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
             int counter = 0;
+
             for (SubNode node : iterable) {
                 NodeInfo info = convert.convertToNodeInfo(
                     false,

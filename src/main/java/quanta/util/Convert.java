@@ -249,6 +249,7 @@ public class Convert extends ServiceBase {
                 Iterable<SubNode> nodeIter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
                 Iterator<SubNode> iterator = nodeIter.iterator();
                 long inlineOrdinal = 0;
+
                 while (true) {
                     if (!iterator.hasNext()) {
                         break;
@@ -368,6 +369,7 @@ public class Convert extends ServiceBase {
         if (tags == null || tags.size() == 0) return null;
         StringBuilder sb = new StringBuilder();
         StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
+
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
             int tokLen = tok.length();
@@ -397,9 +399,8 @@ public class Convert extends ServiceBase {
                         );
                     }
                 }
-            } else // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + //
-            // Mention
-            if ( //
+            } //
+            else if ( // Mention // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + // //
                 tokLen > 1 &&
                 tok.startsWith("@") &&
                 (atCount = StringUtils.countMatches(tok, "@")) <= 2 &&
@@ -488,6 +489,7 @@ public class Convert extends ServiceBase {
         List<AccessControlInfo> ret = null;
         HashMap<String, AccessControl> ac = node.getAc();
         if (ac == null) return null;
+
         for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
             String principalId = entry.getKey();
             AccessControl acval = entry.getValue();
@@ -540,7 +542,8 @@ public class Convert extends ServiceBase {
             Object value = null;
             if (prop instanceof Date) {
                 value = DateUtil.formatTimeForUserTimezone((Date) prop, sc.getTimezone(), sc.getTimeZoneAbbrev());
-            } else if (prop instanceof Collection) {
+            } //
+            else if (prop instanceof Collection) {
                 value = prop;
             } else {
                 value = prop.toString();

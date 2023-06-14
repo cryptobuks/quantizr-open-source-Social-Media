@@ -94,9 +94,11 @@ public class ActPubCrypto extends ServiceBase {
             }
             if (key.equalsIgnoreCase("keyId")) {
                 keyId.setVal(val);
-            } else if (key.equalsIgnoreCase("headers")) {
+            } //
+            else if (key.equalsIgnoreCase("headers")) {
                 headers.setVal(Arrays.asList(val.split(" ")));
-            } else if (key.equalsIgnoreCase("signature")) {
+            } //
+            else if (key.equalsIgnoreCase("signature")) {
                 signature.setVal(val);
             }
         }
@@ -212,12 +214,14 @@ public class ActPubCrypto extends ServiceBase {
     // bodyBytes can be null and they simply won't be checked.
     private byte[] getHeaderSignatureBytes(HttpServletRequest httpReq, List<String> headers, byte[] bodyBytes) {
         ArrayList<String> sigParts = new ArrayList<>();
+
         for (String header : headers) {
             String value;
             // request-target
             if (header.equals("(request-target)")) {
                 value = httpReq.getMethod().toLowerCase() + " " + httpReq.getRequestURI();
-            } else if (header.equals("digest")) { // digest
+            } //
+            else if (header.equals("digest")) { // digest
                 value = httpReq.getHeader(header);
                 /*
                  * if we have body bytes and they don't hash to be what the header claims they should be then that's
@@ -277,8 +281,7 @@ public class ActPubCrypto extends ServiceBase {
             // This is basically calculating the HASH of the bodyBytes
             String digestHeader = digestFromBodyBytes(bodyBytes);
             URL url = new URL(urlStr);
-            String strToSign = //
-                //
+            String strToSign =
                 "(request-target): " + method + " " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date;
             if (digestHeader != null) {
                 strToSign += "\ndigest: " + digestHeader;
@@ -291,8 +294,7 @@ public class ActPubCrypto extends ServiceBase {
              * note: leroma is including content-length in this headers list but we don't. I should probably add
              * it but be sure not to break compatability when doing so.
              */
-            String headerSig = //
-                //
+            String headerSig =
                 headerPair("keyId", actor + "#main-key") +
                 "," +
                 headerPair("headers", "(request-target) host date" + (digestHeader != null ? " digest" : "")) +

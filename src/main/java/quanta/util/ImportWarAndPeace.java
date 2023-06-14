@@ -56,6 +56,7 @@ public class ImportWarAndPeace extends ServiceBase {
             try {
                 String line;
                 int lineCount = 0;
+
                 while (!halt && (line = in.readLine()) != null) {
                     line = line.trim();
                     /*
@@ -132,8 +133,7 @@ public class ImportWarAndPeace extends ServiceBase {
     }
 
     private boolean anyEpilogue(String line) {
-        return // //
-        (
+        return ( // //
             line.startsWith("FIRST EPILOGUE") ||
             line.startsWith("SECOND EPILOGUE") ||
             line.startsWith("THIRD EPILOGUE") || //

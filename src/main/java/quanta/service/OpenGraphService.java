@@ -140,6 +140,7 @@ public class OpenGraphService extends ServiceBase {
 
             // set load=false if we already have this URL in our ogList
             boolean load = true;
+
             for (String urlCheck : ogList) {
                 // just finding the URL is a hack but will be fine for now, to avoid parsing JSON
                 if (urlCheck.contains(url)) {

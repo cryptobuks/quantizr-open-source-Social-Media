@@ -65,6 +65,7 @@ public class LockEx extends ReentrantLock {
              * seconds.
              */
             long startTime = System.currentTimeMillis();
+
             while (!success) {
                 long totalWaitTime = System.currentTimeMillis() - startTime;
                 if (!warningShown && totalWaitTime > deadlockTimeoutMillis) {

@@ -619,7 +619,8 @@ public class SubNode {
                         ThreadLocals.dirty(this);
                     }
                 }
-            } else if (create || forceNew) {
+            } //
+            else if (create || forceNew) {
                 ret = new Attachment(this);
                 attachments = new HashMap<>();
                 attachments.put(name, ret);

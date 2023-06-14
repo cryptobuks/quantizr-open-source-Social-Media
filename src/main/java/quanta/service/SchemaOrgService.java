@@ -71,6 +71,7 @@ public class SchemaOrgService extends ServiceBase {
         if (graph == null) return;
         // first scan graph to build classes
         log.debug("Scanning Schema.org Classes.");
+
         for (Object item : graph) {
             if (item instanceof HashMap) {
                 HashMap mitem = (HashMap) item;
@@ -108,6 +109,7 @@ public class SchemaOrgService extends ServiceBase {
             }
         }
         classList.sort((n1, n2) -> (int) n1.getLabel().compareTo(n2.getLabel()));
+
         for (SchemaOrgClass soc : classList) {
             // to simplify and save space we can remove "schema:" prefix from all IDs
             soc.setId(soc.getId().replace("schema:", ""));
@@ -141,7 +143,8 @@ public class SchemaOrgService extends ServiceBase {
         // handle if string
         if (label instanceof String) {
             slabel = (String) label;
-        } else if (label instanceof HashMap) { // else try to get @value out of object
+        } //
+        else if (label instanceof HashMap) { // else try to get @value out of object
             HashMap mlabel = (HashMap) label;
             Object val = mlabel.get("@value");
             if (val instanceof String) {
@@ -168,8 +171,10 @@ public class SchemaOrgService extends ServiceBase {
         // handle if object
         if (domains instanceof HashMap) {
             setupDomainObj(sop, prop, domains);
-        } else if (domains instanceof List) { // handle of list
+        } //
+        else if (domains instanceof List) { // handle of list
             List ldomains = (List) domains;
+
             for (Object domain : ldomains) {
                 if (domain instanceof HashMap) {
                     setupDomainObj(sop, prop, domain);
@@ -187,8 +192,10 @@ public class SchemaOrgService extends ServiceBase {
         // handle if object
         if (ranges instanceof HashMap) {
             setupRangeObj(sop, prop, ranges);
-        } else if (ranges instanceof List) { // handle of list
+        } //
+        else if (ranges instanceof List) { // handle of list
             List lranges = (List) ranges;
+
             for (Object range : lranges) {
                 if (range instanceof HashMap) {
                     setupRangeObj(sop, prop, range);

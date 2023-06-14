@@ -142,6 +142,7 @@ public class RSSFeedService extends ServiceBase {
             if (failedFeeds.size() > 0) {
                 List<String> failedFeedsList = new LinkedList<>(failedFeeds);
                 failedFeeds.clear();
+
                 for (String url : failedFeedsList) {
                     log.debug("Retrying previously failed feed: " + url);
                     SyndFeed feed = getFeed(url, false);
@@ -188,6 +189,7 @@ public class RSSFeedService extends ServiceBase {
             int pageNo = page - 1;
             int startIdx = pageNo * MAX_FEED_ITEMS;
             int idx = 0;
+
             for (SyndEntry entry : entries) {
                 if (idx >= startIdx) {
                     pageEntries.add(entry);
@@ -382,7 +384,7 @@ public class RSSFeedService extends ServiceBase {
             List<SyndEntry> entries = new LinkedList<>();
             feed.setEntries(entries);
             aggregateFeeds(urlList, entries, req.getPage());
-        } else/* If not an aggregate return the one external feed itself */ {
+        } else /* If not an aggregate return the one external feed itself */{
             String url = urlList.get(0);
             SyndFeed cachedFeed = getFeed(url, true);
             if (cachedFeed != null) {
@@ -458,6 +460,7 @@ public class RSSFeedService extends ServiceBase {
         if (entry.getEnclosures() != null) {
             List<RssFeedEnclosure> enclosures = new LinkedList<>();
             e.setEnclosures(enclosures);
+
             for (SyndEnclosure enc : entry.getEnclosures()) {
                 RssFeedEnclosure re = new RssFeedEnclosure();
                 re.setType(enc.getType());
@@ -510,12 +513,8 @@ public class RSSFeedService extends ServiceBase {
                     } else {
                         log.debug("media has no groups.");
                     }
-                } else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // for (String contents : contentMod.getContents()) {
-                // log.debug("CI.contents: " + contents);
-                // }
-                // }
-                // if (ok(contentMod.getContentItems() )) {
+                } //
+                else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                 // for (ContentItem ci : contentMod.getContentItems()) {
                 // log.debug("CI.encoding: " + ci.getContentEncoding());
                 // log.debug("CI.format: " + ci.getContentFormat());
@@ -539,11 +538,8 @@ public class RSSFeedService extends ServiceBase {
                     if (!StringUtils.isEmpty(itunesMod.getSummary())) {
                         e.setDescription(sanitizeHtml(itunesMod.getSummary()));
                     }
-                } else if (m instanceof DCModuleImpl) {} else // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
-                // String dcSource = dm.getSource();
-                // String dcTitle = dm.getTitle();
-                // log.debug("dcSource: " + dcSource);
-                {
+                } //
+                else if (m instanceof DCModuleImpl) {} else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource = dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }
@@ -602,12 +598,8 @@ public class RSSFeedService extends ServiceBase {
                             }
                         }
                     }
-                } else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // for (String contents : contentMod.getContents()) {
-                // log.debug("CI.contents: " + contents);
-                // }
-                // }
-                // if (ok(contentMod.getContentItems() )) {
+                } //
+                else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                 // for (ContentItem ci : contentMod.getContentItems()) {
                 // log.debug("CI.encoding: " + ci.getContentEncoding());
                 // log.debug("CI.format: " + ci.getContentFormat());
@@ -631,11 +623,8 @@ public class RSSFeedService extends ServiceBase {
                     if (!StringUtils.isEmpty(itunesMod.getSummary())) {
                         e.setDescription(sanitizeHtml(itunesMod.getSummary()));
                     }
-                } else if (m instanceof DCModuleImpl) {} else // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
-                // String dcSource = dm.getSource();
-                // String dcTitle = dm.getTitle();
-                // log.debug("dcSource: " + dcSource);
-                {
+                } //
+                else if (m instanceof DCModuleImpl) {} else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource = dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }
@@ -659,6 +648,7 @@ public class RSSFeedService extends ServiceBase {
         int pageNo = page - 1;
         int startIdx = pageNo * MAX_FEED_ITEMS;
         int idx = 0;
+
         for (SyndEntry entry : cachedFeed.getEntries()) {
             if (idx >= startIdx) {
                 entries.add(entry);
@@ -760,6 +750,7 @@ public class RSSFeedService extends ServiceBase {
      */
     private String convertStreamChars(String s) {
         StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c < 128) {

@@ -109,6 +109,7 @@ public class GraphNodesService extends ServiceBase {
         // get a collection to hold keys so we don't get concurrent modification
         // exception when updating the map.
         List<String> keys = new LinkedList<>();
+
         for (String path : mapByPath.keySet()) {
             keys.add(path);
         }

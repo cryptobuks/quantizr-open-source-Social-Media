@@ -33,6 +33,7 @@ public class PerformanceReport {
         sb.append(htmlH(3, "Events over Threshold of " + String.valueOf(REPORT_THRESHOLD)));
         int counter = 0;
         String rows = "";
+
         for (PerfMonEvent se : orderedData) {
             if (se.duration > REPORT_THRESHOLD) {
                 rows += formatEvent(se, counter++ < 20, false);
@@ -47,6 +48,7 @@ public class PerformanceReport {
         }
         // calculate totals per person
         HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
+
         for (PerfMonEvent se : orderedData) {
             String user = se.user != null ? se.user : PrincipalName.ANON.s();
             UserPerf up = userPerfInfo.get(user);
@@ -62,6 +64,7 @@ public class PerformanceReport {
         // -------------------------------------------
         sb.append(htmlH(3, "Call Counts"));
         rows = "";
+
         for (UserPerf se : upiList) {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(String.valueOf(se.totalCalls)));
         }
@@ -78,6 +81,7 @@ public class PerformanceReport {
         upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
         sb.append(htmlH(3, "Time Usage by User"));
         rows = "";
+
         for (UserPerf se : upiList) {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
         }
@@ -94,6 +98,7 @@ public class PerformanceReport {
         upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
         sb.append(htmlH(3, "Avg Time Per Call"));
         rows = "";
+
         for (UserPerf se : upiList) {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
         }
@@ -115,6 +120,7 @@ public class PerformanceReport {
     /* This is the most 'powerful/useful' feature, because it displays time usage for each category */
     public static String getTimesPerCategory() {
         HashMap<String, MethodStat> stats = new HashMap<>();
+
         for (PerfMonEvent event : Instrument.data) {
             MethodStat stat = stats.get(event.event);
             if (stat == null) {
@@ -134,6 +140,7 @@ public class PerformanceReport {
             htmlTh("Avg. Time") + //
             htmlTh("Time")
         );
+
         for (MethodStat stat : orderedStats) {
             table +=
                 htmlTr( //
@@ -162,6 +169,7 @@ public class PerformanceReport {
             String rows = "";
             if (showSubEvents && se.root != null && se.root.subEvents != null) {
                 // sb.append("\n Set:\n");
+
                 for (PerfMonEvent subEvent : se.root.subEvents) {
                     // if we run across same 'se' we're processing, skip it
                     if (subEvent != se) {

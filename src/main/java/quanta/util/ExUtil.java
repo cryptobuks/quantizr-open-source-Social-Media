@@ -50,6 +50,7 @@ public class ExUtil {
         }
         StringBuilder sb = new StringBuilder();
         StackTraceElement[] trace = thread.getStackTrace();
+
         for (int i = 0; i < trace.length; i++) {
             StackTraceElement e = trace[i];
             sb.append("    ");

@@ -248,6 +248,7 @@ public class NostrService extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         StringTokenizer t = new StringTokenizer(relays, "\n\r\t ", false);
         HashSet<String> relaySet = new HashSet<>();
+
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
             if (relaySet.add(tok)) {
@@ -442,14 +443,17 @@ public class NostrService extends ServiceBase {
         ArrayList<String> any = null;
         ArrayList<String> reply = null;
         ArrayList<String> root = null;
+
         for (ArrayList<String> itm : tags) {
             if ("e".equals(itm.get(0))) {
                 // deprecated positional array (["e", <event-id>, <relay-url>] as per NIP-01.)
                 if (itm.size() < 4) {
                     any = itm;
-                } else if ("reply".equals(itm.get(3))) { // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
+                } //
+                else if ("reply".equals(itm.get(3))) { // Preferred non-deprecated way (["e", <event-id>, <relay-url>, <marker>])
                     reply = itm;
-                } else if ("root".equals(itm.get(3))) {
+                } //
+                else if ("root".equals(itm.get(3))) {
                     root = itm;
                 }
             }
@@ -457,7 +461,8 @@ public class NostrService extends ServiceBase {
         ArrayList<String> accept = null;
         if (reply != null) {
             accept = reply;
-        } else if (root != null) {
+        } //
+        else if (root != null) {
             accept = root;
         } else {
             accept = any;

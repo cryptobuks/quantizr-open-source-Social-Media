@@ -45,6 +45,7 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
     private void dump() {
         log.debug("Dumping all FediverseNames...");
         Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+
         for (FediverseName fName : recs) {
             log.debug(fName.getName());
         }

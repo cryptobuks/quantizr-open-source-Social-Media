@@ -153,7 +153,8 @@ public class ExportServiceFlexmark extends ServiceBase {
                     FileUtils.writeEntireFile(fullFileName, html);
                     wroteFile = true;
                 }
-            } else if ("pdf".equals(format)) {
+            } //
+            else if ("pdf".equals(format)) {
                 // todo-2: We should have an OPTION to export ONLY and DIRECTLY to IPFS here, and
                 // not even write to a file.
                 out = new FileOutputStream(new File(fullFileName));
@@ -298,10 +299,10 @@ public class ExportServiceFlexmark extends ServiceBase {
                     String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
                     files.add(new ExportIpfsFile(cid, fileName, mime));
                     src = fileName + "?cid=" + cid;
-                } else/*
+                } else /*
                  * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
                  * so reference it in src
-                 */ if (ipfsLink != null && fileName != null) {
+                 */if (ipfsLink != null && fileName != null) {
                     files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
                     /*
                      * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open
@@ -314,13 +315,13 @@ public class ExportServiceFlexmark extends ServiceBase {
                      */
                     src = fileName + "?cid=" + ipfsLink;
                 }
-            } else/*
+            } else /*
              * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
              * kind of reference to the image resource, because ultimately the Flexmark code that converts the
              * HTML to the PDF will be calling this image url to extract out the actual image data to embed
              * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
              * eventually put out on IPFS or simply provided to the user as a downloadable link.
-             */ if (bin != null) {
+             */if (bin != null) {
                 String path =
                     AppController.API_PATH +
                     "/bin/" +
@@ -330,7 +331,8 @@ public class ExportServiceFlexmark extends ServiceBase {
                     "&token=" +
                     URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                 src = prop.getHostAndPort() + path;
-            } else if (url != null) {
+            } //
+            else if (url != null) {
                 src = url;
             }
             if (src == null) continue;

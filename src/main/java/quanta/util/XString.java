@@ -83,6 +83,7 @@ public class XString {
     public static String repeatingTrimFromFront(String val, String prefix) {
         if (val == null) return null;
         int loopSafe = 0;
+
         while (++loopSafe < 1000) {
             int len = val.length();
             val = stripIfStartsWith(val.trim(), prefix);
@@ -98,6 +99,7 @@ public class XString {
         if (val == null) return null;
         List<String> list = null;
         StringTokenizer t = new StringTokenizer(val, delimiter, true);
+
         while (t.hasMoreTokens()) {
             if (list == null) {
                 list = new LinkedList<>();
@@ -111,6 +113,7 @@ public class XString {
         if (val == null) return null;
         List<String> list = null;
         StringTokenizer t = new StringTokenizer(val, delimiter, false);
+
         while (t.hasMoreTokens()) {
             if (list == null) {
                 list = new LinkedList<>();
@@ -123,6 +126,7 @@ public class XString {
     public static HashSet<String> tokenizeToSet(String val, String delimiter, boolean trim) {
         HashSet<String> list = null;
         StringTokenizer t = new StringTokenizer(val, delimiter, false);
+
         while (t.hasMoreTokens()) {
             if (list == null) {
                 list = new HashSet<>();
@@ -296,6 +300,7 @@ public class XString {
 
     public static boolean containsNonEnglish(String s) {
         if (s == null || s.length() == 0) return false;
+
         for (int i = 0; i < s.length(); i++) {
             if ((int) s.charAt(i) >= 128) return true;
         }

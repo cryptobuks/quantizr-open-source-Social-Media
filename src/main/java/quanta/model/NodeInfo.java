@@ -141,6 +141,7 @@ public class NodeInfo {
     @JsonIgnore
     public Object getPropVal(String propName) {
         if (properties == null) return null;
+
         for (PropertyInfo prop : properties) {
             if (prop.getName().equals(propName)) {
                 return prop.getValue();

@@ -39,6 +39,7 @@ public class SubNodeUtil extends ServiceBase {
             return false;
         }
         int sz = name.length();
+
         for (int i = 0; i < sz; i++) {
             char c = name.charAt(i);
             if (c == '-' || c == '_' || c == '.') continue;
@@ -177,6 +178,7 @@ public class SubNodeUtil extends ServiceBase {
             }
         }
         boolean nodesCreated = false;
+
         for (String nameToken : nameTokens) {
             String path = fixPath(parentPath + nameToken);
             node = read.getNode(ms, path);
@@ -237,7 +239,8 @@ public class SubNodeUtil extends ServiceBase {
             // truncate any file name extension.
             fileName = XString.truncAfterLast(fileName, ".");
             return fileName;
-        } else if (node.getName() != null) {
+        } //
+        else if (node.getName() != null) {
             return node.getName();
         } else {
             return "f" + getGUID();

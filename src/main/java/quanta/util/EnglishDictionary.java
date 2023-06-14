@@ -49,6 +49,7 @@ public class EnglishDictionary extends ServiceBase {
             BufferedReader in = new BufferedReader(new InputStreamReader(is));
             try {
                 String line;
+
                 while ((line = in.readLine()) != null) {
                     line = line.trim();
                     if (line.length() > 0) {
@@ -70,6 +71,7 @@ public class EnglishDictionary extends ServiceBase {
         try {
             byte[] nl = "\n".getBytes(StandardCharsets.UTF_8);
             os = new BufferedOutputStream(new FileOutputStream(fileName));
+
             for (String s : list) {
                 os.write(s.getBytes(StandardCharsets.UTF_8));
                 os.write(nl);
@@ -105,6 +107,7 @@ public class EnglishDictionary extends ServiceBase {
          * true only of known English reach a threshold percentage.
          */
         StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.?!><", false);
+
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken().trim();
             if (XString.containsNonEnglish(token)) {
@@ -140,6 +143,7 @@ public class EnglishDictionary extends ServiceBase {
         if (badWords.size() == 0) throw new RuntimeException("called isBadWord before dictionary was loaded.");
         if (text == null) return false;
         StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"\'`!?()*#<>", false);
+
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken().trim().toLowerCase();
             if (badWords.contains(token)) {

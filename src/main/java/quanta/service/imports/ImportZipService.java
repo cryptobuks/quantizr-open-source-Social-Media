@@ -75,6 +75,7 @@ public class ImportZipService extends ImportArchiveBase {
             is = new LimitedInputStreamEx(inputStream, maxSize);
             zis = new ZipArchiveInputStream(is);
             ZipArchiveEntry entry;
+
             while ((entry = zis.getNextZipEntry()) != null) {
                 if (!entry.isDirectory()) {
                     processFile(entry, zis, userNode.getOwner());

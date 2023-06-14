@@ -79,6 +79,7 @@ public class EmailSenderDaemon extends ServiceBase {
         synchronized (EmailSender.getLock()) {
             try {
                 mail.init();
+
                 for (SubNode node : nodes) {
                     log.debug("Iterating node to email. nodeId:" + node.getIdStr());
                     String email = node.getStr(NodeProp.EMAIL_RECIP);

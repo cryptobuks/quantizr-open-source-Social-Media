@@ -188,13 +188,17 @@ public class FileIndexer extends ServiceBase {
                             if (!suffixSet.contains(ext)) {
                                 filesSkipped++;
                                 return FileVisitResult.CONTINUE;
-                            } else if (isZipFileFormatFileName(absPath)) {
+                            } //
+                            else if (isZipFileFormatFileName(absPath)) {
                                 indexZipFile(file, absPath);
-                            } else if (isTarFileFormatFileName(absPath)) {
+                            } //
+                            else if (isTarFileFormatFileName(absPath)) {
                                 indexTarFile(file, absPath, CompressionType.NONE);
-                            } else if (isTgzFileFormatFileName(absPath)) {
+                            } //
+                            else if (isTgzFileFormatFileName(absPath)) {
                                 indexTarFile(file, absPath, CompressionType.GZIP);
-                            } else if (isTxzFileFormatFileName(absPath)) {
+                            } //
+                            else if (isTxzFileFormatFileName(absPath)) {
                                 indexTarFile(file, absPath, CompressionType.XZIP);
                             } else {
                                 indexDoc(file, attrs.lastModifiedTime().toMillis());
@@ -216,11 +220,14 @@ public class FileIndexer extends ServiceBase {
             }
             if (isZipFileFormatFileName(absPath)) {
                 indexZipFile(path, absPath);
-            } else if (isTarFileFormatFileName(absPath)) {
+            } //
+            else if (isTarFileFormatFileName(absPath)) {
                 indexTarFile(path, absPath, CompressionType.NONE);
-            } else if (isTgzFileFormatFileName(absPath)) {
+            } //
+            else if (isTgzFileFormatFileName(absPath)) {
                 indexTarFile(path, absPath, CompressionType.GZIP);
-            } else if (isTxzFileFormatFileName(absPath)) {
+            } //
+            else if (isTxzFileFormatFileName(absPath)) {
                 indexTarFile(path, absPath, CompressionType.XZIP);
             } else {
                 indexDoc(path, -1);
@@ -275,6 +282,7 @@ public class FileIndexer extends ServiceBase {
 
     private void indexZipStream(ZipInputStream zis, String zipParent) throws Exception {
         ZipEntry entry;
+
         while ((entry = zis.getNextEntry()) != null) {
             if (entry.isDirectory()) {} else/*
              * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
@@ -299,22 +307,24 @@ public class FileIndexer extends ServiceBase {
     private void indexTarStream(TarArchiveInputStream tis, String zipParent) throws Exception {
         try {
             ArchiveEntry entry = null;
+
             while ((entry = tis.getNextEntry()) != null) {
                 if (!tis.canReadEntryData(entry)) {
                     log.warn("Can\'t read entry." + entry.getName());
                     continue;
                 }
-                if (entry.isDirectory()) {} else // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
-                {
+                if (entry.isDirectory()) {} else { // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
                     String absPath = entry.getName();
                     log.debug("TAR ENTRY:" + absPath);
                     // todo-2: oops ZIP is missing here. plain zip in a tar
                     // todo-2: need to also support a tar in a zip
                     if (isTarFileFormatFileName(absPath)) {
                         indexTarInputStream(tis, zipParent + "->" + absPath, CompressionType.NONE);
-                    } else if (isTgzFileFormatFileName(absPath)) {
+                    } //
+                    else if (isTgzFileFormatFileName(absPath)) {
                         indexTarInputStream(tis, zipParent + "->" + absPath, CompressionType.GZIP);
-                    } else if (isTxzFileFormatFileName(absPath)) {
+                    } //
+                    else if (isTxzFileFormatFileName(absPath)) {
                         indexTarInputStream(tis, zipParent + "->" + absPath, CompressionType.XZIP);
                     } else {
                         indexTarEntry(entry, tis, zipParent);

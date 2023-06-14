@@ -135,6 +135,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
         if (node == null) return;
         processNode(node);
         Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
+
         for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
             recurseNode(n, level + 1);
         }
@@ -173,7 +174,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
                 try {
                     if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
                         pdImage = JPEGFactory.createFromStream(doc, is);
-                    } else if ("image/gif".equals(mime) || "image/bmp".equals(mime) || "image/png".equals(mime)) {
+                    } //
+                    else if ("image/gif".equals(mime) || "image/bmp".equals(mime) || "image/png".equals(mime)) {
                         BufferedImage bim = ImageIO.read(is);
                         pdImage = LosslessFactory.createFromImage(doc, bim);
                     }
@@ -203,13 +205,17 @@ public class ExportPdfServicePdfBox extends ServiceBase {
     private void setFontSizeFromMarkdown(String text) {
         if (text.startsWith("##### ")) {
             setFontSize(baseFontSize + 2);
-        } else if (text.startsWith("#### ")) {
+        } //
+        else if (text.startsWith("#### ")) {
             setFontSize(baseFontSize + 4);
-        } else if (text.startsWith("### ")) {
+        } //
+        else if (text.startsWith("### ")) {
             setFontSize(baseFontSize + 6);
-        } else if (text.startsWith("## ")) {
+        } //
+        else if (text.startsWith("## ")) {
             setFontSize(baseFontSize + 8);
-        } else if (text.startsWith("# ")) {
+        } //
+        else if (text.startsWith("# ")) {
             setFontSize(baseFontSize + 10);
         } else {
             setFontSize(baseFontSize);
@@ -238,6 +244,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
     private void printContent(String wholeLetter) {
         try {
             String[] paragraphs = wholeLetter.split(System.getProperty("line.separator"));
+
             for (String para : paragraphs) {
                 lastSpace = -1;
                 printParagraph(para);
@@ -265,7 +272,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
                     print(subStr);
                     para = para.substring(lastSpace).trim();
                     lastSpace = -1;
-                } else if (spaceIdx == para.length()) {
+                } //
+                else if (spaceIdx == para.length()) {
                     print(para);
                     para = "";
                 } else {

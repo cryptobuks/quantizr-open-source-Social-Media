@@ -186,11 +186,11 @@ public class NodeEditService extends ServiceBase {
         if (req.isReply()) {
             // force to get sharing from node being replied to
             makePublicWritable = false;
-        } else/*
+        } else /*
          * If we're inserting a node under the POSTS it should be public, rather than inherit sharing,
          * unless it's a reply in which case we leave makePublicWitable alone and it picks up shares from
          * parent maybe
-         */ if (parentNode.isType(NodeType.POSTS)) {
+         */if (parentNode.isType(NodeType.POSTS)) {
             makePublicWritable = true;
         }
         // if we never set 'nodeBeingRepliedTo' by now that means it's the parent that we're replying to.
@@ -203,7 +203,8 @@ public class NodeEditService extends ServiceBase {
                 HashMap<String, AccessControl> ac = new HashMap<>();
                 ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
                 newNode.setAc(ac);
-            } else if (makePublicWritable) { // else maybe public.
+            } //
+            else if (makePublicWritable) { // else maybe public.
                 acl.addPrivilege(
                     ms,
                     null,
@@ -581,7 +582,8 @@ public class NodeEditService extends ServiceBase {
          */
         if (StringUtils.isEmpty(nodeInfo.getName())) {
             node.setName(null);
-        } else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) { // if we're setting node name to a different node name
+        } //
+        else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) { // if we're setting node name to a different node name
             if (!snUtil.validNodeName(nodeInfo.getName())) {
                 throw new RuntimeEx("Node names can only contain letter, digit, underscore, dash, and period characters.");
             }
@@ -642,7 +644,7 @@ public class NodeEditService extends ServiceBase {
         String encKey = node.getStr(NodeProp.ENC_KEY);
         if (encKey == null) {
             mongoUtil.removeAllEncryptionKeys(node);
-        } else/* if node is currently encrypted */ {
+        } else /* if node is currently encrypted */{
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
         attach.pinLocalIpfsAttachments(node);
@@ -856,6 +858,7 @@ public class NodeEditService extends ServiceBase {
         List<String> nameTokens = XString.tokenize(path, "/", true);
         StringBuilder sb = new StringBuilder();
         int idx = 0;
+
         for (String tok : nameTokens) {
             if (idx < nameTokens.size()) {
                 sb.append("/");
@@ -927,6 +930,7 @@ public class NodeEditService extends ServiceBase {
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(node);
+
         for (String propName : req.getPropNames()) {
             node.delete(propName);
         }
@@ -967,10 +971,10 @@ public class NodeEditService extends ServiceBase {
         if (req.getSplitType().equalsIgnoreCase("inline")) {
             parentForNewNodes = parentNode;
             firstOrdinal = node.getOrdinal();
-        } else/*
+        } else /*
          * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
          * the top (ordinal), regardless of whether this node already has any children or not.
-         */ {
+         */{
             parentForNewNodes = node;
             firstOrdinal = 0L;
         }
@@ -980,6 +984,7 @@ public class NodeEditService extends ServiceBase {
             update.save(ms, parentForNewNodes);
         }
         int idx = 0;
+
         for (String part : contentParts) {
             // log.debug("ContentPart[" + idx + "] " + part);
             part = part.trim();
@@ -1030,6 +1035,7 @@ public class NodeEditService extends ServiceBase {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             if (req.isRecursive()) {
                 StringBuilder sb = new StringBuilder();
+
                 for (SubNode n : read.getSubGraph(
                     ms,
                     node,
@@ -1087,6 +1093,7 @@ public class NodeEditService extends ServiceBase {
     // todo-2: Move to utils class.
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
+
         for (int i = 0; i < hash.length; i++) {
             String hex = Integer.toHexString(255 & hash[i]);
             if (hex.length() == 1) {
@@ -1186,7 +1193,8 @@ public class NodeEditService extends ServiceBase {
             }
             node.adminUpdate = true;
             ops.inc();
-        } else if (op.equals("accept")) { //
+        } //
+        else if (op.equals("accept")) { //
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
                 return;
@@ -1209,7 +1217,8 @@ public class NodeEditService extends ServiceBase {
                 node.adminUpdate = true;
                 ops.inc();
             }
-        } else if (op.equals("reject")) { //
+        } //
+        else if (op.equals("reject")) { //
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
                 return;
@@ -1233,7 +1242,8 @@ public class NodeEditService extends ServiceBase {
                 node.adminUpdate = true;
                 ops.inc();
             }
-        } else if (op.equals("reclaim")) { //
+        } //
+        else if (op.equals("reclaim")) { //
             if (node.getTransferFrom() != null) {
                 // if we're reclaiming just make sure the transferFrom was us
                 if (!ms.getUserNodeId().equals(node.getTransferFrom())) {
@@ -1285,6 +1295,7 @@ public class NodeEditService extends ServiceBase {
             content = content.trim();
             int baseLevel = XString.getHeadingLevel(content);
             int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
+
             for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
                 int slashCount = StringUtils.countMatches(n.getPath(), "/");
                 int level = baseLevel + (slashCount - baseSlashCount);
@@ -1306,6 +1317,7 @@ public class NodeEditService extends ServiceBase {
         if (nodeContent == null) return null;
         StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);
         StringBuilder ret = new StringBuilder();
+
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
             if (tok.equals("\n")) {

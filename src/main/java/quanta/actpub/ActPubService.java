@@ -344,6 +344,7 @@ public class ActPubService extends ServiceBase {
         List<Attachment> atts = node.getOrderedAttachments();
         if (atts != null) {
             attachments = new APList();
+
             for (Attachment att : atts) {
                 if (att.getBin() != null && att.getMime() != null) {
                     attachments.val(
@@ -1120,6 +1121,7 @@ public class ActPubService extends ServiceBase {
             // HashMap<String, APObj> tags = apub.parseTags(contentHtml, true, false);
             if (tags != null) {
                 importUsers(ms, tags, null);
+
                 for (String mentionName : tags.keySet()) {
                     if (mentionName.startsWith("@")) {
                         saveFediverseName(mentionName);
@@ -1135,7 +1137,8 @@ public class ActPubService extends ServiceBase {
         newNode.set(NodeProp.OBJECT_ID, obj.getId());
         if (objUrl != null) {
             newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
-        } else if (objUrls != null) {
+        } //
+        else if (objUrls != null) {
             apLog.trace("Got muli urls: " + XString.prettyPrint(objUrls));
             newNode.set(NodeProp.ACT_PUB_OBJ_URLS, objUrls);
         }
@@ -1185,11 +1188,14 @@ public class ActPubService extends ServiceBase {
         if ((val = AP.getFromMap(obj, APObj.attributedTo)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else if (val.getVal() instanceof String) { // if we have a plain string prop return it.
+            } //
+            else if (val.getVal() instanceof String) { // if we have a plain string prop return it.
                 apLog.trace("attributed to found as string: " + (String) val.getVal());
                 return (String) val.getVal();
-            } else if (val.getVal() instanceof List) { // else if this is a list we scan it.
+            } //
+            else if (val.getVal() instanceof List) { // else if this is a list we scan it.
                 List<?> attribsList = (List<?>) val.getVal();
+
                 for (Object attribItem : attribsList) {
                     // get a concrete class instance from the factory for 'attribItem'
                     attribItem = AP.typeFromFactory(attribItem);
@@ -1237,7 +1243,8 @@ public class ActPubService extends ServiceBase {
             String href = apStr(tag, APObj.href);
             if ("Mention".equalsIgnoreCase(type)) {
                 tags.put(name, new APOMention(href, name));
-            } else if ("Hashtag".equalsIgnoreCase(type)) { //
+            } //
+            else if ("Hashtag".equalsIgnoreCase(type)) { //
                 tags.put(name, new APOHashtag(href, name));
             }
         }
@@ -1576,6 +1583,7 @@ public class ActPubService extends ServiceBase {
             arun.run(as -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
+
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
                     String userName = acctNode.getStr(NodeProp.USER);
@@ -1694,6 +1702,7 @@ public class ActPubService extends ServiceBase {
             try {
                 scanningForeignUsers = true;
                 Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
+
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled()) break;
                     String userName = node.getStr(NodeProp.USER);
@@ -1795,6 +1804,7 @@ public class ActPubService extends ServiceBase {
             Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
+
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER);
                 if (userName == null) continue;
@@ -1802,6 +1812,7 @@ public class ActPubService extends ServiceBase {
             }
             Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
             int numLoaded = 0;
+
             for (FediverseName fName : recs) {
                 try {
                     String userName = fName.getName();
@@ -1963,6 +1974,7 @@ public class ActPubService extends ServiceBase {
         HashMap<String, APObj> tags = new HashMap<>();
         if (content == null) return tags;
         StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
+
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
             if (tok.length() > 1) {
@@ -1976,12 +1988,14 @@ public class ActPubService extends ServiceBase {
                         userName = XString.stripIfStartsWith(userName, "@");
                         userName = apUtil.stripHostFromUserName(userName);
                         actor = apUtil.makeActorUrlForUserName(userName);
-                    } else if (atMatches == 2) { // foreign userName
+                    } //
+                    else if (atMatches == 2) { // foreign userName
                         String userDoingAction = ThreadLocals.getSC().getUserName();
                         actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
                     }
                     tags.put(tok, new APOMention(actor, tok));
-                } else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) { // HASHTAG
+                } //
+                else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) { // HASHTAG
                     String shortTok = XString.stripIfStartsWith(tok, "#");
                     tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
                 }
@@ -2007,7 +2021,8 @@ public class ActPubService extends ServiceBase {
                 }
                 if ("Hashtag".equalsIgnoreCase(tag.getType())) {
                     tagMap.put(tag.getName(), new APOHashtag(tag.getHref(), tag.getName()));
-                } else if ("Mention".equalsIgnoreCase(tag.getType())) { // Process Mention
+                } //
+                else if ("Mention".equalsIgnoreCase(tag.getType())) { // Process Mention
                     APOMention tagObj = new APOMention(tag.getHref(), tag.getName());
                     // add a string like host@username
                     URL hrefUrl = new URL(tag.getHref());

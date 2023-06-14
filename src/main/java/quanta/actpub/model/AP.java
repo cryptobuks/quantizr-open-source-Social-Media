@@ -33,6 +33,7 @@ public class AP {
      */
     public static Object apParseList(List list, String prop) {
         if (list == null) return null;
+
         for (Object element : list) {
             // see if we can get it, no matter what type element is
             Val<Object> val = getFromMap(element, prop);
@@ -52,9 +53,11 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else if (val.getVal() instanceof String) {
+            } //
+            else if (val.getVal() instanceof String) {
                 return (String) val.getVal();
-            } else if (val.getVal() instanceof List) {
+            } //
+            else if (val.getVal() instanceof List) {
                 // this can happen in normal flow now so I need a 'silent' argument to hide this when we need to.
                 // ExUtil.error("Attempted to read prop " + prop + " from the following object as a string but it
                 // was an array: "
@@ -92,9 +95,11 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return false;
-            } else if (val.getVal() instanceof String) {
+            } //
+            else if (val.getVal() instanceof String) {
                 return ((String) val.getVal()).equalsIgnoreCase(APConst.TRUE);
-            } else if (val.getVal() instanceof Boolean) {
+            } //
+            else if (val.getVal() instanceof Boolean) {
                 return ((Boolean) val.getVal()).booleanValue();
             }
         }
@@ -114,11 +119,14 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return 0;
-            } else if (val.getVal() instanceof Integer) {
+            } //
+            else if (val.getVal() instanceof Integer) {
                 return ((Integer) val.getVal()).intValue();
-            } else if (val.getVal() instanceof Long) {
+            } //
+            else if (val.getVal() instanceof Long) {
                 return ((Long) val.getVal()).intValue();
-            } else if (val.getVal() instanceof String) {
+            } //
+            else if (val.getVal() instanceof String) {
                 return Integer.valueOf((String) val.getVal());
             }
         }
@@ -138,7 +146,8 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else if (val.getVal() instanceof String) {
+            } //
+            else if (val.getVal() instanceof String) {
                 return DateUtil.parseISOTime((String) val.getVal());
             }
         }
@@ -158,10 +167,11 @@ public class AP {
         if ((val = getFromMap(obj, prop)) != null) {
             if (val.getVal() == null) {
                 return null;
-            } else if (val.getVal() instanceof List<?>) { // if we got an instance of a list return it
+            } //
+            else if (val.getVal() instanceof List<?>) { // if we got an instance of a list return it
                 return (List<?>) val.getVal();
-            } else // the address 'to' and 'cc' properties can have this happen often. // if we expected a list and found a String, that's ok, return a list with one entry
-            if (allowConvertString && val.getVal() instanceof String) {
+            } //
+            else if (allowConvertString && val.getVal() instanceof String) { // the address 'to' and 'cc' properties can have this happen often. // if we expected a list and found a String, that's ok, return a list with one entry
                 return Arrays.asList(val.getVal());
             }
         }
@@ -225,7 +235,8 @@ public class AP {
         APObj ret = null;
         if (obj instanceof APObj) {
             ret = (APObj) obj;
-        } else if (obj instanceof Map<?, ?>) {
+        } //
+        else if (obj instanceof Map<?, ?>) {
             ret = new APObj((Map<?, ?>) obj);
         } else {
             throw new RuntimeException("Unable to convert type: " + obj.getClass().getName() + " to an APObj");

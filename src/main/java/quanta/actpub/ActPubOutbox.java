@@ -106,6 +106,7 @@ public class ActPubOutbox extends ServiceBase {
              * foreign server
              */
             HashSet<String> apIdSet = new HashSet<>();
+
             for (SubNode n : outboxItems) {
                 String apId = n.getStr(NodeProp.OBJECT_ID);
                 if (apId != null) {
@@ -325,6 +326,7 @@ public class ActPubOutbox extends ServiceBase {
                     }
                     List<String> sharedToList = new LinkedList<String>();
                     sharedToList.add(_sharedTo);
+
                     for (SubNode child : auth.searchSubGraphByAclUser(
                         as,
                         null,

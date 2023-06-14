@@ -261,6 +261,7 @@ public class SystemService extends ServiceBase {
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();
         sb.append("\nJava VM args:\n");
+
         for (String arg : arguments) {
             sb.append(arg + "\n");
         }
@@ -357,6 +358,7 @@ public class SystemService extends ServiceBase {
     // work in progress.
     public String sendAdminNote() {
         int sessionCount = 0;
+
         for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
             HttpSession httpSess = ThreadLocals.getHttpSession();
             log.debug("Send admin note to: " + sc.getUserName() + " sessId: " + httpSess.getId());
@@ -380,6 +382,7 @@ public class SystemService extends ServiceBase {
         List<SessionContext> sessions = SessionContext.getHistoricalSessions();
         sessions.sort((s1, s2) -> s1.getUserName().compareTo(s2.getUserName()));
         sb.append("Live Sessions:\n");
+
         for (SessionContext s : sessions) {
             if (s.isLive()) {
                 sb.append("User: ");
@@ -389,6 +392,7 @@ public class SystemService extends ServiceBase {
             }
         }
         sb.append("\nPast Sessions:\n");
+
         for (SessionContext s : sessions) {
             if (!s.isLive()) {
                 sb.append("User: ");
@@ -413,6 +417,7 @@ public class SystemService extends ServiceBase {
             Process p = pb.start();
             String s;
             BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
             while ((s = stdout.readLine()) != null) {
                 output.append(s);
                 output.append("\n");
@@ -447,6 +452,7 @@ public class SystemService extends ServiceBase {
             }
         }
         sb.append("Live Sessions:\n");
+
         for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
             if (sc.isLive() && sc.getUserName() != null) {
                 Integer hits = map.get(sc.getSession().getId());

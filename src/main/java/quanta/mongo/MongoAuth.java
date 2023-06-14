@@ -150,9 +150,9 @@ public class MongoAuth extends ServiceBase {
                     child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
                 }
             }
-        } else/*
+        } else /*
          * otherwise if not a FRIEND node we just share to the owner of the parent node
-         */ {
+         */{
             // add `parent.owner` to the ACL
             child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
             if (nostr.isNostrNode(parent)) {
@@ -208,6 +208,7 @@ public class MongoAuth extends ServiceBase {
         }
         if (tags.size() > 0) {
             String content = "";
+
             for (String key : tags.keySet()) {
                 if (key.startsWith("@")) {
                     content += key + " ";
@@ -470,7 +471,7 @@ public class MongoAuth extends ServiceBase {
         /* If this is a share to public we don't need to lookup a user name */
         if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
             principalName = PrincipalName.PUBLIC.s();
-        } else/* else we need the user name */ {
+        } else /* else we need the user name */{
             SubNode principalNode = read.getNode(ms, principalId, false, null);
             if (principalNode == null) {
                 return null;
@@ -548,6 +549,7 @@ public class MongoAuth extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
         if (sharedToAny != null && sharedToAny.size() > 0) {
             List<Criteria> orCriteria = new LinkedList<>();
+
             for (String share : sharedToAny) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
             }

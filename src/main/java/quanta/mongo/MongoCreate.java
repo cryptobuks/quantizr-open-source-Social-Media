@@ -171,9 +171,7 @@ public class MongoCreate extends ServiceBase {
                         ret = ret / 2;
                     }
                     return ret;
-                } else // else minOrdinal is already at zero so we insert a new block, and then let
-                // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now
-                {
+                } else { // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now // else minOrdinal is already at zero so we insert a new block, and then let
                     rangeSize = RESERVE_BLOCK_SIZE;
                     newOrdinal = RESERVE_BLOCK_SIZE - 1;
                 }
@@ -185,6 +183,7 @@ public class MongoCreate extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
         BulkOperations bops = null;
         int batchSize = 0;
+
         for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit)) {
             // lazy create bulkOps
             if (bops == null) {

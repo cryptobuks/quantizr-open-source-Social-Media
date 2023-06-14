@@ -71,9 +71,7 @@ public class SyncFromMFSService extends ServiceBase {
                     res.setMessage("Unable to process: " + req.getPath());
                     res.setSuccess(false);
                 }
-            } else // Loading from an actual MFS path was completed, but is not very usable because we can only
-            // access data from the local MFS
-            {
+            } else { // access data from the local MFS // Loading from an actual MFS path was completed, but is not very usable because we can only
                 if (processPath(req.getPath())) {
                     res.setMessage(buildReport());
                     res.setSuccess(true);
@@ -103,6 +101,7 @@ public class SyncFromMFSService extends ServiceBase {
     public boolean traverseDag(SubNode node, String cid, int level, int recursive) {
         boolean success = false;
         String indent = "";
+
         for (int i = 0; i < level; i++) {
             indent += "    ";
         }
@@ -175,13 +174,12 @@ public class SyncFromMFSService extends ServiceBase {
                 String entryPath = path + "/" + entry.getName();
                 if (entry.getSize() == 0) {
                     processPath(entryPath);
-                } else // else process a file
-                {
+                } else { // else process a file
                     // process directory
                     if (entry.isDir()) {
                         processPath(entryPath);
-                    } else // process file
-                    if (entry.isFile()) {
+                    } //
+                    else if (entry.isFile()) { // process file
                         log.debug("processFile: " + entryPath);
                         // read the node json from ipfs file
                         String json = ipfsFiles.readFile(entryPath);
@@ -211,8 +209,7 @@ public class SyncFromMFSService extends ServiceBase {
                                 if (findNode != null) {
                                     log.debug("Node existed: " + node.getId());
                                     matchingFiles++;
-                                } else // todo-2: check if node is same content here.
-                                {
+                                } else { // todo-2: check if node is same content here.
                                     SubNode realNode = jsonMapper.readValue(json, SubNode.class);
                                     update.save(session, realNode);
                                     log.debug("Created Node: " + node.getId());

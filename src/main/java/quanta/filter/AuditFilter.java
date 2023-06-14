@@ -131,6 +131,7 @@ public class AuditFilter extends GenericFilterBean {
         Enumeration<?> e = sreq.getHeaderNames();
         if (e.hasMoreElements()) {
             sb.append("headers:\n");
+
             while (e.hasMoreElements()) {
                 String name = (String) e.nextElement();
                 sb.append(INDENT);
@@ -148,6 +149,7 @@ public class AuditFilter extends GenericFilterBean {
         Collection<String> names = sres.getHeaderNames();
         if (names.size() > 0) {
             sb.append("headers:\n");
+
             for (String name : names) {
                 sb.append(INDENT);
                 sb.append(name);
@@ -164,6 +166,7 @@ public class AuditFilter extends GenericFilterBean {
         Enumeration<?> e = sreq.getParameterNames();
         if (e.hasMoreElements()) {
             sb.append("Servlet parameters (Multiple Value style):\n");
+
             while (e.hasMoreElements()) {
                 String name = (String) e.nextElement();
                 String[] vals = (String[]) sreq.getParameterValues(name);
@@ -173,6 +176,7 @@ public class AuditFilter extends GenericFilterBean {
                     sb.append(name);
                     sb.append("]=");
                     sb.append(vals[0]);
+
                     for (int i = 1; i < vals.length; i++) {
                         sb.append(INDENT);
                         sb.append(INDENT); // double indent (not a typo)
@@ -192,6 +196,7 @@ public class AuditFilter extends GenericFilterBean {
         if (reqAttrs != null && reqAttrs instanceof Enumeration<?>) {
             Enumeration<?> attrs = (Enumeration<?>) reqAttrs;
             sb.append("Req Attrs:\n");
+
             while (attrs.hasMoreElements()) {
                 String attr = attrs.nextElement().toString();
                 if (sreq.getAttribute(attr) != null) {
@@ -220,6 +225,7 @@ public class AuditFilter extends GenericFilterBean {
         if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?>) {
             Enumeration<?> attrs = (Enumeration<?>) sessionAattrs;
             sb.append("Sess Attrs:\n");
+
             while (attrs.hasMoreElements()) {
                 String attr = attrs.nextElement().toString();
                 if (session.getAttribute(attr) != null) {
@@ -244,6 +250,7 @@ public class AuditFilter extends GenericFilterBean {
         StringBuilder sb = new StringBuilder();
         if (e.hasMoreElements()) {
             sb.append("Servlet parameters (Single Value style):\n");
+
             while (e.hasMoreElements()) {
                 String name = (String) e.nextElement();
                 sb.append(INDENT + name + " = " + sreq.getParameter(name) + "\n");
@@ -270,7 +277,8 @@ public class AuditFilter extends GenericFilterBean {
             sb.append("]");
             // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
             log.debug(sb.toString());
-        } else if (log.isTraceEnabled()) { // VERBOSE Logging
+        } //
+        else if (log.isTraceEnabled()) { // VERBOSE Logging
             try {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n>\n");

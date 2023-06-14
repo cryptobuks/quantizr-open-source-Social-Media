@@ -389,6 +389,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         StringTokenizer t = new StringTokenizer(content, "\n", true);
         List<String> list = new LinkedList<>();
         String curLine = "";
+
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
             if ("\n".equals(tok)) {
@@ -573,6 +574,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private void processAttachmentInCell(boolean injectingTag, JupyterCell cell, Attachment att, String mdLink) {
         if (injectingTag) {
             List<String> newSource = new LinkedList<>();
+
             for (String val : cell.getSource()) {
                 newSource.add(insertMdLink(val, att, mdLink));
             }
@@ -643,6 +645,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);
+
             while (fileNameSet.contains(numberedFileName)) {
                 numberedFileName = fileName + String.valueOf(++idx);
             }
@@ -662,6 +665,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);
+
             while (fileNameSet.contains(numberedFileName)) {
                 numberedFileName = fileName + String.valueOf(++idx);
             }

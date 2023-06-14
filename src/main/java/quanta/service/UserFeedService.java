@@ -119,8 +119,7 @@ public class UserFeedService extends ServiceBase {
             if (AclService.isPublic(ms, rootNode)) {} else /* // do nothing, for now.
              * If chat node is NOT public we try to check our read auth on it and if not this will throw an
              * exception which is the correct flow here
-             */
-            {
+             */{
                 try {
                     auth.auth(ms, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
                 } catch (Exception e) {
@@ -154,7 +153,8 @@ public class UserFeedService extends ServiceBase {
 
         if (doAuth && req.getMyMentions()) {
             searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
-        } else if (!testQuery && doAuth && req.getToMe()) { // includes shares TO me (but not in the context of a 'bidirectional' query)
+        } //
+        else if (!testQuery && doAuth && req.getToMe()) { // includes shares TO me (but not in the context of a 'bidirectional' query)
             myAcntNode = read.getNode(ms, sc.getRootId());
             if (myAcntNode != null) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
@@ -195,7 +195,8 @@ public class UserFeedService extends ServiceBase {
             // this regex simply is "Starts with a period"
             orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
             crit = crit.andOperator(new Criteria().orOperator(orCrit));
-        } else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
+        } //
+        else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
             List<Criteria> orCrit = new LinkedList<>();
             // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
             orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
@@ -430,6 +431,7 @@ public class UserFeedService extends ServiceBase {
             req.getFromMe()
         );
         int skipped = 0;
+
         for (SubNode node : iter) {
             /*
              * todo-2: We could theoretically pre-calculate the 'isEnglish' and 'hasBadWords' state at the time
@@ -554,6 +556,7 @@ public class UserFeedService extends ServiceBase {
         arun.run(as -> {
             List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false, null);
             if (nodeList == null) return null;
+
             for (SubNode node : nodeList) {
                 String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
                 if (userNodeId != null) {

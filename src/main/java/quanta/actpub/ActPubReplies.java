@@ -58,6 +58,7 @@ public class ActPubReplies extends ServiceBase {
                 // at least as far as ActPub is concerned.
                 Sort sort = Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME);
                 Iterable<SubNode> children = read.findSubNodesByType(as, node, NodeType.COMMENT.s(), false, sort, null);
+
                 for (SubNode child : children) {
                     if (AclService.isPublic(as, child)) {
                         nodes.add(child);
@@ -69,6 +70,7 @@ public class ActPubReplies extends ServiceBase {
                     NodeProp.INREPLYTO.s(),
                     nodeId
                 );
+
                 for (SubNode child : iter) {
                     if (AclService.isPublic(as, child)) {
                         nodes.add(child);

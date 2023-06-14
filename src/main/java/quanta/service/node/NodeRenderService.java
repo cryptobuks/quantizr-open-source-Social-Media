@@ -173,7 +173,8 @@ public class NodeRenderService extends ServiceBase {
                 } else {
                     node = parent != null ? parent : node;
                 }
-            } else if (req.getSiblingOffset() > 0) {
+            } //
+            else if (req.getSiblingOffset() > 0) {
                 SubNode nodeBelow = read.getSiblingBelow(ms, node, parent);
                 if (nodeBelow != null) {
                     node = nodeBelow;
@@ -405,10 +406,10 @@ public class NodeRenderService extends ServiceBase {
                         // ROWS_PER_PAGE max and we're done.
                         slidingWindow = null;
                     }
-                } else/*
+                } else /*
                  * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
                  * iteration/node
-                 */ {
+                 */{
                     /* lazily create sliding window */
                     if (slidingWindow == null) {
                         slidingWindow = new LinkedList<>();
@@ -442,6 +443,7 @@ public class NodeRenderService extends ServiceBase {
             int count = slidingWindow.size();
             if (count > 0) {
                 int relativeIdx = idx - 1;
+
                 for (int i = count - 1; i >= 0; i--) {
                     SubNode sn = slidingWindow.get(i);
                     relativeIdx--;
@@ -597,6 +599,7 @@ public class NodeRenderService extends ServiceBase {
         }
         LinkedList<CalendarItem> items = new LinkedList<>();
         res.setItems(items);
+
         for (SubNode n : read.getCalendar(ms, node)) {
             CalendarItem item = new CalendarItem();
             String content = n.getContent();
@@ -638,7 +641,8 @@ public class NodeRenderService extends ServiceBase {
                     } else {
                         content = "";
                     }
-                } else if (
+                } //
+                else if (
                     node.getType() == NodeType.NOSTR_ENC_DM.s() || //
                     content.startsWith(Constant.ENC_TAG.s())
                 ) {
@@ -663,6 +667,7 @@ public class NodeRenderService extends ServiceBase {
     public String stripRenderTags(String content) {
         if (content == null) return null;
         content = content.trim();
+
         while (content.startsWith("#")) {
             content = XString.stripIfStartsWith(content, "#");
         }

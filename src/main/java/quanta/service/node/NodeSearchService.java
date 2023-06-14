@@ -106,6 +106,7 @@ public class NodeSearchService extends ServiceBase {
         List<SubNode> nodes = read.getFlatSubGraph(ms, req.getRootId(), req.isIncludeComments());
 
         int counter = 0;
+
         for (SubNode n : nodes) {
             NodeInfo info = convert.convertToNodeInfo(
                 false,
@@ -171,7 +172,8 @@ public class NodeSearchService extends ServiceBase {
                     searchResults.add(info);
                 }
             }
-        } else if ("node.name".equals(req.getSearchProp())) {
+        } //
+        else if ("node.name".equals(req.getSearchProp())) {
             /* Undocumented Feature: You can find named nodes using format ":userName:nodeName" */
             if (!searchText.contains(":")) {
                 if (ThreadLocals.getSC().isAdmin()) {
@@ -539,7 +541,8 @@ public class NodeSearchService extends ServiceBase {
                 // this regex simply is "Starts with a period"
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
                 // crit = crit.andOperator(new Criteria().orOperator(orCrit));
-            } else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
+            } //
+            else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
                 // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
                 // this regex simly is "Starts with a period"
@@ -601,6 +604,7 @@ public class NodeSearchService extends ServiceBase {
         }
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
+
         for (SubNode node : iter) {
             nodeCount++;
             if (req.isSignatureVerify()) {
@@ -648,6 +652,7 @@ public class NodeSearchService extends ServiceBase {
             }
             HashSet<String> knownTokens = null;
             StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
+
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
                 if (!english.isStopWord(token)) {
@@ -668,7 +673,8 @@ public class NodeSearchService extends ServiceBase {
                             }
                             ws.count++;
                         }
-                    } else if (token.startsWith("#")) { // if word is a hashtag.
+                    } //
+                    else if (token.startsWith("#")) { // if word is a hashtag.
                         if (token.endsWith("#") || token.length() < 4) continue;
                         String tokSearch = token.replace("#", "").toLowerCase();
                         if (blockTerms != null && blockTerms.contains(tokSearch)) continue;
@@ -754,6 +760,7 @@ public class NodeSearchService extends ServiceBase {
         if (wordList != null) {
             ArrayList<String> topWords = new ArrayList<>();
             res.setTopWords(topWords);
+
             for (WordStats ws : wordList) {
                 topWords.add(ws.word); // + "," + ws.count);
                 if (topWords.size() >= 100) break;
@@ -763,6 +770,7 @@ public class NodeSearchService extends ServiceBase {
         if (voteList != null) {
             ArrayList<String> topVotes = new ArrayList<>();
             res.setTopVotes(topVotes);
+
             for (WordStats ws : voteList) {
                 topVotes.add(ws.word + "(" + ws.count + ")");
                 if (topVotes.size() >= 100) break;
@@ -772,6 +780,7 @@ public class NodeSearchService extends ServiceBase {
         if (tagList != null) {
             ArrayList<String> topTags = new ArrayList<>();
             res.setTopTags(topTags);
+
             for (WordStats ws : tagList) {
                 topTags.add(ws.word); // + "," + ws.count);
                 if (topTags.size() >= 100) break;
@@ -781,6 +790,7 @@ public class NodeSearchService extends ServiceBase {
         if (mentionList != null) {
             ArrayList<String> topMentions = new ArrayList<>();
             res.setTopMentions(topMentions);
+
             for (WordStats ws : mentionList) {
                 topMentions.add(ws.word); // + "," + ws.count);
                 if (topMentions.size() >= 100) break;
@@ -809,6 +819,7 @@ public class NodeSearchService extends ServiceBase {
             String blockedWords = root.getStr(NodeProp.USER_BLOCK_WORDS);
             if (StringUtils.isNotEmpty(blockedWords)) {
                 StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
+
                 while (t.hasMoreTokens()) {
                     blockTerms.add(t.nextToken().replace("#", "").toLowerCase());
                 }
@@ -827,6 +838,7 @@ public class NodeSearchService extends ServiceBase {
     ) {
         List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
         if (tags == null) return;
+
         for (APTag tag : tags) {
             try {
                 // ActPub spec originally didn't have Hashtag here, so default to that if no type
@@ -851,7 +863,8 @@ public class NodeSearchService extends ServiceBase {
                         mentionMap.put(_name, ws);
                     }
                     ws.count++;
-                } else if (tag.getType().equals("Hashtag")) { // Hashtags
+                } //
+                else if (tag.getType().equals("Hashtag")) { // Hashtags
                     WordStats ws = tagMap.get(_name);
                     if (ws == null) {
                         ws = new WordStats(_name);

@@ -170,6 +170,7 @@ public class SessionContext extends ServiceBase {
 
     public String dumpActions(String prefix, int countThreshold) {
         StringBuilder sb = new StringBuilder();
+
         for (String actionName : actionCounters.keySet()) {
             Integer count = (Integer) actionCounters.get(actionName);
             if (count.intValue() >= countThreshold) {
@@ -338,7 +339,8 @@ public class SessionContext extends ServiceBase {
                                 guids.add(sc.getAppGuid());
                             }
                         }
-                    } else if (requireToken) {
+                    } //
+                    else if (requireToken) {
                         if (sc.getUserToken() != null) {
                             if (!tokens.contains(sc.getUserToken())) {
                                 ret.add(sc);

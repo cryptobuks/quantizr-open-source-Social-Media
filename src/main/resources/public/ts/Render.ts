@@ -158,11 +158,14 @@ export class Render {
         }
         this.markedRenderer = new marked.Renderer();
 
+        // DO NOT DELETE:
+        // For now I like the default formatter better than this custom stuff, but I want to keep this code
+        // in case we need to go back to it.
         // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
-        this.markedRenderer.codespan = (code: string) => {
-            // return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
-            return `<span class='mkDownCodespan'">${code}</span>`;
-        }
+        // this.markedRenderer.codespan = (code: string) => {
+        //     // return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
+        //     return `<span class='mkDownCodespan'">${code}</span>`;
+        // }
 
         // From Stack Overflow
         // https://github.com/markedjs/marked/issues/882

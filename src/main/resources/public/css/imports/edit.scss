@@ -46,13 +46,7 @@ td {
 
 .mkDownCodespan {
     color: var(--bs-green);
-    word-wrap: break-word;
-    cursor: pointer;
-    font-size: 110%;
-
-    // I saw these in browser elements view but not sure if we need them.
-    // direction: ltr /* rtl:ignore */;
-    // unicode-bidi: bidi-override;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .nostrLink {
@@ -361,4 +355,3 @@ td {
 .ipfsPinnedCheckbox {
     margin-left: 24px;
 }
-
