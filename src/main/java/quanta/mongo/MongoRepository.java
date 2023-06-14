@@ -62,15 +62,6 @@ public class MongoRepository extends ServiceBase {
             );
     }
 
-    /* Once per day rebuild indexes */
-    @Scheduled(fixedDelay = DateUtil.DAY_MILLIS)
-    public void rebuildIndexes() {
-        arun.run(as -> {
-            mongoUtil.rebuildIndexes(as);
-            return null;
-        });
-    }
-
     @PreDestroy
     public void preDestroy() {
         log.debug("MongoRepository.preDestroy running.");
