@@ -69,13 +69,7 @@ public class PerformanceReport {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(String.valueOf(se.totalCalls)));
         }
         if (!rows.isEmpty()) {
-            sb.append(
-                htmlTable( //
-                    //
-                    //
-                    htmlTr(htmlTh("user") + htmlTh("Count")) + rows
-                )
-            );
+            sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Count")) + rows));
         }
         // -------------------------------------------
         upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
@@ -86,13 +80,7 @@ public class PerformanceReport {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
         }
         if (!rows.isEmpty()) {
-            sb.append(
-                htmlTable( //
-                    //
-                    //
-                    htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows
-                )
-            );
+            sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows));
         }
         // -------------------------------------------
         upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
@@ -132,9 +120,7 @@ public class PerformanceReport {
         }
         List<MethodStat> orderedStats = new ArrayList<>(stats.values());
         orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
-        String table = htmlTr( //
-            //
-            //
+        String table = htmlTr(
             htmlTh("Category") +
             htmlTh("Count") +
             htmlTh("Avg. Time") + //
@@ -143,9 +129,7 @@ public class PerformanceReport {
 
         for (MethodStat stat : orderedStats) {
             table +=
-                htmlTr( //
-                    //
-                    //
+                htmlTr(
                     htmlTd(stat.category) +
                     htmlTdRt(String.valueOf(stat.totalCount)) +
                     htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) + //

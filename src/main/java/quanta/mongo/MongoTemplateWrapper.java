@@ -52,7 +52,7 @@ public class MongoTemplateWrapper extends ServiceBase {
             start = System.currentTimeMillis();
         }
 
-        long count = opsw.count(null, query);
+        long count = count(null, query);
         if (logging) {
             log.debug("count=" + count + "t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
@@ -141,7 +141,7 @@ public class MongoTemplateWrapper extends ServiceBase {
             start = System.currentTimeMillis();
         }
 
-        long count = opsw.count(null, query);
+        long count = ops.count(query, SubNode.class);
         if (logging) {
             log.debug("count: " + count + " t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }

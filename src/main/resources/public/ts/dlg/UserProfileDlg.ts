@@ -212,7 +212,7 @@ export class UserProfileDlg extends DialogBase {
                         ? new Button("Secure DM", this.sendSecureDM, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
-                       ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
+                        ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
                         ? new Button("Mentions", () => this.searchMentions(this.getUserName(false)), { title: "Find all Public Mentions of this person" }) : null,
