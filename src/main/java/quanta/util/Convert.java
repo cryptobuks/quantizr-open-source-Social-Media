@@ -59,6 +59,9 @@ public class Convert extends ServiceBase {
      * Note: childrenCheck=true means that we DO need the correct value for hasChildren (from a global,
      * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
      * if there ARE an children REGARDLESS of whether the given user can access those children.
+     *
+     * todo-0: make sure any saving that's triggered in here is done in an async thread that doesn't block
+     * this method from returning fast
      */
     @PerfMon(category = "convert")
     public NodeInfo convertToNodeInfo(
@@ -110,15 +113,6 @@ public class Convert extends ServiceBase {
             }
         }
         attach.fixAllAttachmentMimes(node);
-
-        /*
-         * We only parse openGraph upon demand (lazily) right here, when a node is accessed, because doing
-         * this work unnecessarily when the node is saved would a huge waste of both bandwidth and storage,
-         * so nodes will only have the sn:og property set here if it's ever been accessed.
-         *
-         * todo-0: soon we can remove this, because the data gets set during 'saves'
-         */
-        openGraph.parseNode(node, false);
 
         boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
         List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
@@ -376,7 +370,7 @@ public class Convert extends ServiceBase {
             int atCount = 0;
             boolean formatted = false;
             // Hashtag
-            if ( //
+            if (
                 includeHashtags &&
                 tokLen > 1 &&
                 tok.startsWith("#") &&
