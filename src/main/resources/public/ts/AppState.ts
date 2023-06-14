@@ -101,7 +101,9 @@ export class AppState {
     ttsRan: boolean = false;
     showTtsInputText: boolean = false;
 
-    anonShowLHSMenu: boolean = false;
+    // of the URL is like 'https://quanta.wiki' and no path or query on the url then default
+    // do showing this LHS menu always.
+    anonShowLHSMenu: boolean = (!window.location.pathname || window.location.pathname.length == 1) && !window.location.search;
     showSchemaOrgProps: boolean = false;
     showRecentProps: boolean = false;
 
