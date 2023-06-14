@@ -18,10 +18,14 @@
 
 .menuIcon {
     vertical-align: middle;
-    cursor: pointer;
     margin-top: 5px;
     margin-right: 5px;
-    color: lightSlateGray;
+    color: $primary;
+}
+
+.menuIconDisabled {
+    @extend .menuIcon;
+    color: gray;
 }
 
 .menuItemSeparator {
@@ -33,11 +37,12 @@
     font-weight: lighter;
     background-color: transparent;
     color: $disabled-body-color;
-    padding: 5px; 
+    padding: 5px;
 
     @if $highlightActiveMenuItems {
-        border-left: 5px solid transparent;     
+        border-left: 5px solid transparent;
     }
+
     border: 1px solid transparent;
     border-radius: 0;
 }
@@ -55,8 +60,9 @@
     background-color: transparent;
 
     @if $highlightActiveMenuItems {
-        border-left: 5px solid $nodeBorderBottomColor; 
-    } 
+        border-left: 5px solid $nodeBorderBottomColor;
+    }
+
     padding: 5px;
     border: 1px solid transparent;
     border-radius: 0;
@@ -81,7 +87,7 @@
 .menuHeading {
     cursor: pointer;
     background-color: transparent;
-    padding: 5px 5px 5px 15px; 
+    padding: 5px 5px 5px 15px;
     border: 1px solid transparent;
 }
 

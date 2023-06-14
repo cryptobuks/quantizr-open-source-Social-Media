@@ -1,7 +1,6 @@
 import { asyncDispatch, dispatch, getAs, promiseDispatch } from "./AppContext";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
-import { Tag } from "./comp/core/Tag";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -210,6 +209,7 @@ export class MenuPanel extends Div {
 
         const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
+        const onMainTab: boolean = ast.activeTab == C.TAB_MAIN;
         const nostrNodeHighlighted = !!hltNode && S.nostr.isNostrNode(hltNode);
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;
@@ -256,7 +256,7 @@ export class MenuPanel extends Div {
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
-                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
+                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));
             }
         }
 
@@ -275,7 +275,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Exports", MenuPanel.openExportsNode),
                 systemFolderLinks.length > 0 ? new MenuItemSeparator() : null,
                 ...systemFolderLinks
-            ], null, this.makeHelpIcon(":menu-tree")));
+            ], null));
         }
 
         if (!ast.isAnonUser) {
@@ -290,7 +290,7 @@ export class MenuPanel extends Div {
                  to create a heavy server load for now. Users can add one at a time for now, and only the FollowBot user has
                  this superpower. */
                 ast.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null //
-            ], null, this.makeHelpIcon(":menu-people")));
+            ], null));
         }
 
         if (!ast.isAnonUser) {
@@ -298,29 +298,29 @@ export class MenuPanel extends Div {
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 
-                new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
+                new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-                new MenuItem("Set Headings", S.edit.setHeadings, selNodeIsMine), //
-                new MenuItem("Search and Replace", MenuPanel.searchAndReplace, selNodeIsMine), //
+                new MenuItem("Set Headings", S.edit.setHeadings, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Search and Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
 
                 new MenuItemSeparator(), //
 
-                new MenuItem("Split Node", MenuPanel.splitNode, selNodeIsMine), //
-                new MenuItem("Join Nodes", MenuPanel.joinNodes, selNodeIsMine), //
+                new MenuItem("Split Node", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Join Nodes", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
 
                 new MenuItemSeparator(), //
 
-                new MenuItem("Move to Top", S.edit.moveNodeToTop, canMoveUp), //
-                new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, canMoveDown), //
+                new MenuItem("Move to Top", S.edit.moveNodeToTop, onMainTab && canMoveUp, null, true), //
+                new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, onMainTab && canMoveDown, null, true), //
                 new MenuItemSeparator(), //
 
-                new MenuItem("Cut", S.edit.cutSelNodes, selNodeIsMine ), //
-                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !!ast.nodesToMove), //
+                new MenuItem("Cut", S.edit.cutSelNodes, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Undo Cut", S.edit.undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
                 new MenuItemSeparator(), //
-                
-                new MenuItem("Delete", S.edit.deleteSelNodes, selNodeIsMine) //
+
+                new MenuItem("Delete", S.edit.deleteSelNodes, onMainTab && selNodeIsMine, null, true) //
 
                 // todo-2: disabled during mongo conversion
                 // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -329,7 +329,7 @@ export class MenuPanel extends Div {
                 //    () => { return state.isAdminUser }, //
                 //    true
                 // ), //
-            ], null, this.makeHelpIcon(":menu-edit")));
+            ], null));
         }
 
         const createMenuItems: CompIntf[] = [];
@@ -345,7 +345,7 @@ export class MenuPanel extends Div {
                 typesAdded = true;
                 if (ast.isAdminUser || type.getAllowUserSelect()) {
                     createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null), //
-                        !ast.isAnonUser && !!hltNode));
+                        onMainTab && !ast.isAnonUser && !!hltNode));
                 }
             });
         }
@@ -360,14 +360,14 @@ export class MenuPanel extends Div {
                     S.edit.createNode(hltNode, dlg.chosenType, true, true, null, null);
                 }
             }, //
-                !ast.isAnonUser && !!hltNode));
+                onMainTab && !ast.isAnonUser && !!hltNode, null, true));
 
-            children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
+            children.push(new Menu("Create", createMenuItems, null));
         }
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Search", [
-                new MenuItem("By Content", MenuPanel.searchByContent, !!hltNode), //
+                new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
 
@@ -397,7 +397,7 @@ export class MenuPanel extends Div {
 
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
-            ], null, this.makeHelpIcon(":menu-search")));
+            ], null));
         }
 
         if (!ast.isAnonUser) {
@@ -405,21 +405,21 @@ export class MenuPanel extends Div {
                 // Backing out the Chat Room feature for now.
                 // new MenuItem("Live Rev-Chron (Chat Room)", S.nav.messagesNodeFeed, hltNode?.id != null),
                 // new MenuItemSeparator(), //
-                new MenuItem("Created", MenuPanel.timelineByCreated, !!hltNode), //
-                new MenuItem("Modified", MenuPanel.timelineByModified, !!hltNode), //
+                new MenuItem("Created", MenuPanel.timelineByCreated, onMainTab && !!hltNode, null, true),
+                new MenuItem("Modified", MenuPanel.timelineByModified, onMainTab && !!hltNode, null, true),
                 new MenuItemSeparator(), //
-                new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, !!hltNode), //
-                new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, !!hltNode) //
-            ], null, this.makeHelpIcon(":menu-timeline")));
+                new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true), //
+                new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, onMainTab && !!hltNode, null, true) //
+            ], null));
         }
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Calendar", [
-                new MenuItem("Display", MenuPanel.showCalendar, !!hltNode),
+                new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
                 new MenuItemSeparator(), //
-                new MenuItem("Future", MenuPanel.calendarFutureDates, !!hltNode), //
-                new MenuItem("Past", MenuPanel.calendarPastDates, !!hltNode), //
-                new MenuItem("All", MenuPanel.calendarAllDates, !!hltNode) //
+                new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
+                new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
+                new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
             ]));
         }
 
@@ -427,20 +427,20 @@ export class MenuPanel extends Div {
             children.push(new Menu("Tools", [
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
-                new MenuItem("Import", MenuPanel.import, importFeatureEnabled),
-                new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
+                new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
+                new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
                 new MenuItemSeparator(), //
 
                 S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
-                new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, selNodeIsMine), //
-                new MenuItem("Generate SHA256", MenuPanel.subgraphHash, selNodeIsMine) //
+                new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true) //
 
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
 
                 // DO NOT DELETE
                 // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
-            ], null, this.makeHelpIcon(":menu-tools")));
+            ], null));
         }
 
         if (!ast.isAnonUser) {
@@ -448,30 +448,30 @@ export class MenuPanel extends Div {
                 // I decided with this on the toolbar we don't need it repliated here.
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
-                new MenuItem("Show URLs", MenuPanel.showUrls, !!hltNode), //
-                new MenuItem("Show Raw Data", MenuPanel.showRawData, selNodeIsMine), //
+                new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
+                new MenuItem("Show Raw Data", MenuPanel.showRawData, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Query Nostr Relays", MenuPanel.queryNostrRelays, !ast.isAnonUser && nostrNodeHighlighted), //
-                ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
+                ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson, onMainTab, null, true) : null, //
                 new MenuItemSeparator(), //
-                new MenuItem("Node Stats", MenuPanel.nodeStats) //
-            ], null, this.makeHelpIcon(":menu-node-info")));
+                new MenuItem("Node Stats", onMainTab && MenuPanel.nodeStats) //
+            ], null));
 
             children.push(new Menu("Shortcuts", [
-                new MenuItem("Set Link Source", MenuPanel.setLinkSource, ast.userPrefs.editMode && selNodeIsMine), //
-                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, ast.userPrefs.editMode), //
-                new MenuItem("Link Nodes", MenuPanel.linkNodes, ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget)
+                new MenuItem("Set Link Source", MenuPanel.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
+                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, onMainTab && ast.userPrefs.editMode, null, true), //
+                new MenuItem("Link Nodes", MenuPanel.linkNodes, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true)
             ]));
         }
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Transfer", [
-                new MenuItem("Transfer", MenuPanel.transferNode, selNodeIsMine && !transferring), //
-                new MenuItem("Accept", MenuPanel.acceptTransfer, selNodeIsMine && transferring), //
-                new MenuItem("Reject", MenuPanel.rejectTransfer, selNodeIsMine && transferring), //
-                new MenuItem("Reclaim", MenuPanel.reclaimTransfer, transferFromMe) //
+                new MenuItem("Transfer", MenuPanel.transferNode, onMainTab && selNodeIsMine && !transferring, null, true), //
+                new MenuItem("Accept", MenuPanel.acceptTransfer, onMainTab && selNodeIsMine && transferring, null, true), //
+                new MenuItem("Reject", MenuPanel.rejectTransfer, onMainTab && selNodeIsMine && transferring, null, true), //
+                new MenuItem("Reclaim", MenuPanel.reclaimTransfer, onMainTab && transferFromMe, null, true) //
 
                 // todo-1: need "Show Incomming" transfers menu option
-            ], null, this.makeHelpIcon(":transfers")));
+            ], null));
 
             children.push(new Menu("Account", [
                 new MenuItem("Profile", MenuPanel.userProfile),
@@ -515,23 +515,6 @@ export class MenuPanel extends Div {
 
         this.setChildren(children);
         return true;
-    }
-
-    makeHelpIcon = (nodeName: string): Tag => {
-        // I'm disabling this for now because these named nodes are proprietary to the Quanta.wiki database
-        // and I'll modify this to be something that will be usable by all Quanta-based instances, and
-        // be generated from content that's embedded in the distro itself.
-        return null;
-        // return new Tag("i", {
-        //     className: "fa fa-question-circle fa-lg float-end menuIcon",
-        //     title: "Display Help Information",
-        //     onClick: (event: Event) => {
-        //         event.stopPropagation();
-        //         event.preventDefault();
-        //         // S.view.jumpToId(bookmark.selfId);
-        //         S.nav.openContentNode(nodeName);
-        //     }
-        // });
     }
 
     // These are defined externally in config-text.yaml

@@ -13,7 +13,7 @@ import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
 
-/*
+/**
  * Instrumentation for the app (for Performance Monitoring)
  *
  * Any method can be annotated with @PerfMon to gather performance statistics .
@@ -37,14 +37,10 @@ import quanta.util.ThreadLocals;
  *
  * Example Call
  *
- *  <pre>
  *  @PerfMon(category = "apub")
  *   public APOPerson generatePersonObj(SubNode userNode) {
  *       String host = prop.getProtocolHostAndPort();
- *  </pre>
  */
-// NOTE : To disable the instrumentation, just comment these two annotations
-// Adding these annotations is all you need to enable it.
 public class Instrument {
 
     private static Logger log = LoggerFactory.getLogger(Instrument.class);

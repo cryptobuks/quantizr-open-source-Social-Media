@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { getAs } from "../AppContext";
+import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
-import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
+import { Tag } from "./core/Tag";
 
 interface LS { // Local State
     visible: boolean;
@@ -16,7 +16,7 @@ interface LS { // Local State
 export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null,
-        private floatRightComp: CompIntf = null) {
+        private treeOp: boolean = null) {
         super(name);
         this.onClick = this.onClick.bind(this);
         this.mergeState({ visible: true, enabled });
@@ -43,7 +43,10 @@ export class MenuItem extends Div {
 
         this.setChildren([
             innerSpan,
-            this.floatRightComp
+            this.treeOp ? new Tag("i", {
+                className: "fa fa-caret-right fa-lg float-end " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
+                title: "Operates on the selected Tree Nodes(s)",
+            }) : null
         ]);
 
         return this.tag("div", {
