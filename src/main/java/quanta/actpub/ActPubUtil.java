@@ -223,7 +223,6 @@ public class ActPubUtil extends ServiceBase {
      * Headers can be optionally passed in, preloaded with security properties, or else null is
      * acceptable too. 'clazz' is optional and tells which APObj-derived class to marshall into.
      */
-    @PerfMon(category = "apUtil")
     public APObj getJson(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
         APObj ret = null;
         int responseCode = 0;
@@ -319,7 +318,6 @@ public class ActPubUtil extends ServiceBase {
      * example to get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox)
      * ...so we can definitely do a little optimization here around this
      */
-    @PerfMon(category = "apUtil")
     public APOActor getActorByUrl(MongoSession ms, String userDoingAction, String url) {
         if (url == null) return null;
         apub.saveFediverseName(url);
@@ -440,7 +438,6 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Generate webfinger response from our server
      */
-    @PerfMon(category = "apUtil")
     public APObj generateWebFinger(String resource) {
         try {
             if (StringUtils.isNotEmpty(resource) && resource.startsWith("acct:")) {

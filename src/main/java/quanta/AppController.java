@@ -236,6 +236,7 @@ public class AppController extends ServiceBase implements ErrorController {
         @PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
         @PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
         @PathVariable(value = "userName", required = false) String userName, //
+        //
         // =======================================================================================
         /* REQUEST PARAMS */
         @RequestParam(value = "id", required = false) String id, //
@@ -356,7 +357,6 @@ public class AppController extends ServiceBase implements ErrorController {
     /*
      * DO NOT DELETE: Leave as example for how to render plain HTML directly from a string
      */
-    // @PerfMon
     // @GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
     // public @ResponseBody String systemPage() {
     // return "<html><body>Hi.</body></html>";
@@ -368,7 +368,7 @@ public class AppController extends ServiceBase implements ErrorController {
         return apub.dumpFediverseUsers();
     }
 
-    // NOPE! No performance monitor for this. @PerfMon
+    // No performance monitor for this. @PerfMon
     @GetMapping(value = { "/performance-report" }, produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String performanceReport() {
@@ -931,9 +931,7 @@ public class AppController extends ServiceBase implements ErrorController {
                 if ("pdf".equalsIgnoreCase(req.getExportExt())) {
                     ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
                     svc.export(ms, "pdf", req, res);
-                } else // } // // } // res.setSuccess(false); // res.setMessage("Export of Markdown to IPFS not yet available."); // if (req.isToIpfs()) { // else if ("md".equalsIgnoreCase(req.getExportExt())) { // } // // svc.export(ms, "html", req, res); // ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class); // else if ("html".equalsIgnoreCase(req.getExportExt())) { // and we don't need these options, but I'm leaving the code in place for now. // I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this // DO NOT DELETE (YET) // ================================================ //
-                // ================================================
-                if ("zip".equalsIgnoreCase(req.getExportExt())) {
+                } else if ("zip".equalsIgnoreCase(req.getExportExt())) { // ================================================ // } // // } // res.setSuccess(false); // res.setMessage("Export of Markdown to IPFS not yet available."); // if (req.isToIpfs()) { // else if ("md".equalsIgnoreCase(req.getExportExt())) { // } // // svc.export(ms, "html", req, res); // ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class); // else if ("html".equalsIgnoreCase(req.getExportExt())) { // and we don't need these options, but I'm leaving the code in place for now. // I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this // DO NOT DELETE (YET) // ================================================ //
                     if (req.isToIpfs()) {
                         res.setMessage("Export of ZIP to IPFS not yet available.");
                         res.setSuccess(false);

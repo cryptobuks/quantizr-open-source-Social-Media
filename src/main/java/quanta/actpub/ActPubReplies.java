@@ -31,7 +31,6 @@ public class ActPubReplies extends ServiceBase {
     /**
      * Generates outbound replies collection data
      */
-    @PerfMon(category = "apReplies")
     public APOOrderedCollection generateReplies(String nodeId) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + nodeId;
         return arun.<APOOrderedCollection>run(as -> {

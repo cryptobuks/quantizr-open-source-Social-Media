@@ -43,7 +43,6 @@ public class ActPubFollower extends ServiceBase {
     /**
      * Generates outbound followers data
      */
-    @PerfMon(category = "apFollower")
     public APOOrderedCollection generateFollowers(String userMakingRequest, String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userMakingRequest, userName);
@@ -142,7 +141,6 @@ public class ActPubFollower extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "apFollower")
     public APOOrderedCollectionPage generateFollowersPage(String userName, String minId) {
         List<String> followers = getFollowersPage(userName, minId);
         // this is a self-reference url (id)

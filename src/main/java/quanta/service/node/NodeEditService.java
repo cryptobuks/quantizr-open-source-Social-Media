@@ -488,7 +488,6 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    @PerfMon(category = "edit")
     public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
         LikeNodeResponse res = new LikeNodeResponse();
         exec.run(() -> {
@@ -539,7 +538,6 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    @PerfMon(category = "edit")
     public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
         if (req.getNostrEvent() != null) {
             List<String> failedIds = nostr.nostrVerify(ms, Arrays.asList(req.getNostrEvent()));

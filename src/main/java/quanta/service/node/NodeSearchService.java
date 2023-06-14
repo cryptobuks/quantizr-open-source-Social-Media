@@ -97,7 +97,6 @@ public class NodeSearchService extends ServiceBase {
         return "Trending Data will be refreshed immediately at next request to display it.";
     }
 
-    @PerfMon(category = "search")
     public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
         RenderDocumentResponse res = new RenderDocumentResponse();
         List<NodeInfo> results = new LinkedList<>();

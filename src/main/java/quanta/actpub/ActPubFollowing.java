@@ -259,7 +259,6 @@ public class ActPubFollowing extends ServiceBase {
     /**
      * Generates outbound following data
      */
-    @PerfMon(category = "apFollowing")
     public APOOrderedCollection generateFollowing(String userDoingAction, String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userDoingAction, userName);
@@ -275,7 +274,6 @@ public class ActPubFollowing extends ServiceBase {
     /**
      * Generates one page of results for the outbound 'following' request
      */
-    @PerfMon(category = "apFollowing")
     public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
         List<String> following = getFollowing(userName, true, true, minId, false, null);
         // this is a self-reference url (id)

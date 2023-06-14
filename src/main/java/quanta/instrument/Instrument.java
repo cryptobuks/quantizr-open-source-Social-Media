@@ -28,12 +28,20 @@ import quanta.util.ThreadLocals;
  * proxied by spring which would make sense, but I don't kow if that's the case.
  *
  * Commenting class annotations to turn all the proxy objects back into direct object references for
- * all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is mostly
- * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
+ * all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is
+ * mostly cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
  * Instrumentation unless turning on temporarily for performance analysis.
  *
  * For reference: import org.aspectj.lang.annotation.Aspect; import
  * org.springframework.stereotype.Component;
+ *
+ * Example Call
+ *
+ *  <pre>
+ *  @PerfMon(category = "apub")
+ *   public APOPerson generatePersonObj(SubNode userNode) {
+ *       String host = prop.getProtocolHostAndPort();
+ *  </pre>
  */
 // NOTE : To disable the instrumentation, just comment these two annotations
 // Adding these annotations is all you need to enable it.
@@ -46,8 +54,6 @@ public class Instrument {
     private static final int MAX_EVENTS = 10000;
     public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());
 
-    // @Around("execution(@PerfMon * *(..))") <--- this one also did work, but I changed to the simpler
-    // looking version.
     @Around("@annotation(PerfMon)")
     public Object perfMonAdvice(ProceedingJoinPoint jp) throws Throwable {
         Object value = null;
@@ -89,9 +95,7 @@ public class Instrument {
             if (duration > CAPTURE_THRESHOLD) {
                 new PerfMonEvent(
                     duration,
-                    annotation.category().equals("")
-                        ? signature.getName()
-                        : (annotation.category() + "." + signature.getName()), //
+                    annotation.category().equals("") ? signature.getName() : (annotation.category() + "." + signature.getName()), //
                     userName
                 );
             }

@@ -147,7 +147,6 @@ public class PushService extends ServiceBase {
         }
     }
 
-    @PerfMon(category = "push")
     public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
         if (sc == null) return;

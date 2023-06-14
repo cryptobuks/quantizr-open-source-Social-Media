@@ -603,7 +603,6 @@ public class AttachmentService extends ServiceBase {
      *
      * node can be passed in -or- nodeId. If node is passed nodeId can be null.
      */
-    @PerfMon(category = "attach")
     public void getBinary(
         MongoSession ms,
         String attName,
@@ -890,7 +889,6 @@ public class AttachmentService extends ServiceBase {
      *
      * NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
      */
-    @PerfMon(category = "attach")
     public void readFromUrl(
         MongoSession ms,
         String sourceUrl,

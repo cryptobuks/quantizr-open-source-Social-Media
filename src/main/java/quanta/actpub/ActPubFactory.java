@@ -384,7 +384,6 @@ public class ActPubFactory extends ServiceBase {
     /*
      * Generates an APOPerson object for one of our own local users
      */
-    @PerfMon(category = "apub")
     public APOPerson generatePersonObj(SubNode userNode) {
         String host = prop.getProtocolHostAndPort();
         String userName = userNode.getStr(NodeProp.USER);

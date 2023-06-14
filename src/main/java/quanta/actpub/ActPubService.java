@@ -539,7 +539,6 @@ public class ActPubService extends ServiceBase {
     /**
      * Gets foreign account SubNode using actorUrl, using the cached copy of found.
      */
-    @PerfMon(category = "apub")
     public SubNode getAcctNodeByActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
         saveFediverseName(actorUrl);
         /* return node from cache if already cached */
@@ -565,7 +564,6 @@ public class ActPubService extends ServiceBase {
      * exists and the caller happens to have it we can pass in as non-null userNode and it will get
      * used.
      */
-    @PerfMon(category = "apub")
     public SubNode importActor(MongoSession ms, SubNode userNode, APOActor actor) {
         // if userNode unknown then get and/or create one. May be creating a brand new one even.
         if (userNode == null) {
@@ -603,7 +601,6 @@ public class ActPubService extends ServiceBase {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
      */
-    @PerfMon(category = "apub")
     public void processInboxPost(HttpServletRequest httpReq, byte[] body) {
         APObj payload = apUtil.buildObj(body);
         apLog.trace("INBOX: " + XString.prettyPrint(payload));
@@ -655,7 +652,6 @@ public class ActPubService extends ServiceBase {
     }
 
     /* Process inbound undo actions (coming from foreign servers) */
-    @PerfMon(category = "apub")
     public void processUndoActivity(HttpServletRequest httpReq, APOUndo activity, byte[] bodyBytes) {
         APObj obj = apAPObj(activity, APObj.object);
         apLog.trace("Undo Type: " + obj.getType());
@@ -675,7 +671,6 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    @PerfMon(category = "apub")
     public void processAcceptActivity(APOAccept activity) {
         APObj obj = activity.getAPObj();
         apLog.trace("Accept Type: " + obj.getType());
@@ -690,7 +685,6 @@ public class ActPubService extends ServiceBase {
     }
 
     /* action will be APType.Create or APType.Update */
-    @PerfMon(category = "apub")
     public void processCreateOrUpdateActivity(
         HttpServletRequest httpReq,
         APOActivity activity,
@@ -729,7 +723,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "apub")
     public void processLikeActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes) {
         boolean unlike = activity instanceof APOUndo;
         arun.<Object>run(as -> {
@@ -769,7 +762,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "apub")
     public void processAnnounceActivity(APOActivity activity, byte[] bodyBytes) {
         boolean undo = activity instanceof APOUndo;
         arun.<Object>run(as -> {
@@ -822,7 +814,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "apub")
     public void processDeleteActivity(HttpServletRequest httpReq, APODelete activity, byte[] bodyBytes, Val<String> keyEncoded) {
         arun.<Object>run(as -> {
             apLog.trace("processDeleteAction");
@@ -859,7 +850,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "apub")
     public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
         if (!as.isAdmin()) throw new NodeAuthFailedException();
@@ -886,7 +876,6 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    @PerfMon(category = "apub")
     public void createOrUpdateObj(MongoSession as, APOActivity activity, String encodedKey) {
         if (!as.isAdmin()) throw new NodeAuthFailedException();
         apLog.trace("createOrUpdateObj");
@@ -976,7 +965,6 @@ public class ActPubService extends ServiceBase {
      *
      * action will be APType.Create, APType.Update, or APType.Announce
      */
-    @PerfMon(category = "apub")
     public SubNode saveInboundForeignObj(
         MongoSession ms,
         String userDoingAction,
@@ -1289,7 +1277,6 @@ public class ActPubService extends ServiceBase {
      *
      * The node save is expected to be done external to this function after this function runs.
      */
-    @PerfMon(category = "apub")
     private void shareToAllObjectRecipients(MongoSession ms, String userDoingAction, SubNode node, Object obj, String propName) {
         List<?> list = apList(obj, propName, true);
         if (list != null) {
@@ -1365,7 +1352,6 @@ public class ActPubService extends ServiceBase {
      * Shares this node to the designated user using their actorUrl and is expected to work even if the
      * actorUrl points to a local user
      */
-    @PerfMon(category = "apub")
     private void shareNodeToActorByUrl(MongoSession ms, String userDoingAction, SubNode node, String actorUrl) {
         apLog.trace("Sharing node to actorUrl: " + actorUrl);
         /*
@@ -1422,7 +1408,6 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    @PerfMon(category = "apub")
     public APOPerson generatePersonObj(String userName) {
         return arun.<APOPerson>run(as -> {
             // we get the usernode without authorizing because the APOPerson is guaranteed to only contain

@@ -64,7 +64,6 @@ public class MongoCreate extends ServiceBase {
      *
      * relPath can be null if no path is known
      */
-    @PerfMon(category = "create")
     public SubNode createNode(
         MongoSession ms,
         SubNode parent,
@@ -117,7 +116,6 @@ public class MongoCreate extends ServiceBase {
         return node;
     }
 
-    @PerfMon(category = "create")
     private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal) {
         switch (location) {
             case FIRST:
@@ -146,7 +144,6 @@ public class MongoCreate extends ServiceBase {
      *
      * Returns the first ordinal in the range we actually ended up freeing up for use.
      */
-    @PerfMon(category = "create")
     public long insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
         long minOrdinal = read.getMinChildOrdinal(ms, node);
         // default new ordinal to ordinal

@@ -229,7 +229,6 @@ public class ActPubOutbox extends ServiceBase {
     /*
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
-    @PerfMon(category = "apOutbox")
     public APOOrderedCollectionPage generateOutboxPage(HttpServletRequest httpReq, String userName, String minId) {
         APList items = getOutboxItems(httpReq, userName, minId);
         // this is a self-reference url (id)

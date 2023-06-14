@@ -56,7 +56,6 @@ public class MongoUpdate extends ServiceBase {
         });
     }
 
-    @PerfMon(category = "update")
     public void save(MongoSession ms, SubNode node, boolean allowAuth) {
         if (allowAuth) {
             auth.ownerAuth(ms, node);
@@ -78,7 +77,6 @@ public class MongoUpdate extends ServiceBase {
         update.saveSession(ms, false);
     }
 
-    @PerfMon(category = "update")
     public void saveSession(MongoSession ms, boolean asAdmin) {
         if (ms == null || ThreadLocals.getSaving().booleanValue() || !ThreadLocals.hasDirtyNodes()) return;
         try {

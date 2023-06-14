@@ -58,7 +58,6 @@ public class NodeRenderService extends ServiceBase {
      * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
      * page, this method gets called once per page and retrieves all the data for that page.
      */
-    @PerfMon(category = "render")
     public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
         RenderNodeResponse res = new RenderNodeResponse();
         // by default we do showReplies
@@ -221,7 +220,6 @@ public class NodeRenderService extends ServiceBase {
         return res;
     }
 
-    @PerfMon(category = "render")
     public NodeInfo processRenderNode(
         boolean adminOnly,
         MongoSession ms,
@@ -618,7 +616,6 @@ public class NodeRenderService extends ServiceBase {
         return res;
     }
 
-    @PerfMon(category = "render")
     public void getBreadcrumbs(MongoSession ms, SubNode node, LinkedList<BreadcrumbInfo> list) {
         ms = ThreadLocals.ensure(ms);
         try {

@@ -63,7 +63,6 @@ public class Convert extends ServiceBase {
      * todo-0: make sure any saving that's triggered in here is done in an async thread that doesn't block
      * this method from returning fast
      */
-    @PerfMon(category = "convert")
     public NodeInfo convertToNodeInfo(
         boolean adminOnly,
         SessionContext sc,

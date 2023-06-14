@@ -112,7 +112,6 @@ public class MongoUtil extends ServiceBase {
      * name, or if the path does end with "/", then it has the effect of finding a new leaf from
      * scratch.
      */
-    @PerfMon
     public String findAvailablePath(String path) {
         /*
          * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
@@ -910,7 +909,6 @@ public class MongoUtil extends ServiceBase {
         return "^" + Pattern.quote(path) + "\\/|^" + Pattern.quote(path) + "$";
     }
 
-    @PerfMon(category = "mongoUtil")
     public SubNode createUser(
         MongoSession ms,
         String newUserName,

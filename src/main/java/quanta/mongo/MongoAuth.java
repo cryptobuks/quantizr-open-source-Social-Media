@@ -98,7 +98,6 @@ public class MongoAuth extends ServiceBase {
      * Returns a list of all user names that are shared to on this node, including "public" if any are
      * public.
      */
-    @PerfMon(category = "auth")
     public List<String> getUsersSharedTo(MongoSession ms, SubNode node) {
         List<String> userNames = null;
         List<AccessControlInfo> acList = getAclEntries(ms, node);
@@ -280,7 +279,6 @@ public class MongoAuth extends ServiceBase {
         ownerAuth(null, node);
     }
 
-    @PerfMon(category = "auth")
     public void ownerAuth(MongoSession ms, SubNode node) {
         if (node == null) {
             throw new RuntimeEx("Auth Failed. Node did not exist.");
@@ -323,7 +321,6 @@ public class MongoAuth extends ServiceBase {
         }
     }
 
-    @PerfMon(category = "auth")
     public void auth(MongoSession ms, SubNode node, PrivilegeType... privs) {
         // during server init no auth is required.
         if (node == null || !MongoRepository.fullInit) {
