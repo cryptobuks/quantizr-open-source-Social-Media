@@ -200,7 +200,7 @@ export class MenuPanel extends Div {
     };
 
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
-    static nodeStats = () => S.view.getNodeStats(false, false);
+    static nodeStats = () => S.view.getNodeStats();
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
 

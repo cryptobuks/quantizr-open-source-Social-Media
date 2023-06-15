@@ -32,7 +32,6 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     }
 
     refresh = async () => {
-        console.log("getNodeStats");
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: null,
             trending: true,

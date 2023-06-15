@@ -169,9 +169,9 @@ export class View {
                 forceIPFSRefresh: false,
                 singleNode: false,
                 jumpToRss: false
-            }, 
-            // query as background mode if growing page
-            growingPage);
+            },
+                // query as background mode if growing page
+                growingPage);
             S.nodeUtil.processInboundNode(res.node);
 
             if (!res.node) return;
@@ -317,22 +317,22 @@ export class View {
         });
     }
 
-    getNodeStats = async (trending: boolean, feed: boolean): Promise<any> => {
+    getNodeStats = async (): Promise<any> => {
         const ast = getAs();
         const node = S.nodeUtil.getHighlightedNode();
         const isMine = !!node && (node.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
-            trending,
-            feed,
+            trending: false,
+            feed: false,
             getWords: isMine,
             getTags: isMine,
             getMentions: isMine,
             signatureVerify: false,
             protocol: ast.protocolFilter
         });
-        new NodeStatsDlg(res, trending, feed).open();
+        new NodeStatsDlg(res, false, false).open();
     }
 
     signSubGraph = async (): Promise<any> => {

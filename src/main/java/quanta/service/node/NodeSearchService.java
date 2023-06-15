@@ -522,6 +522,7 @@ public class NodeSearchService extends ServiceBase {
         int signedNodeCount = 0;
         int unsignedNodeCount = 0;
         int failedSigCount = 0;
+        boolean trending = req.isTrending();
         /*
          * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
          * a bunch of options but just the public feed query
@@ -571,7 +572,9 @@ public class NodeSearchService extends ServiceBase {
             q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
             q.limit(TRENDING_LIMIT);
             iter = opsw.find(ms, q);
-        } else /*
+        }
+        //
+        else /*
          * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
          * running a stats request under the 'Node Info' main menu
          */{
@@ -670,7 +673,7 @@ public class NodeSearchService extends ServiceBase {
                                 ws = new WordStats(token);
                                 mentionMap.put(lcToken, ws);
                             }
-                            ws.count++;
+                            ws.inc(node, trending);
                         }
                     } //
                     else if (token.startsWith("#")) { // if word is a hashtag.
@@ -691,7 +694,7 @@ public class NodeSearchService extends ServiceBase {
                                 ws = new WordStats(token);
                                 tagMap.put(lcToken, ws);
                             }
-                            ws.count++;
+                            ws.inc(node, trending);
                         }
                     } else { // ordinary word
                         if (!StringUtils.isAlpha(token) || token.length() < 3) {
@@ -704,13 +707,13 @@ public class NodeSearchService extends ServiceBase {
                                 ws = new WordStats(token);
                                 wordMap.put(lcToken, ws);
                             }
-                            ws.count++;
+                            ws.inc(node, trending);
                         }
                     }
                 }
                 totalWords++;
             }
-            extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms);
+            extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms, trending);
             if (countVotes) {
                 String vote = node.getStr(NodeProp.VOTE.s());
                 if (vote != null) {
@@ -721,7 +724,7 @@ public class NodeSearchService extends ServiceBase {
                             ws = new WordStats(vote);
                             voteMap.put(vote, ws);
                         }
-                        ws.count++;
+                        ws.inc(node, trending);
                     }
                 }
             }
@@ -833,7 +836,8 @@ public class NodeSearchService extends ServiceBase {
         HashSet<String> knownTokens,
         HashMap<String, WordStats> tagMap,
         HashMap<String, WordStats> mentionMap,
-        HashSet<String> blockTerms
+        HashSet<String> blockTerms,
+        boolean trending
     ) {
         List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
         if (tags == null) return;
@@ -861,7 +865,7 @@ public class NodeSearchService extends ServiceBase {
                         ws = new WordStats(_name);
                         mentionMap.put(_name, ws);
                     }
-                    ws.count++;
+                    ws.inc(node, trending);
                 } //
                 else if (tag.getType().equals("Hashtag")) { // Hashtags
                     WordStats ws = tagMap.get(_name);
@@ -869,7 +873,7 @@ public class NodeSearchService extends ServiceBase {
                         ws = new WordStats(_name);
                         tagMap.put(_name, ws);
                     }
-                    ws.count++;
+                    ws.inc(node, trending);
                 }
             } catch (Exception e) {}
             // just ignore this.

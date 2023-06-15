@@ -60,7 +60,7 @@ public class Convert extends ServiceBase {
      * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
      * if there ARE an children REGARDLESS of whether the given user can access those children.
      *
-     * todo-0: make sure any saving that's triggered in here is done in an async thread that doesn't block
+     * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't block
      * this method from returning fast
      */
     public NodeInfo convertToNodeInfo(
