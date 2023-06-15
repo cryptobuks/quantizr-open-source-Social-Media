@@ -992,6 +992,7 @@ export interface RenderCalendarResponse extends ResponseBase {
 
 export interface RenderDocumentResponse extends ResponseBase {
     searchResults: NodeInfo[];
+    breadcrumbs: BreadcrumbInfo[];
 }
 
 export interface RenderNodeResponse extends ResponseBase {

@@ -271,6 +271,7 @@ export class Search {
             dispatch("RenderDocumentResults", s => {
                 DocumentTab.inst.openGraphComps = [];
                 const info = DocumentTab.inst.props as DocumentRSInfo;
+                info.breadcrumbs = res.breadcrumbs;
                 info.endReached = true;
                 s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             });
@@ -282,6 +283,7 @@ export class Search {
             if (!DocumentTab.inst) return;
             DocumentTab.inst.openGraphComps = [];
             const info = DocumentTab.inst.props as DocumentRSInfo;
+            info.breadcrumbs = res.breadcrumbs;
             info.endReached = true;
             S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
 

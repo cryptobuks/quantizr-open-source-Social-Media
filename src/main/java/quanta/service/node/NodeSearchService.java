@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMon;
+import quanta.model.BreadcrumbInfo;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.APTag;
@@ -103,8 +103,9 @@ public class NodeSearchService extends ServiceBase {
         res.setSearchResults(results);
         HashSet<String> truncates = new HashSet<>();
         List<SubNode> nodes = read.getFlatSubGraph(ms, req.getRootId(), req.isIncludeComments());
-
         int counter = 0;
+
+        SubNode node = read.getNode(ms, req.getRootId());
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.convertToNodeInfo(
@@ -130,6 +131,10 @@ public class NodeSearchService extends ServiceBase {
                 results.add(info);
             }
         }
+
+        LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
+        res.setBreadcrumbs(breadcrumbs);
+        render.getBreadcrumbs(ms, node, breadcrumbs);
         return res;
     }
 

@@ -573,8 +573,7 @@ public class NodeRenderService extends ServiceBase {
             // }
             req.setNodeId(id);
         }
-        RenderNodeResponse res = renderNode(ms, req);
-        return res;
+        return renderNode(ms, req);
     }
 
     public void populateSocialCardProps(SubNode node, Model model) {

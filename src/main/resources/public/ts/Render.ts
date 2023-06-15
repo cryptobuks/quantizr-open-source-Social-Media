@@ -536,7 +536,10 @@ export class Render {
                         S.quanta.configRes.urlIdFailMsg = null;
                         s.node = res.node;
                         s.endReached = res.endReached;
-                        s.breadcrumbs = res.breadcrumbs;
+
+                        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_MAIN);
+                        if (!data || !data.props) return false;
+                        data.props.breadcrumbs = res.breadcrumbs;
 
                         // if the rendered node has one child and it's an RSS node then render it right away.
                         if (s.node.children?.length === 1 && s.node.children[0].type === J.NodeType.RSS_FEED) {

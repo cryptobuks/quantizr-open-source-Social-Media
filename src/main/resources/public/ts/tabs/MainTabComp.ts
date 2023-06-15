@@ -38,24 +38,13 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             contentDiv = null;
         }
         else {
-            // DO NOT DELETE (currently we have the 'show parents' button that ALWAYS needs to be available so we
-            // will always render the BreadcrumbesPanel)
-            // let renderableCrumbs = 0;
-            // if (state.breadcrumbs) {
-            //     state.breadcrumbs.forEach(bc => {
-            //         if (bc.id !== state.node.id && bc.id !== state.userProfile.userNodeId) {
-            //             renderableCrumbs++;
-            //         }
-            //     });
-            // }
-
             const pageNodeIsCut = ast.nodesToMove && ast.nodesToMove.find(id => id === ast.node.id);
 
             contentDiv = new Divc({
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
-                !ast.mobileMode ? new BreadcrumbsPanel() : null,
+                !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
                 ast.pageMessage ? new Html(ast.pageMessage, { className: "alert alert-info float-end" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 

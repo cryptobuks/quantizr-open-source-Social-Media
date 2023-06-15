@@ -2,6 +2,7 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
+import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -79,7 +80,8 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 this.getFloatRightHeaderComp()
             ]),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
-            this.data.props.description ? new Div(this.data.props.description) : null
+            this.data.props.description ? new Div(this.data.props.description) : null,
+            !ast.mobileMode && this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
         ];
 
         // this shows the page number. not needed. used for debugging.

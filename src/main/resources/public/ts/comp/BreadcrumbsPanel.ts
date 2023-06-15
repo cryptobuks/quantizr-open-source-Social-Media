@@ -5,9 +5,10 @@ import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
+import * as J from "../JavaIntf";
 
 export class BreadcrumbsPanel extends Div {
-    constructor() {
+    constructor(public breadcrumbs: J.BreadcrumbInfo[]) {
         super(null, {
             className: "breadcrumbPanel"
         });
@@ -22,8 +23,8 @@ export class BreadcrumbsPanel extends Div {
         let children: CompIntf[] = [];
 
         const ast = getAs();
-        if (ast.breadcrumbs?.length > 0) {
-            children = ast.breadcrumbs.map(bc => {
+        if (this.breadcrumbs?.length > 0) {
+            children = this.breadcrumbs.map(bc => {
                 if (bc.id === ast.node.id) {
                     // ignore root node or page root node. we don't need it.
                     return null;

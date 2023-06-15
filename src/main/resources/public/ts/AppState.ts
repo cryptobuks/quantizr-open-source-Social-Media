@@ -90,9 +90,6 @@ export class AppState {
 
     fullScreenImageSize: string = C.FULL_SCREEN_MAX_WIDTH;
 
-    /* holds array of all parent items all the way up the tree (as far as user is authorized) */
-    breadcrumbs: J.BreadcrumbInfo[];
-
     speechPaused: boolean = false;
     speechSpeaking: boolean = false;
     speechVoice: number = -1; // index into speech.voices array (-1 means not set)
