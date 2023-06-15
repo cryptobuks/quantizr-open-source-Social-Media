@@ -161,7 +161,7 @@ public class FileUtils extends ServiceBase {
     public File[] getSortedListOfFolders(String folder, Set<String> exclusions) {
         File directory = new File(folder);
         if (!directory.isDirectory()) {
-            throw new RuntimeEx("Folder doesn\'t exist: " + folder);
+            throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
         /* First read folders and sort them */
         File[] folders = directory.listFiles(
@@ -184,7 +184,7 @@ public class FileUtils extends ServiceBase {
     public File[] getSortedListOfFiles(String folder, Set<String> exclusions) {
         File directory = new File(folder);
         if (!directory.isDirectory()) {
-            throw new RuntimeEx("Folder doesn\'t exist: " + folder);
+            throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
         /* Then read files and sort them */
         File[] files = directory.listFiles(

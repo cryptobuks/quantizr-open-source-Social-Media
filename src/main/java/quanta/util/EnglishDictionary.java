@@ -142,7 +142,7 @@ public class EnglishDictionary extends ServiceBase {
     public boolean hasBadWords(String text) {
         if (badWords.size() == 0) throw new RuntimeException("called isBadWord before dictionary was loaded.");
         if (text == null) return false;
-        StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"\'`!?()*#<>", false);
+        StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);
 
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken().trim().toLowerCase();

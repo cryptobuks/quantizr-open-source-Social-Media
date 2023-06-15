@@ -221,7 +221,7 @@ public class SchemaOrgService extends ServiceBase {
                     sop.setLabel(slabel);
                     soc.getProps().add(sop);
                 } else {
-                    throw new RuntimeException("Unable to parse \'rdfs:label\' from " + XString.prettyPrint(prop));
+                    throw new RuntimeException("Unable to parse 'rdfs:label' from " + XString.prettyPrint(prop));
                 }
             }
         }

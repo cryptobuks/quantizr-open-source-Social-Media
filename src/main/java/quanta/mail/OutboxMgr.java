@@ -109,7 +109,7 @@ public class OutboxMgr extends ServiceBase {
         String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
         String content = String.format(
             prop.getConfigText("brandingAppName") +
-            " user \'%s\' shared a node to your \'%s\' account.<p>\n\n" + //
+            " user '%s' shared a node to your '%s' account.<p>\n\n" + //
             "%s",
             fromUserName,
             toUserName,

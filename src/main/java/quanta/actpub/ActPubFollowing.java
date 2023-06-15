@@ -160,7 +160,7 @@ public class ActPubFollowing extends ServiceBase {
                     // Note: followObj CAN be a String here.
                     Object followObj = apObj(activity, APObj.object);
                     if (followObj == null) {
-                        log.debug("Can\'t get followObj from: " + XString.prettyPrint(activity));
+                        log.debug("Can't get followObj from: " + XString.prettyPrint(activity));
                         throw new RuntimeException("no followObj");
                     }
                     log.debug("followObj.type=" + followObj.getClass().getName());

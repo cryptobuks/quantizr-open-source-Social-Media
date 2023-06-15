@@ -118,7 +118,7 @@ public class NodeEditService extends ServiceBase {
                     ms,
                     null,
                     null,
-                    "### " + ThreadLocals.getSC().getUserName() + "\'s Public Posts",
+                    "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
                     NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()),
                     NodeName.POSTS
@@ -457,7 +457,7 @@ public class NodeEditService extends ServiceBase {
         // if that's going to work or not (yet)
         if (!lcData.startsWith("http://") && !lcData.startsWith("https://") && !lcData.startsWith("file://")) {
             log.info("Drop even ignored: " + data);
-            res.setMessage("Sorry, can\'t drop that there.");
+            res.setMessage("Sorry, can't drop that there.");
             return res;
         }
         SubNode linksNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);

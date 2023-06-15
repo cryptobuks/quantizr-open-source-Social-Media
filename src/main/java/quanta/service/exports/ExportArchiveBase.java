@@ -100,7 +100,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 StringBuilder out = new StringBuilder();
                 appendHtmlBegin("", out);
                 if (htmlToc.length() > 0) {
-                    out.append("<div class=\'toc\'>Table of Contents</div>\n");
+                    out.append("<div class='toc'>Table of Contents</div>\n");
                     out.append(htmlToc);
                 }
                 out.append(fullHtml);
@@ -215,14 +215,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private void appendHtmlBegin(String rootPath, StringBuilder html) {
         html.append("<html>");
         html.append("<head>\n");
-        html.append("<link rel=\'stylesheet\' href=\'" + rootPath + "exported.css\' />");
+        html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
         html.append("</head>\n");
         html.append("<body>\n");
     }
 
     private void appendHtmlEnd(String rootPath, StringBuilder html) {
-        html.append("<script src=\'" + rootPath + "marked.min.js\'></script>");
-        html.append("<script src=\'" + rootPath + "exported.js\'></script>");
+        html.append("<script src='" + rootPath + "marked.min.js'></script>");
+        html.append("<script src='" + rootPath + "exported.js'></script>");
         html.append("</body></html>");
     }
 
@@ -368,15 +368,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 level--;
                 String prefix = level > 0 ? "    ".repeat(level) : "";
                 markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
-                String clazz = level == 0 ? "class=\'topLevelToc\'" : "";
+                String clazz = level == 0 ? "class='topLevelToc'" : "";
                 htmlToc.append(
                     "<div " +
                     clazz +
-                    " style=\'margin-left: " +
+                    " style='margin-left: " +
                     (25 + level * 25) +
-                    "px\'><a class=\'tocLink\' href=\'#" +
+                    "px'><a class='tocLink' href='#" +
                     nodeId +
-                    "\'>" +
+                    "'>" +
                     StringEscapeUtils.escapeHtml4(heading) +
                     "</a></div>"
                 );
@@ -590,7 +590,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             // then inject our HTML, and then reopen a new div so keep the markdown separate from the
             // RAW html "imgLink" we're inserting here.
             content =
-                content.replace("{{" + att.getFileName() + "}}", "\n</div>" + imgLink + "<div class=\'markdown container\'>\n");
+                content.replace("{{" + att.getFileName() + "}}", "\n</div>" + imgLink + "<div class='markdown container'>\n");
         }
         return content;
     }
@@ -604,22 +604,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private String appendImgLink(String nodeId, String binFileNameStr, String url) {
         return (
-            "<div class=\'attachment\'><img title=\'" +
+            "<div class='attachment'><img title='" +
             binFileNameStr +
-            "\' id=\'img_" +
+            "' id='img_" +
             nodeId +
-            "\' style=\'width:50%\' onclick=\'document.getElementById(\"img_" +
+            "' style='width:50%' onclick='document.getElementById(\"img_" +
             nodeId +
-            "\").style.width=\"\"\' src=\'" +
+            "\").style.width=\"\"' src='" +
             url +
-            "\'/></div>"
+            "'/></div>"
         );
     }
 
     private String appendNonImgLink(String binFileNameStr, String url) {
-        return (
-            "<div class=\'attachment\'><a class=\'link\' target=\'_blank\' href=\'" + url + "\'>" + binFileNameStr + "</a></div>"
-        );
+        return ("<div class='attachment'><a class='link' target='_blank' href='" + url + "'>" + binFileNameStr + "</a></div>");
     }
 
     private String formatContentToHtml(SubNode node, String content) {
@@ -632,9 +630,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 prefix += "<hr>";
             }
             if (req.isIncludeIDs()) {
-                prefix += "\n<div class=\'floatContainer\'><div class=\'floatRight\'>\nID:" + node.getIdStr() + "</div></div>";
+                prefix += "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
             }
-            return prefix + "\n<div id=\'" + node.getIdStr() + "\' class=\'markdown container\'>" + escapedContent + "\n</div>\n";
+            return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent + "\n</div>\n";
         }
     }
 

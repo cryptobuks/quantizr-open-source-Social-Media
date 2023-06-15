@@ -310,7 +310,7 @@ public class FileIndexer extends ServiceBase {
 
             while ((entry = tis.getNextEntry()) != null) {
                 if (!tis.canReadEntryData(entry)) {
-                    log.warn("Can\'t read entry." + entry.getName());
+                    log.warn("Can't read entry." + entry.getName());
                     continue;
                 }
                 if (entry.isDirectory()) {} else { // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this

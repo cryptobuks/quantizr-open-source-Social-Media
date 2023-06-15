@@ -290,7 +290,7 @@ public class MongoAuth extends ServiceBase {
         if (ms == null) {
             // when we get here it normally means we should've called "arun.exec" to manage
             // the thread instead of justs passing in an 'ms' or null
-            throw new RuntimeException("ThreadLocals doesn\'t have session.");
+            throw new RuntimeException("ThreadLocals doesn't have session.");
         }
         if (ms.isAdmin()) {
             return;
@@ -357,7 +357,7 @@ public class MongoAuth extends ServiceBase {
         }
         // admin has full power over all nodes
         if (ms.isAdmin()) {
-            if (verbose) log.trace("auth granted. you\'re admin.");
+            if (verbose) log.trace("auth granted. you're admin.");
             return;
         }
         if (verbose) log.trace("auth path " + node.getPath() + " for " + ms.getUserName());

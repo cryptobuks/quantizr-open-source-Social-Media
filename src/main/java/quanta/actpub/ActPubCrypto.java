@@ -60,7 +60,7 @@ public class ActPubCrypto extends ServiceBase {
         /* get private key of this user so we can sign the outbound message */
         privateKey = userNode.getStr(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
-            log.debug("Unable to update federated users. User didn\'t have a private key on his userNode: " + userName);
+            log.debug("Unable to update federated users. User didn't have a private key on his userNode: " + userName);
             return null;
         }
         // add to cache.
@@ -102,9 +102,9 @@ public class ActPubCrypto extends ServiceBase {
                 signature.setVal(val);
             }
         }
-        if (keyId.getVal() == null) throw new RuntimeException("Header signature missing \'keyId\'");
-        if (headers == null) throw new RuntimeException("Header signature missing \'headers\'");
-        if (signature == null) throw new RuntimeException("Header signature missing \'signature\'");
+        if (keyId.getVal() == null) throw new RuntimeException("Header signature missing 'keyId'");
+        if (headers == null) throw new RuntimeException("Header signature missing 'headers'");
+        if (signature == null) throw new RuntimeException("Header signature missing 'signature'");
         if (!headers.getVal().contains("(request-target)")) throw new RuntimeException(
             "(request-target) is not in signed headers"
         );
@@ -176,7 +176,7 @@ public class ActPubCrypto extends ServiceBase {
             }
             // #todo-optimization: this block will eventually be unneeded once all accounts have pkey in them.
             if (pkey == null) {
-                log.debug("NOTE: actorUrl " + actorUrl + " doesn\'t have pkey in account node yet");
+                log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet");
                 // Get ActorObject from actor url.
                 APOActor actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
                 if (actorObj == null) {

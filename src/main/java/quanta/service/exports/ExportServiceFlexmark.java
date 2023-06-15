@@ -283,13 +283,13 @@ public class ExportServiceFlexmark extends ServiceBase {
             String style = "";
             String imgSize = att.getCssSize();
             if (imgSize != null && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
-                style = " style=\'width:" + imgSize + "\'";
+                style = " style='width:" + imgSize + "'";
             } else {
                 // For large enough images if they're left to actual size that can clip in the final PDF output
                 // so we set any images big enough that we know they're not a thubnail or icon depiction to 100%
                 // always
                 if (att.getWidth() > 500) {
-                    style = " style=\'width:100%\'";
+                    style = " style='width:100%'";
                 }
             }
             String src = null;
@@ -342,7 +342,7 @@ public class ExportServiceFlexmark extends ServiceBase {
              * images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
              * position images, since it seems ok
              */
-            markdown.append("\n<img src=\'" + src + "\' " + style + "/>\n");
+            markdown.append("\n<img src='" + src + "' " + style + "/>\n");
         }
     }
 

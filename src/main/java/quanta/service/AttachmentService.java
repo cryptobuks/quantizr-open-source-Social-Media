@@ -811,7 +811,7 @@ public class AttachmentService extends ServiceBase {
             // startTime = System.currentTimeMillis();
             long size = att.getSize();
             if (size == 0) {
-                throw new RuntimeEx("Can\'t stream video without the file size. BIN_SIZE property missing");
+                throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
             }
             inStream = new BufferedInputStream(is);
             byte[] bytes = IOUtils.toByteArray(inStream);

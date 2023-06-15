@@ -240,7 +240,7 @@ public class AclService extends ServiceBase {
                 String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
                 if (principalPubKey == null) {
                     if (res != null) {
-                        res.setMessage("User doesn\'t have a PublicKey available: " + principal);
+                        res.setMessage("User doesn't have a PublicKey available: " + principal);
                         res.setSuccess(false);
                         return false;
                     }

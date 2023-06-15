@@ -137,7 +137,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         update.save(as, testingRoot);
         // Insert a test node
         SubNode adminsNode = create.createNode(as, testingRoot.getPath() + "/?");
-        adminsNode.setContent("admin\'s test node " + System.currentTimeMillis());
+        adminsNode.setContent("admin's test node " + System.currentTimeMillis());
         update.save(as, adminsNode);
         ObjectId insertedId = adminsNode.getId();
         log.debug("admin inserted a node: " + insertedId.toString());
@@ -162,7 +162,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         try {
             log.debug("Insecure root insert test.");
             SubNode adamsNode = create.createNode(adamSession, testingRoot.getPath() + "/?");
-            adamsNode.setContent("adam\'s test node " + System.currentTimeMillis());
+            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
             update.save(as, adamsNode);
             throw new RuntimeException("allowed node in secure area");
         } catch (NodeAuthFailedException e) {
@@ -172,7 +172,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         try {
             log.debug("Insecure insert test (under adminsNode)");
             SubNode adamsNode = create.createNode(adamSession, adminsNode.getPath() + "/?");
-            adamsNode.setContent("adam\'s test node " + System.currentTimeMillis());
+            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
             update.save(as, adamsNode);
             throw new RuntimeException("allowed node in secure area");
         } catch (NodeAuthFailedException e) {
@@ -183,7 +183,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam");
         if (adamsRootNode != null) {
             adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
-            adamsNode.setContent("adam\'s test node " + System.currentTimeMillis());
+            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
             update.save(adamSession, adamsNode);
             insertedId = adamsNode.getId();
             log.debug("adam inserted a node: " + insertedId.toString());

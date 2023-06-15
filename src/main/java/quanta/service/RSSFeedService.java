@@ -330,11 +330,11 @@ public class RSSFeedService extends ServiceBase {
     }
 
     private String quoteFix(String html) {
-        html = html.replace("&#8221;", "\'");
-        html = html.replace("&#8220;", "\'");
+        html = html.replace("&#8221;", "'");
+        html = html.replace("&#8220;", "'");
         // Warning these ARE two different characters, even though they look the same.
-        html = html.replace("’", "\'");
-        html = html.replace("‘", "\'");
+        html = html.replace("’", "'");
+        html = html.replace("‘", "'");
         // special kinds of dashes
         html = html.replace("–", "--");
         return html;
@@ -514,8 +514,7 @@ public class RSSFeedService extends ServiceBase {
                         log.debug("media has no groups.");
                     }
                 } //
-                else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // for (ContentItem ci : contentMod.getContentItems()) {
+                else if (m instanceof ContentModuleImpl) {} else // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                 // log.debug("CI.encoding: " + ci.getContentEncoding());
                 // log.debug("CI.format: " + ci.getContentFormat());
                 // log.debug("CI.value: " + ci.getContentValue());
@@ -599,8 +598,7 @@ public class RSSFeedService extends ServiceBase {
                         }
                     }
                 } //
-                else if (m instanceof ContentModuleImpl) {} else // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // for (ContentItem ci : contentMod.getContentItems()) {
+                else if (m instanceof ContentModuleImpl) {} else // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                 // log.debug("CI.encoding: " + ci.getContentEncoding());
                 // log.debug("CI.format: " + ci.getContentFormat());
                 // log.debug("CI.value: " + ci.getContentValue());
@@ -764,7 +762,7 @@ public class RSSFeedService extends ServiceBase {
                         sb.append("\"");
                         break;
                     case '’':
-                        sb.append("\'");
+                        sb.append("'");
                         break;
                     default:
                         sb.append(" ");

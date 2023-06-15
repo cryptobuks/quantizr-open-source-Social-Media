@@ -197,7 +197,7 @@ public class PerformanceReport {
     }
 
     public static String htmlTdRt(String td) {
-        return "<td align=\'right\'>\n" + td + "</td>\n";
+        return "<td align='right'>\n" + td + "</td>\n";
     }
 
     public static String htmlTh(String td) {
@@ -213,7 +213,7 @@ public class PerformanceReport {
             "border-collapse: collapse;\n" +
             "}\n" +
             "body {padding: 20px;}" +
-            "html, body {font-family: \'Courier New\', \'Courier\', \'Roboto\', \'Verdana\', \'Helvetica\', \'Arial\', \'sans-serif\' !important}" + //
+            "html, body {font-family: 'Courier New', 'Courier', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important}" + //
             "</style>"
         );
     }

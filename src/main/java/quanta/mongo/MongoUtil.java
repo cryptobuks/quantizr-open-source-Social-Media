@@ -964,9 +964,9 @@ public class MongoUtil extends ServiceBase {
         if (postsNodeVal != null) {
             postsNodeVal.setVal(postsNode);
         }
-        if (!nostr.isNostrUserName(newUserName)) {
-            user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "\'s Node", NodeType.NONE.s(), NodeName.HOME);
-        }
+        // if (!nostr.isNostrUserName(newUserName)) {
+        //     user.ensureUserHomeNodeExists(ms, newUserName, "### " + newUserName + "'s Node", NodeType.NONE.s(), NodeName.HOME);
+        // }
         update.save(ms, userNode);
         return userNode;
     }

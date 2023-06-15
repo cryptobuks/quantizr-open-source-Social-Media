@@ -341,7 +341,7 @@ public class MongoRead extends ServiceBase {
         if (identifier == null) return null;
         if (identifier.equals("/")) {
             throw new RuntimeEx(
-                "SubNode doesn\'t implement the root node. Root is implicit and never needs an actual node to represent it."
+                "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it."
             );
         }
         SubNode ret = null;
@@ -1056,7 +1056,7 @@ public class MongoRead extends ServiceBase {
             return "### Blocked Users";
         }
         if (type.equals(NodeType.POSTS.s())) {
-            return "### " + ThreadLocals.getSC().getUserName() + "\'s Public Posts";
+            return "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts";
         }
         if (type.equals(NodeType.NOTES.s())) {
             return "### Notes";

@@ -980,7 +980,7 @@ public class ActPubUtil extends ServiceBase {
                             if (parent != null) {
                                 log.debug("NOSTR REPLY PARENT of " + node.getIdStr() + "=" + XString.prettyPrint(parent));
                             } else {
-                                log.debug("NOSTR couldn\'t find reply parent.");
+                                log.debug("NOSTR couldn't find reply parent.");
                             }
                         }
                     }

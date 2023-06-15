@@ -574,7 +574,7 @@ public class ActPubService extends ServiceBase {
                 apUserName.endsWith("@" + prop.getMetaHost().toLowerCase()) ||
                 apUserName.contains("@" + prop.getMetaHost().toLowerCase() + ":")
             ) {
-                log.debug("Can\'t import a user that\'s not from a foreign server.");
+                log.debug("Can't import a user that's not from a foreign server.");
                 return null;
             }
             apLog.trace("importing Actor: " + apUserName);
@@ -610,7 +610,7 @@ public class ActPubService extends ServiceBase {
          * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
          */
         if (payload.getActor() == null) {
-            log.error("no \'actor\' found on payload: " + XString.prettyPrint(payload));
+            log.error("no 'actor' found on payload: " + XString.prettyPrint(payload));
             throw new RuntimeException("No actor on payload");
         }
         Val<String> keyEncoded = new Val<>();
@@ -734,7 +734,7 @@ public class ActPubService extends ServiceBase {
             }
             // For now we don't maintain likes on nodes that aren't native to Quanta.
             if (!objectIdUrl.startsWith(prop.getProtocolHostAndPort())) {
-                log.debug("Ignoring \'like\' on foreign node: " + objectIdUrl);
+                log.debug("Ignoring 'like' on foreign node: " + objectIdUrl);
                 return null;
             }
             String userDoingAction = ThreadLocals.getSC().getUserName();

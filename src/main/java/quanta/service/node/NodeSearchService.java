@@ -72,7 +72,7 @@ public class NodeSearchService extends ServiceBase {
      * want / or ? or & characters in this delimiters list, and to support hyphenated terms we don't
      * want '-' character as a delimiter either
      */
-    static final String WORD_DELIMS = " \n\r\t,;:\"\'`()*{}[]<>=\\.!“";
+    static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
     static final int TRENDING_LIMIT = 10000;
     private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
 
@@ -569,9 +569,11 @@ public class NodeSearchService extends ServiceBase {
             }
             crit.andOperator(ands);
             q.addCriteria(crit);
-            q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
+            q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
             q.limit(TRENDING_LIMIT);
-            iter = opsw.find(ms, q);
+
+            // pass null session here to bypass security. We quey for only PUBLIC to this is fine
+            iter = opsw.find(null, q);
         }
         //
         else /*
@@ -657,6 +659,11 @@ public class NodeSearchService extends ServiceBase {
 
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
+                // todo-0: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
+                // was getting processed by lots of nodes
+                if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token) || "quanta".equalsIgnoreCase(token)) {
+                    continue;
+                }
                 if (!english.isStopWord(token)) {
                     String lcToken = token.toLowerCase();
                     // if word is a mention.

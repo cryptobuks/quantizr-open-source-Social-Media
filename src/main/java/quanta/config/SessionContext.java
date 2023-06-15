@@ -289,7 +289,7 @@ public class SessionContext extends ServiceBase {
             }
             String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
             if (pubKeyJson == null) {
-                throw new RuntimeException("User Account didn\'t have SIG KEY: userName: " + sc.getUserName());
+                throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
             }
             sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
             if (sc.pubSigKey == null) {

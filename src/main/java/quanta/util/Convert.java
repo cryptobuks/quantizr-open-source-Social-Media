@@ -384,11 +384,7 @@ public class Convert extends ServiceBase {
                         // having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
                         formatted = true;
                         sb.append( //
-                            "<a class=\'mention hashtag\' href=\'" +
-                            href +
-                            "\' target=\'_blank\'>#<span>" +
-                            shortTok +
-                            "</span></a>"
+                            "<a class='mention hashtag' href='" + href + "' target='_blank'>#<span>" + shortTok + "</span></a>"
                         );
                     }
                 }
@@ -411,9 +407,9 @@ public class Convert extends ServiceBase {
                         // NOTE: h-card and u-url are part of 'microformats'
                         formatted = true;
                         sb.append( //
-                            "<span class=\'h-card\'><a class=\'u-url mention\' href=\'" +
+                            "<span class='h-card'><a class='u-url mention' href='" +
                             href +
-                            "\' target=\'_blank\'>@<span>" +
+                            "' target='_blank'>@<span>" +
                             shortTok +
                             "</span></a></span>"
                         );
