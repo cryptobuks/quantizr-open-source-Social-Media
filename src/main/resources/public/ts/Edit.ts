@@ -1103,7 +1103,11 @@ export class Edit {
             this.createSubNodeResponse(res, false, null);
         }
         else {
-            S.util.flashMessage("Saved in Notes folder", "Saved", true);
+            let msg = "Saved in Notes folder";
+            if (clipText) {
+                msg += ":\n\n" + clipText;
+            }
+            S.util.flashMessage(msg, "Saved", true);
         }
     }
 
