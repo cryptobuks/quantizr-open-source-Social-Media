@@ -267,7 +267,7 @@ public class NodeMoveService extends ServiceBase {
                     // find any new Path available under the paste target location 'parentPath'
                     String newPath = mongoUtil.findAvailablePath(parentPath + "/"); // + node.getLastPathPart());
                     // log.debug("New Available Path Found: " + newPath);
-                    changePathOfSubGraph(as, node, node.getPath(), newPath, res, false);
+                    changePathOfSubGraph(as, node, node.getPath(), newPath, res);
                     node.setPath(newPath);
                     // crypto sig uses path as part of it, so we just invalidated the signature.
                     if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
@@ -306,19 +306,17 @@ public class NodeMoveService extends ServiceBase {
         MongoSession ms,
         SubNode graphRoot,
         String oldPathPrefix,
-        String newPathPrefix, //
-        MoveNodesResponse res,
-        boolean fast
+        String newPathPrefix,
+        MoveNodesResponse res
     ) {
         String originalPath = graphRoot.getPath();
         // log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" +
         // oldPathPrefix
         // + " newPathPrefix" + newPathPrefix);
-        boolean removeOrphans = !fast;
         BulkOperations bops = null;
         int batchSize = 0;
 
-        for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false, null)) {
+        for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, false, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
                 throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
             }

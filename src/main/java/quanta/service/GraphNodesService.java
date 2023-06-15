@@ -38,7 +38,7 @@ public class GraphNodesService extends ServiceBase {
             Iterable<SubNode> results = null;
             // Run subgraph query to get all nodes if no search text provided
             if (StringUtils.isEmpty(req.getSearchText())) {
-                results = read.getSubGraph(ms, node, null, 0, true, false, true, null);
+                results = read.getSubGraph(ms, node, null, 0, false, true, null);
             } else { // If search text provided run subgraph search.
                 int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
                 results =

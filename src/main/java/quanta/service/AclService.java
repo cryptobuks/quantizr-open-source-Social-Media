@@ -73,16 +73,7 @@ public class AclService extends ServiceBase {
         Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
         int batchSize = 0;
 
-        for (SubNode n : read.getSubGraph(
-            ms,
-            node,
-            null,
-            0,
-            true, //
-            false,
-            true,
-            null
-        )) {
+        for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
             if (batchMode) {
                 // lazy instantiate
                 if (bops == null) {

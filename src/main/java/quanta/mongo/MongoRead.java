@@ -726,7 +726,6 @@ public class MongoRead extends ServiceBase {
         SubNode node,
         Sort sort,
         int limit,
-        boolean removeOrphans,
         boolean publicOnly,
         boolean doAuth,
         Criteria moreCriteria
@@ -734,13 +733,7 @@ public class MongoRead extends ServiceBase {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
-        /*
-         * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit')
-         */
-        // DO NOT REMOVE THIS CHECK!!!
-        if (removeOrphans && limit > 0) {
-            throw new RuntimeException("getSubGraph: invalid parameters");
-        }
+
         if (doAuth) {
             auth.auth(ms, node, PrivilegeType.READ);
         }
@@ -767,8 +760,7 @@ public class MongoRead extends ServiceBase {
         if (limit > 0) {
             q.limit(limit);
         }
-        Iterable<SubNode> iter = opsw.find(doAuth ? ms : null, q);
-        return removeOrphans ? mongoUtil.filterOutOrphans(ms, node, iter) : iter;
+        return opsw.find(doAuth ? ms : null, q);
     }
 
     /**
@@ -1429,7 +1421,7 @@ public class MongoRead extends ServiceBase {
         nodeMap.put(rootNode.getPath(), rootTreeNode);
 
         // first scan to build up the nodes list and nodeMap
-        for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, false, true, criteria)) {
+        for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, true, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
             if (nodeMap.size() > 5000) {
                 throw new RuntimeException("Too much data to return. Max is 5000 nodes.");

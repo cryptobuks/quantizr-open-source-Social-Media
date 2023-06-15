@@ -1286,7 +1286,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-        log.debug("saveNode()");
         return callProc.run(
             "saveNode",
             true,

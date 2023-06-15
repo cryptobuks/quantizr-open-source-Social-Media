@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
@@ -25,7 +26,6 @@ import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
@@ -1034,16 +1034,7 @@ public class NodeEditService extends ServiceBase {
             if (req.isRecursive()) {
                 StringBuilder sb = new StringBuilder();
 
-                for (SubNode n : read.getSubGraph(
-                    ms,
-                    node,
-                    Sort.by(Sort.Direction.ASC, SubNode.PATH),
-                    0,
-                    true,
-                    false,
-                    false,
-                    null
-                )) {
+                for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false, false, null)) {
                     nodeCount++;
                     sb.append(n.getPath());
                     sb.append("-");
@@ -1138,7 +1129,7 @@ public class NodeEditService extends ServiceBase {
         if (req.isRecursive()) {
             // todo-1: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
             // but leave as ALL node for the admin who might specify the 'from'?
-            for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
+            for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
                 transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
             }
         }
@@ -1294,7 +1285,7 @@ public class NodeEditService extends ServiceBase {
             int baseLevel = XString.getHeadingLevel(content);
             int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
-            for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
+            for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
                 int slashCount = StringUtils.countMatches(n.getPath(), "/");
                 int level = baseLevel + (slashCount - baseSlashCount);
                 if (level > 6) level = 6;
@@ -1396,8 +1387,10 @@ public class NodeEditService extends ServiceBase {
             replacements++;
             cachedChanges++;
         }
+
         if (req.isRecursive()) {
-            for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true, null)) {
+            Criteria crit = Criteria.where(SubNode.CONTENT).regex(req.getSearch());
+            for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, crit)) {
                 if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
                     replacements++;
                     cachedChanges++;

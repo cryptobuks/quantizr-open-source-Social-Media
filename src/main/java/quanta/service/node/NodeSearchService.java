@@ -604,7 +604,7 @@ public class NodeSearchService extends ServiceBase {
             // has the side effect of cleaning out orphans.
             // Note doAuth is saying here if there's any potential secrets in the results then use doAuth=true
             boolean doAuth = wordMap != null || tagMap != null || mentionMap != null;
-            iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth, null);
+            iter = read.getSubGraph(ms, searchRoot, sort, limit, false, doAuth, null);
         }
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
