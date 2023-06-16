@@ -61,7 +61,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word,
+                    [C.WORD_ATTR]: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -83,7 +83,6 @@ export class NodeStatsDlg extends DialogBase {
 
     searchWord = (evt: Event) => {
         this.close();
-
         const word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         if (!word) return;
 
