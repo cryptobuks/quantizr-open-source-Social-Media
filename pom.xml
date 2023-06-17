@@ -2,7 +2,9 @@
 
 <!-- There are 4 profiles: DEV,PROD,DEV-VSCODE -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>quanta</groupId>
 	<artifactId>quanta</artifactId>
@@ -19,9 +21,11 @@
 			Tip: When upgrading this verison it's a good ideal to blow away
 			the '.m2' hidden folder on your machine (maven cache) and also 
 			enable this line in build.sh: "mvn dependency:sources", so you get
-			all new source AND remove all the old stuff
+			all new source AND remove all the old stuff.
+
+			WARNING: This version number is in BOTH pom files!
 		-->
-		<version>2.6.1</version>
+		<version>2.7.3</version>
 		<relativePath />
 	</parent>
 
@@ -30,7 +34,8 @@
 		<profile>
 			<id>dev</id>
 			<activation>
-				<!-- Prior to 4/5/2019 we had this profile as the default and the 'dev-vscode' profile didn't exist (below), for
+				<!-- Prior to 4/5/2019 we had this profile as the default and the 'dev-vscode'
+				profile didn't exist (below), for
 				more info on why there is dev and dev-vscode profiles see the long comment below that is
 				above the dev-vscode profile.
 				-->
@@ -39,7 +44,7 @@
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 				<start-class>quanta.AppServer</start-class>
-				<java.version>11</java.version>
+				<java.version>17</java.version>
 			</properties>
 
 			<dependencies>
@@ -67,7 +72,8 @@
 							<exclude>public/node/**</exclude>
 						</excludes>
 
-						<!-- I have resource filtering disabled for now because i don't need it, but if you turn it back on don't forget
+						<!-- I have resource filtering disabled for now because i don't need it, but
+						if you turn it back on don't forget
 				to add 'resources:resources' to the maven command for inside<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
@@ -137,7 +143,8 @@
 						</configuration>
 					</plugin>
 					<!-- 
-				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work, because it ends up 
+				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work,
+					because it ends up 
 				only running one of them. Don't know why. So just put ALL scripting stuff in this one file
 				-->
 
@@ -146,7 +153,8 @@
 		</profile>
 
 		<!-- 
-		This profile is for the purpose of updating /target/classes only so we can do a rapid server reload/iteration 
+		This profile is for the purpose of updating /target/classes only so we can do a rapid server
+		reload/iteration 
 		
 		========== JAVA-COMPILE PROFILE BEGIN ========== -->
 
@@ -158,7 +166,7 @@
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 				<start-class>quanta.AppServer</start-class>
-				<java.version>11</java.version>
+				<java.version>17</java.version>
 			</properties>
 
 			<dependencies>
@@ -185,35 +193,47 @@
 		</profile>
 
 		<!-- ========== DEV-VSCODE PROFILE BEGIN ==========	-->
-		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in VSCode we don't run into the
-		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is identical to the 'dev' 
-		profile except for omitting the webpack part which causes this bug/hang. All profiles work just fine with or without
-		webpack when run on the command line, but it seems VSCode is not able to run any webpack without this bug happening, so the 
+		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in
+		VSCode we don't run into the
+		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is
+		identical to the 'dev' 
+		profile except for omitting the webpack part which causes this bug/hang. All profiles work just
+		fine with or without
+		webpack when run on the command line, but it seems VSCode is not able to run any webpack without
+		this bug happening, so the 
 		solution is just that we never run any webpack from inside VSCode
 		
-		Interestingly, this bug only happens then VSCode is automatically running the the build behind the scenes just because you
-		opened the project and it wants to run a build. Running from a tasks.json entry that runs './build.sh', from the Terminal 
+		Interestingly, this bug only happens then VSCode is automatically running the the build behind the
+		scenes just because you
+		opened the project and it wants to run a build. Running from a tasks.json entry that runs
+		'./build.sh', from the Terminal 
 		menu inside VSCode works just fine.
 
-		UPDATE: There ended up being an additional need for this profile to the above, which is the fact that it can compile the Java
-		and run the typescript-generator-maven-plugin to generate the generated TypeScript Interfaces, without WebPack trying to run first
+		UPDATE: There ended up being an additional need for this profile to the above, which is the fact
+		that it can compile the Java
+		and run the typescript-generator-maven-plugin to generate the generated TypeScript Interfaces,
+		without WebPack trying to run first
 	    which can potentially have outdated (old) generated file, and fail.
 		-->
 		<profile>
 			<id>dev-vscode</id>
 			<activation>
-				<!-- I think i added this 'default' designation so that IDEs can build always even when no specific build config is being run 
+				<!-- I think i added this 'default' designation so that IDEs can build always even
+				when no specific build config is being run 
 				
-				Update: I set this activeByDefaut to 'false' on 4/6/2019, because I noticed the webpack process was hanging up in 'node' somehow, 
-				and the 'node' process in linux was sitting ther burning up 155% CPU forever, in a loop. This stops VSCode from causing this to happen.
-				Somehow there is a bug in that scenario. VSCode detecting this and trying to run a build once you just merely open your IDE.
+				Update: I set this activeByDefaut to 'false' on 4/6/2019, because I noticed the webpack process was
+				hanging up in 'node' somehow, 
+				and the 'node' process in linux was sitting ther burning up 155% CPU forever, in a loop. This stops
+				VSCode from causing this to happen.
+				Somehow there is a bug in that scenario. VSCode detecting this and trying to run a build once you
+				just merely open your IDE.
 				-->
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 				<start-class>quanta.AppServer</start-class>
-				<java.version>11</java.version>
+				<java.version>17</java.version>
 			</properties>
 
 			<dependencies>
@@ -241,7 +261,8 @@
 							<exclude>public/node/**</exclude>
 						</excludes>
 
-						<!-- I have resource filtering disabled for now because i don't need it, but if you turn it back on don't forget
+						<!-- I have resource filtering disabled for now because i don't need it, but
+						if you turn it back on don't forget
 				to add 'resources:resources' to the maven command for inside<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
@@ -276,7 +297,8 @@
 							</optionalAnnotations>
 							<jsonLibrary>jackson2</jsonLibrary>
 
-							<!-- Supposedly this will allow @JsonProperty(required = false) in the java to put a '?' after the param
+							<!-- Supposedly this will allow @JsonProperty(required = false) in the
+							java to put a '?' after the param
 								but unfortunately it doesn't default to 'true' as one would expect, so for now I'll leave it out
 							    to get maximal typesafety
 							<optionalProperties>useLibraryDefinition</optionalProperties>
@@ -334,7 +356,8 @@
 						<artifactId>spring-boot-maven-plugin</artifactId>
 					</plugin>
 					<!-- 
-				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work, because it ends up 
+				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work,
+					because it ends up 
 				only running one of them. Don't know why. So just put ALL scripting stuff in this one file
 				-->
 
@@ -348,7 +371,7 @@
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 				<start-class>quanta.AppServer</start-class>
-				<java.version>11</java.version>
+				<java.version>17</java.version>
 			</properties>
 
 			<dependencies>
@@ -377,8 +400,10 @@
 							<exclude>public/node/**</exclude>
 						</excludes>
 
-						<!-- I have resource filtering disabled for now because i don't need it, but if you turn it back on don't forget
-				to add 'resources:resources' to the maven command for inside VSCode AND also your prod builder shell script!!!
+						<!-- I have resource filtering disabled for now because i don't need it, but
+						if you turn it back on don't forget
+				to add 'resources:resources' to the maven command for inside VSCode AND also your prod builder
+						shell script!!!
 				<filtering>true</filtering>
 				-->
 					</resource>
@@ -417,7 +442,8 @@
 						<artifactId>spring-boot-maven-plugin</artifactId>
 					</plugin>
 					<!-- 
-				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work, because it ends up 
+				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work,
+					because it ends up 
 				only running one of them. Don't know why. So just put ALL scripting stuff in this one file
 				-->
 

@@ -17,5 +17,9 @@ cd ${PRJROOT}
 dockerDown
 dockerUp
 
+# commenting this out, and doing it in compose file instead.
+# echo "Scaling Replicas"
+# docker service scale quanta-stack-dev_quanta-dev=2
+
 printUrlsMessage
 

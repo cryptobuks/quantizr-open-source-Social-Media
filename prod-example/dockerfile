@@ -4,7 +4,7 @@
 # The main (or only?) difference between this 'prod' dockerfile and the other docker file in the project
 # is that this one has PORT_SEC(443/https), and the other only has PORT (80/http)
 
-FROM openjdk:11-jre
+FROM openjdk:17
 LABEL maintainer="wclayf@gmail.com"
 
 ARG PORT

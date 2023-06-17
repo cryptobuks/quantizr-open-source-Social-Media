@@ -85,6 +85,7 @@ export DOCKER_UP_DELAY=5s
 # to an email server, but won't be required if you're running your peer as a single
 # user instance, or just doing localhost p2p testing/development.
 export emailPassword=
+export REDIS_PASSWORD=
 
 # Warning: To be able to create our test accounts we need this email prop defined even
 # even if it's a dummy string
