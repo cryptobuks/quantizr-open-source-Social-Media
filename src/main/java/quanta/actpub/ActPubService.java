@@ -49,7 +49,6 @@ import quanta.actpub.model.APType;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
-import quanta.instrument.PerfMon;
 import quanta.model.client.APTag;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;

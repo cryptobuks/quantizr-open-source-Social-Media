@@ -22,7 +22,6 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.PerfMon;
 import quanta.model.AccessControlInfo;
 import quanta.model.PrivilegeInfo;
 import quanta.model.client.Attachment;

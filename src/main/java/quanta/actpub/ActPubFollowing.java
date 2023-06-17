@@ -25,7 +25,6 @@ import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
