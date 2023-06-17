@@ -36,9 +36,9 @@ const plugins = [
     new HtmlWebpackPlugin({
         filename: "../../templates/error.html",
         template: "errorTemplate.html",
-        publicPath: "/dist"
+        publicPath: "/dist",
         // scriptLoading: "blocking",
-        // inject: "head"
+        inject: false
     }),
 
     new ESLintPlugin({
