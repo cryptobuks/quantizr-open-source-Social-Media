@@ -67,6 +67,10 @@ public class MongoRead extends ServiceBase {
         }
     }
 
+    public boolean readFromAdminCache() {
+        return system.adminNodesCacheMap != null && ThreadLocals.getSC() != null && !ThreadLocals.getSC().isAdmin();
+    }
+
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
@@ -148,7 +152,7 @@ public class MongoRead extends ServiceBase {
             throw new RuntimeException("doAuth and allowUpdate are mutually exclusive.");
         }
 
-        if (ThreadLocals.getSC() != null && ThreadLocals.getSC().readFromAdminCache()) {
+        if (readFromAdminCache()) {
             synchronized (SystemService.adminNodesCacheLock) {
                 TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
                 if (tn != null) {
@@ -359,7 +363,7 @@ public class MongoRead extends ServiceBase {
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
         } //
         else if (!identifier.startsWith("/")) { // else if search doesn't start with a slash then it's a nodeId and not a path
-            if (ThreadLocals.getSC() != null && ThreadLocals.getSC().readFromAdminCache()) {
+            if (readFromAdminCache()) {
                 synchronized (SystemService.adminNodesCacheLock) {
                     TreeNode tn = system.adminNodesCacheMap.get(identifier);
                     if (tn != null) {
@@ -422,7 +426,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getParent(MongoSession ms, SubNode node) {
-        if (ThreadLocals.getSC() != null && ThreadLocals.getSC().readFromAdminCache()) {
+        if (readFromAdminCache()) {
             synchronized (SystemService.adminNodesCacheLock) {
                 TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
                 /*
@@ -568,13 +572,7 @@ public class MongoRead extends ServiceBase {
             return Collections.<SubNode>emptyList();
         }
 
-        if (
-            ThreadLocals.getSC() != null &&
-            ThreadLocals.getSC().readFromAdminCache() &&
-            moreCriteria == null && //
-            sort != null &&
-            ordinalSort.equals(sort)
-        ) {
+        if (readFromAdminCache() && moreCriteria == null && sort != null && ordinalSort.equals(sort)) {
             TreeNode tn = null;
             synchronized (SystemService.adminNodesCacheLock) {
                 tn = system.adminNodesCacheMap.get(node.getIdStr());

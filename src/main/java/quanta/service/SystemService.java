@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -63,6 +65,9 @@ import quanta.util.val.IntVal;
 public class SystemService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
+    private static final Random rand = new Random();
+    private static final int replicaId = rand.nextInt(Integer.MAX_VALUE);
+
     long lastNostrQueryTime = 0L;
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
     public static final ObjectMapper mapper = new ObjectMapper();
@@ -243,6 +248,7 @@ public class SystemService extends ServiceBase {
 
     public String getSystemInfo() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Swarm Replica ID: " + SystemService.replicaId + "\n");
         sb.append("AuditFilter Enabed: " + String.valueOf(AuditFilter.enabled) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
         Runtime runtime = Runtime.getRuntime();
@@ -265,8 +271,25 @@ public class SystemService extends ServiceBase {
         for (String arg : arguments) {
             sb.append(arg + "\n");
         }
+
+        sb.append("\nEnvironment Vars:\n");
+        sb.append(getEnvironment());
+
         // Run command inside container
         // sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
+        return sb.toString();
+    }
+
+    public String getEnvironment() {
+        Map<String, String> env = System.getenv();
+        LinkedList<String> envList = new LinkedList<String>();
+        env.forEach((k, v) -> {
+            if (k.toLowerCase().contains("pass")) return;
+            envList.add(k + ":" + v + "\n");
+        });
+        envList.sort(null);
+        StringBuilder sb = new StringBuilder();
+        envList.forEach(v -> sb.append(v));
         return sb.toString();
     }
 
@@ -451,15 +474,16 @@ public class SystemService extends ServiceBase {
                 }
             }
         }
-        sb.append("Live Sessions:\n");
 
-        for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
-            if (sc.isLive() && sc.getUserName() != null) {
-                Integer hits = map.get(sc.getSession().getId());
-                sb.append("    " + sc.getUserName() + " hits=" + (hits != null ? String.valueOf(hits) : "?"));
-                sb.append("\n");
-            }
-        }
+        // todo-0: possibly bring this back. Removed during redis conversion
+        // sb.append("Live Sessions:\n");
+        // for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
+        //     if (sc.isLive() && sc.getUserName() != null) {
+        //         Integer hits = map.get(sc.getSession().getId());
+        //         sb.append("    " + sc.getUserName() + " hits=" + (hits != null ? String.valueOf(hits) : "?"));
+        //         sb.append("\n");
+        //     }
+        // }
         sb.append("\n");
         return sb.toString();
     }

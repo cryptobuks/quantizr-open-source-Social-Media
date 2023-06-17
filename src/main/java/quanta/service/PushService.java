@@ -151,7 +151,8 @@ public class PushService extends ServiceBase {
         // If user is currently logged in we have a session here.
         if (sc == null) return;
         exec.run(() -> {
-            SseEmitter pushEmitter = sc.getPushEmitter();
+            SseEmitter pushEmitter = user.getPushEmitter();
+            if (pushEmitter == null) return;
             /*
              * Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable
              * even probably to be sure each session is only doing one emit at a time.
