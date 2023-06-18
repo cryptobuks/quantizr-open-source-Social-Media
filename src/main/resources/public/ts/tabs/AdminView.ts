@@ -56,7 +56,6 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Divc({ className: "settingsCol" }, [
                         // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                         this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
-                        this.settingsLink("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null)), //
                     ]),
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //

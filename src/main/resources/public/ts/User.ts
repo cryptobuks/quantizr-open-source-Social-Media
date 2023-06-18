@@ -103,7 +103,6 @@ export class User {
                     asymEncKey: S.crypto.asymEncKey,
                     nostrNpub: S.nostr.npub,
                     nostrPubKey: S.nostr.pk
-
                 }, false, true);
                 S.quanta.authToken = res.authToken;
 
