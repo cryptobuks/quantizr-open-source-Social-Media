@@ -50,6 +50,7 @@ public class CryptoService extends ServiceBase {
     public static final ObjectMapper mapper = new ObjectMapper();
     public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
     private static final Random rand = new Random();
+    private static boolean debugSigning = false;
     int SIGN_BLOCK_SIZE = 100;
 
     // NOTE: This didn't allow unknown properties as expected but putting the
@@ -188,6 +189,10 @@ public class CryptoService extends ServiceBase {
             if (bops != null) {
                 bops.execute();
             }
+
+            if (debugSigning) {
+                log.debug("signSubGraph finished workload: " + req.getWorkloadId());
+            }
             sigPendingQueue.remove(req.getWorkloadId());
         } else {
             log.warn("Unknown workload id: " + req.getWorkloadId());
@@ -195,10 +200,15 @@ public class CryptoService extends ServiceBase {
     }
 
     public void signSubGraph(MongoSession ms, SessionContext sc, SignSubGraphRequest req) {
+        if (debugSigning) {
+            log.debug("signSubGraph of nodeId: " + req.getNodeId());
+        }
+
         SubNode parent = read.getNode(ms, req.getNodeId());
         if (parent == null) {
             return;
         }
+
         // query all nodes under the path that are owned by 'ms'
         Criteria criteria = Criteria //
             .where(SubNode.PATH)
@@ -212,7 +222,11 @@ public class CryptoService extends ServiceBase {
         // add in root node first
         pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
         pushInfo.getVal().setListToSign(new LinkedList<>());
-        pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), getNodeSigData(parent)));
+        String sig = getNodeSigData(parent);
+        if (debugSigning) {
+            log.debug("signed: nodeId=" + parent.getIdStr() + " sig=" + sig);
+        }
+        pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
         count.inc();
         BooleanVal failed = new BooleanVal();
         ops
@@ -226,7 +240,11 @@ public class CryptoService extends ServiceBase {
                     pushInfo.getVal().setListToSign(new LinkedList<>());
                 }
                 // add this node.
-                pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), getNodeSigData(node)));
+                String sig1 = getNodeSigData(node);
+                pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sig1));
+                if (debugSigning) {
+                    log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sig1);
+                }
                 count.inc();
                 // if we have enough to send a block send it.
                 if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {

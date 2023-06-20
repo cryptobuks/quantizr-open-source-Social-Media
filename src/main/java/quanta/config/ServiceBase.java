@@ -268,7 +268,7 @@ public class ServiceBase {
     }
 
     static <T> T getBean(ApplicationContext ctx, Class<T> requiredType) throws BeansException {
-        log.debug("getBean: " + requiredType.getSimpleName());
+        // log.debug("getBean: " + requiredType.getSimpleName());
         return ctx.getBean(requiredType);
     }
 

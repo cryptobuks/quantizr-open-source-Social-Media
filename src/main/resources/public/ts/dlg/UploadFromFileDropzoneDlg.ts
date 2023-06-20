@@ -45,10 +45,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const ast = getAs();
         const children = [
             new Diva([
-                this.importMode || !ast.config.ipfsEnabled ? null : new Divc({ className: "marginBottom" }, [
+                this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Divc({ className: "marginBottom" }, [
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
@@ -67,7 +66,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         title: "Upload from Web/URL"
                     }),
 
-                    this.importMode || !ast.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
+                    this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
 
                     // LEAVING THIS FOR FUTURE
                     // (Currently the clipboard upload button on the editor itself is all we need so this button

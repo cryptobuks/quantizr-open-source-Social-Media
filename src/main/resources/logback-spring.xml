@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- NOTE: This file is copied over to /log/logback.xml and configured to exist there in deployments/runtime, but you 
-should do normal editing in /src/main/resources/logback-spring.xml which is the 'master' copy of the file. -->
+<!-- NOTE: This file is copied over to /log/logback.xml and configured to exist there in
+deployments/runtime, but you 
+should do normal editing in /src/main/resources/logback-spring.xml which is the 'master' copy of
+the file. -->
 <configuration scan="true" scanPeriod="120 seconds">
 
     <property name="LOGS" value="/log" />
@@ -8,7 +10,8 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}):
+                %msg%n%throwable
             </Pattern>
         </layout>
     </appender>
@@ -23,7 +26,8 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
             <fileNamePattern>${LOGS}/archived/spring-boot-logger-%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <timeBasedFileNamingAndTriggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>20MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
@@ -48,15 +52,11 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
     </logger>
     -->
 
-    <!-- This is the single point to turn on 'trace' level debugging (level=trace) for pretty much all
+    <!-- This is the single point to turn on 'trace' level debugging (level=trace) for pretty much
+    all
         of the ActivityPub processing. Leaving as 'debug' level here turns it all of, but setting trace
         turns it all on. -->
     <logger name="quanta.actpub.ActPubLog" level="debug" additivity="false">
-        <appender-ref ref="RollingFile" />
-    </logger>
-
-    <!-- To activate AuditFilter set level to DEBUG or TRACE, and yes there IS more info in TRACE mode than DEBUG -->
-    <logger name="quanta.filter.AuditFilter" level="TRACE" additivity="false">
         <appender-ref ref="RollingFile" />
     </logger>
 
@@ -66,6 +66,21 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
     </logger>
 
     <logger name="org.apache" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="io.lettuce" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="org.thymeleaf" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="io.netty" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
@@ -90,7 +105,8 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
         <appender-ref ref="Console" />
     </logger>
 
-    <logger name="com.rometools.modules.content.io.ContentModuleGenerator" level="warn" additivity="false">
+    <logger name="com.rometools.modules.content.io.ContentModuleGenerator" level="warn"
+        additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>

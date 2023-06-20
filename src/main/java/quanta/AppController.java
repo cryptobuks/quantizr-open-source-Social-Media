@@ -22,9 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,12 +40,12 @@ import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
-import quanta.filter.AuditFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
 import quanta.model.NodeInfo;
 import quanta.model.client.Attachment;
+import quanta.model.client.ClientConfig;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeProp;
@@ -72,7 +69,6 @@ import quanta.request.DeletePropertyRequest;
 import quanta.request.ExportRequest;
 import quanta.request.GetActPubObjectRequest;
 import quanta.request.GetBookmarksRequest;
-import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
 import quanta.request.GetIPFSContentRequest;
@@ -137,12 +133,10 @@ import quanta.response.CloseAccountResponse;
 import quanta.response.ExportResponse;
 import quanta.response.GetActPubObjectResponse;
 import quanta.response.GetBookmarksResponse;
-import quanta.response.GetConfigResponse;
 import quanta.response.GetIPFSContentResponse;
 import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetPeopleResponse;
-import quanta.response.GetSchemaOrgTypesResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
 import quanta.response.GetUserProfileResponse;
@@ -156,6 +150,7 @@ import quanta.response.SignNodesResponse;
 import quanta.response.SignSubGraphResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
+import quanta.service.AppFilter;
 import quanta.service.RSSFeedService;
 import quanta.service.exports.ExportServiceFlexmark;
 import quanta.service.exports.ExportTarService;
@@ -166,6 +161,7 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.XString;
 import quanta.util.val.Val;
 
 /**
@@ -182,7 +178,11 @@ public class AppController extends ServiceBase implements ErrorController {
     @Autowired
     private GracefulShutdown gracefulShutdown;
 
-    public static final String API_PATH = "/mobile/api";
+    // todo-1: put in const file so they're available on client
+    public static final String API_PATH = "/api";
+    public static final String ADMIN_PATH = "/admin";
+    public static final String FILE_PATH = "/f";
+
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
@@ -242,6 +242,7 @@ public class AppController extends ServiceBase implements ErrorController {
         @RequestParam(value = "id", required = false) String id, //
         @RequestParam(value = "nostrId", required = false) String nostrId, //
         @RequestParam(value = "refNodeId", required = false) String refNodeId, //
+        @RequestParam(value = "tag", required = false) String tag, //
         // be careful removing this, clicking on a node updates the browser history to
         // an 'n=' style url if this node is named
         // so we will need to change that to the path format.
@@ -253,9 +254,8 @@ public class AppController extends ServiceBase implements ErrorController {
     ) {
         HashMap<String, String> attrs = getThymeleafAttribs();
         try {
-            // we force create a new session bean here, but the http session itself of course may stay unchanged
-            SessionContext sc = SessionContext.init(context, session);
-            sc.urlAccessReset();
+            SessionContext sc = ThreadLocals.getSC();
+
             boolean isHomeNodeRequest = false;
             if (nostrId != null) {
                 id = "." + nostrId;
@@ -333,6 +333,10 @@ public class AppController extends ServiceBase implements ErrorController {
             // with the arguments went wrong.
             ExUtil.error(log, "exception in call processor", e);
         }
+        ClientConfig config = new ClientConfig();
+        config.setTagSearch(tag);
+        loadConfig(config);
+        attrs.put("g_config", XString.compactPrint(config));
         model.addAllAttributes(attrs);
         return "index";
     }
@@ -345,6 +349,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * Renders files in './src/main/resources/templates/demo' folder.
      */
     @PerfMon
+    // todo-1: broken for now. Needs '/admin/' path and token
     @RequestMapping({ "/demo/{file}" })
     public String demo(
         @PathVariable(value = "file", required = false) String file, //
@@ -366,13 +371,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public String fediverseUsers() {
         return apub.dumpFediverseUsers();
-    }
-
-    // No performance monitor for this. @PerfMon
-    @GetMapping(value = { "/performance-report" }, produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String performanceReport() {
-        return PerformanceReport.getReport();
     }
 
     /*
@@ -453,7 +451,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getMultiRssFeed",
             false,
@@ -471,7 +468,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
     @ResponseBody
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "signup",
             false,
@@ -490,7 +486,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
     @ResponseBody
     public Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "login",
             false,
@@ -530,14 +525,9 @@ public class AppController extends ServiceBase implements ErrorController {
             req,
             session,
             ms -> {
+                user.redisDelete(ThreadLocals.getSC());
                 ThreadLocals.getSC().forceAnonymous();
-                // WARNING: ms will be null here always. Don't use.
                 session.invalidate();
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null) {
-                    new SecurityContextLogoutHandler().logout(sreq, sres, auth);
-                }
-                SecurityContextHolder.getContext().setAuthentication(null);
                 LogoutResponse res = new LogoutResponse();
                 res.setSuccess(true);
                 return res;
@@ -567,7 +557,6 @@ public class AppController extends ServiceBase implements ErrorController {
         HttpServletRequest httpReq,
         HttpSession session
     ) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "likeNode",
             false,
@@ -634,7 +623,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
     @ResponseBody
     public Object renderNode(@RequestBody RenderNodeRequest req, HttpServletRequest httpReq, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "renderNode",
             false,
@@ -651,7 +639,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, HttpServletRequest httpReq, HttpSession session) {
         checkIpfs();
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getIPFSFiles",
             false,
@@ -680,7 +667,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, HttpServletRequest httpReq, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         checkIpfs();
         return callProc.run(
             "deleteMFSFile",
@@ -700,7 +686,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getIPFSContent(@RequestBody GetIPFSContentRequest req, HttpServletRequest httpReq, HttpSession session) {
         checkIpfs();
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getIPFSContent",
             false,
@@ -754,7 +739,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return openGraph.getOpenGraph(req);
     }
 
@@ -768,8 +752,7 @@ public class AppController extends ServiceBase implements ErrorController {
             req,
             session,
             ms -> {
-                GetSchemaOrgTypesResponse res = schema.getSchemaOrgTypes();
-                return res;
+                return schema.getSchemaOrgTypes();
             }
         );
     }
@@ -939,7 +922,7 @@ public class AppController extends ServiceBase implements ErrorController {
                     ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
                     svc.export(ms, req, res);
                 } //
-                else if ("tar".equalsIgnoreCase(req.getExportExt())) { //
+                else if ("tar".equalsIgnoreCase(req.getExportExt())) {
                     if (req.isToIpfs()) {
                         res.setMessage("Export of TAR to IPFS not yet available.");
                         res.setSuccess(false);
@@ -947,7 +930,7 @@ public class AppController extends ServiceBase implements ErrorController {
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
                     svc.export(ms, req, res);
                 } //
-                else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) { //
+                else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
                     if (req.isToIpfs()) {
                         res.setMessage("Export of TAR.GZ to IPFS not yet available.");
                         res.setSuccess(false);
@@ -1301,7 +1284,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
     @ResponseBody
     public Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "changePassword",
             false,
@@ -1317,7 +1299,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "resetPassword",
             false,
@@ -1335,7 +1316,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
      */
     @PerfMon
-    @RequestMapping({ "/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}" })
+    @RequestMapping({ FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}", FILE_PATH + "/{userName}/{nameOnUserNode}" })
     public void attachment(
         // node name on 'admin' account. Non-admin named nodes use url
         // "/u/userName/nodeName"
@@ -1358,11 +1339,10 @@ public class AppController extends ServiceBase implements ErrorController {
             if (StringUtils.isEmpty(attName)) {
                 attName = Constant.ATTACHMENT_PRIMARY.s();
             }
-            // NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
-            // but check below
-            // only after knowing whether the node has any sharing on it at all or not.
-            // SessionContext.checkReqToken();
-            // Node Names are identified using a colon in front of it, to make it detectable
+            /* NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
+            but check below only after knowing whether the node has any sharing on it at all or not.
+            
+            Node Names are identified using a colon in front of it, to make it detectable */
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
                 id = ":" + userName + ":" + nameOnUserNode;
             } //
@@ -1380,15 +1360,13 @@ public class AppController extends ServiceBase implements ErrorController {
                         throw new RuntimeException("Node not found.");
                     }
                     // if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
-                    // This is for
-                    // good fediverse interoperability but still with a level of privacy for completely unshared nodes.
+                    // This is for good fediverse interoperability but still with a level of privacy for completely unshared nodes.
                     if (node.getAc() == null || node.getAc().size() == 0) {
-                        SessionContext.authBearer();
-                        SessionContext.authSig();
+                        user.authBearer();
+                        user.authSig();
                     }
                     String _gid = gid;
-                    // if no cachebuster gid was on url then redirect to a url that does have the
-                    // gid
+                    // if no cachebuster gid was on url then redirect to a url that does have the gid
                     if (_gid == null) {
                         Attachment att = node.getAttachment(_attName, false, false);
                         _gid = att != null ? att.getIpfsLink() : null;
@@ -1449,7 +1427,6 @@ public class AppController extends ServiceBase implements ErrorController {
         HttpSession session,
         HttpServletResponse response
     ) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         if (token == null) {
             // Check if this is an 'avatar' request and if so bypass security
             if ("avatar".equals(binId)) {
@@ -1481,7 +1458,7 @@ public class AppController extends ServiceBase implements ErrorController {
                 );
             }
         } else {
-            if (SessionContext.validToken(token, null)) {
+            if (user.validToken(token, null)) {
                 arun.run(as -> {
                     attach.getBinary(as, null, null, nodeId, binId, download != null, response);
                     return null;
@@ -1497,7 +1474,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot
      * -is-getting-truncated
      */
-    @RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = FILE_PATH + "/export/{fileName:.+}", method = RequestMethod.GET)
     public void getFile(
         @PathVariable("fileName") String fileName,
         @RequestParam(name = "disp", required = false) String disposition,
@@ -1505,9 +1482,11 @@ public class AppController extends ServiceBase implements ErrorController {
         HttpSession session,
         HttpServletResponse response
     ) {
-        if (SessionContext.getSCByToken(token) == null) {
-            throw new RuntimeException("Invalid token.");
+        SessionContext sc = ServiceBase.user.redisGet(token);
+        if (sc == null) {
+            throw new RuntimeException("bad token in /f/export/ access: " + token);
         }
+
         callProc.run(
             "file",
             false,
@@ -1542,6 +1521,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
      * -return-chunked-file </pre>
      */
+    // todo-1: broken for now. Needs accepted path (by AppFilter) and token
     @RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
     public Object getFileSystemResourceStream(
         @PathVariable("nodeId") String nodeId,
@@ -1582,7 +1562,6 @@ public class AppController extends ServiceBase implements ErrorController {
         HttpServletResponse response,
         HttpSession session
     ) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return (ResponseEntity<ResourceRegion>) callProc.run(
             "stream",
             false,
@@ -1702,7 +1681,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
     @ResponseBody
     public Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "anonPageLoad",
             false,
@@ -1718,7 +1696,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
-        // SessionContext.checkReqToken();
         return callProc.run(
             "nodeSearch",
             false,
@@ -1734,7 +1711,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
     @ResponseBody
     public Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
-        // SessionContext.checkReqToken();
         return callProc.run(
             "renderDocument",
             false,
@@ -1750,7 +1726,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getFollowers",
             false,
@@ -1771,7 +1746,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getFollowing",
             false,
@@ -1787,7 +1761,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "nodeFeed",
             false,
@@ -1848,7 +1821,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getUserProfile",
             false,
@@ -1946,7 +1918,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getUserAcccountInfo",
             false,
@@ -1959,18 +1930,11 @@ public class AppController extends ServiceBase implements ErrorController {
         );
     }
 
-    @PerfMon
-    @RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
-        // NO NOT HERE, this can be called before token will exist -> SessionContext.checkReqToken();
-        GetConfigResponse res = new GetConfigResponse();
+    private void loadConfig(ClientConfig res) {
         // Identifier generated once on Browser, can uniquely identify one single session to associate with
         // the given webpage/tab
         SessionContext sc = ThreadLocals.getSC();
         if (sc != null) {
-            ThreadLocals.getSC().setAppGuid(req.getAppGuid());
-            log.debug("BrowserGuid: " + req.getAppGuid());
             res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
             // we only need to display this once so remove it.
             sc.setUrlIdFailMsg(null);
@@ -1981,13 +1945,11 @@ public class AppController extends ServiceBase implements ErrorController {
             res.setLoadNostrIdRelays(sc.getLoadNostrIdRelays());
         }
         res.setConfig(prop.getConfig());
-        res.setSessionTimeoutMinutes(prop.getSessionTimeoutMinutes());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));
         res.setRequireCrypto(prop.isRequireCrypto());
         SubNode root = read.getDbRoot();
         String relays = root.getStr(NodeProp.NOSTR_RELAYS);
         res.setNostrRelays(relays);
-        return res;
     }
 
     @RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
@@ -2036,7 +1998,8 @@ public class AppController extends ServiceBase implements ErrorController {
             session,
             ms -> {
                 SignSubGraphResponse res = new SignSubGraphResponse();
-                // run the signing in an async thread, so we can push messages back to browser from it
+                // run the signing in an async thread, so we can push messages back to browser from it without
+                // any session mutexing getting in the way
                 exec.run(() -> {
                     crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
                 });
@@ -2049,7 +2012,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return callProc.run(
             "getNodeStats",
             false,
@@ -2081,6 +2043,9 @@ public class AppController extends ServiceBase implements ErrorController {
                 }
                 log.debug("Command: " + req.getCommand());
                 switch (req.getCommand()) {
+                    case "performanceReport":
+                        res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
+                        break;
                     case "crawlUsers":
                         res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
                         break;
@@ -2131,7 +2096,7 @@ public class AppController extends ServiceBase implements ErrorController {
                         res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
                         break;
                     case "toggleAuditFilter":
-                        AuditFilter.enabled = !AuditFilter.enabled;
+                        AppFilter.audit = !AppFilter.audit;
                         res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
                         break;
                     case "toggleDaemons":
@@ -2145,12 +2110,6 @@ public class AppController extends ServiceBase implements ErrorController {
                     // break;
                     case "getServerInfo":
                         res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                        break;
-                    case "getSessionActivity":
-                        res.getMessages().add(new InfoMessage(system.getSessionActivity(), null));
-                        break;
-                    case "sendAdminNote":
-                        res.getMessages().add(new InfoMessage(system.sendAdminNote(), null));
                         break;
                     case "getJson":
                         res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
@@ -2224,6 +2183,20 @@ public class AppController extends ServiceBase implements ErrorController {
         );
     }
 
+    // todo-1: broken for now. Needs special treatment in AppFilter to allow
+    @RequestMapping(value = "/up", method = RequestMethod.GET)
+    @ResponseBody
+    public String up() {
+        return (
+            "Server: t=" +
+            System.currentTimeMillis() +
+            " SwarmTaskId=" +
+            prop.getSwarmTaskId() +
+            " slot=" +
+            prop.getSwarmTaskSlot()
+        );
+    }
+
     /*
      * Used to keep session from timing out when browser is doing something long-running like playing an
      * audio file, and the user may not be interacting at all.
@@ -2239,7 +2212,7 @@ public class AppController extends ServiceBase implements ErrorController {
             session,
             ms -> {
                 PingResponse res = new PingResponse();
-                res.setServerInfo("Server: t=" + System.currentTimeMillis());
+                res.setServerInfo("Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
                 res.setSuccess(true);
                 return res;
             }
@@ -2333,25 +2306,24 @@ public class AppController extends ServiceBase implements ErrorController {
     // return res;
     // }
     // reference: https://www.baeldung.com/spring-server-sent-events
-    @GetMapping(API_PATH + "/serverPush")
-    public SseEmitter serverPush(HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
-        return (SseEmitter) callProc.run(
-            "serverPush",
-            false,
-            false,
-            null,
-            session,
-            ms -> {
-                return ThreadLocals.getSC().getPushEmitter();
-            }
-        );
+    @GetMapping(API_PATH + "/serverPush/{token}")
+    public SseEmitter serverPush(
+        @PathVariable(value = "token", required = true) String token, //
+        HttpSession session
+    ) {
+        if (StringUtils.isEmpty(token)) {
+            throw new RuntimeException("No token for serverPush");
+        }
+        SseEmitter emitter = user.getPushEmitter(token);
+        if (emitter == null) {
+            throw new RuntimeException("Failed getting emitter for token: " + token);
+        }
+        return emitter;
     }
 
     @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return (byte[]) callProc.run(
             "captcha",
             false,
@@ -2371,12 +2343,11 @@ public class AppController extends ServiceBase implements ErrorController {
      * command to the app, so we'll just use curl from a shell script
      *
      * So doing this request terminates the server: curl
-     * http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+     * http://${quanta_domain}:${PORT}/api/shutdown?password=${adminPassword}
      */
     @RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
     @ResponseBody
     public String shutdown(HttpSession session, @RequestParam(value = "password", required = true) String password) {
-        // NO NOT HERE -> SessionContext.checkReqToken();
         return (String) callProc.run(
             "shutdown",
             false,

@@ -17,15 +17,17 @@ import quanta.util.LockEx;
 public class AppSessionListener implements HttpSessionListener {
 
     private static Logger log = LoggerFactory.getLogger(AppSessionListener.class);
+    private static final boolean debug = false;
 
     @Autowired
     private AppProp appProp;
 
-    private static int sessionCounter = 0;
+    public static int sessionCounter = 0;
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
         HttpSession session = se.getSession();
+
         // multiply by 60 to convert minutes to seconds.
         session.setMaxInactiveInterval(appProp.getSessionTimeoutMinutes() * 60);
         /*
@@ -36,21 +38,21 @@ public class AppSessionListener implements HttpSessionListener {
          */
         session.setAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE, new LockEx("SESSION-LockEx:" + session.getId(), true, 180000, 1));
         sessionCounter++;
+
+        if (debug) {
+            log.debug("Session Created: " + session.getId() + " count=" + sessionCounter);
+        }
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         HttpSession session = se.getSession();
-        SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
-        if (sc != null) {
-            sc.sessionTimeout();
-            session.removeAttribute(SessionContext.QSC);
-            // this should trigger the removal of SessionContext.allSessions entry too, however we also
-            // try to remove it manually just to be sure, instead of trusting server HTTP layer
-            SessionContext.removeSession(sc);
-        }
         session.removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
         sessionCounter--;
+
+        if (debug) {
+            log.debug("Session Destroyed: " + session.getId() + " count=" + sessionCounter);
+        }
     }
 
     public static int getSessionCounter() {

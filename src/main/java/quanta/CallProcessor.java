@@ -1,6 +1,5 @@
 package quanta;
 
-import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +7,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
@@ -21,7 +19,6 @@ import quanta.request.LogoutRequest;
 import quanta.request.base.RequestBase;
 import quanta.response.base.ResponseBase;
 import quanta.util.ExUtil;
-import quanta.util.LockEx;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -48,11 +45,9 @@ public class CallProcessor extends ServiceBase {
         }
         SessionContext sc = ThreadLocals.getSC();
         sc.setCommand(command);
-        if (sc == null || !SessionContext.sessionExists(sc)) {
-            throw new RuntimeException("Unable to get SessionContext to check token.");
-        }
+
         if (authBearer) {
-            SessionContext.authBearer();
+            user.authBearer();
         }
         /*
          * #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way to
@@ -62,7 +57,7 @@ public class CallProcessor extends ServiceBase {
          * needs to be tested and more well thought out.
          */
         if (authSig && sc.isAdmin()) {
-            SessionContext.authSig();
+            user.authSig();
         }
         logRequest(command, req, httpSession);
         /*
@@ -71,36 +66,16 @@ public class CallProcessor extends ServiceBase {
          * overwrites this
          */
         new ResponseBase();
-        boolean useLock = true;
-        /*
-         * #push-locks: do this cleaner. There should be a way to accomplish this without disabling the
-         * mutex here.
-         */
-        switch (command) {
-            case "serverPush":
-            case "signNodes":
-                useLock = false;
-            default:
-                break;
-        }
+
         Object ret = null;
-        LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
-        if (mutex == null) {
-            log.error("Session mutex lock is null.");
-        }
-        long startTime = 0;
+
+        long startTime = System.currentTimeMillis();
         String userName = null;
         try {
-            if (useLock && mutex != null) {
-                mutex.lockEx();
-            }
             if (req instanceof LogoutRequest) {
                 // Note: all this run will be doing in this case is a session invalidate.
                 ret = runner.run(null);
             } else {
-                // mutexCounter++;
-                Date now = new Date();
-                sc.setLastActiveTime(startTime = now.getTime());
                 userName = sc.getUserName();
                 MongoSession ms = ThreadLocals.getMongoSession();
                 ret = runner.run(ms);
@@ -141,10 +116,6 @@ public class CallProcessor extends ServiceBase {
             if (duration > Instrument.CAPTURE_THRESHOLD) {
                 new PerfMonEvent(duration, "callProc." + command, userName);
             }
-            if (useLock && mutex != null) {
-                mutex.unlockEx();
-            }
-            // mutexCounter--;
             nostr.pushNostrInfoToClient();
         }
         logResponse(ret);

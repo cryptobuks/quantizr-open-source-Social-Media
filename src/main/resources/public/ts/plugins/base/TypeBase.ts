@@ -81,7 +81,7 @@ export class TypeBase implements TypeIntf {
     // for doing simplest possible layouts we allow types to set the width percent used by each property
     // and then we just let a "display: flex" style take care of rendering them left to right top to bottom
     getPropConfig = (prop: string): ConfigProp => {
-        return getAs()?.config?.props?.[this.typeName]?.[prop];
+        return S.quanta.cfg.props?.[this.typeName]?.[prop];
     }
 
     getSchemaOrgPropComment(prop: string): string {
@@ -141,7 +141,7 @@ export class TypeBase implements TypeIntf {
 
     allowDeleteProperty = (prop: string) => {
         let ret = true;
-        const typeObj = getAs()?.config?.props?.[this.typeName];
+        const typeObj = S.quanta.cfg.props?.[this.typeName];
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {
@@ -160,7 +160,7 @@ export class TypeBase implements TypeIntf {
     */
     ensureDefaultProperties(node: J.NodeInfo) {
         // look for this as a configured property
-        const typeObj = getAs()?.config?.props?.[node.type];
+        const typeObj = S.quanta.cfg.props?.[node.type];
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {

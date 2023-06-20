@@ -96,7 +96,7 @@ export class AudioPlayerDlg extends DialogBase {
         const children = [
             new Diva([
                 this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
-                this.audioPlayer = S.rpcUtil.sessionTimedOut ? null : new AudioPlayer({
+                this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,
                     className: "audioPlayer",
                     onPause: () => { this.savePlayerInfo(this.player.src, this.player.currentTime); },

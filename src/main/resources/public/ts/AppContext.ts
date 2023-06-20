@@ -78,11 +78,6 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
         throw new Error("Called dispatch before first render. type: " + type);
     }
 
-    if (S.rpcUtil.sessionTimedOut) {
-        S.rpcUtil.handleSessionTimeout();
-        return;
-    }
-
     // this is a bit of tight coupling to audio player and we may decouple this better later. Keeping it simple for now.
     if (S.quanta.audioPlaying) {
         console.warn(`Ignoring dispatch ${type} while audio playing.`);
@@ -112,11 +107,6 @@ export function promiseDispatch(type: string, func: StateModFunc): Promise<void>
     return new Promise<void>(async (resolve, reject) => {
         if (!dispatcher) {
             throw new Error("Called dispatch before first render. type: " + type);
-        }
-
-        if (S.rpcUtil.sessionTimedOut) {
-            S.rpcUtil.handleSessionTimeout();
-            return;
         }
 
         // this is a bit of tight coupling to audio player and we may decouple this better later. Keeping it simple for now.

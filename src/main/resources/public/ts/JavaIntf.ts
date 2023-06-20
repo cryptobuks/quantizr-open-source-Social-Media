@@ -41,6 +41,21 @@ export interface Bookmark {
     selfId: string;
 }
 
+export interface ClientConfig {
+    config: { [index: string]: any };
+    brandingAppName: string;
+    requireCrypto: boolean;
+    urlIdFailMsg: string;
+    userMsg: string;
+    displayUserProfileId: string;
+    initialNodeId: string;
+    loadNostrId: string;
+    loadNostrIdRelays: string;
+    nostrRelays: string;
+    urlView: string;
+    tagSearch: string;
+}
+
 export interface IPSMData {
     mime: string;
     data: string;
@@ -305,10 +320,6 @@ export interface GetActPubObjectRequest extends RequestBase {
 }
 
 export interface GetBookmarksRequest extends RequestBase {
-}
-
-export interface GetConfigRequest extends RequestBase {
-    appGuid: string;
 }
 
 export interface GetFollowersRequest extends RequestBase {
@@ -778,20 +789,6 @@ export interface GetBookmarksResponse extends ResponseBase {
     bookmarks: Bookmark[];
 }
 
-export interface GetConfigResponse extends ResponseBase {
-    config: { [index: string]: any };
-    sessionTimeoutMinutes: number;
-    brandingAppName: string;
-    requireCrypto: boolean;
-    urlIdFailMsg: string;
-    userMsg: string;
-    displayUserProfileId: string;
-    initialNodeId: string;
-    loadNostrId: string;
-    loadNostrIdRelays: string;
-    nostrRelays: string;
-}
-
 export interface GetFollowersResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
@@ -1139,7 +1136,7 @@ export interface NodeInfo {
     boostedNode: NodeInfo;
 }
 
-export interface UserPreferences {
+export interface UserPreferences extends Serializable {
     editMode: boolean;
     showMetaData: boolean;
     nsfw: boolean;
@@ -1184,6 +1181,9 @@ export interface BreadcrumbInfo {
     id: string;
     name: string;
     type: string;
+}
+
+export interface Serializable {
 }
 
 export interface PrivilegeInfo {

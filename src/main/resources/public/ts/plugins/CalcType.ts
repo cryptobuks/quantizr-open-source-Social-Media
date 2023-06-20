@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
@@ -20,8 +19,7 @@ export class CalcType extends TypeBase {
     }
 
     override getEditorHelp(): string {
-        const ast = getAs();
-        return ast.config.help?.type?.calculator?.editor;
+        return S.quanta.cfg.help?.type?.calculator?.editor;
     }
 
     override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {

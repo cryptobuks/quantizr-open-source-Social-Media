@@ -77,7 +77,7 @@ export class UserProfileDlg extends DialogBase {
         let web3Div: Div = null;
         const web3Enabled = ast.allowedFeatures?.indexOf("web3") !== -1;
 
-        if (ast.config.ipfsEnabled && web3Enabled) {
+        if (S.quanta.cfg.ipfsEnabled && web3Enabled) {
             const web3Comps: CompIntf[] = [];
 
             if (state.userProfile.didIPNS) {
@@ -191,7 +191,7 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     getAs().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    (getAs().isAnonUser || this.readOnly || !ast.config.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
+                    (getAs().isAnonUser || this.readOnly || !S.quanta.cfg.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 

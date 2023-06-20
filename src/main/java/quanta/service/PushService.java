@@ -1,7 +1,6 @@
 package quanta.service;
 
 import java.util.HashSet;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,14 +8,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.response.FeedPushInfo;
-import quanta.response.NodeEditedPushInfo;
 import quanta.response.ServerPushInfo;
-import quanta.util.Convert;
+import quanta.util.ThreadLocals;
 
 @Component
 public class PushService extends ServiceBase {
@@ -26,63 +22,64 @@ public class PushService extends ServiceBase {
 
     /* Notify all users being shared to on this node, or everyone if the node is public. */
     public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
-        exec.run(() -> {
-            /* get list of userNames this node is shared to (one of them may be 'public') */
-            List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
-            // if node has no sharing we're done here
-            if (usersSharedTo == null) {
-                return;
-            }
-            // put user names in a hash set for faster performance
-            HashSet<String> usersSharedToSet = new HashSet<>();
-            usersSharedToSet.addAll(usersSharedTo);
-            /* Scan all sessions and push message to the ones that need to see it */
-            for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
-                // if we know we already just pushed to this session, we can skip it in here.
-                if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
-                    continue;
-                }
-                /* Anonymous sessions won't have userName and can be ignored */
-                if (sc.getUserName() == null) continue;
-                /*
-                 * push if the sc user is in the shared set or this session is OURs
-                 *
-                 * Having "public" option here (pushing public nodes to everyone) floods in too many messages to be
-                 * practical, becuase the ActivityPub deamon that reads messages pushes them. Handling that firehose
-                 * of posts is a cool feature but will take some time to think thru the usability issues, so for now
-                 * we only live-push messages to the browser that created them (the guy who did the save), and the
-                 * people a node is specifically shared to.
-                 */
-                if (
-                    sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
-                    // usersSharedToSet.contains("public") ||
-                    usersSharedToSet.contains(sc.getUserName())
-                ) {
-                    /* build our push message payload */
-                    NodeInfo info = convert.convertToNodeInfo(
-                        false,
-                        sc,
-                        ms,
-                        node,
-                        false, //
-                        Convert.LOGICAL_ORDINAL_IGNORE,
-                        false,
-                        false,
-                        true, //
-                        false,
-                        true,
-                        true,
-                        null,
-                        false
-                    );
-                    if (info != null) {
-                        FeedPushInfo pushInfo = new FeedPushInfo(info);
-                        // push notification message to browser
-                        push.sendServerPushInfo(sc, pushInfo);
-                    }
-                }
-            }
-        });
+        // todo-a: pending redesign for swarm replias and redis
+        // exec.run(() -> {
+        //     /* get list of userNames this node is shared to (one of them may be 'public') */
+        //     List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
+        //     // if node has no sharing we're done here
+        //     if (usersSharedTo == null) {
+        //         return;
+        //     }
+        //     // put user names in a hash set for faster performance
+        //     HashSet<String> usersSharedToSet = new HashSet<>();
+        //     usersSharedToSet.addAll(usersSharedTo);
+        //     /* Scan all sessions and push message to the ones that need to see it */
+        //     for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
+        //         // if we know we already just pushed to this session, we can skip it in here.
+        //         if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
+        //             continue;
+        //         }
+        //         /* Anonymous sessions won't have userName and can be ignored */
+        //         if (sc.getUserName() == null) continue;
+        //         /*
+        //          * push if the sc user is in the shared set or this session is OURs
+        //          *
+        //          * Having "public" option here (pushing public nodes to everyone) floods in too many messages to be
+        //          * practical, becuase the ActivityPub deamon that reads messages pushes them. Handling that firehose
+        //          * of posts is a cool feature but will take some time to think thru the usability issues, so for now
+        //          * we only live-push messages to the browser that created them (the guy who did the save), and the
+        //          * people a node is specifically shared to.
+        //          */
+        //         if (
+        //             sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
+        //             // usersSharedToSet.contains("public") ||
+        //             usersSharedToSet.contains(sc.getUserName())
+        //         ) {
+        //             /* build our push message payload */
+        //             NodeInfo info = convert.convertToNodeInfo(
+        //                 false,
+        //                 sc,
+        //                 ms,
+        //                 node,
+        //                 false, //
+        //                 Convert.LOGICAL_ORDINAL_IGNORE,
+        //                 false,
+        //                 false,
+        //                 true, //
+        //                 false,
+        //                 true,
+        //                 true,
+        //                 null,
+        //                 false
+        //             );
+        //             if (info != null) {
+        //                 FeedPushInfo pushInfo = new FeedPushInfo(info);
+        //                 // push notification message to browser
+        //                 push.sendServerPushInfo(sc, pushInfo);
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     /*
@@ -92,77 +89,83 @@ public class PushService extends ServiceBase {
      */
     public void pushNodeToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
         /* Scan all sessions and push message to the ones that need to see it */
-        for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
-            /* Anonymous sessions won't have userName and can be ignored */
-            if (sc.getUserName() == null) continue;
-            // sc.getUserName() + " token="
-            // + sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
-            // if this node starts with the 'watchingPath' of the user that means the node is a descendant of
-            // the watching path
-            if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
-                /* build our push message payload */
-                NodeInfo info = convert.convertToNodeInfo(
-                    false,
-                    sc,
-                    ms,
-                    node,
-                    false,
-                    Convert.LOGICAL_ORDINAL_IGNORE,
-                    false,
-                    false,
-                    true,
-                    false,
-                    true,
-                    true,
-                    null,
-                    false
-                );
-                if (info != null) {
-                    FeedPushInfo pushInfo = new FeedPushInfo(info);
-                    // push notification message to browser
-                    sendServerPushInfo(sc, pushInfo);
-                    if (sessionsPushed != null) {
-                        sessionsPushed.add(sc.hashCode());
-                    }
-                }
-            }
-        }
+        // todo-1: pending redesign for swarm replias and redis
+        // for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
+        //     /* Anonymous sessions won't have userName and can be ignored */
+        //     if (sc.getUserName() == null) continue;
+        //     // sc.getUserName() + " token="
+        //     // + sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
+        //     // if this node starts with the 'watchingPath' of the user that means the node is a descendant of
+        //     // the watching path
+        //     if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
+        //         /* build our push message payload */
+        //         NodeInfo info = convert.convertToNodeInfo(
+        //             false,
+        //             sc,
+        //             ms,
+        //             node,
+        //             false,
+        //             Convert.LOGICAL_ORDINAL_IGNORE,
+        //             false,
+        //             false,
+        //             true,
+        //             false,
+        //             true,
+        //             true,
+        //             null,
+        //             false
+        //         );
+        //         if (info != null) {
+        //             FeedPushInfo pushInfo = new FeedPushInfo(info);
+        //             // push notification message to browser
+        //             sendServerPushInfo(sc, pushInfo);
+        //             if (sessionsPushed != null) {
+        //                 sessionsPushed.add(sc.hashCode());
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     /* Notify all browser timelines if they have new info */
     public void pushTimelineUpdateToBrowsers(MongoSession ms, NodeInfo nodeInfo) {
         /* Scan all sessions and push message to the ones that need to see it */
-        for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
-            /* Anonymous sessions can be ignored */
-            if (sc.getUserName() == null) continue;
-            /*
-             * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
-             * node and therefore will be sent to their respecitve browsers
-             */
-            if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
-                continue;
-            }
-            NodeEditedPushInfo pushInfo = new NodeEditedPushInfo(nodeInfo);
-            sendServerPushInfo(sc, pushInfo);
-        }
+        // todo-a: pending redesign for swarm replias and redis
+        // for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
+        //     /* Anonymous sessions can be ignored */
+        //     if (sc.getUserName() == null) continue;
+        //     /*
+        //      * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
+        //      * node and therefore will be sent to their respecitve browsers
+        //      */
+        //     if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
+        //         continue;
+        //     }
+        //     NodeEditedPushInfo pushInfo = new NodeEditedPushInfo(nodeInfo);
+        //     sendServerPushInfo(sc, pushInfo);
+        // }
     }
 
     public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
         if (sc == null) return;
         exec.run(() -> {
-            SseEmitter pushEmitter = user.getPushEmitter();
-            if (pushEmitter == null) return;
+            SseEmitter pushEmitter = user.getPushEmitter(sc.getUserToken());
+            if (pushEmitter == null) {
+                log.debug("No PushEmitter for user: " + ThreadLocals.getSC().getUserName());
+                return;
+            }
             /*
              * Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable
              * even probably to be sure each session is only doing one emit at a time.
              */
             synchronized (pushEmitter) {
                 try {
-                    SseEventBuilder event = //
-                        //
-                        //
-                        SseEmitter.event().data(info).id(String.valueOf(info.hashCode())).name(info.getType());
+                    SseEventBuilder event = SseEmitter
+                        .event()
+                        .data(info)
+                        .id(String.valueOf(info.hashCode()))
+                        .name(info.getType());
                     pushEmitter.send(event);
                 } catch (
                     /*

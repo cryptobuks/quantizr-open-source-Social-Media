@@ -11,5 +11,5 @@ public class Const {
     // "Mozilla/5.0";
 
     public static final boolean adminDebugStreaming = true;
-    public static final boolean debugRequests = false;
+    public static final boolean debugFilterEntry = false;
 }

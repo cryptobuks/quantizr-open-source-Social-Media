@@ -311,7 +311,7 @@ export class Nostr {
             return ast.userProfile.relays;
         }
 
-        return S.quanta.configRes.nostrRelays;
+        return S.quanta.config.nostrRelays;
     }
 
     // Recursive method. As we walk up the chain we maintain the set of all relays used during the walk, so we're likely to

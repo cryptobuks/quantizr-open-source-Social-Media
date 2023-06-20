@@ -330,7 +330,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                     node.getIdStr() +
                     "&token=" +
                     URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
-                src = prop.getHostAndPort() + path;
+                src = prop.getProtocolHostAndPort() + path;
             } //
             else if (url != null) {
                 src = url;

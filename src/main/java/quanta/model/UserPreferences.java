@@ -1,11 +1,14 @@
 package quanta.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 
 /**
  * Models UserPreferences
  */
-public class UserPreferences {
+public class UserPreferences implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private boolean editMode;
     private boolean showMetaData;

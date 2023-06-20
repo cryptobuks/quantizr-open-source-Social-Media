@@ -231,7 +231,6 @@ export abstract class Comp implements CompIntf {
             // Not fat arrow, because we need 'arguments',
             // create a new function that injects calls to userActive
             obj.onClick = function (evt: any) {
-                S.rpcUtil.userActive();
                 func.apply(null, arguments);
             };
 

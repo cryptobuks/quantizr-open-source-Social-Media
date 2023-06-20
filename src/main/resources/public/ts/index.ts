@@ -28,8 +28,10 @@ let initialized = false;
 
 const processAppLoad = async () => {
     new Factory();
-    await S.quanta.loadConfig();
+    S.quanta.config = (window as any).g_config;
+    S.quanta.cfg = S.quanta.config.config || {};
 
+    // todo-1: get this url param from server just like other g_config stuff does
     const urlParams = new URLSearchParams(window.location.search);
     const app = urlParams.get("app");
     console.log("app=" + app);

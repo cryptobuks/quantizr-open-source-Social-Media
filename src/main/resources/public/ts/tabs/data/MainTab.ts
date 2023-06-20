@@ -72,7 +72,7 @@ export class MainTab implements TabIntf<any> {
             !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home", false)) : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
             ...this.customAnonRHSLinks(),
-            ...S.render.buildCustomLinks(ast.config.rhsLinks)
+            ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)
         ]);
     };
 
@@ -82,6 +82,6 @@ export class MainTab implements TabIntf<any> {
         // if not anon user return empty items
         if (!getAs().isAnonUser) return [];
 
-        return S.render.buildCustomLinks(getAs().config.rhsAnonLinks);
+        return S.render.buildCustomLinks(S.quanta.cfg.rhsAnonLinks);
     }
 }

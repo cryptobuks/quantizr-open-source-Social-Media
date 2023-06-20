@@ -34,68 +34,70 @@ public class OutboxMgr extends ServiceBase {
     /**
      * Adds a node into the user's "Inbox" as an indicator to them that the 'node' added needs their
      * attention, for some reason or that someone has shared this node with them.
+     *
+     * todo-a: currently not used
      */
     public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
         // if you re-enable this code be sure to add a new partialIndex on "pro."+NodeProp.TARGET_ID.s(), so
-        // the
-        // findNodeByProp will be fast.
+        // the findNodeByProp will be fast.
+
         if (true) throw new RuntimeException("currently not used.");
-        arun.run(as -> {
-            SubNode userInbox = read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
-            if (userInbox != null) {
-                /*
-                 * First look to see if there is a target node already existing in this persons inbox that points to
-                 * the node in question
-                 */
-                SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
-                /*
-                 * If there's no notification for this node already in the user's inbox then add one
-                 */
-                if (notifyNode == null) {
-                    notifyNode =
-                        create.createNode(
-                            as,
-                            userInbox,
-                            null,
-                            NodeType.INBOX_ENTRY.s(),
-                            0L,
-                            CreateNodeLocation.FIRST,
-                            null,
-                            null,
-                            true,
-                            true
-                        );
-                    // trim to 280 like twitter.
-                    String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
-                    String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
-                    notifyNode.setOwner(userInbox.getOwner());
-                    notifyNode.setContent(content);
-                    notifyNode.touch();
-                    notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
-                    update.save(as, notifyNode);
-                }
-                /*
-                 * Send push notification so the user sees live there's a new share comming in or being re-added
-                 * even.
-                 */
-                List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
-                if (scList != null) {
-                    for (SessionContext sc : scList) {
-                        push.sendServerPushInfo(
-                            sc,
-                            // todo-2: fill in the two null parameters here if/when you ever bring this method back.
-                            new NotificationMessage(
-                                "newInboxNode",
-                                node.getIdStr(),
-                                "New node shared to you.",
-                                ThreadLocals.getSC().getUserName()
-                            )
-                        );
-                    }
-                }
-            }
-            return null;
-        });
+        // arun.run(as -> {
+        //     SubNode userInbox = read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
+        //     if (userInbox != null) {
+        //         /*
+        //          * First look to see if there is a target node already existing in this persons inbox that points to
+        //          * the node in question
+        //          */
+        //         SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
+        //         /*
+        //          * If there's no notification for this node already in the user's inbox then add one
+        //          */
+        //         if (notifyNode == null) {
+        //             notifyNode =
+        //                 create.createNode(
+        //                     as,
+        //                     userInbox,
+        //                     null,
+        //                     NodeType.INBOX_ENTRY.s(),
+        //                     0L,
+        //                     CreateNodeLocation.FIRST,
+        //                     null,
+        //                     null,
+        //                     true,
+        //                     true
+        //                 );
+        //             // trim to 280 like twitter.
+        //             String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+        //             String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
+        //             notifyNode.setOwner(userInbox.getOwner());
+        //             notifyNode.setContent(content);
+        //             notifyNode.touch();
+        //             notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
+        //             update.save(as, notifyNode);
+        //         }
+        //         /*
+        //          * Send push notification so the user sees live there's a new share comming in or being re-added
+        //          * even.
+        //          */
+        //         List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
+        //         if (scList != null) {
+        //             for (SessionContext sc : scList) {
+        //                 push.sendServerPushInfo(
+        //                     sc,
+        //                     // todo-2: fill in the two null parameters here if/when you ever bring this method back.
+        //                     new NotificationMessage(
+        //                         "newInboxNode",
+        //                         node.getIdStr(),
+        //                         "New node shared to you.",
+        //                         ThreadLocals.getSC().getUserName()
+        //                     )
+        //                 );
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // });
     }
 
     /**

@@ -1,4 +1,7 @@
 #!/bin/bash
+# This file is the actual version of 'setenv-run-distro.sh' that's used for the Quanta.wiki production deployment
+# and is provided here as an example of a prod config. This file should be deployed into the distro as 'setenv-run-distro.sh'
+# which means it's renamed to that name when placed in deplyment folder.
 source ./define-functions.sh
 
 # we make up any prod version we want here. It won't matter. This image is built on and private to the prod instance
@@ -53,6 +56,10 @@ export MONGO_DATA=/var/lib/mongodb
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
+
+export REDIS_HOST=redis-host-distro
+export REDIS_PORT=6379
+export REDIS_PASSWORD=
 
 # tserver-tag
 export TSERVER_PORT=4000

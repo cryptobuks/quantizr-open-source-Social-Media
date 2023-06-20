@@ -1,4 +1,3 @@
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -18,14 +17,6 @@ export class RpcUtil {
     rpcCounter: number = 0;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
-
-    // note: When the app loads we immediately set this timeout to a value from the server.
-    SESSION_TIMEOUT_MINS = 30;
-    sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
-    sessionTimedOut = false;
-    rpcEnable = true;
-    millisSinceLastRpc = 0;
-    areYouThereDlg: ConfirmDlg;
     RPC_TIMER_INTERVAL = 1000;
 
     getRemoteHost = (): string => {
@@ -39,16 +30,13 @@ export class RpcUtil {
     }
 
     getRpcPath = (): string => {
-        return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/mobile/api/");
+        return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/api/");
     }
 
     /* Makes calls to server */
     rpc = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
         (postName: string, postData: RequestType = null,
             background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
-        if (this.sessionTimedOut || !this.rpcEnable) {
-            return Promise.resolve(null);
-        }
 
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
@@ -73,9 +61,6 @@ export class RpcUtil {
                 if (this.logRpc && !S.crypto.userSignature) {
                     console.warn("Request will have no signature.");
                 }
-
-                this.millisSinceLastRpc = 0;
-                this.userActive();
 
                 // const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
@@ -256,78 +241,7 @@ export class RpcUtil {
 
     initRpcTimer = () => {
         // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
-        this.timer = setInterval(() => {
-            this.progressInterval();
-            this.timeoutInterval();
-        }, this.RPC_TIMER_INTERVAL);
-    }
-
-    timeoutInterval = async () => {
-        if (this.sessionTimedOut) return;
-
-        this.sessionTimeRemainingMillis -= this.RPC_TIMER_INTERVAL;
-        this.millisSinceLastRpc += this.RPC_TIMER_INTERVAL;
-        if (this.sessionTimeRemainingMillis <= 0) {
-            console.log("Session Timed Out.");
-            this.sessionTimedOut = true;
-            this.rpcEnable = false;
-            clearInterval(this.timer);
-
-            // if audio player is not playing we can close out the app now
-            if (!S.quanta.audioPlaying) {
-                this.handleSessionTimeout();
-                return;
-            }
-            return;
-        }
-        // else {
-        //      console.log("STR: " + this.sessionTimeRemainingMillis);
-        // }
-
-        if (this.areYouThereDlg) return;
-
-        // is there less than 90 seconds before session should timeout?
-        if (this.sessionTimeRemainingMillis < 90_000) {
-            this.areYouThereDlg = new ConfirmDlg("Are you still there?", S.quanta.configRes.brandingAppName,
-                "btn-info", "alert alert-info", false);
-            await this.areYouThereDlg.open();
-            if (this.areYouThereDlg.yes) {
-                S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
-            }
-
-            this.userActive();
-            this.areYouThereDlg = null;
-        }
-    }
-
-    handleSessionTimeout = async () => {
-        // this is kind of tricky but we set sessionTimedOut to false here so the
-        // dispatcher will keep working just to show the final "Session Expired" message
-        this.sessionTimedOut = false;
-
-        // we don't need to close this but we do just to remove clutter from the screen beneath
-        // the Session Expored message.
-        if (this.areYouThereDlg) {
-            this.areYouThereDlg.close();
-        }
-        await S.util.showMessage("Session expired.", "Warning");
-        window.location.href = window.location.origin;
-    }
-
-    userActive = () => {
-        if (S.rpcUtil.sessionTimedOut) {
-            S.rpcUtil.handleSessionTimeout();
-            return;
-        }
-
-        this.sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
-
-        // if user is still active but hasn't made call to server which is about to cause a timeout
-        // in 10 seconds, then ping the server so the session does not timeout.
-        if (this.millisSinceLastRpc > this.SESSION_TIMEOUT_MINS * 60_000 - 10_000) {
-            this.millisSinceLastRpc = 0;
-            S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
-        }
+        this.timer = setInterval(this.progressInterval, this.RPC_TIMER_INTERVAL);
     }
 
     startBlockingProcess = () => {

@@ -1,9 +1,9 @@
-import { getAs } from "../AppContext";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
 export class ExportsType extends TypeBase {
@@ -16,8 +16,7 @@ export class ExportsType extends TypeBase {
     }
 
     override getEditorHelp(): string {
-        const ast = getAs();
-        return ast.config.help?.editor?.dialog;
+        return S.quanta.cfg.help?.editor?.dialog;
     }
 
     override isSpecialAccountNode(): boolean {

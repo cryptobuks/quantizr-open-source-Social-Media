@@ -871,12 +871,12 @@ export class Util {
         }
     }
 
-    processUrlParams = () => {
+    checkChangePassword = () => {
         const passCode = this.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
                 new ChangePasswordDlg(passCode).open();
-            }, 100);
+            }, 1000);
         }
     }
 
@@ -887,7 +887,7 @@ export class Util {
             }
             else {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
-                    nodeId: S.quanta.initialNodeId || ":home",
+                    nodeId: S.quanta.config.initialNodeId || ":home",
                     upLevel: false,
                     siblingOffset: 0,
                     renderParentIfLeaf: false,
@@ -944,7 +944,7 @@ export class Util {
         return val.split(char).length - 1;
     }
 
-    setStateVarsUsingLoginResponse = async (res: J.LoginResponse) => {
+    setInitialStateVars = async (res: J.LoginResponse) => {
         if (!res) return;
 
         const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX);
@@ -966,7 +966,7 @@ export class Util {
             s.speechRate = rate || "normal";
 
             // allow for everyone for now
-            s.allowedFeatures = res.allowedFeatures;
+            s.allowedFeatures = res.allowedFeatures || "";
             // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
@@ -1066,10 +1066,16 @@ export class Util {
         const info = data.props as DocumentRSInfo;
         if (!info.results || info.results.length < 2) return false;
 
+        let idx = 0;
         for (const node of info.results) {
-            if (node.hasChildren) {
-                return true;
+            // we have idx to skip the top node because we know for sure it does have children, as
+            // the root of the document
+            if (idx > 0) {
+                if (node.hasChildren) {
+                    return true;
+                }
             }
+            idx++;
         }
         return false;
     }

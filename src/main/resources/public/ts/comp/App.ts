@@ -59,8 +59,8 @@ export class App extends Main {
             ]);
         }
         else {
-            if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
-                this.setChildren([new Heading(4, S.quanta.configRes.brandingAppName + " requires a browser with crypto features.")]);
+            if (S.quanta.config.requireCrypto && !S.crypto.avail) {
+                this.setChildren([new Heading(4, S.quanta.config.brandingAppName + " requires a browser with crypto features.")]);
                 return true;
             }
 

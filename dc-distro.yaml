@@ -1,5 +1,29 @@
 version: '3.7'
 services:
+    redis-distro:
+        image: redis:6.0
+        restart: always
+        hostname: redis-host-distro
+        networks:
+            bridge:
+                aliases:
+                    - redis-host-distro
+        ports:
+            - "${REDIS_PORT}:${REDIS_PORT}"
+        
+        # Saves to disk every 20 seconds (if 1 or more writes done)
+        # command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+        
+        command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD}
+        environment:
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+            
+        # todo-a: start using a cache folder
+        # volumes: 
+        #     - cache:/data
+
     mongo-distro: 
         hostname: mongo-host-distro
         networks:
@@ -70,8 +94,16 @@ services:
                 JAR_FILE: "${JAR_FILE}"
                 XMS: "${XMS}"
                 XMX: "${XMX}"
-            dockerfile: ./dockerfile
-
+                REDIS_HOST: "${REDIS_HOST}"
+                REDIS_PORT: "${REDIS_PORT}"
+                REDIS_PASSWORD: "${REDIS_PASSWORD}"
+            dockerfile: ./dockerfile-distro
+        restart: "no"
+        deploy:
+            restart_policy:
+                condition: none
+                max_attempts: 0
+            replicas: 1
         hostname: quanta-host
         networks:
             bridge:
@@ -88,9 +120,23 @@ services:
             #- '8000:8000'
         
         environment:
+            # Docker warm vars
+            X_NODE_ID: "{{.Node.ID}}"
+            X_NODE_HOSTNAME: '{{.Node.Hostname}}'
+            X_SERVICE_ID: '{{.Service.ID}}'
+            X_SERVICE_NAME: '{{.Service.Name}}'
+            X_TASK_SLOT: "{{.Task.Slot}}"
+            X_TASK_ID: '{{.Task.ID}}'
+            X_TASK_NAME: '{{.Task.Name}}'
+
             logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
+
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"
             mongoSecurity: "true"
@@ -153,6 +199,7 @@ services:
 
         depends_on:
             - mongo-distro
+            - redis-distro
             # - ipfs-distro
 
     # tserver-tag
@@ -160,7 +207,7 @@ services:
         image: ${TSERVER_IMAGE}
         build:
             context: ./src/main/resources/server
-            dockerfile: ./Dockerfile
+            dockerfile: ./dockerfile
         hostname: tserver-host
         networks:
             bridge:

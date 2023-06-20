@@ -1,6 +1,6 @@
-import { getAs } from "../AppContext";
 import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 /* Type for 'untyped' types. That is, if the user has not set a type explicitly this type will be the default */
@@ -11,8 +11,7 @@ export class NostrEncryptedDMType extends TypeBase {
     }
 
     override getEditorHelp(): string {
-        const ast = getAs();
-        return ast.config.help?.editor?.dialog;
+        return S.quanta.cfg.help?.editor?.dialog;
     }
 
     override getEditorOptions(): EditorOptions {

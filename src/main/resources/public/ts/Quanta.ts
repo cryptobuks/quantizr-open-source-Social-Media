@@ -10,15 +10,15 @@ import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
 import { utils } from "quanta-common";
+import { TrendingView } from "./tabs/TrendingView";
 
 export class Quanta {
-    urlParamView: string = null;
-    initialTab: string = null;
-    tagSearch: string = null;
-    initialNodeId: string = null;
+    // initialized in index.ts
+    config: J.ClientConfig = null;
 
-    static appGuid: string = "appid." + Math.random();
-    configRes: J.GetConfigResponse = null;
+    // this is a convenience var pointing to Quanta.config.config
+    cfg: { [index: string]: any };
+
     mainMenu: MainMenuDlg;
     noScrollToId: string = null;
     pendingLocationHash: string;
@@ -105,29 +105,6 @@ export class Quanta {
         await S.nostr.initKeys(user);
     }
 
-    loadConfig = async () => {
-        console.log("loadConfig()");
-        this.configRes = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
-            appGuid: Quanta.appGuid
-        }, true);
-        // console.log("GetConfigResponse: " + S.util.prettyPrint(this.configRes));
-    }
-
-    parseUrlParams = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        this.urlParamView = urlParams.get("view");
-
-        if (this.urlParamView === "doc") {
-            this.initialTab = "docRS";
-        } else if (this.urlParamView === "feed") {
-            this.initialTab = "feedTab";
-        } else if (this.urlParamView === "trending") {
-            this.initialTab = "trendingTab";
-        }
-
-        this.tagSearch = urlParams.get("tagSearch");
-    }
-
     initApp = async () => {
         // todo-1: eventually we can remove this call we do to verify package is working.
         console.log("TEST: " + utils.testCall("abc"));
@@ -135,14 +112,13 @@ export class Quanta {
             throw new Error("initApp called multiple times.");
         }
         this.appInitialized = true;
-        this.parseUrlParams();
-        this.initialNodeId = S.quanta.configRes.initialNodeId;
 
         try {
+            this.setOverlay(false);
             this.dragImg = new Image();
             // this.dragImg.src = "/images/favicon-32x32.png";
 
-            if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
+            if (S.quanta.config.requireCrypto && !S.crypto.avail) {
                 return;
             }
 
@@ -241,29 +217,17 @@ export class Quanta {
             //     return "Leave [appName] ?";
             // };
 
-            /*
-             * This call checks the server to see if we have a session already, and gets back the login information from
-             * the session, and then renders page content, after that.
-             */
-            await S.user.refreshLogin();
+            await S.user.initLoginState();
             console.log("refreshLogin completed.");
 
             S.rpcUtil.initRpcTimer();
-            S.util.processUrlParams();
-            this.setOverlay(false);
+            S.util.checkChangePassword();
             S.util.playAudioIfRequested();
 
-            S.push.init();
-
-            if (this.configRes.config) {
-                S.rpcUtil.SESSION_TIMEOUT_MINS = this.configRes.sessionTimeoutMinutes || 30;
-                S.rpcUtil.sessionTimeRemainingMillis = S.rpcUtil.SESSION_TIMEOUT_MINS * 60_000;
-
+            if (this.config.config) {
                 const network = await S.localDB.getVal(C.LOCALDB_NETWORK_SELECTION);
 
                 dispatch("configUpdates", s => {
-                    s.config = this.configRes.config || {};
-
                     if (network) {
                         s.protocolFilter = network;
                     }
@@ -271,18 +235,20 @@ export class Quanta {
                     // we show the user message after the config is set, but there's no reason to do it here
                     // other than perhaps have the screen updated with the latest based on the config.
                     setTimeout(() => {
-                        if (S.quanta.configRes.userMsg) {
-                            S.util.showMessage(S.quanta.configRes.userMsg, "");
-                            S.quanta.configRes.userMsg = null;
+                        if (S.quanta.config.userMsg) {
+                            S.util.showMessage(S.quanta.config.userMsg, "");
+                            S.quanta.config.userMsg = null;
                         }
 
-                        if (S.quanta.configRes.displayUserProfileId) {
-                            new UserProfileDlg(S.quanta.configRes.displayUserProfileId).open();
-                            S.quanta.configRes.displayUserProfileId = null;
+                        if (S.quanta.config.displayUserProfileId) {
+                            new UserProfileDlg(S.quanta.config.displayUserProfileId).open();
+                            S.quanta.config.displayUserProfileId = null;
                         }
                     }, 100);
                 });
             }
+
+            await this.initialRender();
 
             Log.log("initApp complete.");
             S.domUtil.enableMouseEffect();
@@ -295,6 +261,112 @@ export class Quanta {
         finally {
             dispatch("AppInitComplete", s => s.appInitComplete = true);
         }
+    }
+
+    initialRender = async () => {
+        let initialTab = null;
+        switch (this.config.urlView) {
+            case "doc":
+                initialTab = "docRS";
+                break;
+            case "feed":
+                initialTab = "feedTab";
+                break;
+            case "trending":
+                initialTab = "trendingTab";
+                break;
+            default:
+                initialTab = "mainRS";
+                break;
+        }
+
+        if (initialTab) {
+            if (initialTab === C.TAB_FEED && S.quanta.config.tagSearch) {
+                TrendingView.searchWord(null, "#" + S.quanta.config.tagSearch);
+                return;
+            }
+            else {
+                if (initialTab === C.TAB_DOCUMENT && S.quanta.config.initialNodeId) {
+                    S.nav.openDocumentView(null, S.quanta.config.initialNodeId);
+                    S.quanta.config.initialNodeId = null;
+                    return;
+                }
+            }
+        }
+
+        /* set ID to be the page we want to show user right after login */
+        let id: string = null;
+        let childId: string = null;
+        let renderParentIfLeaf = true;
+        const ast = getAs();
+
+        // When user has perhaps requested a NostrId on the URL we'll end up here where we need to get the Nostr
+        // data and display it.
+        //
+        // todo-1: Currently we always try to pull loadNostrId immediately from a relay here, but we could
+        // do a lookup for it on the server for it during the initial URL request to load the page
+        // and if the node happened to be found for this event, we'd set initialNodeId or whatever's required to
+        // load that ID for the already-existing node.
+        if (S.quanta.config.loadNostrId) {
+            console.log("requested NostrId: " + S.quanta.config.loadNostrId);
+            // need client to be showing instant progress indicator underway.
+            let nostrId = S.quanta.config.loadNostrId;
+            S.quanta.config.loadNostrId = null;
+
+            if (nostrId.startsWith(".")) {
+                nostrId = nostrId.substring(1);
+            }
+
+            // load relays saved in config or else use ones defined by this user.
+            const relays: string[] = S.nostr.getRelays((S.nostr.getSessionRelaysStr() || "") + "\n" + (S.quanta.config.loadNostrIdRelays || ""));
+            S.quanta.config.loadNostrIdRelays = null;
+
+            if (!relays || relays.length === 0) {
+                console.log("No relays were available.");
+                return;
+            }
+
+            const event = await S.nostr.getEvent(nostrId, null, relays);
+            if (!event) {
+                console.warn("Unable to lookup nostrId=" + nostrId);
+                return;
+            }
+            else {
+                await S.nostr.persistEvents([event]);
+            }
+            id = "." + event.id;
+            console.log("nostr id loaded: " + event.id);
+        }
+        else if (S.quanta.config.initialNodeId) {
+            id = S.quanta.config.initialNodeId;
+            S.quanta.config.initialNodeId = null;
+            if (id && id.startsWith("~")) {
+                renderParentIfLeaf = false;
+            }
+        } //
+        else {
+            const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
+
+            if (lastNode) {
+                id = lastNode;
+                childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
+            } else {
+                id = ast.userProfile?.userNodeId;
+            }
+        }
+
+        await S.view.refreshTree({
+            nodeId: id,
+            zeroOffset: true,
+            renderParentIfLeaf,
+            highlightId: childId,
+            forceIPFSRefresh: false,
+            scrollToTop: false,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            jumpToRss: true
+        });
     }
 
     isLandscapeOrientation = () => {
@@ -315,7 +387,6 @@ export class Quanta {
             document.body.addEventListener("mousemove", function (e: any) {
                 S.domUtil.mouseX = e.clientX;
                 S.domUtil.mouseY = e.clientY;
-                S.rpcUtil.userActive();
             });
 
             document.body.addEventListener("click", function (e: any) {
@@ -325,7 +396,6 @@ export class Quanta {
                 // Whenever something is clicked, forget the pending focus data
                 Comp.focusElmId = null;
                 // Log.log("document.body.click target.id=" + target.id);
-                S.rpcUtil.userActive();
             }, false);
 
             document.body.addEventListener("focusin", (e: any) => {

@@ -595,7 +595,7 @@ public class NodeSearchService extends ServiceBase {
                         failedSigCount++;
                     }
                 } else {
-                    log.debug("UNSIGNED: " + XString.prettyPrint(searchRoot));
+                    // log.debug("UNSIGNED: " + XString.prettyPrint(searchRoot));
                     unsignedNodeCount++;
                 }
             }
@@ -624,7 +624,7 @@ public class NodeSearchService extends ServiceBase {
                         failedSigCount++;
                     }
                 } else {
-                    log.debug("UNSIGNED: " + XString.prettyPrint(node));
+                    // log.debug("UNSIGNED: " + XString.prettyPrint(node));
                     unsignedNodeCount++;
                 }
             }
@@ -664,7 +664,7 @@ public class NodeSearchService extends ServiceBase {
 
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
-                // todo-0: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
+                // todo-a: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
                 // was getting processed by lots of nodes
                 if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token) || "quanta".equalsIgnoreCase(token)) {
                     continue;

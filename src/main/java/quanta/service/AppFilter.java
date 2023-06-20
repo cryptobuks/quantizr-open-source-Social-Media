@@ -1,8 +1,10 @@
-package quanta.filter;
+package quanta.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -10,48 +12,171 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.WebUtils;
+import quanta.AppController;
+import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
+import quanta.exception.NotLoggedInException;
 import quanta.util.Const;
+import quanta.util.LockEx;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.XString;
 
 /**
  * Filter for logging details of any request/response
  */
+// See AppConfiguration.java for Bean Registration
 @Component
-@Order(1)
-public class AuditFilter extends GenericFilterBean {
+public class AppFilter extends GenericFilterBean {
 
-    private static Logger log = LoggerFactory.getLogger(AuditFilter.class);
+    private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
-    public static boolean enabled = false;
+    public static boolean audit = false;
+    public static boolean debug = true;
+    public static String BEARER_TOKEN = "token";
+    private static final Object filterLock = new Object();
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
-        if (Const.debugRequests) {
-            log.debug("AuditFilter.doFilter()");
-        }
-        if (!Util.gracefulReadyCheck(response)) return;
-        HttpServletRequest sreq = null;
-        if (request instanceof HttpServletRequest) {
-            sreq = (HttpServletRequest) request;
-        }
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        if (!Util.gracefulReadyCheck(res)) return;
+        ThreadLocals.removeAll();
+
+        String token = null;
+        SessionContext sc = null;
+        HttpServletRequest httpReq = (HttpServletRequest) req;
+        HttpServletResponse httpRes = (HttpServletResponse) res;
+        HttpSession session = null;
+        boolean isNewSession = false;
+        LockEx mutex = null;
+        boolean useLock = true;
+
         try {
-            if (enabled) {
-                preProcess(sreq);
+            // we synchronize here to be sure no other thread can create a session or lock on it
+            // while we're initializing this session and it's locking.
+            synchronized (filterLock) {
+                // test if we have a session before creating it.
+                session = httpReq.getSession(false);
+                isNewSession = session == null;
+
+                // always create session immediately so we get concurrency mutexing
+                session = httpReq.getSession(true);
+
+                // bypass locking for these two
+                switch (httpReq.getRequestURI()) {
+                    case AppController.API_PATH + "/serverPush":
+                    case AppController.API_PATH + "/signNodes":
+                        useLock = false;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (useLock) {
+                    mutex = (LockEx) WebUtils.getSessionMutex(session);
+                    mutex.lockEx();
+                    // log.debug("Mutex: " + mutex.hashCode() + " locked");
+                }
             }
-            chain.doFilter(request, response);
+
+            ThreadLocals.setHttpSession(session);
+
+            if (Const.debugFilterEntry || debug) {
+                String url = "URI=" + httpReq.getRequestURI();
+                if (httpReq.getQueryString() != null) {
+                    url += " q=" + httpReq.getQueryString();
+                }
+                Map params = httpReq.getParameterMap();
+                if (params != null && params.size() > 0) {
+                    url += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
+                }
+                log.debug(url);
+            }
+
+            if (audit) {
+                preProcess(httpReq);
+            }
+            token = httpReq.getHeader("Bearer");
+
+            // allow token to be specified in URL as well
+            if (StringUtils.isEmpty(token)) {
+                token = httpReq.getParameter(BEARER_TOKEN);
+            }
+
+            if (StringUtils.isEmpty(token) && session != null) {
+                token = (String) session.getAttribute(BEARER_TOKEN);
+            }
+
+            ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
+            ThreadLocals.setServletResponse(httpRes);
+
+            if (!StringUtils.isEmpty(token)) {
+                sc = ServiceBase.user.redisGet(token);
+                if (sc == null) {
+                    log.debug("bad token: " + token);
+                    token = null;
+                } else {
+                    // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
+                    ThreadLocals.setReqBearerToken(token);
+                }
+            }
+
+            boolean newSc = false;
+            if (sc == null) {
+                // anonymous user
+                sc = new SessionContext();
+                newSc = true;
+            }
+            Date now = new Date();
+            sc.setLastActiveTime(now.getTime());
+
+            ThreadLocals.setSC(sc);
+            chain.doFilter(req, res);
+
+            // if we did a login we can create the session right away.
+            if (token == null && sc.getUserToken() != null) {
+                session.setAttribute(BEARER_TOKEN, sc.getUserToken());
+
+                if (isNewSession) {
+                    log.debug(
+                        "New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token=" + sc.getUserToken()
+                    );
+                }
+            }
+
+            if (sc.getUserToken() != null) {
+                ServiceBase.user.redisSave(ThreadLocals.getSC());
+                if (newSc) {
+                    log.debug("First Save of RedisKey: " + sc.getUserToken());
+                }
+            }
+        } catch (NotLoggedInException e) {
+            httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        } catch (Exception e) {
+            /*
+             * we send back the error here, for AJAX calls so we don't bubble up to the default handling and
+             * cause it to send back the html error page.
+             */
+            log.error("Failed", e);
+            httpRes.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
-            if (enabled) {
-                if (log.isTraceEnabled()) {
-                    if (response instanceof HttpServletResponse) {
-                        HttpServletResponse sres = (HttpServletResponse) response;
-                        postProcess(sreq, sres);
+            try {
+                if (audit) {
+                    if (log.isTraceEnabled()) {
+                        if (res instanceof HttpServletResponse) {
+                            HttpServletResponse sres = (HttpServletResponse) res;
+                            postProcess(httpReq, sres);
+                        }
                     }
+                }
+            } finally {
+                if (mutex != null) {
+                    mutex.unlockEx();
                 }
             }
         }

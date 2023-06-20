@@ -687,7 +687,7 @@ export class Edit {
 
         // state.editNode holds non-null always whenever there is editing underway.
         if (ast.editNode) {
-            S.util.showMessage("You're already editing a node. Finish that edit first. Tip: Use `Menu -> Edit -> Continue Editing` if you forgot which node you're editing.", "Warning");
+            S.util.showMessage("You're already editing a node. Finish that edit first. Tip: Use `Menu -> Edit -> Resume Editing` if you forgot which node you're editing.", "Warning");
             return true;
         }
         return false;
@@ -713,7 +713,7 @@ export class Edit {
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean,
         showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
-        if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
+        if (S.quanta.config.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
         }

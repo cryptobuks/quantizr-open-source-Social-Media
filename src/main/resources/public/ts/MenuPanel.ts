@@ -431,7 +431,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
                 new MenuItemSeparator(), //
 
-                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
+                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine, null, true) : null, //
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true) //
 
@@ -532,9 +532,8 @@ export class MenuPanel extends Div {
 
     getSystemFolderLinks = (): MenuItem[] => {
         const ret: MenuItem[] = [];
-        const ast = getAs();
-        if (!ast.config.systemFolderLinks) return ret;
-        for (const menuItem of ast.config.systemFolderLinks) {
+        if (!S.quanta.cfg.systemFolderLinks) return ret;
+        for (const menuItem of S.quanta.cfg.systemFolderLinks) {
             this.appendMenuItemFromConfig(menuItem, ret);
         }
         return ret;

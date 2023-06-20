@@ -24,7 +24,6 @@ import quanta.exception.NodeAuthFailedException;
 import quanta.model.client.PrincipalName;
 import quanta.util.XString;
 
-// @CrossOrigin is done by AppFilter.
 /**
  * Main REST Controller endpoint for AP
  *

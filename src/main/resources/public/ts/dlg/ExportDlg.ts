@@ -50,7 +50,7 @@ export class ExportDlg extends DialogBase {
             }) : null,
 
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
-            ast.config.ipfsEnabled ? new Diva([
+            S.quanta.cfg.ipfsEnabled ? new Diva([
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
             new ButtonBar([
@@ -149,7 +149,9 @@ export class ExportDlg extends DialogBase {
         the plan is to have the export return the actual md5 of the export for use here */
 
         // disp=inline (is the other)
-        const downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+        // todo-1: Need more secure way to access file than this token=url, possibly by just creating a temporary token that 
+        // can timeout faster than the user token times out.
+        const downloadLink = hostAndPort + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         // todo-3: Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, because we DO want ALL types exports to
         // be able to go to MFS, and it would be pretty easy to do what the PDFs are doing (recarding save to MFS) for all other types of exports.

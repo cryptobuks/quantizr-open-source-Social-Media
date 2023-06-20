@@ -73,7 +73,7 @@ dockerDown() {
 printUrlsMessage() {
     echo ================================================
     echo Quanta is Running at: http://${quanta_domain}:${HOST_PORT}
-    # echo To Test: curl -X POST  http://${quanta_domain}:${HOST_PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
+    # echo To Test: curl -X POST  http://${quanta_domain}:${HOST_PORT}/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
     echo ================================================
     read -p "Press enter key."
 }

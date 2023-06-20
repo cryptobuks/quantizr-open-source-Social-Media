@@ -58,7 +58,7 @@ export class AdminView extends AppTab<any, AdminView> {
                         this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
                     ]),
                     new Divc({ className: "settingsCol" }, [
-                        this.settingsLink("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
+                        this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
                     ])
                 ], horzClass),
 
@@ -68,7 +68,6 @@ export class AdminView extends AppTab<any, AdminView> {
                         this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                         this.settingsLink("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
                         this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
-                        this.settingsLink("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null)), //        
                     ]),
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //

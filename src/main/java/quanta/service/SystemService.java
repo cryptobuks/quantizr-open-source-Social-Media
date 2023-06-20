@@ -15,12 +15,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,8 +34,6 @@ import quanta.actpub.APConst;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.filter.AuditFilter;
-import quanta.filter.HitFilter;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -44,11 +43,11 @@ import quanta.model.client.NostrEventWrapper;
 import quanta.model.client.NostrQuery;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
+import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.FriendInfo;
 import quanta.response.GetPeopleResponse;
-import quanta.response.PushPageMessage;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -81,6 +80,11 @@ public class SystemService extends ServiceBase {
 
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    @EventListener
+    public void handleContextRefresh(ContextRefreshedEvent event) {
+        ServiceBase.init(event.getApplicationContext());
     }
 
     public void cacheAdminNodes() {
@@ -249,14 +253,17 @@ public class SystemService extends ServiceBase {
     public String getSystemInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("Swarm Replica ID: " + SystemService.replicaId + "\n");
-        sb.append("AuditFilter Enabed: " + String.valueOf(AuditFilter.enabled) + "\n");
+        sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
+
+        sb.append(getRedisReport());
+        sb.append("HttpSessions: " + AppSessionListener.sessionCounter);
+
         Runtime runtime = Runtime.getRuntime();
         runtime.gc();
         long freeMem = runtime.freeMemory() / Const.ONE_MB;
         sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
-        sb.append(String.format("Sessions: %d\n", AppSessionListener.getSessionCounter()));
-        sb.append(getSessionReport());
+
         sb.append("Node Count: " + read.getNodeCount() + "\n");
         sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
         sb.append(user.getUserAccountsReport(null));
@@ -267,7 +274,6 @@ public class SystemService extends ServiceBase {
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();
         sb.append("\nJava VM args:\n");
-
         for (String arg : arguments) {
             sb.append(arg + "\n");
         }
@@ -277,6 +283,17 @@ public class SystemService extends ServiceBase {
 
         // Run command inside container
         // sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
+        return sb.toString();
+    }
+
+    public String getRedisReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("User Sessions (Redis): \n");
+        List<SessionContext> list = user.redisQuery();
+        for (SessionContext sc : list) {
+            sb.append("    " + sc.getUserName() + " " + sc.getUserToken() + "\n");
+        }
+        sb.append("\n");
         return sb.toString();
     }
 
@@ -296,6 +313,8 @@ public class SystemService extends ServiceBase {
     // tserver-tag
     @Scheduled(fixedDelay = 20 * DateUtil.MINUTE_MILLIS)
     public String nostrQueryUpdate() {
+        if (!MongoRepository.fullInit) return "App not yet ready";
+
         if (!prop.isNostrDaemonEnabled()) {
             return "nostrDaemon not enabled";
         }
@@ -377,56 +396,6 @@ public class SystemService extends ServiceBase {
         );
     }
 
-    // For now this is for server restart notify, but will eventually be a general broadcast messenger.
-    // work in progress.
-    public String sendAdminNote() {
-        int sessionCount = 0;
-
-        for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
-            HttpSession httpSess = ThreadLocals.getHttpSession();
-            log.debug("Send admin note to: " + sc.getUserName() + " sessId: " + httpSess.getId());
-            // need custom messages support pushed by admin
-            push.sendServerPushInfo(
-                sc,
-                new PushPageMessage(
-                    "Server " +
-                    prop.getMetaHost() +
-                    "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.",
-                    true
-                )
-            );
-            sessionCount++;
-        }
-        return String.valueOf(sessionCount) + " sessions notified.";
-    }
-
-    public String getSessionActivity() {
-        StringBuilder sb = new StringBuilder();
-        List<SessionContext> sessions = SessionContext.getHistoricalSessions();
-        sessions.sort((s1, s2) -> s1.getUserName().compareTo(s2.getUserName()));
-        sb.append("Live Sessions:\n");
-
-        for (SessionContext s : sessions) {
-            if (s.isLive()) {
-                sb.append("User: ");
-                sb.append(s.getUserName());
-                sb.append("\n");
-                sb.append(s.dumpActions("      ", 3));
-            }
-        }
-        sb.append("\nPast Sessions:\n");
-
-        for (SessionContext s : sessions) {
-            if (!s.isLive()) {
-                sb.append("User: ");
-                sb.append(s.getPastUserName());
-                sb.append("\n");
-                sb.append(s.dumpActions("      ", 3));
-            }
-        }
-        return sb.toString();
-    }
-
     private static String runBashCommand(String title, String command) {
         ProcessBuilder pb = new ProcessBuilder();
         pb.command("bash", "-c", command);
@@ -456,35 +425,5 @@ public class SystemService extends ServiceBase {
         }
         output.append("\n\n");
         return output.toString();
-    }
-
-    /*
-     * uniqueIps are all IPs even comming from foreign FediverseServers, but uniqueUserIps are the ones
-     * that represent actual users accessing thru their browsers
-     */
-    private static String getSessionReport() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("All Sessions (over 20 hits)\n");
-        HashMap<String, Integer> map = HitFilter.getHits();
-        synchronized (map) {
-            for (String key : map.keySet()) {
-                int hits = map.get(key);
-                if (hits > 20) {
-                    sb.append("    " + key + " hits=" + hits + "\n");
-                }
-            }
-        }
-
-        // todo-0: possibly bring this back. Removed during redis conversion
-        // sb.append("Live Sessions:\n");
-        // for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
-        //     if (sc.isLive() && sc.getUserName() != null) {
-        //         Integer hits = map.get(sc.getSession().getId());
-        //         sb.append("    " + sc.getUserName() + " hits=" + (hits != null ? String.valueOf(hits) : "?"));
-        //         sb.append("\n");
-        //     }
-        // }
-        sb.append("\n");
-        return sb.toString();
     }
 }

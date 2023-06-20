@@ -36,6 +36,9 @@
     <script nomodule>
         alert("This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
     </script>
+    <script>
+        window.g_config = [(${ g_config })];
+    </script>
 </head>
 
 <body style="background-color: 'black'; width: 100%; height: 100%;">
@@ -45,8 +48,9 @@
 
     <div id="app">
         <div style="height: 100vh; width: 20%; margin: auto">
-            <h6 style="margin-left: auto; margin-right: auto; text-align: center; margin-top: 100px;">Loading Quanta...</h6>
-            <div style="margin-left: auto; margin-right: auto;"class="progressSpinner">
+            <h6 style="margin-left: auto; margin-right: auto; text-align: center; margin-top: 100px;">Loading Quanta...
+            </h6>
+            <div style="margin-left: auto; margin-right: auto;" class="progressSpinner">
                 <div class="spinner-border text-success"></div>
             </div>
         </div>

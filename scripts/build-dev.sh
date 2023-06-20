@@ -27,7 +27,7 @@ THIS_FOLDER=$(dirname "$THIS_FILE")
 
 # I'm no longer forcing a gracefull shutdown this way, becasue I'm assuming Docker Swarm is graceful enough.
 # echo "Stopping any existing server instance..."
-# curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+# curl http://${quanta_domain}:${PORT}/api/shutdown?password=${adminPassword}
 
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*

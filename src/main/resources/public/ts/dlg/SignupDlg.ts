@@ -47,7 +47,7 @@ export class SignupDlg extends DialogBase {
 
                 this.adminCreatingUser ? null : new FlexRowLayout([
                     new Img({
-                        src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
+                        src: window.location.origin + "/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
                     }),
                     new Diva([
@@ -95,7 +95,7 @@ export class SignupDlg extends DialogBase {
             }
             else {
                 await S.util.showMessage(
-                    "Check your email for verification link.", "Welcome to " + S.quanta.configRes.brandingAppName + "!"
+                    "Check your email for verification link.", "Welcome to " + S.quanta.config.brandingAppName + "!"
                 );
 
                 window.location.href = window.location.origin;

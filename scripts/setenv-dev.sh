@@ -30,8 +30,8 @@ export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
 # This is the domain name as your BROWSER sees it.
-# The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
-#  but can be verified by running `docker network inspect bridge`.
+# The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* is constant.
+# but can be verified by running `docker network inspect bridge`.
 export quanta_domain=172.17.0.1
 
 # Docker files are relative to project root. We hold these in variables so that none of the scripts have them hardcoded
@@ -85,6 +85,9 @@ export DOCKER_UP_DELAY=5s
 # to an email server, but won't be required if you're running your peer as a single
 # user instance, or just doing localhost p2p testing/development.
 export emailPassword=
+
+export REDIS_HOST=redis-host-dev
+export REDIS_PORT=6378
 export REDIS_PASSWORD=
 
 # Warning: To be able to create our test accounts we need this email prop defined even

@@ -18,8 +18,6 @@ public class PerformanceReport {
     public static String getReport() {
         ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><head>" + htmlStyle() + "</head><body>");
-        sb.append(htmlH(2, "Performance Report"));
         // Sort list by whichever are consuming the most time (i.e. by duration, descending order)
         List<PerfMonEvent> orderedData;
         synchronized (Instrument.data) {
@@ -30,16 +28,17 @@ public class PerformanceReport {
             orderedData = new ArrayList<>(Instrument.data);
             orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
         }
-        sb.append(htmlH(3, "Events over Threshold of " + String.valueOf(REPORT_THRESHOLD)));
+
         int counter = 0;
         String rows = "";
-
         for (PerfMonEvent se : orderedData) {
             if (se.duration > REPORT_THRESHOLD) {
                 rows += formatEvent(se, counter++ < 20, false);
             }
         }
+
         if (!rows.isEmpty()) {
+            sb.append(htmlH(3, "Slow Ops"));
             sb.append(
                 htmlTable(
                     htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id")) + rows
@@ -94,7 +93,6 @@ public class PerformanceReport {
             sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
         }
         sb.append(getTimesPerCategory());
-        sb.append("</body></html>");
         return sb.toString();
     }
 
@@ -181,7 +179,7 @@ public class PerformanceReport {
     }
 
     public static String htmlH(int level, String heading) {
-        return "<h" + String.valueOf(level) + ">\n" + heading + "</h" + String.valueOf(level) + ">\n";
+        return "<h" + String.valueOf(level) + " class='marginTop'>\n" + heading + "</h" + String.valueOf(level) + ">\n";
     }
 
     public static String htmlTable(String table) {
@@ -202,19 +200,5 @@ public class PerformanceReport {
 
     public static String htmlTh(String td) {
         return "<th>\n" + td + "</th>\n";
-    }
-
-    public static String htmlStyle() {
-        return (
-            "<style>\n" +
-            "table, th, td {\n" +
-            "padding: 5px;\n" +
-            "border: 1px solid black;\n" +
-            "border-collapse: collapse;\n" +
-            "}\n" +
-            "body {padding: 20px;}" +
-            "html, body {font-family: 'Courier New', 'Courier', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important}" + //
-            "</style>"
-        );
     }
 }

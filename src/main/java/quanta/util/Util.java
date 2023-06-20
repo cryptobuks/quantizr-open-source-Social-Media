@@ -20,10 +20,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import quanta.AppController;
 import quanta.mongo.MongoRepository;
 
 public class Util {
@@ -31,17 +29,16 @@ public class Util {
     private static Logger log = LoggerFactory.getLogger(Util.class);
     private static final Random rand = new Random();
 
-    public static boolean allowInsecureUrl(String url) {
-        // return url.contains("/bin/profileHeader") || url.contains("/bin/avatar") || //
-        // todo-1: this is a known and 'by design' security hole where we don't protect binaries from access
-        // [yet]
-        return (
-            url.contains("/bin/") || //
-            !url.contains(AppController.API_PATH)
-        );
-    }
-
     public static boolean gracefulReadyCheck(ServletResponse res) throws RuntimeException, IOException {
+        if (!MongoRepository.fullInit) {
+            sleep(2000);
+        }
+        if (!MongoRepository.fullInit) {
+            sleep(3000);
+        }
+        if (!MongoRepository.fullInit) {
+            sleep(5000);
+        }
         if (!MongoRepository.fullInit) {
             if (res instanceof HttpServletResponse) {
                 try {
@@ -71,17 +68,6 @@ public class Util {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean isSpringAuthenticated() {
-        return (
-            SecurityContextHolder.getContext().getAuthentication() != null &&
-            SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
-        );
-        // DO NOT DELETE (yet)
-        // //when Anonymous Authentication is enabled
-        // !(SecurityContextHolder.getContext().getAuthentication()
-        // instanceof AnonymousAuthenticationToken)
     }
 
     /*

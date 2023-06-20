@@ -230,13 +230,14 @@ public class IPFSPubSub extends ServiceBase {
         } else {
             pushInfo = new IPSMPushInfo(payload);
         }
-        for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
-            // only consider sessions that have viewed their IPSM tab
-            if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
-                continue;
-            }
-            push.sendServerPushInfo(sc, pushInfo);
-        }
+        // renable for Redis
+        // for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
+        //     // only consider sessions that have viewed their IPSM tab
+        //     if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
+        //         continue;
+        //     }
+        //     push.sendServerPushInfo(sc, pushInfo);
+        // }
     }
 
     private String getMessageText(IPSMMessage msg) {

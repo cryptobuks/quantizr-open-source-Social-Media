@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
@@ -17,8 +16,7 @@ export class FriendType extends TypeBase {
     }
 
     override getEditorHelp(): string {
-        const ast = getAs();
-        return ast.config.help?.type?.friend?.editor;
+        return S.quanta.cfg.help?.type?.friend?.editor;
     }
 
     override getAllowRowHeader(): boolean {

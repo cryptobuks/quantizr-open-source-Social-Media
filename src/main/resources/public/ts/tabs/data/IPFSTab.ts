@@ -1,11 +1,12 @@
 import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
-import { Div } from "../../comp/core/Div";
-import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
+import { Div } from "../../comp/core/Div";
+import { TabIntf } from "../../intf/TabIntf";
 import { IPFSFilesView } from "../IPFSFilesView";
 import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
 
@@ -30,7 +31,7 @@ export class IPFSTab implements TabIntf<any> {
         const ast = getAs();
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
         // return state.showIpfsTab;
-        return ast.config.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures?.indexOf("web3") !== -1;
+        return S.quanta.cfg.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures?.indexOf("web3") !== -1;
     };
 
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);

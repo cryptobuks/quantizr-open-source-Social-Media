@@ -1,5 +1,6 @@
 package quanta.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
@@ -39,6 +38,7 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMonEvent;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
@@ -50,6 +50,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -97,14 +98,132 @@ public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
     @Autowired
-    private ActPubLog apLog;
+    private RedisTemplate<String, SessionContext> redisTemplate;
 
     @Autowired
-    public AuthenticationManager authenticationManager;
+    private ActPubLog apLog;
 
     private static final Random rand = new Random();
     /* Private keys of each user by user name as key */
     public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
+
+    public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
+
+    public SseEmitter getPushEmitter(String token) {
+        SessionContext sc = redisGet(token);
+        if (sc == null) {
+            throw new RuntimeException("bad token for push emitter: " + token);
+        }
+
+        SseEmitter emitter = pushEmitters.get(token);
+        if (emitter == null) {
+            emitter = new SseEmitter();
+            pushEmitters.put(token, emitter);
+            log.debug("Assigned SseEmitter to user " + sc.getUserName() + " as token " + token);
+        }
+        return emitter;
+    }
+
+    // todo-a: I think this function AND "reqBearerToken" (not bearerToken) can be factored out for a more consistent
+    // design letting all the logic be only in AppFilter
+    public void authBearer() {
+        SessionContext sc = ThreadLocals.getSC();
+        if (sc == null) {
+            throw new RuntimeException("Unable to get SessionContext to check token.");
+        }
+        String bearer = ThreadLocals.getReqBearerToken();
+        // otherwise require secure header
+        if (bearer == null || !validToken(bearer, sc.getUserName())) {
+            throw new RuntimeException("Auth failed. Bad bearer token.");
+        }
+    }
+
+    /*
+     * We rely on the secrecy and unguessability of the token here, but eventually this will become JWT
+     * and perhaps use Spring Security.
+     *
+     * useName can be null, in which case we only validate the token exists.
+     */
+    public boolean validToken(String token, String userName) {
+        if (StringUtils.isEmpty(token)) return false;
+
+        SessionContext sc = redisGet(token);
+        return sc != null && (userName == null || sc.getUserName().equals(userName));
+    }
+
+    public void redisSave(SessionContext sc) {
+        if (sc.getUserToken() == null) return;
+        long start = System.currentTimeMillis();
+        redisTemplate.opsForValue().set(sc.getUserToken(), sc);
+        new PerfMonEvent(System.currentTimeMillis() - start, "redisSave", sc.getUserName());
+    }
+
+    public void redisDelete(SessionContext sc) {
+        if (sc.getUserToken() == null) return;
+        long start = System.currentTimeMillis();
+        if (redisTemplate.delete(sc.getUserToken())) {
+            log.debug("Redis Token Deleted: " + sc.getUserToken());
+        }
+        new PerfMonEvent(System.currentTimeMillis() - start, "redisDel", sc.getUserName());
+    }
+
+    public SessionContext redisGet(String token) {
+        if (StringUtils.isEmpty(token)) return null;
+        long start = System.currentTimeMillis();
+        SessionContext sc = redisTemplate.opsForValue().get(token);
+        if (sc != null) {
+            new PerfMonEvent(System.currentTimeMillis() - start, "redisGet", sc.getUserName());
+        } else {
+            log.debug("unknown redis token: " + token);
+        }
+        return sc;
+    }
+
+    public List<SessionContext> redisQuery() {
+        long start = System.currentTimeMillis();
+        LinkedList<SessionContext> list = new LinkedList<>();
+        Set<String> keys = redisTemplate.keys("*");
+        if (keys != null) {
+            for (String key : keys) {
+                list.add(redisTemplate.opsForValue().get(key));
+            }
+        }
+        new PerfMonEvent(System.currentTimeMillis() - start, "redisQuery", "_sys_");
+
+        // DO NOT DELETE
+        // I found this pattern online and I'm not sure of it's purpose becuase it reads apparently only bytes,
+        // so I guess the expectation is that we setup some kind of deserializer.
+        // RedisConnection redisConnection = null;
+        // try {
+        //     redisConnection = redisTemplate.getConnectionFactory().getConnection();
+        //     ScanOptions options = ScanOptions.scanOptions().match("*").count(Integer.MAX_VALUE).build();
+        //     Cursor c = redisConnection.scan(options);
+        //     while (c.hasNext()) {
+        //         Object obj = c.next();
+        //         log.debug("REDIS SCAN: " + obj.getClass().getName());
+        //     }
+        // } finally {
+        //     redisConnection.close(); //Ensure closing this connection.
+        // }
+        return list;
+    }
+
+    // Note: This happens to be about the same as the session timeout, but doesn't need to be
+    @Scheduled(fixedDelay = 15 * DateUtil.MINUTE_MILLIS)
+    public void redisMaintenance() {
+        if (!MongoRepository.fullInit) return;
+
+        List<SessionContext> list = user.redisQuery();
+        if (list.size() > 0) {
+            int timeoutMillis = (int) (prop.getSessionTimeoutMinutes() * DateUtil.MINUTE_MILLIS);
+            Date now = new Date();
+            for (SessionContext sc : list) {
+                if (sc.getLastActiveTime() < now.getTime() - timeoutMillis) {
+                    redisDelete(sc);
+                }
+            }
+        }
+    }
 
     /*
      * Note that this function does 'succeed' even with ANON user given, and just considers that an
@@ -113,27 +232,51 @@ public class UserManagerService extends ServiceBase {
     public LoginResponse login(HttpServletRequest httpReq, LoginRequest req) {
         LoginResponse res = new LoginResponse();
         SessionContext sc = ThreadLocals.getSC();
-        SubNode userNode = null;
+        Val<SubNode> userNodeVal = new Val<>();
+
         /* Anonymous user */
         if (req.getUserName() == null || PrincipalName.ANON.s().equals(req.getUserName())) {
             log.debug("Anonymous user login.");
             // just as a precaution update the sc userName to anon values
             sc.setUserName(PrincipalName.ANON.s());
             sc.setUserNodeId(null);
-        } else /* Admin Login */if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
-            // springLogin throws exception if it fails.
-            springLogin(req.getUserName(), req.getPassword(), httpReq);
-            sc.setAuthenticated(req.getUserName(), null);
-        } else /* User Login */{
-            // lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
-            userNode = arun.run(as -> read.getUserNodeByUserName(as, req.getUserName()));
-            String userName = userNode.getStr(NodeProp.USER);
-            String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
-            // springLogin throws exception if it fails.
-            springLogin(userName, pwdHash, httpReq);
-            sc.setAuthenticated(userName, null);
         }
-        // If we reach here we either have ANON user or some authenticated user (password checked)
+        // Admin Login
+        else if (PrincipalName.ADMIN.s().equalsIgnoreCase(req.getUserName().trim())) {
+            if (!prop.getAdminPassword().equals(req.getPassword())) {
+                throw new RuntimeException("Unauthorized");
+            }
+
+            arun.run(as -> {
+                SubNode userNode = read.getUserNodeByUserName(as, req.getUserName());
+                if (userNode == null) {
+                    throw new RuntimeException("User not found: " + req.getUserName());
+                }
+                userNodeVal.setVal(userNode);
+                setAuthenticated(sc, req.getUserName(), userNode.getId());
+                return null;
+            });
+        }
+        // User Login
+        else {
+            // lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
+            arun.run(as -> {
+                SubNode userNode = read.getUserNodeByUserName(as, req.getUserName());
+                if (userNode == null) {
+                    throw new RuntimeException("User not found: " + req.getUserName());
+                }
+                userNodeVal.setVal(userNode);
+                String userName = userNode.getStr(NodeProp.USER);
+                String checkHash = userNode.getStr(NodeProp.PWD_HASH);
+                String reqHash = mongoUtil.getHashOfPassword(req.getPassword());
+                if (!checkHash.equals(reqHash)) {
+                    throw new RuntimeException("Unauthorized");
+                }
+                setAuthenticated(sc, userName, userNode.getId());
+                return null;
+            });
+        }
+        // If we reach here we either have ANON user or some authenticated user (password checked ok)
         ThreadLocals.initMongoSession(sc);
         /*
          * We have to get timezone information from the user's browser, so that all times on all nodes
@@ -142,12 +285,12 @@ public class UserManagerService extends ServiceBase {
         sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
         sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
         res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
-        if (sc.isAuthenticated()) {
+        if (sc.getUserToken() != null) {
             MongoSession ms = ThreadLocals.getMongoSession();
             processLogin(
                 ms,
                 res,
-                userNode,
+                userNodeVal.getVal(),
                 sc.getUserName(),
                 req.getAsymEncKey(),
                 req.getSigKey(),
@@ -164,15 +307,59 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public void springLogin(String userName, String password, HttpServletRequest httpReq) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            userName,
-            password,
-            Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"))
+    /* This is called only upon successful login of a non-anon user */
+    public void setAuthenticated(SessionContext sc, String userName, ObjectId userNodeId) {
+        if (userName.equals(PrincipalName.ANON.s())) {
+            throw new RuntimeException("invalid call to setAuthenticated for anon.");
+        }
+
+        // only generate a token if not already set, becasue this SessionContext is shared across
+        // swarm replicas via redis
+        if (sc.getUserToken() == null) {
+            sc.setUserToken(Util.genStrongToken());
+            log.debug("userToken: " + sc.getUserToken());
+        }
+        sc.setUserName(userName);
+        sc.setUserNodeId(userNodeId);
+    }
+
+    public void authSig() {
+        SessionContext sc = ThreadLocals.getSC();
+        if (sc == null) {
+            throw new RuntimeException("Unable to get SessionContext to check token.");
+        }
+        if (!prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
+            return;
+        }
+        String sig = ThreadLocals.getReqSig();
+        if (sig == null) {
+            throw new RuntimeException("Request failed. No signature.");
+        }
+        // if pubSigKey not yet saved in SessionContext then generate it
+        if (sc.getPubSigKey() == null) {
+            SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
+            if (userNode == null) {
+                throw new RuntimeException("Unknown user: " + sc.getUserName());
+            }
+            String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+            if (pubKeyJson == null) {
+                throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
+            }
+            sc.setPubSigKey(crypto.parseJWK(pubKeyJson, userNode));
+            if (sc.getPubSigKey() == null) {
+                throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
+            }
+        }
+        boolean verified = crypto.sigVerify(
+            sc.getPubSigKey(),
+            Util.hexStringToBytes(sig),
+            sc.getUserName().getBytes(StandardCharsets.UTF_8)
         );
-        authToken.setDetails(new WebAuthenticationDetails(httpReq));
-        Authentication authentication = authenticationManager.authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!verified) {
+            throw new RuntimeException(
+                "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName()
+            );
+        }
     }
 
     public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String type, String name) {
@@ -234,7 +421,7 @@ public class UserManagerService extends ServiceBase {
         if (!StringUtils.isEmpty(nostrPubKey)) userNode.setIfNotExist(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
         if (!StringUtils.isEmpty(asymEncKey)) userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
         if (!StringUtils.isEmpty(sigKey)) userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
-        ThreadLocals.getSC().pubSigKey = null;
+        ThreadLocals.getSC().setPubSigKey(null);
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
         ensureValidCryptoKeys(userNode);
         update.save(ms, userNode);
@@ -486,7 +673,7 @@ public class UserManagerService extends ServiceBase {
                 }
                 if (!StringUtils.isEmpty(req.getSigKey())) {
                     // force pubSigKey to regenerate as needed by setting to null
-                    ThreadLocals.getSC().pubSigKey = null;
+                    ThreadLocals.getSC().setPubSigKey(null);
                     userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
                 }
                 if (!StringUtils.isEmpty(req.getNostrNpub()) && !StringUtils.isEmpty(req.getNostrPubKey())) {

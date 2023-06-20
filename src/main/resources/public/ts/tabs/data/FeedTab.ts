@@ -66,7 +66,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
                 // todo-1: eventually we will make available to all users
                 ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
                 new AppNavLink("Fediverse", S.nav.messagesFediverse),
-                ...S.render.buildCustomLinks(ast.config.rhsFeedLinks)
+                ...S.render.buildCustomLinks(S.quanta.cfg.rhsFeedLinks)
             ]);
         }
     };

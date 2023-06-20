@@ -19,12 +19,12 @@ export class ServerPush {
         }
     }
 
-    init = (): any => {
+    init = (authToken: string): any => {
         // if already inititlized do nothing
-        if (this.eventSource) return;
+        if (this.eventSource || !authToken) return;
 
-        console.log("ServerPush.init");
-        this.eventSource = new EventSource(S.rpcUtil.getRpcPath() + "serverPush");
+        // console.log("ServerPush.init: " + authToken);
+        this.eventSource = new EventSource(S.rpcUtil.getRpcPath() + "serverPush/" + authToken);
 
         // DO NOT DELETE.
         // eventSource.onmessage = e => {
@@ -48,7 +48,7 @@ export class ServerPush {
                 message = "<p><p>Click to resume editing.";
             }
 
-            new MessageDlg("Your session has ended due to inactivity." + message, S.quanta.configRes.brandingAppName,
+            new MessageDlg("Your session has ended due to inactivity." + message, S.quanta.config.brandingAppName,
                 () => {
                     history.go(0);
                 }, null, false, 0, "appModalContTinyWidth"

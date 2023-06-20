@@ -37,7 +37,7 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback
 # copy some configs and scripts to deploy target
 cd ${PRJROOT}
 cp ${PRJROOT}/dc-distro.yaml                    ${DEPLOY_TARGET}
-cp ${PRJROOT}/dockerfile                        ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile-distro                 ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh                     ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 

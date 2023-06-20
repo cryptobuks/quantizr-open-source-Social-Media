@@ -28,11 +28,11 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;
-        if (S.quanta.configRes.loadNostrId) {
+        if (S.quanta.config.loadNostrId) {
             contentDiv = new Progress();
         }
-        else if (S.quanta.configRes.urlIdFailMsg) {
-            contentDiv = new Heading(4, S.quanta.configRes.urlIdFailMsg);
+        else if (S.quanta.config.urlIdFailMsg) {
+            contentDiv = new Heading(4, S.quanta.config.urlIdFailMsg);
         }
         else if (!ast.node) {
             contentDiv = null;
@@ -85,7 +85,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.runTimeline
                     }) : null
                 ]),
-                header = new Div(S.quanta.configRes.brandingAppName, {
+                header = new Div(S.quanta.config.brandingAppName, {
                     className: "tabTitle headerUploadPanel",
                     title: "Drop Files here to upload"
                 })

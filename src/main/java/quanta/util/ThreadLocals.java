@@ -102,10 +102,10 @@ public class ThreadLocals {
     }
 
     public static void setSC(SessionContext sc) {
-        if (sc == null) return;
-        if (sessionContext != null) {
-            sessionContext.set(sc);
+        if (sc == null) {
+            throw new RuntimeException("setSC() set to null");
         }
+        sessionContext.set(sc);
         initMongoSession(sc);
     }
 
@@ -120,7 +120,11 @@ public class ThreadLocals {
      * trace back to this cause.
      */
     public static SessionContext getSC() {
-        return sessionContext.get();
+        SessionContext sc = sessionContext.get();
+        if (sc == null) {
+            throw new RuntimeException("getSC() has null");
+        }
+        return sc;
     }
 
     public static void setServletResponse(HttpServletResponse res) {

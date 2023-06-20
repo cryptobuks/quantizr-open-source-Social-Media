@@ -301,7 +301,7 @@ public class MongoRead extends ServiceBase {
              * pass a null session here to cause adminSession to be used which is required to get a user node,
              * but it always safe to get this node this way here.
              */
-            userNode = getUserNodeByUserName(allowAuth ? ms : null, userName);
+            userNode = getUserNodeByUserName(null, userName);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
                 return null;

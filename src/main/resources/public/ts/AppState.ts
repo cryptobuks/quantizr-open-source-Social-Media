@@ -31,10 +31,6 @@ export class AppState {
     displayFeedSearch: boolean = false;
     docIndent: boolean = true;
 
-    // Initialize to empty object so we don't get NPE. This will hold the YAML configs, which is set on server
-    // side in 'getConfigs' endpoint
-    config: any = {};
-
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 
     // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
