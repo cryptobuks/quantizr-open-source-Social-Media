@@ -212,9 +212,8 @@ export class RpcUtil {
     authFail = async () => {
         if (this.unauthMessageShowing) return;
         this.unauthMessageShowing = true;
-        await S.util.showMessage("Unauthorized", "Warning");
+        await S.util.showMessage("Unauthorized or Logged Out", "Warning");
         this.unauthMessageShowing = false;
-        // window.location.href = window.location.origin;
     }
 
     incRpcCounter = () => {

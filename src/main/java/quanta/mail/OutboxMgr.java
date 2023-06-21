@@ -1,21 +1,14 @@
 package quanta.mail;
 
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
-import quanta.config.SessionContext;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.response.NotificationMessage;
-import quanta.util.ThreadLocals;
-import quanta.util.XString;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.

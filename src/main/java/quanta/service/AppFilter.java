@@ -118,8 +118,7 @@ public class AppFilter extends GenericFilterBean {
             if (!StringUtils.isEmpty(token)) {
                 sc = ServiceBase.user.redisGet(token);
                 if (sc == null) {
-                    log.debug("bad token: " + token);
-                    token = null;
+                    throw new NotLoggedInException();
                 } else {
                     // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
                     ThreadLocals.setReqBearerToken(token);

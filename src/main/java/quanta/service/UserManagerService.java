@@ -36,6 +36,7 @@ import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMonEvent;
@@ -134,7 +135,7 @@ public class UserManagerService extends ServiceBase {
         String bearer = ThreadLocals.getReqBearerToken();
         // otherwise require secure header
         if (bearer == null || !validToken(bearer, sc.getUserName())) {
-            throw new RuntimeException("Auth failed. Bad bearer token.");
+            throw new NotLoggedInException();
         }
     }
 
