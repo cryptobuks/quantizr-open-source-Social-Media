@@ -92,8 +92,8 @@ public class PushService extends ServiceBase {
             // isPublic || // node is public
 
             node.getOwner().toHexString().equals(sc.getRootId()) || // node belongs to me
-            node.getPath().startsWith(sc.getWatchingPath()) || // I'm watching path it's on
-            node.getPath().startsWith(sc.getTimelinePath()) || // my timeline includes it
+            (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) || // I'm watching path it's on
+            (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) || // my timeline includes it
             (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // it's shared to me
         ) {
             pushToBrowser(ms, sc, sessionsPushed, node);
