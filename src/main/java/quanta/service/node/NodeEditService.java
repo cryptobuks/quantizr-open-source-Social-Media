@@ -694,11 +694,7 @@ public class NodeEditService extends ServiceBase {
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
-        // todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check
-        // to send only to users who should see it.
-        if (AclService.isPublic(ms, node)) {
-            push.pushTimelineUpdateToBrowsers(ms, newNodeInfo);
-        }
+
         res.setSuccess(true);
         return res;
     }
@@ -737,15 +733,14 @@ public class NodeEditService extends ServiceBase {
             return;
         }
         arun.run(s -> {
-            HashSet<Integer> sessionsPushed = new HashSet<>();
+            HashSet<String> sessionsPushed = new HashSet<>();
             boolean isAccnt = node.isType(NodeType.ACCOUNT);
             if (node.isType(NodeType.FRIEND)) {
                 ThreadLocals.getSC().setFriendsTagsDirty(true);
             }
-            // push any chat messages that need to go out.
-            if (!isAccnt) {
-                push.pushNodeToBrowsers(s, sessionsPushed, node);
-            }
+
+            push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
+
             if (!isAccnt) {
                 HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, true);
                 if (tags != null && tags.size() > 0) {
@@ -769,7 +764,6 @@ public class NodeEditService extends ServiceBase {
                     // This broadcasts out to the shared inboxes of all the followers of the user
                     apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
                 }
-                push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
             }
             if (AclService.isPublic(ms, node) && !StringUtils.isEmpty(node.getName())) {
                 saveNodeToMFS(ms, node);

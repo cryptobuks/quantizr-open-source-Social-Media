@@ -1156,11 +1156,13 @@ public class ActPubService extends ServiceBase {
         addAttachments(ms, newNode, obj);
         openGraph.parseNode(newNode, true);
         update.save(ms, newNode, false);
+
         try {
             push.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
+
         apLog.trace("newAPNode: " + XString.prettyPrint(newNode));
         return newNode;
     }

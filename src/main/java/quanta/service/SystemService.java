@@ -289,7 +289,7 @@ public class SystemService extends ServiceBase {
     public String getRedisReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("User Sessions (Redis): \n");
-        List<SessionContext> list = user.redisQuery();
+        List<SessionContext> list = user.redisQuery("*");
         for (SessionContext sc : list) {
             sb.append("    " + sc.getUserName() + " " + sc.getUserToken() + "\n");
         }

@@ -179,10 +179,10 @@ public class UserManagerService extends ServiceBase {
         return sc;
     }
 
-    public List<SessionContext> redisQuery() {
+    public List<SessionContext> redisQuery(String pattern) {
         long start = System.currentTimeMillis();
         LinkedList<SessionContext> list = new LinkedList<>();
-        Set<String> keys = redisTemplate.keys("*");
+        Set<String> keys = redisTemplate.keys(pattern);
         if (keys != null) {
             for (String key : keys) {
                 list.add(redisTemplate.opsForValue().get(key));
@@ -213,7 +213,7 @@ public class UserManagerService extends ServiceBase {
     public void redisMaintenance() {
         if (!MongoRepository.fullInit) return;
 
-        List<SessionContext> list = user.redisQuery();
+        List<SessionContext> list = user.redisQuery("*");
         if (list.size() > 0) {
             int timeoutMillis = (int) (prop.getSessionTimeoutMinutes() * DateUtil.MINUTE_MILLIS);
             Date now = new Date();
