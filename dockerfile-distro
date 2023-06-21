@@ -1,5 +1,6 @@
-# FROM openjdk:17
-FROM openjdk:17-jdk-slim
+# NOTE: Don't try 'slim' jdk. It's missing the code for our captcha image generation
+# and possibly other things
+FROM openjdk:17
 LABEL maintainer="wclayf@gmail.com"
 
 ARG PORT
