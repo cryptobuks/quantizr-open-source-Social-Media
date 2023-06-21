@@ -35,25 +35,24 @@ public class CaptchaMaker {
 
     public static final int CAPTCHA_MAX_REQUESTS = 5;
     public static final int CAPTCHA_CHAR_SIZE = 40;
-    public static final int CAPTCHA_NUM_CHARS = 4;
+    public static final int CAPTCHA_NUM_CHARS = 5;
 
     private static Font fontKnown = null;
 
     /* writes captcha image out to stream */
-    public static byte[] makeCaptcha(String captchaCode) {
+    public static byte[] makeCaptcha(String captcha) {
         /* set some parameters */
-        int len = captchaCode.length();
-        int imgWidth = len * CAPTCHA_CHAR_SIZE;
-        int imgHeight = CAPTCHA_CHAR_SIZE * 3;
+        int len = captcha.length();
+        int imgWidth = len * CAPTCHA_CHAR_SIZE - CAPTCHA_CHAR_SIZE / 2;
+        int imgHeight = CAPTCHA_CHAR_SIZE * 2;
 
         /* setup image to draw into */
         BufferedImage outBufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = outBufferedImage.createGraphics();
 
-        /* configure drawing */
-        g.setColor(Color.white);
-        g.fillRect(0, 0, imgWidth, imgHeight);
         g.setColor(Color.black);
+        g.fillRect(0, 0, imgWidth, imgHeight);
+        g.setColor(Color.green);
 
         /*
          * due to wierdness on various comptuers the rendering size of any given font is not known and we
@@ -66,73 +65,35 @@ public class CaptchaMaker {
 
             while (fontPoints < 50) {
                 g.setFont(fontKnown = new Font("Courier New", Font.BOLD, fontPoints));
-
-                /*
-                 * if our font is big enough break out (+5 is just a hack cuz it looks like there is always room for
-                 * slightly bigger characters
-                 */
-                if (g.getFontMetrics().getHeight() >= CAPTCHA_CHAR_SIZE + 7) {
+                if (g.getFontMetrics().getHeight() >= CAPTCHA_CHAR_SIZE) {
                     break;
                 }
-                fontPoints += 2;
+                fontPoints += 1;
             }
         }
         FontMetrics fm = g.getFontMetrics();
-        Rectangle2D sb = fontKnown.getStringBounds(captchaCode, g.getFontRenderContext());
-        int charWidth = ((int) sb.getWidth()) / captchaCode.length();
+        Rectangle2D sb = fontKnown.getStringBounds(captcha, g.getFontRenderContext());
+        int charWidth = ((int) sb.getWidth()) / captcha.length();
         int charHeight = fm.getHeight();
 
-        char[] chars = captchaCode.toCharArray();
-        int charBase = charHeight * 2 - charHeight / 2;
-
-        int advance = charWidth + 3;
-        int x = charWidth / 2, y, i;
-
+        char[] chars = captcha.toCharArray();
+        int charBase = charHeight + charHeight / 3;
+        int advance = charWidth + charWidth / 2;
+        int x = charWidth;
         g.setStroke(stroke);
-        g.setColor(Color.black);
-        int lineIdx = 0;
 
         /* now draw the captcha characters into the image */
-        for (i = 0; i < len; i++, x += advance) {
-            y = charBase - rand.nextInt(charHeight);
-
-            /* oscillate back and forth rotation */
-            double angle = rand.nextFloat() * .50 * ((i % 2 == 0) ? 1 : -1);
-            double shearX = rand.nextFloat() / 4;
-            double shearY = rand.nextFloat() / 4;
-
-            /* rotate & sheer */
-            g.rotate(angle, x, y);
-            g.shear(shearX, shearY);
-            g.drawChars(chars, i, 1, x, y);
-
-            /* unrotate & sheer (we don't want a cumulative effect) */
-            g.shear(-shearX, -shearY);
-            g.rotate(-angle, x, y);
-
-            // note lineIdx remainder controls back and forth tilt angle of line
-            int delta = (lineIdx % 2 == 0) ? rand.nextInt(imgHeight) : -rand.nextInt(imgHeight);
-
-            g.drawLine(0, y - delta, imgWidth, y + delta);
-            lineIdx++;
-        }
-
-        // draw three more lines just to add more difficulty.
-        for (int idx = 0; idx < 3; idx++) {
-            y = charBase - rand.nextInt(charHeight);
-            int delta = (idx % 2 == 0) ? rand.nextInt(imgHeight) : -rand.nextInt(imgHeight);
-            g.drawLine(0, y - delta, imgWidth, y + delta);
+        for (int i = 0; i < len; i++, x += advance) {
+            g.drawChars(chars, i, 1, x, charBase);
         }
 
         ByteArrayOutputStream tmp = null;
         try {
             BufferedImage scaledImage = ImageUtil.scaleImage(outBufferedImage, imgWidth);
             tmp = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(scaledImage, "png", tmp);
-            } catch (IOException e) {
-                throw ExUtil.wrapEx(e);
-            }
+            ImageIO.write(scaledImage, "png", tmp);
+        } catch (IOException e) {
+            throw ExUtil.wrapEx(e);
         } finally {
             StreamUtil.close(tmp);
         }

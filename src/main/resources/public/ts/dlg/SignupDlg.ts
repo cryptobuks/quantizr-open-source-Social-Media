@@ -51,7 +51,7 @@ export class SignupDlg extends DialogBase {
                         className: "captchaImage"
                     }),
                     new Diva([
-                        new TextField({ label: "Enter Numbers Displayed", val: this.captchaState })
+                        new TextField({ label: "Code", val: this.captchaState })
                     ])
                 ], "marginTop"),
                 new ButtonBar([
