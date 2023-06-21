@@ -40,6 +40,7 @@ public class AppFilter extends GenericFilterBean {
     public static boolean audit = false;
     public static boolean debug = true;
     public static String BEARER_TOKEN = "token";
+
     private static final Object filterLock = new Object();
 
     @Override
@@ -66,6 +67,7 @@ public class AppFilter extends GenericFilterBean {
 
                 // always create session immediately so we get concurrency mutexing
                 session = httpReq.getSession(true);
+                ThreadLocals.setHttpSession(session);
 
                 // bypass locking for these two
                 switch (httpReq.getRequestURI()) {
@@ -83,8 +85,6 @@ public class AppFilter extends GenericFilterBean {
                     // log.debug("Mutex: " + mutex.hashCode() + " locked");
                 }
             }
-
-            ThreadLocals.setHttpSession(session);
 
             if (Const.debugFilterEntry || debug) {
                 String url = "URI=" + httpReq.getRequestURI();

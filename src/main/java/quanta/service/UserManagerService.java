@@ -596,16 +596,9 @@ public class UserManagerService extends ServiceBase {
                 res.setSuccess(false);
             }
             if (!automated) {
-                if (!ThreadLocals.getSC().getCaptcha().equals(req.getCaptcha())) {
-                    int captchaFails = ThreadLocals.getSC().getCaptchaFails();
-                    if (captchaFails > 0) {
-                        try {
-                            // this sleep should stop brute forcing, every failed attempt makes the user
-                            // need to wait an additional 2 seconds each time.
-                            Thread.sleep(captchaFails * 2000);
-                        } catch (Exception e) {}
-                    }
-                    ThreadLocals.getSC().setCaptchaFails(captchaFails + 1);
+                String captcha = (String) ThreadLocals.getHttpSession().getAttribute("captcha");
+                if (!captcha.equals(req.getCaptcha())) {
+                    Util.sleep(3000);
                     res.setCaptchaError("Wrong captcha. Try again.");
                     res.setSuccess(false);
                 }

@@ -45,8 +45,6 @@ public class SessionContext implements Serializable {
     private long lastLoginTime;
     private long lastActiveTime;
     private UserPreferences userPreferences;
-    private String captcha;
-    private int captchaFails = 0;
     private String userToken;
     private boolean enableIPSM;
     // this gets set to true, to trigger a refresh when needed again.
@@ -161,22 +159,6 @@ public class SessionContext implements Serializable {
 
     public void setLastActiveTime(long lastActiveTime) {
         this.lastActiveTime = lastActiveTime;
-    }
-
-    public String getCaptcha() {
-        return captcha;
-    }
-
-    public void setCaptcha(String captcha) {
-        this.captcha = captcha;
-    }
-
-    public int getCaptchaFails() {
-        return captchaFails;
-    }
-
-    public void setCaptchaFails(int captchaFails) {
-        this.captchaFails = captchaFails;
     }
 
     public String getTimelinePath() {

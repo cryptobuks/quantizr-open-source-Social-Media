@@ -2332,7 +2332,7 @@ public class AppController extends ServiceBase implements ErrorController {
             session,
             ms -> {
                 String captcha = CaptchaMaker.createCaptchaString();
-                ThreadLocals.getSC().setCaptcha(captcha);
+                ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
                 return CaptchaMaker.makeCaptcha(captcha);
             }
         );
